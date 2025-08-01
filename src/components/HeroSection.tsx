@@ -35,12 +35,13 @@ const HeroSection = () => {
       {/* Hero Content */}
       <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
         <div className="mb-8 animate-fade-in">
-          <h1 className="text-6xl md:text-8xl font-['Orbitron'] font-black mb-4">
-            <span className="text-neon block animate-neon-flicker">DANCE ONE</span>
-            <span className="text-neon-purple text-4xl md:text-6xl font-normal tracking-[0.2em]">
-              RADIO
-            </span>
-          </h1>
+          <div className="flex justify-center mb-6">
+            <img 
+              src="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png" 
+              alt="Dance One Radio" 
+              className="h-32 md:h-48 w-auto object-contain animate-neon-flicker"
+            />
+          </div>
           <p className="text-xl md:text-2xl text-muted-foreground font-['Rajdhani'] font-light max-w-2xl mx-auto leading-relaxed">
             The future of electronic music broadcasting. Live DJ sets, exclusive tracks, and the heartbeat of dance culture.
           </p>
