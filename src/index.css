@@ -2,39 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Futuristic Dance Radio Design System - All colors MUST be HSL */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Dark space theme with neon accents */
+    --background: 220 25% 5%;
+    --foreground: 210 100% 95%;
+    
+    /* Neon color palette */
+    --cyber-blue: 200 100% 50%;
+    --electric-purple: 270 100% 60%;
+    --neon-green: 120 100% 50%;
+    --plasma-pink: 320 100% 60%;
+    --laser-orange: 30 100% 60%;
+    
+    /* Futuristic gradients */
+    --gradient-cyber: linear-gradient(135deg, hsl(200 100% 50%), hsl(270 100% 60%));
+    --gradient-neon: linear-gradient(90deg, hsl(120 100% 50%), hsl(200 100% 50%), hsl(270 100% 60%));
+    --gradient-plasma: linear-gradient(45deg, hsl(270 100% 60%), hsl(320 100% 60%));
+    --gradient-aurora: linear-gradient(180deg, hsl(200 100% 50% / 0.1), hsl(270 100% 60% / 0.1));
+    
+    /* Glow effects */
+    --glow-cyber: 0 0 20px hsl(200 100% 50% / 0.5), 0 0 40px hsl(200 100% 50% / 0.3);
+    --glow-purple: 0 0 20px hsl(270 100% 60% / 0.5), 0 0 40px hsl(270 100% 60% / 0.3);
+    --glow-green: 0 0 20px hsl(120 100% 50% / 0.5), 0 0 40px hsl(120 100% 50% / 0.3);
+    
+    /* Component colors */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 220 20% 8%;
+    --card-foreground: 210 100% 95%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 220 25% 6%;
+    --popover-foreground: 210 100% 95%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 200 100% 50%;
+    --primary-foreground: 220 25% 5%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 220 20% 12%;
+    --secondary-foreground: 210 100% 90%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 15% 15%;
+    --muted-foreground: 210 50% 60%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 270 100% 60%;
+    --accent-foreground: 220 25% 5%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 210 100% 95%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 220 15% 20%;
+    --input: 220 20% 10%;
+    --ring: 200 100% 50%;
 
     --radius: 0.5rem;
 
@@ -55,42 +76,27 @@ All colors MUST be HSL.
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+  /* Light mode uses same dark theme for consistency */
+  .light {
+    --background: 220 25% 5%;
+    --foreground: 210 100% 95%;
+    --card: 220 20% 8%;
+    --card-foreground: 210 100% 95%;
+    --popover: 220 25% 6%;
+    --popover-foreground: 210 100% 95%;
+    --primary: 200 100% 50%;
+    --primary-foreground: 220 25% 5%;
+    --secondary: 220 20% 12%;
+    --secondary-foreground: 210 100% 90%;
+    --muted: 220 15% 15%;
+    --muted-foreground: 210 50% 60%;
+    --accent: 270 100% 60%;
+    --accent-foreground: 220 25% 5%;
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 210 100% 95%;
+    --border: 220 15% 20%;
+    --input: 220 20% 10%;
+    --ring: 200 100% 50%;
   }
 }
 
@@ -100,6 +106,100 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-['Rajdhani'];
+    overflow-x: hidden;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-['Orbitron'];
+  }
+}
+
+@layer components {
+  /* Cyber button effects */
+  .btn-cyber {
+    @apply relative bg-transparent border border-primary text-primary font-['Orbitron'] font-semibold px-6 py-3 uppercase tracking-wider transition-all duration-300;
+    background: linear-gradient(45deg, transparent, hsl(var(--primary) / 0.1));
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+  }
+  
+  .btn-cyber:hover {
+    @apply text-primary-foreground;
+    background: var(--gradient-cyber);
+    box-shadow: var(--glow-cyber);
+    transform: translateY(-2px);
+  }
+  
+  .btn-cyber::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r opacity-0 transition-opacity duration-300;
+    background: var(--gradient-cyber);
+    z-index: -1;
+  }
+  
+  .btn-cyber:hover::before {
+    @apply opacity-100;
+  }
+  
+  /* Neon text effect */
+  .text-neon {
+    @apply font-['Orbitron'] font-bold uppercase tracking-wider;
+    color: hsl(var(--cyber-blue));
+    text-shadow: 
+      0 0 5px hsl(var(--cyber-blue) / 0.5),
+      0 0 10px hsl(var(--cyber-blue) / 0.3),
+      0 0 20px hsl(var(--cyber-blue) / 0.2);
+  }
+  
+  .text-neon-purple {
+    @apply font-['Orbitron'] font-bold uppercase tracking-wider;
+    color: hsl(var(--electric-purple));
+    text-shadow: 
+      0 0 5px hsl(var(--electric-purple) / 0.5),
+      0 0 10px hsl(var(--electric-purple) / 0.3),
+      0 0 20px hsl(var(--electric-purple) / 0.2);
+  }
+  
+  /* Glowing cards */
+  .card-cyber {
+    @apply bg-card/80 backdrop-blur-sm border border-primary/30 rounded-lg;
+    background: linear-gradient(135deg, hsl(var(--card) / 0.8), hsl(var(--card) / 0.4));
+    box-shadow: 
+      0 4px 20px hsl(var(--primary) / 0.1),
+      inset 0 1px 0 hsl(var(--primary) / 0.2);
+  }
+  
+  .card-cyber:hover {
+    box-shadow: 
+      0 8px 40px hsl(var(--primary) / 0.2),
+      inset 0 1px 0 hsl(var(--primary) / 0.3);
+    transform: translateY(-4px);
+    transition: all 0.3s ease;
+  }
+  
+  /* Pulse animations */
+  .pulse-cyber {
+    animation: pulse-cyber 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  @keyframes pulse-cyber {
+    0%, 100% {
+      box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+    }
+    50% {
+      box-shadow: 0 0 40px hsl(var(--primary) / 0.6), 0 0 60px hsl(var(--primary) / 0.3);
+    }
+  }
+  
+  /* Audio wave animation */
+  .wave-animation {
+    background: var(--gradient-neon);
+    background-size: 400% 400%;
+    animation: wave-flow 3s ease-in-out infinite;
+  }
+  
+  @keyframes wave-flow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
   }
 }
