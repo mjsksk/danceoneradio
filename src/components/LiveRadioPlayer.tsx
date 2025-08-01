@@ -83,8 +83,17 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
   };
 
   return (
-    <div className="card-cyber p-8 max-w-md mx-auto">
-      <div className="flex items-center justify-center mb-6">
+    <div className="card-cyber p-8 max-w-md mx-auto relative overflow-hidden">
+      {/* Blurred background from album art */}
+      {albumArt && (
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-20 blur-xl scale-110"
+          style={{ backgroundImage: `url(${albumArt})` }}
+        />
+      )}
+      {/* Content overlay */}
+      <div className="relative z-10">
+        <div className="flex items-center justify-center mb-6">
         <div className="relative">
           <div className="w-20 h-20 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center pulse-cyber overflow-hidden">
             {albumArt ? (
@@ -167,6 +176,7 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
           }
         }}
       />
+      </div>
     </div>
   );
 };
