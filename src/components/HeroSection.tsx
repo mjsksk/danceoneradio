@@ -2,10 +2,12 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Volume2, Radio } from 'lucide-react';
 import heroImage from '@/assets/hero-bg.jpg';
+import { RadioStreamService } from '@/utils/RadioStreamService';
 
 const HeroSection = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [streamTitle, setStreamTitle] = useState('🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵');
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const handlePlayPause = async () => {
@@ -48,6 +50,27 @@ const HeroSection = () => {
       audio.removeEventListener('canplay', handleCanPlay);
       audio.removeEventListener('error', handleError);
     };
+  }, []);
+
+  // Fetch stream metadata periodically
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      try {
+        const metadata = await RadioStreamService.getStreamMetadata();
+        const formattedTitle = RadioStreamService.formatTitle(metadata);
+        setStreamTitle(formattedTitle);
+      } catch (error) {
+        console.error('Error fetching stream metadata:', error);
+      }
+    };
+
+    // Fetch immediately
+    fetchMetadata();
+
+    // Then fetch every 30 seconds
+    const interval = setInterval(fetchMetadata, 30000);
+
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -110,7 +133,7 @@ const HeroSection = () => {
               <div className="relative overflow-hidden bg-background/20 rounded-md p-2 mb-2">
                 <div className="animate-scroll whitespace-nowrap">
                   <span className="text-sm text-foreground font-['Rajdhani'] font-medium">
-                    🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵
+                    {streamTitle}
                   </span>
                 </div>
               </div>
