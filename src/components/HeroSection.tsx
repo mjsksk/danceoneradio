@@ -22,8 +22,8 @@ const HeroSection = () => {
     // Fetch immediately
     fetchStreamMetadata();
 
-    // Update every 30 seconds
-    const interval = setInterval(fetchStreamMetadata, 30000);
+    // Update every 10 seconds
+    const interval = setInterval(fetchStreamMetadata, 10000);
 
     return () => clearInterval(interval);
   }, []);
