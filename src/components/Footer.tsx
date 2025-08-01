@@ -16,18 +16,12 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand Section */}
           <div className="lg:col-span-2">
-            <div className="flex items-center space-x-3 mb-6">
-              <div className="relative">
-                <Radio className="w-10 h-10 text-primary animate-glow-pulse" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-['Orbitron'] font-bold text-neon">
-                  DANCE ONE RADIO
-                </h3>
-                <p className="text-sm text-accent font-['Rajdhani']">
-                  The Castle of Dance
-                </p>
-              </div>
+            <div className="flex items-center mb-6">
+              <img 
+                src="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png" 
+                alt="Dance One Radio" 
+                className="h-16 w-auto object-contain"
+              />
             </div>
             <p className="text-muted-foreground font-['Rajdhani'] mb-6 max-w-md">
               Broadcasting the future of electronic dance music. Join us every Friday at 5PM Pacific for biweekly episodes featuring brand new music and exclusive tracks.

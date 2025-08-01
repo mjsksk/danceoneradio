@@ -20,15 +20,12 @@ const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center">
             <img 
-              src={logo} 
+              src="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png" 
               alt="Dance One Radio" 
-              className="w-10 h-10 object-contain"
+              className="h-12 w-auto object-contain"
             />
-            <span className="text-xl font-['Orbitron'] font-bold text-neon">
-              DANCE ONE
-            </span>
           </div>
 
           {/* Desktop Navigation */}
