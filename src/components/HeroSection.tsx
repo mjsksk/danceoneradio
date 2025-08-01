@@ -1,94 +1,28 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, Volume2, Radio } from 'lucide-react';
+import { Volume2 } from 'lucide-react';
 import heroImage from '@/assets/hero-bg.jpg';
-import { RadioStreamService } from '@/utils/RadioStreamService';
+import LiveRadioPlayer from './LiveRadioPlayer';
 
 const HeroSection = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [streamTitle, setStreamTitle] = useState('🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵');
-  const audioRef = useRef<HTMLAudioElement>(null);
 
-  console.log('HeroSection render - isLoading:', isLoading, 'isPlaying:', isPlaying);
-
-  const handlePlayPause = () => {
-    console.log('handlePlayPause clicked - current state:', { isPlaying, isLoading });
+  useEffect(() => {
+    // Update stream title periodically with dynamic content
+    const titles = [
+      '🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵',
+      '🎧 Now Playing: Electronic Beats • Dance Music 24/7 • Live Stream from Dance One Radio 🎧',
+      '🔥 Progressive House • Trance • Techno • Deep House • Live DJ Mixes • Dance One Radio 🔥',
+      '⭐ The Best Electronic Music • Live Broadcasting • Dance One Radio • Your Sound, Your Vibe ⭐'
+    ];
     
-    if (!audioRef.current) {
-      console.log('No audio ref available');
-      return;
-    }
+    let currentIndex = 0;
+    const interval = setInterval(() => {
+      currentIndex = (currentIndex + 1) % titles.length;
+      setStreamTitle(titles[currentIndex]);
+    }, 15000); // Change title every 15 seconds
 
-    if (isPlaying) {
-      console.log('Pausing audio');
-      audioRef.current.pause();
-      setIsPlaying(false);
-      setIsLoading(false);
-    } else {
-      console.log('Attempting to play audio');
-      setIsLoading(true);
-      
-      // Try to play the audio
-      const playPromise = audioRef.current.play();
-      
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            console.log('Audio play successful');
-            setIsPlaying(true);
-            setIsLoading(false);
-          })
-          .catch((error) => {
-            console.error('Audio play failed:', error);
-            setIsLoading(false);
-            setIsPlaying(false);
-          });
-      } else {
-        // Fallback for older browsers
-        setIsPlaying(true);
-        setIsLoading(false);
-      }
-    }
-  };
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const handleError = (e: Event) => {
-      console.error('Audio error:', e);
-      setIsLoading(false);
-      setIsPlaying(false);
-    };
-
-    audio.addEventListener('error', handleError);
-
-    return () => {
-      audio.removeEventListener('error', handleError);
-    };
-  }, []);
-
-  // Fetch stream metadata periodically (disabled due to CORS issues)
-  useEffect(() => {
-    const fetchMetadata = async () => {
-      try {
-        // Temporarily disabled due to CORS restrictions
-        // const metadata = await RadioStreamService.getStreamMetadata();
-        // const formattedTitle = RadioStreamService.formatTitle(metadata);
-        // setStreamTitle(formattedTitle);
-        console.log('Metadata fetching disabled due to CORS restrictions');
-      } catch (error) {
-        console.error('Error fetching stream metadata:', error);
-      }
-    };
-
-    // Fetch immediately
-    fetchMetadata();
-
-    // Disable periodic fetching for now
-    // const interval = setInterval(fetchMetadata, 30000);
-    // return () => clearInterval(interval);
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -134,75 +68,10 @@ const HeroSection = () => {
 
         {/* Live Player */}
         <div className="mb-8 animate-slide-up">
-          <div className="card-cyber p-8 max-w-md mx-auto">
-            <div className="flex items-center justify-center mb-6">
-              <div className="relative">
-                <div className="w-20 h-20 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center pulse-cyber">
-                  <Radio className="w-10 h-10 text-primary-foreground" />
-                </div>
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center animate-glow-pulse">
-                  <div className="w-3 h-3 bg-white rounded-full"></div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="text-center mb-6">
-              <h3 className="text-lg font-['Orbitron'] font-semibold text-primary mb-2">NOW PLAYING</h3>
-              <div className="relative overflow-hidden bg-background/20 rounded-md p-2 mb-2">
-                <div className="animate-scroll whitespace-nowrap">
-                  <span className="text-sm text-foreground font-['Rajdhani'] font-medium">
-                    {streamTitle}
-                  </span>
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground">Broadcasting Live 24/7</p>
-            </div>
-
-            {/* Audio Visualizer */}
-            <div className="flex items-center justify-center space-x-1 mb-6">
-              {[...Array(8)].map((_, i) => (
-                <div
-                  key={i}
-                  className="w-1 bg-primary rounded-full wave-animation"
-                  style={{
-                    height: `${20 + Math.random() * 40}px`,
-                    animationDelay: `${i * 0.1}s`
-                  }}
-                />
-              ))}
-            </div>
-
-            <Button
-              onClick={handlePlayPause}
-              className="btn-cyber w-full"
-              size="lg"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <div className="w-5 h-5 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  LOADING...
-                </>
-              ) : isPlaying ? (
-                <>
-                  <Pause className="w-5 h-5 mr-2" />
-                  PAUSE STREAM
-                </>
-              ) : (
-                <>
-                  <Play className="w-5 h-5 mr-2" />
-                  LISTEN LIVE
-                </>
-              )}
-            </Button>
-
-            {/* Hidden Audio Element */}
-            <audio
-              ref={audioRef}
-              preload="none"
-              src="http://s9.myradiostream.com:14296/"
-            />
-          </div>
+          <LiveRadioPlayer 
+            streamUrl="http://s9.myradiostream.com:14296/"
+            streamTitle={streamTitle}
+          />
         </div>
 
         {/* CTA Buttons */}
