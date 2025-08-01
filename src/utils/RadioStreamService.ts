@@ -283,8 +283,7 @@ export class RadioStreamService {
     }
 
     const title = metadata.title;
-    const bitrate = metadata.bitrate ? ` • ${metadata.bitrate}` : '';
     
-    return `🎵 ${title}${bitrate} • Dance One Radio 🎵`;
+    return `🎵 ${title} • Dance One Radio 🎵`;
   }
 }
