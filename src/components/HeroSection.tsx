@@ -61,7 +61,7 @@ const HeroSection = () => {
             <img 
               src="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png" 
               alt="Dance One Radio" 
-              className="h-40 md:h-64 w-auto object-contain animate-neon-flicker"
+              className="h-48 md:h-80 w-auto object-contain animate-neon-flicker"
             />
           </div>
           <p className="text-xl md:text-2xl text-muted-foreground font-['Rajdhani'] font-light max-w-2xl mx-auto leading-relaxed">
