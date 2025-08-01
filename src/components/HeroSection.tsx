@@ -107,8 +107,14 @@ const HeroSection = () => {
             
             <div className="text-center mb-6">
               <h3 className="text-lg font-['Orbitron'] font-semibold text-primary mb-2">NOW PLAYING</h3>
-              <p className="text-sm text-muted-foreground font-['Rajdhani']">Progressive House Session</p>
-              <p className="text-xs text-muted-foreground">Friday 5PM Pacific</p>
+              <div className="relative overflow-hidden bg-background/20 rounded-md p-2 mb-2">
+                <div className="animate-scroll whitespace-nowrap">
+                  <span className="text-sm text-foreground font-['Rajdhani'] font-medium">
+                    🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵
+                  </span>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">Broadcasting Live 24/7</p>
             </div>
 
             {/* Audio Visualizer */}
