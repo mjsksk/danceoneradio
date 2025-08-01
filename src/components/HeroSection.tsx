@@ -10,30 +10,45 @@ const HeroSection = () => {
   const [streamTitle, setStreamTitle] = useState('🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵');
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const handlePlayPause = async () => {
-    if (!audioRef.current) return;
+  console.log('HeroSection render - isLoading:', isLoading, 'isPlaying:', isPlaying);
 
-    try {
-      if (isPlaying) {
-        audioRef.current.pause();
-        setIsPlaying(false);
-        setIsLoading(false);
+  const handlePlayPause = () => {
+    console.log('handlePlayPause clicked - current state:', { isPlaying, isLoading });
+    
+    if (!audioRef.current) {
+      console.log('No audio ref available');
+      return;
+    }
+
+    if (isPlaying) {
+      console.log('Pausing audio');
+      audioRef.current.pause();
+      setIsPlaying(false);
+      setIsLoading(false);
+    } else {
+      console.log('Attempting to play audio');
+      setIsLoading(true);
+      
+      // Try to play the audio
+      const playPromise = audioRef.current.play();
+      
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log('Audio play successful');
+            setIsPlaying(true);
+            setIsLoading(false);
+          })
+          .catch((error) => {
+            console.error('Audio play failed:', error);
+            setIsLoading(false);
+            setIsPlaying(false);
+          });
       } else {
-        setIsLoading(true);
-        // Set a timeout to clear loading state if it takes too long
-        const loadingTimeout = setTimeout(() => {
-          setIsLoading(false);
-        }, 10000); // 10 second timeout
-
-        await audioRef.current.play();
-        clearTimeout(loadingTimeout);
+        // Fallback for older browsers
         setIsPlaying(true);
         setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Error playing audio:', error);
-      setIsLoading(false);
-      setIsPlaying(false);
     }
   };
 
@@ -41,53 +56,16 @@ const HeroSection = () => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const handleLoadStart = () => {
-      console.log('Audio loading started');
-      setIsLoading(true);
-    };
-    
-    const handleCanPlay = () => {
-      console.log('Audio can play');
-      setIsLoading(false);
-    };
-    
-    const handleLoadedData = () => {
-      console.log('Audio loaded data');
-      setIsLoading(false);
-    };
-    
     const handleError = (e: Event) => {
       console.error('Audio error:', e);
       setIsLoading(false);
       setIsPlaying(false);
     };
-    
-    const handlePlay = () => {
-      console.log('Audio started playing');
-      setIsPlaying(true);
-      setIsLoading(false);
-    };
-    
-    const handlePause = () => {
-      console.log('Audio paused');
-      setIsPlaying(false);
-      setIsLoading(false);
-    };
 
-    audio.addEventListener('loadstart', handleLoadStart);
-    audio.addEventListener('canplay', handleCanPlay);
-    audio.addEventListener('loadeddata', handleLoadedData);
     audio.addEventListener('error', handleError);
-    audio.addEventListener('play', handlePlay);
-    audio.addEventListener('pause', handlePause);
 
     return () => {
-      audio.removeEventListener('loadstart', handleLoadStart);
-      audio.removeEventListener('canplay', handleCanPlay);
-      audio.removeEventListener('loadeddata', handleLoadedData);
       audio.removeEventListener('error', handleError);
-      audio.removeEventListener('play', handlePlay);
-      audio.removeEventListener('pause', handlePause);
     };
   }, []);
 
