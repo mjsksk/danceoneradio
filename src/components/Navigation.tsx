@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Radio, Volume2 } from 'lucide-react';
+import logo from '@/assets/dance-one-logo.png';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -19,13 +20,12 @@ const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <div className="relative">
-              <Radio className="w-8 h-8 text-primary animate-glow-pulse" />
-              <div className="absolute inset-0 w-8 h-8 text-primary animate-spin-slow opacity-30">
-                <Volume2 className="w-8 h-8" />
-              </div>
-            </div>
+          <div className="flex items-center space-x-3">
+            <img 
+              src={logo} 
+              alt="Dance One Radio" 
+              className="w-10 h-10 object-contain"
+            />
             <span className="text-xl font-['Orbitron'] font-bold text-neon">
               DANCE ONE
             </span>
