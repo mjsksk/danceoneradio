@@ -3,24 +3,27 @@ import { Button } from '@/components/ui/button';
 import { Volume2 } from 'lucide-react';
 import heroImage from '@/assets/hero-bg.jpg';
 import LiveRadioPlayer from './LiveRadioPlayer';
+import { RadioStreamService } from '@/utils/RadioStreamService';
 
 const HeroSection = () => {
   const [streamTitle, setStreamTitle] = useState('🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵');
 
   useEffect(() => {
-    // Update stream title periodically with dynamic content
-    const titles = [
-      '🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵',
-      '🎧 Now Playing: Electronic Beats • Dance Music 24/7 • Live Stream from Dance One Radio 🎧',
-      '🔥 Progressive House • Trance • Techno • Deep House • Live DJ Mixes • Dance One Radio 🔥',
-      '⭐ The Best Electronic Music • Live Broadcasting • Dance One Radio • Your Sound, Your Vibe ⭐'
-    ];
-    
-    let currentIndex = 0;
-    const interval = setInterval(() => {
-      currentIndex = (currentIndex + 1) % titles.length;
-      setStreamTitle(titles[currentIndex]);
-    }, 15000); // Change title every 15 seconds
+    const fetchStreamMetadata = async () => {
+      try {
+        const metadata = await RadioStreamService.getStreamMetadata();
+        const formattedTitle = RadioStreamService.formatTitle(metadata);
+        setStreamTitle(formattedTitle);
+      } catch (error) {
+        console.error('Error fetching stream metadata:', error);
+      }
+    };
+
+    // Fetch immediately
+    fetchStreamMetadata();
+
+    // Update every 30 seconds
+    const interval = setInterval(fetchStreamMetadata, 30000);
 
     return () => clearInterval(interval);
   }, []);
