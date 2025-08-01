@@ -14,19 +14,26 @@ const HeroSection = () => {
     if (!audioRef.current) return;
 
     try {
-      setIsLoading(true);
-      
       if (isPlaying) {
         audioRef.current.pause();
         setIsPlaying(false);
+        setIsLoading(false);
       } else {
+        setIsLoading(true);
+        // Set a timeout to clear loading state if it takes too long
+        const loadingTimeout = setTimeout(() => {
+          setIsLoading(false);
+        }, 10000); // 10 second timeout
+
         await audioRef.current.play();
+        clearTimeout(loadingTimeout);
         setIsPlaying(true);
+        setIsLoading(false);
       }
     } catch (error) {
       console.error('Error playing audio:', error);
-    } finally {
       setIsLoading(false);
+      setIsPlaying(false);
     }
   };
 
@@ -34,31 +41,65 @@ const HeroSection = () => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const handleLoadStart = () => setIsLoading(true);
-    const handleCanPlay = () => setIsLoading(false);
-    const handleError = () => {
+    const handleLoadStart = () => {
+      console.log('Audio loading started');
+      setIsLoading(true);
+    };
+    
+    const handleCanPlay = () => {
+      console.log('Audio can play');
+      setIsLoading(false);
+    };
+    
+    const handleLoadedData = () => {
+      console.log('Audio loaded data');
+      setIsLoading(false);
+    };
+    
+    const handleError = (e: Event) => {
+      console.error('Audio error:', e);
       setIsLoading(false);
       setIsPlaying(false);
+    };
+    
+    const handlePlay = () => {
+      console.log('Audio started playing');
+      setIsPlaying(true);
+      setIsLoading(false);
+    };
+    
+    const handlePause = () => {
+      console.log('Audio paused');
+      setIsPlaying(false);
+      setIsLoading(false);
     };
 
     audio.addEventListener('loadstart', handleLoadStart);
     audio.addEventListener('canplay', handleCanPlay);
+    audio.addEventListener('loadeddata', handleLoadedData);
     audio.addEventListener('error', handleError);
+    audio.addEventListener('play', handlePlay);
+    audio.addEventListener('pause', handlePause);
 
     return () => {
       audio.removeEventListener('loadstart', handleLoadStart);
       audio.removeEventListener('canplay', handleCanPlay);
+      audio.removeEventListener('loadeddata', handleLoadedData);
       audio.removeEventListener('error', handleError);
+      audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('pause', handlePause);
     };
   }, []);
 
-  // Fetch stream metadata periodically
+  // Fetch stream metadata periodically (disabled due to CORS issues)
   useEffect(() => {
     const fetchMetadata = async () => {
       try {
-        const metadata = await RadioStreamService.getStreamMetadata();
-        const formattedTitle = RadioStreamService.formatTitle(metadata);
-        setStreamTitle(formattedTitle);
+        // Temporarily disabled due to CORS restrictions
+        // const metadata = await RadioStreamService.getStreamMetadata();
+        // const formattedTitle = RadioStreamService.formatTitle(metadata);
+        // setStreamTitle(formattedTitle);
+        console.log('Metadata fetching disabled due to CORS restrictions');
       } catch (error) {
         console.error('Error fetching stream metadata:', error);
       }
@@ -67,10 +108,9 @@ const HeroSection = () => {
     // Fetch immediately
     fetchMetadata();
 
-    // Then fetch every 30 seconds
-    const interval = setInterval(fetchMetadata, 30000);
-
-    return () => clearInterval(interval);
+    // Disable periodic fetching for now
+    // const interval = setInterval(fetchMetadata, 30000);
+    // return () => clearInterval(interval);
   }, []);
 
   return (
