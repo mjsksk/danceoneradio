@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Radio } from 'lucide-react';
 import { AlbumArtService } from '@/utils/AlbumArtService';
+import stationLogo from '@/assets/dance-one-logo.png';
 
 interface LiveRadioPlayerProps {
   streamUrls: string[];
@@ -84,11 +85,16 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
 
   return (
     <div className="card-cyber p-8 max-w-md mx-auto relative overflow-hidden">
-      {/* Blurred background from album art */}
-      {albumArt && (
+      {/* Blurred background from album art or station logo */}
+      {albumArt ? (
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-20 blur-xl scale-110"
           style={{ backgroundImage: `url(${albumArt})` }}
+        />
+      ) : (
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-10 blur-xl scale-110"
+          style={{ backgroundImage: `url(${stationLogo})` }}
         />
       )}
       {/* Content overlay */}
@@ -99,13 +105,28 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
             {albumArt ? (
               <img 
                 src={albumArt} 
-                alt="Album Art" 
+                alt="Current Track Album Art" 
                 className="w-full h-full object-cover rounded-full"
                 onError={() => setAlbumArt(null)}
               />
             ) : (
-              <Radio className="w-10 h-10 text-primary-foreground" />
+              <img 
+                src={stationLogo} 
+                alt="Dance One Radio Logo" 
+                className="w-12 h-12 object-contain filter brightness-0 invert"
+                onError={(e) => {
+                  // If station logo fails to load, fallback to Radio icon
+                  e.currentTarget.style.display = 'none';
+                  const radioIcon = e.currentTarget.nextElementSibling as HTMLElement;
+                  if (radioIcon) radioIcon.style.display = 'block';
+                }}
+              />
             )}
+            {/* Fallback radio icon - hidden by default */}
+            <Radio 
+              className="w-10 h-10 text-primary-foreground hidden" 
+              style={{ display: albumArt ? 'none' : 'none' }}
+            />
           </div>
           <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center animate-glow-pulse">
             <div className="w-3 h-3 bg-white rounded-full"></div>
