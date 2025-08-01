@@ -3,14 +3,23 @@ import { Button } from '@/components/ui/button';
 import { Play, Pause, Radio } from 'lucide-react';
 
 interface LiveRadioPlayerProps {
-  streamUrl: string;
+  streamUrls: string[];
   streamTitle: string;
 }
 
-const LiveRadioPlayer = ({ streamUrl, streamTitle }: LiveRadioPlayerProps) => {
+const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  const tryNextUrl = () => {
+    if (currentUrlIndex < streamUrls.length - 1) {
+      setCurrentUrlIndex(prev => prev + 1);
+      return true;
+    }
+    return false;
+  };
 
   const handlePlayPause = () => {
     if (!audioRef.current) return;
@@ -20,16 +29,31 @@ const LiveRadioPlayer = ({ streamUrl, streamTitle }: LiveRadioPlayerProps) => {
       setIsPlaying(false);
     } else {
       setIsLoading(true);
-      audioRef.current.play()
-        .then(() => {
-          setIsPlaying(true);
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          console.error('Failed to play stream:', error);
-          setIsLoading(false);
-        });
+      setCurrentUrlIndex(0); // Reset to first URL
+      attemptPlay();
     }
+  };
+
+  const attemptPlay = () => {
+    if (!audioRef.current) return;
+    
+    const currentUrl = streamUrls[currentUrlIndex];
+    audioRef.current.src = currentUrl;
+    
+    audioRef.current.play()
+      .then(() => {
+        setIsPlaying(true);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error(`Failed to play stream ${currentUrl}:`, error);
+        if (tryNextUrl()) {
+          setTimeout(attemptPlay, 1000); // Try next URL after 1 second
+        } else {
+          setIsLoading(false);
+          console.error('All stream URLs failed');
+        }
+      });
   };
 
   return (
@@ -98,10 +122,14 @@ const LiveRadioPlayer = ({ streamUrl, streamTitle }: LiveRadioPlayerProps) => {
       <audio
         ref={audioRef}
         preload="none"
-        src={streamUrl}
         onError={() => {
-          setIsLoading(false);
-          setIsPlaying(false);
+          console.error('Audio element error');
+          if (tryNextUrl()) {
+            setTimeout(attemptPlay, 1000);
+          } else {
+            setIsLoading(false);
+            setIsPlaying(false);
+          }
         }}
       />
     </div>
