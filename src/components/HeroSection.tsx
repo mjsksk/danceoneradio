@@ -49,7 +49,7 @@ const HeroSection = () => {
 
         {/* Live Player */}
         <div className="mb-8 animate-slide-up">
-          <div className="card-cyber p-8 max-w-md mx-auto">
+          <div className="card-cyber p-8 max-w-2xl mx-auto">
             <div className="flex items-center justify-center mb-6">
               <div className="relative">
                 <div className="w-20 h-20 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center pulse-cyber">
@@ -62,9 +62,21 @@ const HeroSection = () => {
             </div>
             
             <div className="text-center mb-6">
-              <h3 className="text-lg font-['Orbitron'] font-semibold text-primary mb-2">NOW PLAYING</h3>
-              <p className="text-sm text-muted-foreground font-['Rajdhani']">Progressive House Session</p>
-              <p className="text-xs text-muted-foreground">Friday 5PM Pacific</p>
+              <h3 className="text-lg font-['Orbitron'] font-semibold text-primary mb-2">FUTURE DANCE ANTHEMS</h3>
+              <p className="text-sm text-muted-foreground font-['Rajdhani']">with Mario</p>
+              <p className="text-xs text-muted-foreground">Every Friday 5PM Pacific</p>
+            </div>
+
+            {/* Apple Podcasts Embed */}
+            <div className="mb-6 rounded-lg overflow-hidden border border-primary/20">
+              <iframe 
+                src="https://embed.podcasts.apple.com/us/podcast/future-dance-anthems-with-mario/id1439656478"
+                height="450"
+                className="w-full bg-background"
+                frameBorder="0"
+                sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
+                allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
+              />
             </div>
 
             {/* Audio Visualizer */}
@@ -80,24 +92,6 @@ const HeroSection = () => {
                 />
               ))}
             </div>
-
-            <Button
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="btn-cyber w-full"
-              size="lg"
-            >
-              {isPlaying ? (
-                <>
-                  <Pause className="w-5 h-5 mr-2" />
-                  PAUSE STREAM
-                </>
-              ) : (
-                <>
-                  <Play className="w-5 h-5 mr-2" />
-                  LISTEN LIVE
-                </>
-              )}
-            </Button>
           </div>
         </div>
 
