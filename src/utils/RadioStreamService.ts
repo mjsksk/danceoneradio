@@ -132,10 +132,14 @@ export class RadioStreamService {
       if (endpoint.includes('7.html')) {
         const lines = data.split(',');
         if (lines.length >= 7) {
+          let title = lines[6] || 'Dance One Radio';
+          // Clean up HTML tags from title
+          title = title.replace(/<[^>]*>/g, '').trim();
+          
           return {
             listeners: lines[0],
             status: lines[1] === '1' ? 'live' : 'offline',
-            title: lines[6] || 'Dance One Radio',
+            title: title,
             bitrate: lines[5] || '128kbps'
           };
         }
