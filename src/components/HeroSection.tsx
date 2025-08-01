@@ -69,7 +69,7 @@ const HeroSection = () => {
         {/* Live Player */}
         <div className="mb-8 animate-slide-up">
           <LiveRadioPlayer 
-            streamUrl="http://s9.myradiostream.com:14296/"
+            streamUrl="https://s9.myradiostream.com:14296/"
             streamTitle={streamTitle}
           />
         </div>
