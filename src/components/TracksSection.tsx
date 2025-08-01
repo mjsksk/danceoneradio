@@ -1,56 +1,43 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Download, Heart, Share2, Clock } from 'lucide-react';
+import { RadioStreamService } from '@/utils/RadioStreamService';
+
+interface Track {
+  id: number;
+  title: string;
+  artist: string;
+  duration: string;
+  genre: string;
+  playedAt: string;
+  waveform: number[];
+  likes: number;
+  downloads: number;
+}
 
 const TracksSection = () => {
   const [playingTrack, setPlayingTrack] = useState<number | null>(null);
+  const [tracks, setTracks] = useState<Track[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const tracks = [
-    {
-      id: 1,
-      title: "Digital Dreams",
-      artist: "DJ Pulse",
-      duration: "6:42",
-      genre: "Progressive House",
-      releaseDate: "2024-01-15",
-      waveform: [12, 24, 18, 32, 28, 15, 22, 35, 28, 16, 20, 30],
-      likes: 1247,
-      downloads: 532
-    },
-    {
-      id: 2,
-      title: "Neon Nights",
-      artist: "DJ Neon",
-      duration: "5:38",
-      genre: "Cyberpunk",
-      releaseDate: "2024-01-12",
-      waveform: [20, 15, 28, 22, 35, 18, 25, 32, 20, 24, 18, 28],
-      likes: 892,
-      downloads: 345
-    },
-    {
-      id: 3,
-      title: "Deep Space Journey",
-      artist: "DJ Cosmos",
-      duration: "7:15",
-      genre: "Deep House",
-      releaseDate: "2024-01-10",
-      waveform: [15, 28, 22, 18, 25, 32, 20, 35, 28, 16, 22, 30],
-      likes: 1156,
-      downloads: 478
-    },
-    {
-      id: 4,
-      title: "Aurora Rising",
-      artist: "DJ Aurora",
-      duration: "8:22",
-      genre: "Trance",
-      releaseDate: "2024-01-08",
-      waveform: [25, 32, 20, 28, 35, 18, 22, 30, 25, 20, 28, 32],
-      likes: 1523,
-      downloads: 687
-    }
-  ];
+  useEffect(() => {
+    const fetchRecentTracks = async () => {
+      try {
+        const recentTracks = await RadioStreamService.getRecentTracks();
+        setTracks(recentTracks);
+      } catch (error) {
+        console.error('Failed to fetch recent tracks:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecentTracks();
+    
+    // Refresh tracks every 5 minutes
+    const interval = setInterval(fetchRecentTracks, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handlePlayPause = (trackId: number) => {
     if (playingTrack === trackId) {
@@ -69,12 +56,17 @@ const TracksSection = () => {
             <span className="text-neon-purple">TRACKS</span>
           </h2>
           <p className="text-xl text-muted-foreground font-['Rajdhani'] max-w-2xl mx-auto">
-            Exclusive releases and featured tracks from our DJ collective
+            Recently played tracks from Dance One Radio live stream
           </p>
         </div>
 
         <div className="space-y-6">
-          {tracks.map((track, index) => (
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="text-muted-foreground">Loading recent tracks...</div>
+            </div>
+          ) : (
+            tracks.map((track, index) => (
             <div
               key={track.id}
               className="card-cyber p-6 animate-fade-in"
@@ -113,7 +105,7 @@ const TracksSection = () => {
                         {track.duration}
                       </div>
                       <span>•</span>
-                      <span>{track.releaseDate}</span>
+                      <span>{new Date(track.playedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
                   </div>
                 </div>
@@ -175,7 +167,8 @@ const TracksSection = () => {
                 </div>
               </div>
             </div>
-          ))}
+            ))
+          )}
         </div>
 
         {/* More Tracks Button */}

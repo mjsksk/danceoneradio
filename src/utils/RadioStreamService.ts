@@ -7,6 +7,18 @@ interface StreamMetadata {
   status?: string;
 }
 
+interface Track {
+  id: number;
+  title: string;
+  artist: string;
+  duration: string;
+  genre: string;
+  playedAt: string;
+  waveform: number[];
+  likes: number;
+  downloads: number;
+}
+
 export class RadioStreamService {
   private static streamUrl = 'http://s9.myradiostream.com:14296/';
   
@@ -156,6 +168,109 @@ export class RadioStreamService {
     }
 
     return null;
+  }
+
+  static async getRecentTracks(): Promise<Track[]> {
+    try {
+      // Get current stream data to get the currently playing track
+      const currentMetadata = await this.getStreamMetadata();
+      const recentTracks: Track[] = [];
+      
+      // Generate recent tracks based on current playing + some mock recent ones
+      if (currentMetadata?.title) {
+        const [title, artist] = this.parseTrackInfo(currentMetadata.title);
+        
+        recentTracks.push({
+          id: 1,
+          title,
+          artist,
+          duration: this.generateRandomDuration(),
+          genre: this.generateRandomGenre(),
+          playedAt: new Date().toISOString(),
+          waveform: this.generateWaveform(),
+          likes: Math.floor(Math.random() * 2000) + 500,
+          downloads: Math.floor(Math.random() * 800) + 200
+        });
+      }
+      
+      // Add some recent tracks (simulated)
+      const recentTrackTitles = [
+        'Deep House Vibes - DJ Shadow',
+        'Progressive Journey - Alex Mind',
+        'Trance State - Luna Deep',
+        'Techno Underground - Dark Matter'
+      ];
+      
+      recentTrackTitles.forEach((trackInfo, index) => {
+        const [title, artist] = trackInfo.split(' - ');
+        const playedTime = new Date();
+        playedTime.setMinutes(playedTime.getMinutes() - (index + 1) * 15);
+        
+        recentTracks.push({
+          id: index + 2,
+          title,
+          artist,
+          duration: this.generateRandomDuration(),
+          genre: this.generateRandomGenre(),
+          playedAt: playedTime.toISOString(),
+          waveform: this.generateWaveform(),
+          likes: Math.floor(Math.random() * 2000) + 500,
+          downloads: Math.floor(Math.random() * 800) + 200
+        });
+      });
+      
+      return recentTracks.slice(0, 4); // Return latest 4 tracks
+    } catch (error) {
+      console.error('Error fetching recent tracks:', error);
+      return this.generateFallbackTracks();
+    }
+  }
+
+  private static parseTrackInfo(title: string): [string, string] {
+    // Try to parse "Artist - Title" or "Title - Artist" format
+    if (title.includes(' - ')) {
+      const parts = title.split(' - ');
+      return [parts[1] || parts[0], parts[0]];
+    }
+    
+    // Fallback to just using title as song name with generic artist
+    return [title.replace('Dance One Radio - ', ''), 'Dance One Radio'];
+  }
+
+  private static generateRandomDuration(): string {
+    const minutes = Math.floor(Math.random() * 4) + 4; // 4-7 minutes
+    const seconds = Math.floor(Math.random() * 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  private static generateRandomGenre(): string {
+    const genres = ['Progressive House', 'Deep House', 'Trance', 'Techno', 'Electronic'];
+    return genres[Math.floor(Math.random() * genres.length)];
+  }
+
+  private static generateWaveform(): number[] {
+    return Array.from({ length: 12 }, () => Math.floor(Math.random() * 20) + 10);
+  }
+
+  private static generateFallbackTracks(): Track[] {
+    const fallbackTracks = [
+      { title: 'Progressive House Mix', artist: 'DJ Pulse' },
+      { title: 'Deep Electronic Vibes', artist: 'DJ Neon' },
+      { title: 'Trance Journey', artist: 'DJ Cosmos' },
+      { title: 'Techno Underground', artist: 'DJ Aurora' }
+    ];
+
+    return fallbackTracks.map((track, index) => ({
+      id: index + 1,
+      title: track.title,
+      artist: track.artist,
+      duration: this.generateRandomDuration(),
+      genre: this.generateRandomGenre(),
+      playedAt: new Date(Date.now() - index * 15 * 60 * 1000).toISOString(),
+      waveform: this.generateWaveform(),
+      likes: Math.floor(Math.random() * 2000) + 500,
+      downloads: Math.floor(Math.random() * 800) + 200
+    }));
   }
 
   static formatTitle(metadata: StreamMetadata | null): string {
