@@ -279,9 +279,8 @@ export class RadioStreamService {
     }
 
     const title = metadata.title;
-    const listeners = metadata.listeners ? ` • ${metadata.listeners} Listeners` : '';
     const bitrate = metadata.bitrate ? ` • ${metadata.bitrate}` : '';
     
-    return `🎵 ${title}${listeners}${bitrate} • Dance One Radio 🎵`;
+    return `🎵 ${title}${bitrate} • Dance One Radio 🎵`;
   }
 }
