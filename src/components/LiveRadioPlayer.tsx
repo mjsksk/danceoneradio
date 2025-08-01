@@ -1,6 +1,7 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Radio } from 'lucide-react';
+import { AlbumArtService } from '@/utils/AlbumArtService';
 
 interface LiveRadioPlayerProps {
   streamUrls: string[];
@@ -11,6 +12,8 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
+  const [albumArt, setAlbumArt] = useState<string | null>(null);
+  const [isLoadingArt, setIsLoadingArt] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const tryNextUrl = () => {
@@ -33,6 +36,29 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
       attemptPlay();
     }
   };
+
+  // Fetch album art when stream title changes
+  useEffect(() => {
+    const fetchAlbumArt = async () => {
+      if (!streamTitle || streamTitle.includes('Dance One Radio - The Future')) return;
+      
+      setIsLoadingArt(true);
+      try {
+        // Extract song title from the formatted stream title
+        const songMatch = streamTitle.match(/🎵\s*(.*?)\s*•/);
+        const songTitle = songMatch ? songMatch[1] : streamTitle;
+        
+        const result = await AlbumArtService.getAlbumArt(songTitle);
+        setAlbumArt(result.imageUrl);
+      } catch (error) {
+        console.error('Error fetching album art:', error);
+      } finally {
+        setIsLoadingArt(false);
+      }
+    };
+
+    fetchAlbumArt();
+  }, [streamTitle]);
 
   const attemptPlay = () => {
     if (!audioRef.current) return;
@@ -60,8 +86,17 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
     <div className="card-cyber p-8 max-w-md mx-auto">
       <div className="flex items-center justify-center mb-6">
         <div className="relative">
-          <div className="w-20 h-20 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center pulse-cyber">
-            <Radio className="w-10 h-10 text-primary-foreground" />
+          <div className="w-20 h-20 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center pulse-cyber overflow-hidden">
+            {albumArt ? (
+              <img 
+                src={albumArt} 
+                alt="Album Art" 
+                className="w-full h-full object-cover rounded-full"
+                onError={() => setAlbumArt(null)}
+              />
+            ) : (
+              <Radio className="w-10 h-10 text-primary-foreground" />
+            )}
           </div>
           <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center animate-glow-pulse">
             <div className="w-3 h-3 bg-white rounded-full"></div>
