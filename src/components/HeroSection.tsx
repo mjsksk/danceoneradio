@@ -1,10 +1,54 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Volume2, Radio } from 'lucide-react';
 import heroImage from '@/assets/hero-bg.jpg';
 
 const HeroSection = () => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  const handlePlayPause = async () => {
+    if (!audioRef.current) return;
+
+    try {
+      setIsLoading(true);
+      
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      }
+    } catch (error) {
+      console.error('Error playing audio:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handleLoadStart = () => setIsLoading(true);
+    const handleCanPlay = () => setIsLoading(false);
+    const handleError = () => {
+      setIsLoading(false);
+      setIsPlaying(false);
+    };
+
+    audio.addEventListener('loadstart', handleLoadStart);
+    audio.addEventListener('canplay', handleCanPlay);
+    audio.addEventListener('error', handleError);
+
+    return () => {
+      audio.removeEventListener('loadstart', handleLoadStart);
+      audio.removeEventListener('canplay', handleCanPlay);
+      audio.removeEventListener('error', handleError);
+    };
+  }, []);
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -82,11 +126,17 @@ const HeroSection = () => {
             </div>
 
             <Button
-              onClick={() => setIsPlaying(!isPlaying)}
+              onClick={handlePlayPause}
               className="btn-cyber w-full"
               size="lg"
+              disabled={isLoading}
             >
-              {isPlaying ? (
+              {isLoading ? (
+                <>
+                  <div className="w-5 h-5 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  LOADING...
+                </>
+              ) : isPlaying ? (
                 <>
                   <Pause className="w-5 h-5 mr-2" />
                   PAUSE STREAM
@@ -98,6 +148,13 @@ const HeroSection = () => {
                 </>
               )}
             </Button>
+
+            {/* Hidden Audio Element */}
+            <audio
+              ref={audioRef}
+              preload="none"
+              src="http://s9.myradiostream.com:14296/"
+            />
           </div>
         </div>
 
