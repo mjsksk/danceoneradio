@@ -118,8 +118,8 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
   };
 
   const startFallbackAnimation = () => {
-    console.log('🎵 Starting enhanced fallback animation');
-    setDebugInfo('Using animated EQ (CORS blocked real analysis)');
+    console.log('🎵 Starting DIRECT DOM animation');
+    setDebugInfo('Using DIRECT DOM animation');
     setAnimationActive(true);
     
     // Stop any existing analysis first
@@ -131,37 +131,53 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
     let frameCount = 0;
     
     const animateFallback = () => {
-      // Use animationActive instead of isPlaying for more reliable control
-      if (!animationActive) {
-        console.log('🎵 Stopping animation - animation not active');
-        return;
-      }
-      
-      time += 0.15;
+      time += 0.2;
       frameCount++;
       
-      if (frameCount % 120 === 0) {
-        console.log('🎵 Animation running, frame:', frameCount, 'isPlaying:', isPlaying, 'animationActive:', animationActive);
+      if (frameCount % 30 === 0) {
+        console.log('🎵 DIRECT animation frame:', frameCount);
       }
       
-      // Create more realistic animated bars that simulate different frequency ranges
+      // Find the EQ bars in the DOM and animate them directly
+      const eqContainer = document.querySelector('[data-eq-container]');
+      if (eqContainer) {
+        const bars = eqContainer.querySelectorAll('[data-eq-bar]');
+        bars.forEach((bar: any, i: number) => {
+          const bassBoost = i < 2 ? 2.0 : 1;
+          const trebleBoost = i > 5 ? 1.5 : 1;
+          
+          const baseHeight = 35;
+          const primaryWave = Math.sin(time + i * 1.2) * 25 * bassBoost;
+          const secondaryWave = Math.sin(time * 3.1 + i * 0.7) * 15 * trebleBoost;
+          const randomVariation = (Math.random() - 0.5) * 10;
+          
+          const height = Math.max(30, Math.min(70, baseHeight + primaryWave + secondaryWave + randomVariation));
+          const hue = 160 + (height / 70) * 80;
+          const lightness = 45 + (height / 70) * 25;
+          
+          // Apply directly to DOM
+          bar.style.height = `${height}px`;
+          bar.style.backgroundColor = `hsl(${hue}, 80%, ${lightness}%)`;
+          bar.style.boxShadow = `0 0 ${height / 8}px hsl(${hue}, 80%, ${lightness}%)`;
+          bar.style.transform = `scaleY(${0.8 + (height / 70) * 0.4})`;
+        });
+      }
+      
+      // Also update React state as backup
       const bars = Array.from({ length: 8 }, (_, i) => {
-        // Different frequencies have different characteristics
-        const bassBoost = i < 2 ? 2.0 : 1; // Lower frequencies are typically stronger
-        const trebleBoost = i > 5 ? 1.5 : 1; // Higher frequencies have more variation
-        
-        const baseHeight = 30;
-        const primaryWave = Math.sin(time + i * 0.8) * 20 * bassBoost;
-        const secondaryWave = Math.sin(time * 2.3 + i * 0.5) * 12 * trebleBoost;
-        const randomVariation = (Math.random() - 0.5) * 8;
-        
-        return Math.max(25, Math.min(65, baseHeight + primaryWave + secondaryWave + randomVariation));
+        const bassBoost = i < 2 ? 2.0 : 1;
+        const trebleBoost = i > 5 ? 1.5 : 1;
+        const baseHeight = 35;
+        const primaryWave = Math.sin(time + i * 1.2) * 25 * bassBoost;
+        const secondaryWave = Math.sin(time * 3.1 + i * 0.7) * 15 * trebleBoost;
+        const randomVariation = (Math.random() - 0.5) * 10;
+        return Math.max(30, Math.min(70, baseHeight + primaryWave + secondaryWave + randomVariation));
       });
       
       setFrequencyData(bars);
       
       if (frameCount % 60 === 0) {
-        console.log('🎵 Setting frequency data:', bars.map(b => Math.round(b)));
+        console.log('🎵 Heights:', bars.map(b => Math.round(b)));
       }
       
       animationRef.current = requestAnimationFrame(animateFallback);
@@ -324,18 +340,20 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
       </div>
 
       {/* Real-time Audio EQ Visualizer */}
-      <div className="flex items-center justify-center space-x-1 mb-6">
+      <div className="flex items-center justify-center space-x-1 mb-6" data-eq-container>
         {frequencyData.map((height, i) => (
           <div
             key={i}
-            className="w-3 rounded-full transition-all duration-150 ease-out shadow-lg"
+            data-eq-bar
+            className="w-4 rounded-full transition-none shadow-lg"
             style={{
-              height: `${Math.max(25, Math.min(65, height))}px`,
+              height: `${Math.max(30, Math.min(70, height))}px`,
               backgroundColor: animationActive 
-                ? `hsl(${160 + (height / 65) * 80}, 80%, ${45 + (height / 65) * 25}%)` 
+                ? `hsl(${160 + (height / 70) * 80}, 80%, ${45 + (height / 70) * 25}%)` 
                 : 'hsl(var(--muted))',
-              boxShadow: animationActive ? `0 0 ${height / 8}px hsl(${160 + (height / 65) * 80}, 80%, ${45 + (height / 65) * 25}%)` : 'none',
-              transform: animationActive ? `scaleY(${0.8 + (height / 65) * 0.4})` : 'scaleY(1)'
+              boxShadow: animationActive ? `0 0 ${height / 8}px hsl(${160 + (height / 70) * 80}, 80%, ${45 + (height / 70) * 25}%)` : 'none',
+              transform: animationActive ? `scaleY(${0.8 + (height / 70) * 0.4})` : 'scaleY(1)',
+              willChange: 'height, background-color, box-shadow, transform'
             }}
           />
         ))}
@@ -343,7 +361,7 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
       
       {/* Debug info */}
       <div className="text-xs text-muted-foreground mb-2 text-center">
-        {debugInfo} | Playing: {isPlaying ? 'Yes' : 'No'} | Active: {animationActive ? 'Yes' : 'No'}
+        {debugInfo} | Playing: {isPlaying ? 'Yes' : 'No'} | Active: {animationActive ? 'Yes' : 'No'} | Frame: {frequencyData[0] ? Math.round(frequencyData[0]) : 0}
       </div>
 
       <Button
