@@ -284,6 +284,6 @@ export class RadioStreamService {
 
     const title = metadata.title;
     
-    return `🎵 ${title} • Dance One Radio 🎵`;
+    return `🎵 ${title} 🎵`;
   }
 }
