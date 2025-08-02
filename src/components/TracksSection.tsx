@@ -62,11 +62,13 @@ const TracksSection = () => {
             const cleanedQuery = cleanTrackForSearch(track.artist, track.title);
             console.log(`🎵 Fetching album art for: "${track.artist} - ${track.title}" -> cleaned: "${cleanedQuery}"`);
             const result = await AlbumArtService.getAlbumArt(cleanedQuery);
-            if (result.imageUrl) {
+            if (result.imageUrl && !result.imageUrl.includes('unsplash.com')) {
+              // Only use the result if it's not the default fallback image
               setAlbumArt(prev => ({...prev, [track.id]: result.imageUrl}));
-              console.log(`🎵 Found album art for: ${cleanedQuery}`);
+              console.log(`🎵 Found real album art for: ${cleanedQuery}`);
             } else {
-              console.log(`🎵 No album art found for: ${cleanedQuery}`);
+              console.log(`🎵 No real album art found for: ${cleanedQuery}, will use station logo`);
+              setAlbumArt(prev => ({...prev, [track.id]: null})); // Explicitly set to null to use station logo
             }
           } catch (error) {
             console.error(`🎵 Failed to fetch album art for ${track.artist} - ${track.title}:`, error);
