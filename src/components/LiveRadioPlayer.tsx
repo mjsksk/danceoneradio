@@ -365,7 +365,13 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
         <div className="relative overflow-hidden bg-background/20 rounded-md p-2 mb-2">
           <div className="animate-scroll whitespace-nowrap">
             <span className="text-sm text-foreground font-['Rajdhani'] font-medium">
-              {streamTitle}
+              {streamTitle
+                .replace(/Frequency\s*&\s*/gi, '') // Remove "Frequency &"
+                .replace(/🎵/g, '') // Remove music note icons
+                .replace(/[📻🔊🎶🎧]/g, '') // Remove other music/radio icons
+                .replace(/\s+/g, ' ') // Clean up extra spaces
+                .trim()
+              }
             </span>
           </div>
         </div>
