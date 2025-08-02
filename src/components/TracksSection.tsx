@@ -73,9 +73,6 @@ const TracksSection = () => {
             <span className="text-neon">LATEST</span>{" "}
             <span className="text-neon-purple">TRACKS</span>
           </h2>
-          <p className="text-xl text-muted-foreground font-['Rajdhani'] max-w-2xl mx-auto mb-4">
-            Recently played tracks from Dance One Radio live stream
-          </p>
           <Button 
             onClick={handleManualRefresh}
             disabled={refreshing}
