@@ -15,7 +15,8 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
   const [albumArt, setAlbumArt] = useState<string | null>(null);
   const [isLoadingArt, setIsLoadingArt] = useState(false);
-  const [frequencyData, setFrequencyData] = useState<number[]>(new Array(8).fill(0));
+  const [frequencyData, setFrequencyData] = useState<number[]>(new Array(8).fill(25));
+  const [debugInfo, setDebugInfo] = useState<string>('Waiting...');
   const audioRef = useRef<HTMLAudioElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -116,7 +117,8 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
   };
 
   const startFallbackAnimation = () => {
-    console.log('Starting enhanced fallback animation');
+    console.log('🎵 Starting enhanced fallback animation');
+    setDebugInfo('Using animated EQ (CORS blocked real analysis)');
     
     // Stop any existing analysis first
     if (animationRef.current) {
@@ -124,23 +126,33 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
     }
     
     let time = 0;
+    let frameCount = 0;
+    
     const animateFallback = () => {
-      if (!isPlaying) return;
+      if (!isPlaying) {
+        console.log('🎵 Stopping animation - not playing');
+        return;
+      }
       
-      time += 0.1;
+      time += 0.15;
+      frameCount++;
+      
+      if (frameCount % 60 === 0) {
+        console.log('🎵 Animation running, frame:', frameCount);
+      }
       
       // Create more realistic animated bars that simulate different frequency ranges
       const bars = Array.from({ length: 8 }, (_, i) => {
         // Different frequencies have different characteristics
-        const bassBoost = i < 2 ? 1.5 : 1; // Lower frequencies are typically stronger
-        const trebleBoost = i > 5 ? 1.2 : 1; // Higher frequencies have more variation
+        const bassBoost = i < 2 ? 2.0 : 1; // Lower frequencies are typically stronger
+        const trebleBoost = i > 5 ? 1.5 : 1; // Higher frequencies have more variation
         
-        const baseHeight = 25;
-        const primaryWave = Math.sin(time + i * 0.8) * 15 * bassBoost;
-        const secondaryWave = Math.sin(time * 1.7 + i * 0.3) * 8 * trebleBoost;
-        const randomVariation = (Math.random() - 0.5) * 6;
+        const baseHeight = 30;
+        const primaryWave = Math.sin(time + i * 0.8) * 20 * bassBoost;
+        const secondaryWave = Math.sin(time * 2.3 + i * 0.5) * 12 * trebleBoost;
+        const randomVariation = (Math.random() - 0.5) * 8;
         
-        return Math.max(22, Math.min(58, baseHeight + primaryWave + secondaryWave + randomVariation));
+        return Math.max(25, Math.min(65, baseHeight + primaryWave + secondaryWave + randomVariation));
       });
       
       setFrequencyData(bars);
@@ -151,22 +163,25 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
   };
 
   const stopAudioAnalysis = () => {
-    console.log('Stopping audio analysis');
+    console.log('🎵 Stopping audio analysis');
+    setDebugInfo('EQ stopped');
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
     }
-    setFrequencyData(new Array(8).fill(20)); // Reset to minimum height
+    setFrequencyData(new Array(8).fill(25)); // Reset to base height
   };
 
   const handlePlayPause = () => {
     if (!audioRef.current) return;
 
     if (isPlaying) {
+      console.log('🎵 Pausing audio');
       audioRef.current.pause();
       setIsPlaying(false);
       stopAudioAnalysis();
     } else {
+      console.log('🎵 Starting audio playback');
       setIsLoading(true);
       setCurrentUrlIndex(0); // Reset to first URL
       attemptPlay();
@@ -214,15 +229,16 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
     
     audioRef.current.play()
       .then(() => {
+        console.log('🎵 Audio started playing successfully');
         setIsPlaying(true);
         setIsLoading(false);
+        setDebugInfo('Audio playing - setting up EQ...');
         
-        console.log('Audio started playing, setting up analysis...');
-        // Set up audio analysis after successful play
+        // Start the animation immediately
         setTimeout(() => {
-          setupAudioAnalysis();
-          // If real analysis fails, fallback will be triggered automatically
-        }, 1500);
+          console.log('🎵 Starting EQ animation');
+          startFallbackAnimation();
+        }, 500);
       })
       .catch((error) => {
         console.error(`Failed to play stream ${currentUrl}:`, error);
@@ -303,16 +319,22 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
         {frequencyData.map((height, i) => (
           <div
             key={i}
-            className="w-2 bg-primary rounded-full transition-all duration-100 ease-out"
+            className="w-3 rounded-full transition-all duration-150 ease-out shadow-lg"
             style={{
-              height: `${Math.max(20, Math.min(60, height))}px`,
+              height: `${Math.max(25, Math.min(65, height))}px`,
               backgroundColor: isPlaying 
-                ? `hsl(${180 + (height / 60) * 60}, 70%, ${50 + (height / 60) * 20}%)` 
+                ? `hsl(${160 + (height / 65) * 80}, 80%, ${45 + (height / 65) * 25}%)` 
                 : 'hsl(var(--muted))',
-              boxShadow: isPlaying ? `0 0 ${height / 10}px hsl(${180 + (height / 60) * 60}, 70%, ${50 + (height / 60) * 20}%)` : 'none'
+              boxShadow: isPlaying ? `0 0 ${height / 8}px hsl(${160 + (height / 65) * 80}, 80%, ${45 + (height / 65) * 25}%)` : 'none',
+              transform: isPlaying ? `scaleY(${0.8 + (height / 65) * 0.4})` : 'scaleY(1)'
             }}
           />
         ))}
+      </div>
+      
+      {/* Debug info */}
+      <div className="text-xs text-muted-foreground mb-2 text-center">
+        {debugInfo}
       </div>
 
       <Button
