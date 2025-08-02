@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Download, Heart, Share2, Clock, RefreshCw } from 'lucide-react';
 import { RadioStreamService } from '@/utils/RadioStreamService';
+import stationLogo from '@/assets/dance-one-logo.png';
 
 interface Track {
   id: number;
@@ -96,8 +97,21 @@ const TracksSection = () => {
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
-                {/* Play Button & Track Info */}
+                {/* Album Art & Play Button & Track Info */}
                 <div className="flex items-center space-x-4 flex-1">
+                  {/* Album Art */}
+                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-secondary/20 flex-shrink-0">
+                    <img 
+                      src={stationLogo} 
+                      alt="Track Album Art" 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // Fallback is already the station logo
+                        console.log('Using station logo for track:', track.title);
+                      }}
+                    />
+                  </div>
+
                   <Button
                     onClick={() => handlePlayPause(track.id)}
                     className={`w-16 h-16 rounded-full ${
