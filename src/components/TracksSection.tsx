@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Play, Pause, Download, Heart, Share2, Clock, RefreshCw, Radio } from 'lucide-react';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import { AlbumArtService } from '@/utils/AlbumArtService';
+import { AppleMusicService } from '@/utils/AppleMusicService';
 import stationLogo from '/lovable-uploads/72d04e54-23af-4f4a-bf39-efcc6c6b2150.png';
 
 interface Track {
@@ -24,6 +25,22 @@ const TracksSection = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [logoError, setLogoError] = useState<{[key: number]: boolean}>({});
   const [albumArt, setAlbumArt] = useState<{[key: number]: string | null}>({});
+  const [previewUrls, setPreviewUrls] = useState<{[key: number]: string | null}>({});
+  const [audioRef, setAudioRef] = useState<HTMLAudioElement | null>(null);
+
+  // Initialize audio element
+  useEffect(() => {
+    const audio = new Audio();
+    audio.addEventListener('ended', () => {
+      setPlayingTrack(null);
+    });
+    setAudioRef(audio);
+    
+    return () => {
+      audio.pause();
+      audio.src = '';
+    };
+  }, []);
 
   // Clean and format track info for better album art search
   const cleanTrackForSearch = (artist: string, title: string): string => {
@@ -87,6 +104,32 @@ const TracksSection = () => {
   //   }
   // }, [tracks, albumArt]);
 
+  // Fetch Apple Music previews for tracks
+  useEffect(() => {
+    const fetchPreviews = async () => {
+      for (const track of tracks) {
+        if (!previewUrls[track.id]) {
+          try {
+            console.log(`🎵 Fetching Apple Music preview for: ${track.artist} - ${track.title}`);
+            const previewUrl = await AppleMusicService.getTrackPreview(track.id, track.artist, track.title);
+            if (previewUrl) {
+              setPreviewUrls(prev => ({...prev, [track.id]: previewUrl}));
+              console.log(`🎵 Found Apple Music preview for: ${track.artist} - ${track.title}`);
+            } else {
+              console.log(`🎵 No Apple Music preview found for: ${track.artist} - ${track.title}`);
+            }
+          } catch (error) {
+            console.error(`🎵 Failed to fetch Apple Music preview for ${track.artist} - ${track.title}:`, error);
+          }
+        }
+      }
+    };
+
+    if (tracks.length > 0) {
+      fetchPreviews();
+    }
+  }, [tracks, previewUrls]);
+
   useEffect(() => {
     const fetchRecentTracks = async () => {
       console.log('🎵 TracksSection: Starting to fetch recent tracks...');
@@ -109,11 +152,33 @@ const TracksSection = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handlePlayPause = (trackId: number) => {
+  const handlePlayPause = async (trackId: number) => {
+    if (!audioRef) return;
+
     if (playingTrack === trackId) {
+      // Pause current track
+      audioRef.pause();
       setPlayingTrack(null);
     } else {
-      setPlayingTrack(trackId);
+      // Stop any currently playing track
+      audioRef.pause();
+      
+      // Find the preview URL for this track
+      const previewUrl = previewUrls[trackId];
+      if (previewUrl) {
+        try {
+          audioRef.src = previewUrl;
+          await audioRef.play();
+          setPlayingTrack(trackId);
+          console.log(`🎵 Playing Apple Music preview for track ${trackId}`);
+        } catch (error) {
+          console.error('Failed to play Apple Music preview:', error);
+          setPlayingTrack(null);
+        }
+      } else {
+        console.log(`🎵 No Apple Music preview available for track ${trackId}`);
+        // Could add a fallback here to show a message or try alternative sources
+      }
     }
   };
 
