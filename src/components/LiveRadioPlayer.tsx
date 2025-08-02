@@ -101,12 +101,12 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
       <div className="relative z-10">
         <div className="flex items-center justify-center mb-6">
         <div className="relative">
-          <div className="w-20 h-20 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center pulse-cyber overflow-hidden">
+          <div className="w-20 h-20 bg-gradient-to-r from-primary to-accent rounded-lg flex items-center justify-center pulse-cyber overflow-hidden">
             {albumArt ? (
               <img 
                 src={albumArt} 
                 alt="Current Track Album Art" 
-                className="w-full h-full object-cover rounded-full"
+                className="w-full h-full object-cover rounded-lg"
                 onError={() => setAlbumArt(null)}
               />
             ) : (
