@@ -176,12 +176,6 @@ const TracksSection = () => {
           )}
         </div>
 
-        {/* More Tracks Button */}
-        <div className="text-center mt-12">
-          <Button className="btn-cyber" size="lg">
-            Browse All Tracks
-          </Button>
-        </div>
       </div>
     </section>
   );
