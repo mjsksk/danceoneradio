@@ -15,7 +15,12 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
   const [albumArt, setAlbumArt] = useState<string | null>(null);
   const [isLoadingArt, setIsLoadingArt] = useState(false);
+  const [frequencyData, setFrequencyData] = useState<number[]>(new Array(8).fill(0));
   const audioRef = useRef<HTMLAudioElement>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const dataArrayRef = useRef<Uint8Array | null>(null);
+  const animationRef = useRef<number | null>(null);
 
   const tryNextUrl = () => {
     if (currentUrlIndex < streamUrls.length - 1) {
@@ -25,12 +30,75 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
     return false;
   };
 
+  const setupAudioAnalysis = () => {
+    if (!audioRef.current || audioContextRef.current) return;
+
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const analyser = audioContext.createAnalyser();
+      const source = audioContext.createMediaElementSource(audioRef.current);
+      
+      analyser.fftSize = 64; // This gives us 32 frequency bins, we'll use 8
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      
+      source.connect(analyser);
+      analyser.connect(audioContext.destination);
+      
+      audioContextRef.current = audioContext;
+      analyserRef.current = analyser;
+      dataArrayRef.current = dataArray;
+      
+      startAudioAnalysis();
+    } catch (error) {
+      console.error('Error setting up audio analysis:', error);
+    }
+  };
+
+  const startAudioAnalysis = () => {
+    if (!analyserRef.current || !dataArrayRef.current) return;
+
+    const updateFrequencyData = () => {
+      if (!analyserRef.current || !dataArrayRef.current || !isPlaying) return;
+
+      analyserRef.current.getByteFrequencyData(dataArrayRef.current);
+      
+      // Group frequency data into 8 bars (we have 32 bins, so group by 4)
+      const bars = [];
+      const binsPerBar = Math.floor(dataArrayRef.current.length / 8);
+      
+      for (let i = 0; i < 8; i++) {
+        let sum = 0;
+        for (let j = 0; j < binsPerBar; j++) {
+          sum += dataArrayRef.current[i * binsPerBar + j];
+        }
+        const average = sum / binsPerBar;
+        // Normalize to 20-60 pixel range for visual appeal
+        bars.push(Math.max(20, (average / 255) * 40 + 20));
+      }
+      
+      setFrequencyData(bars);
+      animationRef.current = requestAnimationFrame(updateFrequencyData);
+    };
+
+    updateFrequencyData();
+  };
+
+  const stopAudioAnalysis = () => {
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+    setFrequencyData(new Array(8).fill(20)); // Reset to minimum height
+  };
+
   const handlePlayPause = () => {
     if (!audioRef.current) return;
 
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
+      stopAudioAnalysis();
     } else {
       setIsLoading(true);
       setCurrentUrlIndex(0); // Reset to first URL
@@ -46,7 +114,7 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
       setIsLoadingArt(true);
       try {
         // Extract song title from the formatted stream title
-        const songMatch = streamTitle.match(/🎵\s*(.*?)\s*•/);
+        const songMatch = streamTitle.match(/🎵\s*(.*?)\s*🎵/);
         const songTitle = songMatch ? songMatch[1] : streamTitle;
         
         const result = await AlbumArtService.getAlbumArt(songTitle);
@@ -61,6 +129,16 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
     fetchAlbumArt();
   }, [streamTitle]);
 
+  // Cleanup audio context on unmount
+  useEffect(() => {
+    return () => {
+      stopAudioAnalysis();
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+      }
+    };
+  }, []);
+
   const attemptPlay = () => {
     if (!audioRef.current) return;
     
@@ -71,6 +149,11 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
       .then(() => {
         setIsPlaying(true);
         setIsLoading(false);
+        
+        // Set up audio analysis after successful play
+        setTimeout(() => {
+          setupAudioAnalysis();
+        }, 1000); // Wait a bit for audio to stabilize
       })
       .catch((error) => {
         console.error(`Failed to play stream ${currentUrl}:`, error);
@@ -146,15 +229,17 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
         <p className="text-xs text-muted-foreground">Broadcasting Live 24/7</p>
       </div>
 
-      {/* Audio Visualizer */}
+      {/* Real-time Audio EQ Visualizer */}
       <div className="flex items-center justify-center space-x-1 mb-6">
-        {[...Array(8)].map((_, i) => (
+        {frequencyData.map((height, i) => (
           <div
             key={i}
-            className="w-1 bg-primary rounded-full wave-animation"
+            className="w-2 bg-primary rounded-full transition-all duration-75 ease-out"
             style={{
-              height: `${20 + Math.random() * 40}px`,
-              animationDelay: `${i * 0.1}s`
+              height: `${height}px`,
+              backgroundColor: isPlaying 
+                ? `hsl(${180 + (height / 60) * 60}, 70%, ${50 + (height / 60) * 20}%)` 
+                : 'hsl(var(--muted))'
             }}
           />
         ))}
@@ -187,14 +272,20 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
       <audio
         ref={audioRef}
         preload="none"
+        crossOrigin="anonymous"
         onError={() => {
           console.error('Audio element error');
+          stopAudioAnalysis();
           if (tryNextUrl()) {
             setTimeout(attemptPlay, 1000);
           } else {
             setIsLoading(false);
             setIsPlaying(false);
           }
+        }}
+        onPause={() => {
+          setIsPlaying(false);
+          stopAudioAnalysis();
         }}
       />
       </div>
