@@ -364,10 +364,6 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
         ))}
       </div>
       
-      {/* Debug info */}
-      <div className="text-xs text-muted-foreground mb-2 text-center">
-        {debugInfo} | Playing: {isPlaying ? 'Yes' : 'No'} | Active: {animationActive ? 'Yes' : 'No'} | Frame: {frequencyData[0] ? Math.round(frequencyData[0]) : 0}
-      </div>
 
       <Button
         onClick={handlePlayPause}
