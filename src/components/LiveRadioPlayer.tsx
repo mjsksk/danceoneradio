@@ -155,11 +155,14 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
           const hue = 160 + (height / 70) * 80;
           const lightness = 45 + (height / 70) * 25;
           
-          // Apply directly to DOM
+          // Apply directly to DOM with fixed width to prevent oscillation
           bar.style.height = `${height}px`;
+          bar.style.width = '16px'; // Fixed width to prevent oscillation
+          bar.style.minWidth = '16px';
+          bar.style.maxWidth = '16px';
           bar.style.backgroundColor = `hsl(${hue}, 80%, ${lightness}%)`;
           bar.style.boxShadow = `0 0 ${height / 8}px hsl(${hue}, 80%, ${lightness}%)`;
-          bar.style.transform = `scaleY(${0.8 + (height / 70) * 0.4})`;
+          bar.style.transform = 'scaleX(1)'; // Remove scaleY to prevent width changes
         });
       }
       
@@ -339,21 +342,23 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
         <p className="text-xs text-muted-foreground">Broadcasting Live 24/7</p>
       </div>
 
-      {/* Real-time Audio EQ Visualizer */}
-      <div className="flex items-center justify-center space-x-1 mb-6" data-eq-container>
+      {/* Real-time Audio EQ Visualizer - Fixed container to prevent width oscillation */}
+      <div className="flex items-end justify-center space-x-1 mb-6 h-20" data-eq-container>
         {frequencyData.map((height, i) => (
           <div
             key={i}
             data-eq-bar
-            className="w-4 rounded-full transition-none shadow-lg"
+            className="rounded-full transition-none shadow-lg flex-shrink-0"
             style={{
               height: `${Math.max(30, Math.min(70, height))}px`,
+              width: '16px',
+              minWidth: '16px',
+              maxWidth: '16px',
               backgroundColor: animationActive 
                 ? `hsl(${160 + (height / 70) * 80}, 80%, ${45 + (height / 70) * 25}%)` 
                 : 'hsl(var(--muted))',
               boxShadow: animationActive ? `0 0 ${height / 8}px hsl(${160 + (height / 70) * 80}, 80%, ${45 + (height / 70) * 25}%)` : 'none',
-              transform: animationActive ? `scaleY(${0.8 + (height / 70) * 0.4})` : 'scaleY(1)',
-              willChange: 'height, background-color, box-shadow, transform'
+              willChange: 'height, background-color, box-shadow'
             }}
           />
         ))}
