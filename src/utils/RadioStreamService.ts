@@ -331,45 +331,52 @@ export class RadioStreamService {
     try {
       const tracks: Track[] = [];
       console.log('Parsing history data, length:', data.length);
+      console.log('First 1000 chars of history data:', data.substring(0, 1000));
       
       // Parse HTML response from SHOUTcast admin interface
       const lines = data.split('\n');
       let trackId = 1;
       
+      // Look for different patterns that might contain track history
       for (let i = 0; i < lines.length && tracks.length < 10; i++) {
         const line = lines[i].trim();
         
-        // Look for various patterns that might contain track information
-        // Pattern 1: HTML table cells with time and track info
-        if (line.includes('<td>') && (line.includes(':') || line.includes(' - '))) {
-          const timeMatch = line.match(/(\d{1,2}:\d{2}(?::\d{2})?)/);
+        // Skip empty lines
+        if (!line) continue;
+        
+        // Pattern 1: Look for table rows with track data
+        if (line.includes('<tr>') || line.includes('<td>')) {
+          // Check next few lines for track information
+          let combinedLine = line;
+          for (let j = i + 1; j < Math.min(i + 5, lines.length); j++) {
+            combinedLine += ' ' + lines[j].trim();
+          }
           
-          // Extract all text content between HTML tags
-          const textMatches = line.match(/>([^<]+)</g);
-          if (textMatches) {
-            let foundTrackInThisLine = false;
-            for (const match of textMatches) {
+          // Extract track info from combined HTML
+          const trackMatch = combinedLine.match(/>\s*([^<]+(?:\s+-\s+[^<]+))\s*</g);
+          if (trackMatch) {
+            for (const match of trackMatch) {
               const content = match.replace(/[><]/g, '').trim();
               
-              // Look for content that looks like a track (contains " - " and is not just numbers/time)
-              if (content.includes(' - ') && content.length > 5 && !content.match(/^\d+$/) && !content.match(/^\d{1,2}:\d{2}/) && !foundTrackInThisLine) {
+              if (content.includes(' - ') && content.length > 5 && 
+                  !content.match(/^\d+$/) && !content.match(/^\d{1,2}:\d{2}/) &&
+                  !content.toLowerCase().includes('time') && 
+                  !content.toLowerCase().includes('song') &&
+                  !content.toLowerCase().includes('artist')) {
+                
                 const parts = content.split(' - ');
                 if (parts.length >= 2) {
                   const artist = parts[0].trim();
                   const title = parts.slice(1).join(' - ').trim();
                   
+                  // Skip if already have this track
+                  if (tracks.some(t => t.artist === artist && t.title === title)) {
+                    continue;
+                  }
+                  
                   if (artist.length > 0 && title.length > 0) {
-                    // Calculate played time
                     const playedTime = new Date();
-                    if (timeMatch) {
-                      const timeParts = timeMatch[1].split(':');
-                      const hours = parseInt(timeParts[0]);
-                      const minutes = parseInt(timeParts[1]);
-                      const seconds = timeParts[2] ? parseInt(timeParts[2]) : 0;
-                      playedTime.setHours(hours, minutes, seconds, 0);
-                    } else {
-                      playedTime.setMinutes(playedTime.getMinutes() - tracks.length * 5);
-                    }
+                    playedTime.setMinutes(playedTime.getMinutes() - tracks.length * 5);
                     
                     tracks.push({
                       id: trackId++,
@@ -384,7 +391,6 @@ export class RadioStreamService {
                     });
                     
                     console.log(`Found track ${tracks.length}: ${artist} - ${title}`);
-                    foundTrackInThisLine = true; // Prevent multiple tracks from same line
                   }
                 }
               }
@@ -392,10 +398,11 @@ export class RadioStreamService {
           }
         }
         
-        // Pattern 2: Plain text lines with track info (fallback)
+        // Pattern 2: Direct lines with track info (no HTML)
         else if (line.includes(' - ') && !line.includes('<') && !line.includes('>') && line.length > 10) {
           // Skip lines that are obviously not tracks
-          if (line.includes('http') || line.includes('www') || line.includes('admin') || line.includes('mode=')) {
+          if (line.includes('http') || line.includes('www') || line.includes('admin') || 
+              line.includes('mode=') || line.includes('copyright') || line.includes('shoutcast')) {
             continue;
           }
           
@@ -403,6 +410,11 @@ export class RadioStreamService {
           if (parts.length >= 2) {
             const artist = parts[0].trim();
             const title = parts.slice(1).join(' - ').trim();
+            
+            // Skip if already have this track
+            if (tracks.some(t => t.artist === artist && t.title === title)) {
+              continue;
+            }
             
             if (artist.length > 0 && title.length > 0 && !artist.match(/^\d+$/) && !title.match(/^\d+$/)) {
               const playedTime = new Date();
@@ -421,6 +433,42 @@ export class RadioStreamService {
               });
               
               console.log(`Found plain text track ${tracks.length}: ${artist} - ${title}`);
+            }
+          }
+        }
+        
+        // Pattern 3: Look for time stamps followed by track info  
+        else if (line.match(/\d{1,2}:\d{2}/) && (i + 1 < lines.length)) {
+          const nextLine = lines[i + 1]?.trim();
+          if (nextLine && nextLine.includes(' - ') && !nextLine.includes('<')) {
+            const parts = nextLine.split(' - ');
+            if (parts.length >= 2) {
+              const artist = parts[0].trim();
+              const title = parts.slice(1).join(' - ').trim();
+              
+              // Skip if already have this track
+              if (tracks.some(t => t.artist === artist && t.title === title)) {
+                continue;
+              }
+              
+              if (artist.length > 0 && title.length > 0) {
+                const playedTime = new Date();
+                playedTime.setMinutes(playedTime.getMinutes() - tracks.length * 5);
+                
+                tracks.push({
+                  id: trackId++,
+                  title,
+                  artist,
+                  duration: this.generateRandomDuration(),
+                  genre: this.generateRandomGenre(),
+                  playedAt: playedTime.toISOString(),
+                  waveform: this.generateWaveform(),
+                  likes: Math.floor(Math.random() * 2000) + 500,
+                  downloads: Math.floor(Math.random() * 800) + 200
+                });
+                
+                console.log(`Found timestamped track ${tracks.length}: ${artist} - ${title}`);
+              }
             }
           }
         }
