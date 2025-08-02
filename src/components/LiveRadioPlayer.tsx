@@ -83,6 +83,17 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
 
       analyserRef.current.getByteFrequencyData(dataArrayRef.current);
       
+      // Check if we're getting real data (sum should be > 0 if audio is playing)
+      const dataSum = Array.from(dataArrayRef.current).reduce((sum, val) => sum + val, 0);
+      
+      if (dataSum === 0) {
+        console.log('No audio data detected, using fallback animation');
+        startFallbackAnimation();
+        return;
+      }
+      
+      console.log('Real audio data detected:', dataSum);
+      
       // Group frequency data into 8 bars (we have 32 bins, so group by 4)
       const bars = [];
       const binsPerBar = Math.floor(dataArrayRef.current.length / 8);
@@ -105,16 +116,31 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
   };
 
   const startFallbackAnimation = () => {
-    console.log('Starting fallback animation');
+    console.log('Starting enhanced fallback animation');
+    
+    // Stop any existing analysis first
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+    
+    let time = 0;
     const animateFallback = () => {
       if (!isPlaying) return;
       
-      // Create animated bars when real audio analysis isn't available
+      time += 0.1;
+      
+      // Create more realistic animated bars that simulate different frequency ranges
       const bars = Array.from({ length: 8 }, (_, i) => {
+        // Different frequencies have different characteristics
+        const bassBoost = i < 2 ? 1.5 : 1; // Lower frequencies are typically stronger
+        const trebleBoost = i > 5 ? 1.2 : 1; // Higher frequencies have more variation
+        
         const baseHeight = 25;
-        const variation = Math.sin(Date.now() * 0.01 + i * 0.5) * 15;
-        const randomVariation = Math.random() * 10;
-        return Math.max(20, baseHeight + variation + randomVariation);
+        const primaryWave = Math.sin(time + i * 0.8) * 15 * bassBoost;
+        const secondaryWave = Math.sin(time * 1.7 + i * 0.3) * 8 * trebleBoost;
+        const randomVariation = (Math.random() - 0.5) * 6;
+        
+        return Math.max(22, Math.min(58, baseHeight + primaryWave + secondaryWave + randomVariation));
       });
       
       setFrequencyData(bars);
@@ -195,7 +221,8 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
         // Set up audio analysis after successful play
         setTimeout(() => {
           setupAudioAnalysis();
-        }, 2000); // Wait a bit longer for audio to stabilize
+          // If real analysis fails, fallback will be triggered automatically
+        }, 1500);
       })
       .catch((error) => {
         console.error(`Failed to play stream ${currentUrl}:`, error);
