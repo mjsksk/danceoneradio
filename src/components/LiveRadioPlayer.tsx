@@ -17,6 +17,7 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
   const [isLoadingArt, setIsLoadingArt] = useState(false);
   const [frequencyData, setFrequencyData] = useState<number[]>(new Array(8).fill(25));
   const [debugInfo, setDebugInfo] = useState<string>('Waiting...');
+  const [animationActive, setAnimationActive] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -119,6 +120,7 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
   const startFallbackAnimation = () => {
     console.log('🎵 Starting enhanced fallback animation');
     setDebugInfo('Using animated EQ (CORS blocked real analysis)');
+    setAnimationActive(true);
     
     // Stop any existing analysis first
     if (animationRef.current) {
@@ -129,16 +131,17 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
     let frameCount = 0;
     
     const animateFallback = () => {
-      if (!isPlaying) {
-        console.log('🎵 Stopping animation - not playing');
+      // Use animationActive instead of isPlaying for more reliable control
+      if (!animationActive) {
+        console.log('🎵 Stopping animation - animation not active');
         return;
       }
       
       time += 0.15;
       frameCount++;
       
-      if (frameCount % 60 === 0) {
-        console.log('🎵 Animation running, frame:', frameCount);
+      if (frameCount % 120 === 0) {
+        console.log('🎵 Animation running, frame:', frameCount, 'isPlaying:', isPlaying, 'animationActive:', animationActive);
       }
       
       // Create more realistic animated bars that simulate different frequency ranges
@@ -156,6 +159,11 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
       });
       
       setFrequencyData(bars);
+      
+      if (frameCount % 60 === 0) {
+        console.log('🎵 Setting frequency data:', bars.map(b => Math.round(b)));
+      }
+      
       animationRef.current = requestAnimationFrame(animateFallback);
     };
     
@@ -165,6 +173,7 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
   const stopAudioAnalysis = () => {
     console.log('🎵 Stopping audio analysis');
     setDebugInfo('EQ stopped');
+    setAnimationActive(false);
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
@@ -322,11 +331,11 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
             className="w-3 rounded-full transition-all duration-150 ease-out shadow-lg"
             style={{
               height: `${Math.max(25, Math.min(65, height))}px`,
-              backgroundColor: isPlaying 
+              backgroundColor: animationActive 
                 ? `hsl(${160 + (height / 65) * 80}, 80%, ${45 + (height / 65) * 25}%)` 
                 : 'hsl(var(--muted))',
-              boxShadow: isPlaying ? `0 0 ${height / 8}px hsl(${160 + (height / 65) * 80}, 80%, ${45 + (height / 65) * 25}%)` : 'none',
-              transform: isPlaying ? `scaleY(${0.8 + (height / 65) * 0.4})` : 'scaleY(1)'
+              boxShadow: animationActive ? `0 0 ${height / 8}px hsl(${160 + (height / 65) * 80}, 80%, ${45 + (height / 65) * 25}%)` : 'none',
+              transform: animationActive ? `scaleY(${0.8 + (height / 65) * 0.4})` : 'scaleY(1)'
             }}
           />
         ))}
@@ -334,7 +343,7 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
       
       {/* Debug info */}
       <div className="text-xs text-muted-foreground mb-2 text-center">
-        {debugInfo}
+        {debugInfo} | Playing: {isPlaying ? 'Yes' : 'No'} | Active: {animationActive ? 'Yes' : 'No'}
       </div>
 
       <Button
