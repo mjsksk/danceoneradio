@@ -10,7 +10,6 @@ const Navigation = () => {
     { name: 'Home', href: '/' },
     { name: 'Privacy', href: '/privacy' },
     { name: 'Love', href: '/love' },
-    { name: 'DJs', href: '#djs' },
     { name: 'Contact', href: '#contact' }
   ];
 
