@@ -22,11 +22,14 @@ const TracksSection = () => {
 
   useEffect(() => {
     const fetchRecentTracks = async () => {
+      console.log('🎵 TracksSection: Starting to fetch recent tracks...');
       try {
+        setLoading(true);
         const recentTracks = await RadioStreamService.getRecentTracks();
+        console.log('🎵 TracksSection: Received tracks:', recentTracks.length, recentTracks);
         setTracks(recentTracks);
       } catch (error) {
-        console.error('Failed to fetch recent tracks:', error);
+        console.error('🎵 TracksSection: Failed to fetch recent tracks:', error);
       } finally {
         setLoading(false);
       }
@@ -34,8 +37,8 @@ const TracksSection = () => {
 
     fetchRecentTracks();
     
-    // Refresh tracks every 5 minutes
-    const interval = setInterval(fetchRecentTracks, 5 * 60 * 1000);
+    // Refresh tracks every 30 seconds for testing (was 5 minutes)
+    const interval = setInterval(fetchRecentTracks, 30 * 1000);
     return () => clearInterval(interval);
   }, []);
 
