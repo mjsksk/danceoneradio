@@ -176,7 +176,13 @@ export class RadioStreamService {
 
   static async getRecentTracks(): Promise<Track[]> {
     try {
-      // Get current stream data to get the currently playing track
+      // Try to fetch from the actual history feed first
+      const historyTracks = await this.fetchTrackHistory();
+      if (historyTracks.length > 0) {
+        return historyTracks;
+      }
+      
+      // Fallback to existing logic if history feed fails
       const currentMetadata = await this.getStreamMetadata();
       const recentTracks: Track[] = [];
       
@@ -227,6 +233,140 @@ export class RadioStreamService {
     } catch (error) {
       console.error('Error fetching recent tracks:', error);
       return this.generateFallbackTracks();
+    }
+  }
+
+  private static async fetchTrackHistory(): Promise<Track[]> {
+    try {
+      const historyUrl = 'http://s9.myradiostream.com:14296/admin.cgi?sid=1&mode=history';
+      
+      // Try CORS proxy services to bypass CORS restrictions
+      const proxies = [
+        'https://api.allorigins.win/get?url=',
+        'https://corsproxy.io/?',
+        'https://cors-anywhere.herokuapp.com/'
+      ];
+
+      for (const proxy of proxies) {
+        try {
+          const proxyUrl = `${proxy}${encodeURIComponent(historyUrl)}`;
+          const response = await fetch(proxyUrl, {
+            method: 'GET',
+            headers: {
+              'Accept': 'text/html,application/xhtml+xml,application/xml',
+            },
+          });
+
+          if (response.ok) {
+            let data = await response.text();
+            
+            // If using allorigins, extract contents
+            if (proxy.includes('allorigins')) {
+              const json = JSON.parse(data);
+              data = json.contents;
+            }
+            
+            const tracks = this.parseHistoryData(data);
+            if (tracks.length > 0) {
+              console.log('Successfully fetched track history:', tracks);
+              return tracks;
+            }
+          }
+        } catch (error) {
+          console.log(`Failed to fetch history from ${proxy}:`, error);
+          continue;
+        }
+      }
+
+      return [];
+    } catch (error) {
+      console.error('Error fetching track history:', error);
+      return [];
+    }
+  }
+
+  private static parseHistoryData(data: string): Track[] {
+    try {
+      const tracks: Track[] = [];
+      
+      // Parse HTML response from SHOUTcast admin interface
+      // Look for table rows containing track information
+      const lines = data.split('\n');
+      let trackId = 1;
+      
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        
+        // Look for lines containing track data (typically in table format)
+        if (line.includes('<td>') && line.includes(':')) {
+          // Extract time and track info
+          const timeMatch = line.match(/(\d{2}:\d{2}:\d{2})/);
+          const trackMatch = line.match(/>([^<]+)</g);
+          
+          if (timeMatch && trackMatch && trackMatch.length >= 2) {
+            const time = timeMatch[1];
+            let trackInfo = '';
+            
+            // Find the track title (usually the longest text content)
+            for (const match of trackMatch) {
+              const content = match.replace(/[><]/g, '').trim();
+              if (content && content.length > trackInfo.length && !content.match(/^\d+$/)) {
+                trackInfo = content;
+              }
+            }
+            
+            if (trackInfo && !trackInfo.includes('html') && !trackInfo.includes('body')) {
+              const [title, artist] = this.parseTrackInfo(trackInfo);
+              
+              // Calculate played time based on the time found
+              const playedTime = new Date();
+              const [hours, minutes, seconds] = time.split(':').map(Number);
+              playedTime.setHours(hours, minutes, seconds, 0);
+              
+              tracks.push({
+                id: trackId++,
+                title,
+                artist,
+                duration: this.generateRandomDuration(),
+                genre: this.generateRandomGenre(),
+                playedAt: playedTime.toISOString(),
+                waveform: this.generateWaveform(),
+                likes: Math.floor(Math.random() * 2000) + 500,
+                downloads: Math.floor(Math.random() * 800) + 200
+              });
+            }
+          }
+        }
+        
+        // Also look for direct track listings in other formats
+        if (line.includes(' - ') && !line.includes('<') && line.length > 10) {
+          const [title, artist] = this.parseTrackInfo(line.trim());
+          if (title && artist && tracks.length < 10) {
+            const playedTime = new Date();
+            playedTime.setMinutes(playedTime.getMinutes() - tracks.length * 5);
+            
+            tracks.push({
+              id: trackId++,
+              title,
+              artist,
+              duration: this.generateRandomDuration(),
+              genre: this.generateRandomGenre(),
+              playedAt: playedTime.toISOString(),
+              waveform: this.generateWaveform(),
+              likes: Math.floor(Math.random() * 2000) + 500,
+              downloads: Math.floor(Math.random() * 800) + 200
+            });
+          }
+        }
+      }
+      
+      // Sort by played time (most recent first) and limit to 4 tracks
+      return tracks
+        .sort((a, b) => new Date(b.playedAt).getTime() - new Date(a.playedAt).getTime())
+        .slice(0, 4);
+    } catch (error) {
+      console.error('Error parsing history data:', error);
+      return [];
     }
   }
 
