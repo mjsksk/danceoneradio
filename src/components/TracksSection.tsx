@@ -168,13 +168,6 @@ const TracksSection = () => {
                     >
                       <Share2 className="w-4 h-4" />
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-muted-foreground hover:text-primary hover:bg-primary/20"
-                    >
-                      <Download className="w-4 h-4" />
-                    </Button>
                   </div>
                 </div>
               </div>
