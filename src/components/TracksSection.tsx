@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Download, Heart, Share2, Clock, RefreshCw, Radio } from 'lucide-react';
 import { RadioStreamService } from '@/utils/RadioStreamService';
+import { AlbumArtService } from '@/utils/AlbumArtService';
 import stationLogo from '/lovable-uploads/72d04e54-23af-4f4a-bf39-efcc6c6b2150.png';
 
 interface Track {
@@ -22,6 +23,31 @@ const TracksSection = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [logoError, setLogoError] = useState<{[key: number]: boolean}>({});
+  const [albumArt, setAlbumArt] = useState<{[key: number]: string | null}>({});
+
+  // Fetch album art for tracks when tracks change
+  useEffect(() => {
+    const fetchAlbumArt = async () => {
+      for (const track of tracks) {
+        if (!albumArt[track.id]) {
+          try {
+            console.log(`🎵 Fetching album art for: ${track.artist} - ${track.title}`);
+            const result = await AlbumArtService.getAlbumArt(`${track.artist} - ${track.title}`);
+            if (result.imageUrl) {
+              setAlbumArt(prev => ({...prev, [track.id]: result.imageUrl}));
+              console.log(`🎵 Found album art for: ${track.artist} - ${track.title}`);
+            }
+          } catch (error) {
+            console.error(`🎵 Failed to fetch album art for ${track.artist} - ${track.title}:`, error);
+          }
+        }
+      }
+    };
+
+    if (tracks.length > 0) {
+      fetchAlbumArt();
+    }
+  }, [tracks, albumArt]);
 
   useEffect(() => {
     const fetchRecentTracks = async () => {
@@ -100,22 +126,32 @@ const TracksSection = () => {
               <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
                 {/* Album Art & Play Button & Track Info */}
                 <div className="flex items-center space-x-4 flex-1">
-                  {/* Album Art */}
-                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-secondary/20 flex-shrink-0 flex items-center justify-center">
-                    {logoError[track.id] ? (
-                      <Radio className="w-8 h-8 text-primary" />
-                    ) : (
-                      <img 
-                        src={stationLogo} 
-                        alt="Dance One Radio Logo" 
-                        className="w-full h-full object-contain"
-                        onError={() => {
-                          setLogoError(prev => ({...prev, [track.id]: true}));
-                          console.log('Station logo failed to load for track:', track.title);
-                        }}
-                      />
-                    )}
-                  </div>
+                   {/* Album Art */}
+                   <div className="w-16 h-16 rounded-lg overflow-hidden bg-secondary/20 flex-shrink-0 flex items-center justify-center">
+                     {logoError[track.id] ? (
+                       <Radio className="w-8 h-8 text-primary" />
+                     ) : albumArt[track.id] ? (
+                       <img 
+                         src={albumArt[track.id]} 
+                         alt={`${track.artist} - ${track.title} Album Art`}
+                         className="w-full h-full object-cover"
+                         onError={() => {
+                           setLogoError(prev => ({...prev, [track.id]: true}));
+                           console.log('Album art failed to load for track:', track.title);
+                         }}
+                       />
+                     ) : (
+                       <img 
+                         src={stationLogo} 
+                         alt="Dance One Radio Logo" 
+                         className="w-full h-full object-contain"
+                         onError={() => {
+                           setLogoError(prev => ({...prev, [track.id]: true}));
+                           console.log('Station logo failed to load for track:', track.title);
+                         }}
+                       />
+                     )}
+                   </div>
 
                   <Button
                     onClick={() => handlePlayPause(track.id)}
