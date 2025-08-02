@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, Download, Heart, Share2, Clock } from 'lucide-react';
+import { Play, Pause, Download, Heart, Share2, Clock, RefreshCw } from 'lucide-react';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 
 interface Track {
@@ -19,6 +19,7 @@ const TracksSection = () => {
   const [playingTrack, setPlayingTrack] = useState<number | null>(null);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const fetchRecentTracks = async () => {
@@ -50,6 +51,20 @@ const TracksSection = () => {
     }
   };
 
+  const handleManualRefresh = async () => {
+    console.log('🎵 Manual refresh triggered');
+    setRefreshing(true);
+    try {
+      const recentTracks = await RadioStreamService.getRecentTracks();
+      console.log('🎵 Manual refresh received tracks:', recentTracks.length, recentTracks);
+      setTracks(recentTracks);
+    } catch (error) {
+      console.error('🎵 Manual refresh failed:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   return (
     <section id="tracks" className="py-20 relative">
       <div className="container mx-auto px-4">
@@ -58,9 +73,17 @@ const TracksSection = () => {
             <span className="text-neon">LATEST</span>{" "}
             <span className="text-neon-purple">TRACKS</span>
           </h2>
-          <p className="text-xl text-muted-foreground font-['Rajdhani'] max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground font-['Rajdhani'] max-w-2xl mx-auto mb-4">
             Recently played tracks from Dance One Radio live stream
           </p>
+          <Button 
+            onClick={handleManualRefresh}
+            disabled={refreshing}
+            className="btn-cyber"
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+            {refreshing ? 'Refreshing...' : 'Refresh Tracks'}
+          </Button>
         </div>
 
         <div className="space-y-6">

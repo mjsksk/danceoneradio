@@ -188,6 +188,8 @@ export class RadioStreamService {
         return historyTracks;
       }
       
+      console.log('🎵 Using fallback tracks since history failed');
+      
       // Fallback to existing logic if history feed fails
       const currentMetadata = await this.getStreamMetadata();
       const recentTracks: Track[] = [];
@@ -240,10 +242,15 @@ export class RadioStreamService {
         });
       });
       
-      return recentTracks.slice(0, 10); // Return latest 10 tracks
+      console.log('🎵 Total tracks before slicing:', recentTracks.length);
+      const finalTracks = recentTracks.slice(0, 10);
+      console.log('🎵 Final tracks to return:', finalTracks.length, finalTracks);
+      return finalTracks; // Return latest 10 tracks
     } catch (error) {
       console.error('Error fetching recent tracks:', error);
-      return this.generateFallbackTracks();
+      const fallbackTracks = this.generateFallbackTracks();
+      console.log('🎵 Using fallback tracks:', fallbackTracks.length, fallbackTracks);
+      return fallbackTracks;
     }
   }
 
