@@ -35,13 +35,13 @@ const DJSection = () => {
     },
     {
       id: 4,
-      name: "DJ Aurora",
-      role: "Trance Architect",
-      genre: "Trance",
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=face",
-      bio: "Crafting euphoric journeys through uplifting trance",
-      socials: { instagram: "@djaurora", twitter: "@aurora_trance" },
-      nextShow: "Monday 8PM PST"
+      name: "Mario",
+      role: "Future Dance Anthems Host",
+      genre: "Electronic Dance Music",
+      image: "/lovable-uploads/ba6a92fa-e132-4643-8d4c-abc0bab124f1.png",
+      bio: "Host of Future Dance Anthems, bringing you the latest electronic music",
+      socials: { instagram: "@mario", twitter: "@mario_dance" },
+      nextShow: "Weekly Episodes"
     }
   ];
 
@@ -71,7 +71,8 @@ const DJSection = () => {
                   <img
                     src={dj.image}
                     alt={dj.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-300"
+                    style={{ objectPosition: 'center top' }}
                   />
                 </div>
                 <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-primary rounded-full flex items-center justify-center animate-glow-pulse">
