@@ -70,7 +70,7 @@ const TracksSection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16 animate-fade-in">
           <h2 className="text-4xl md:text-6xl font-['Orbitron'] font-bold mb-6">
-            <span className="text-neon">LATEST</span>{" "}
+            <span className="text-neon">LATEST PLAYED</span>{" "}
             <span className="text-neon-purple">TRACKS</span>
           </h2>
           <Button 
