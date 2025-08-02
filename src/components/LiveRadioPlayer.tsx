@@ -367,6 +367,8 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
             <span className="text-sm text-foreground font-['Rajdhani'] font-medium">
               {streamTitle
                 .replace(/Frequency\s*&\s*/gi, '') // Remove "Frequency &"
+                .replace(/&amp;/g, '&') // Convert HTML entity to normal ampersand
+                .replace(/amp;/g, '') // Remove remaining "amp;" text
                 .replace(/🎵/g, '') // Remove music note icons
                 .replace(/[📻🔊🎶🎧]/g, '') // Remove other music/radio icons
                 .replace(/\s+/g, ' ') // Clean up extra spaces
