@@ -216,6 +216,30 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
     }
   };
 
+  // Clean and format track info for better album art search
+  const cleanTrackForSearch = (streamTitle: string): string => {
+    // Extract song title from the formatted stream title
+    const songMatch = streamTitle.match(/🎵\s*(.*?)\s*🎵/);
+    const songTitle = songMatch ? songMatch[1] : streamTitle;
+    
+    // Clean the title for better search results
+    return songTitle
+      .replace(/&amp;/g, '&')
+      .replace(/&apos;/g, "'")
+      .replace(/\(.*?extended.*?\)/gi, '') // Remove (Extended)
+      .replace(/\(.*?remix.*?\)/gi, '') // Remove remix info
+      .replace(/\(.*?edit.*?\)/gi, '') // Remove edit info
+      .replace(/\(.*?mix.*?\)/gi, '') // Remove mix info
+      .replace(/\[.*?\]/g, '') // Remove [brackets]
+      .replace(/feat\..*$/gi, '') // Remove featuring
+      .replace(/ft\..*$/gi, '') // Remove ft.
+      .replace(/vs\..*$/gi, '') // Remove vs.
+      .replace(/\d{4}$/, '') // Remove year at end
+      .replace(/[^\w\s&'-]/g, '')
+      .replace(/Dance One Radio.*$/gi, '') // Remove radio station info
+      .trim();
+  };
+
   // Fetch album art when stream title changes
   useEffect(() => {
     const fetchAlbumArt = async () => {
@@ -223,14 +247,20 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
       
       setIsLoadingArt(true);
       try {
-        // Extract song title from the formatted stream title
-        const songMatch = streamTitle.match(/🎵\s*(.*?)\s*🎵/);
-        const songTitle = songMatch ? songMatch[1] : streamTitle;
+        const cleanedQuery = cleanTrackForSearch(streamTitle);
+        console.log(`🎵 Radio: Fetching album art for: "${streamTitle}" -> cleaned: "${cleanedQuery}"`);
         
-        const result = await AlbumArtService.getAlbumArt(songTitle);
-        setAlbumArt(result.imageUrl);
+        const result = await AlbumArtService.getAlbumArt(cleanedQuery);
+        if (result.imageUrl) {
+          setAlbumArt(result.imageUrl);
+          console.log(`🎵 Radio: Found album art for: ${cleanedQuery}`);
+        } else {
+          console.log(`🎵 Radio: No album art found for: ${cleanedQuery}`);
+          setAlbumArt(null);
+        }
       } catch (error) {
         console.error('Error fetching album art:', error);
+        setAlbumArt(null);
       } finally {
         setIsLoadingArt(false);
       }
