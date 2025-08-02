@@ -153,17 +153,6 @@ const TracksSection = () => {
 
                 {/* Stats & Actions */}
                 <div className="flex items-center space-x-4">
-                  <div className="text-center">
-                    <div className="flex items-center space-x-1 text-muted-foreground mb-1">
-                      <Heart className="w-4 h-4" />
-                      <span className="text-sm font-['Rajdhani']">{track.likes}</span>
-                    </div>
-                    <div className="flex items-center space-x-1 text-muted-foreground">
-                      <Download className="w-4 h-4" />
-                      <span className="text-sm font-['Rajdhani']">{track.downloads}</span>
-                    </div>
-                  </div>
-
                   <div className="flex flex-col space-y-2">
                     <Button
                       variant="ghost"
