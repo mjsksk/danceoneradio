@@ -25,17 +25,48 @@ const TracksSection = () => {
   const [logoError, setLogoError] = useState<{[key: number]: boolean}>({});
   const [albumArt, setAlbumArt] = useState<{[key: number]: string | null}>({});
 
+  // Clean and format track info for better album art search
+  const cleanTrackForSearch = (artist: string, title: string): string => {
+    // Clean artist name
+    const cleanArtist = artist
+      .replace(/&amp;/g, '&')
+      .replace(/&apos;/g, "'")
+      .replace(/[^\w\s&'-]/g, '')
+      .trim();
+    
+    // Clean title
+    const cleanTitle = title
+      .replace(/&amp;/g, '&')
+      .replace(/&apos;/g, "'")
+      .replace(/\(.*?extended.*?\)/gi, '') // Remove (Extended)
+      .replace(/\(.*?remix.*?\)/gi, '') // Remove remix info
+      .replace(/\(.*?edit.*?\)/gi, '') // Remove edit info
+      .replace(/\(.*?mix.*?\)/gi, '') // Remove mix info
+      .replace(/\[.*?\]/g, '') // Remove [brackets]
+      .replace(/feat\..*$/gi, '') // Remove featuring
+      .replace(/ft\..*$/gi, '') // Remove ft.
+      .replace(/vs\..*$/gi, '') // Remove vs.
+      .replace(/\d{4}$/, '') // Remove year at end
+      .replace(/[^\w\s&'-]/g, '')
+      .trim();
+    
+    return `${cleanArtist} ${cleanTitle}`;
+  };
+
   // Fetch album art for tracks when tracks change
   useEffect(() => {
     const fetchAlbumArt = async () => {
       for (const track of tracks) {
         if (!albumArt[track.id]) {
           try {
-            console.log(`🎵 Fetching album art for: ${track.artist} - ${track.title}`);
-            const result = await AlbumArtService.getAlbumArt(`${track.artist} - ${track.title}`);
+            const cleanedQuery = cleanTrackForSearch(track.artist, track.title);
+            console.log(`🎵 Fetching album art for: "${track.artist} - ${track.title}" -> cleaned: "${cleanedQuery}"`);
+            const result = await AlbumArtService.getAlbumArt(cleanedQuery);
             if (result.imageUrl) {
               setAlbumArt(prev => ({...prev, [track.id]: result.imageUrl}));
-              console.log(`🎵 Found album art for: ${track.artist} - ${track.title}`);
+              console.log(`🎵 Found album art for: ${cleanedQuery}`);
+            } else {
+              console.log(`🎵 No album art found for: ${cleanedQuery}`);
             }
           } catch (error) {
             console.error(`🎵 Failed to fetch album art for ${track.artist} - ${track.title}:`, error);
