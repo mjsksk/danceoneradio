@@ -145,19 +145,32 @@ const Footer = () => {
           </div>
         </div>
 
+        {/* DMCA Notice */}
+        <div className="card-cyber p-6 mt-12 bg-primary/5">
+          <h4 className="text-lg font-['Orbitron'] font-semibold text-primary mb-4">
+            DMCA Notice
+          </h4>
+          <p className="text-muted-foreground font-['Rajdhani'] text-sm leading-relaxed">
+            Dance One Radio respects the intellectual property rights of others. If you believe that material on our platform infringes your copyright, 
+            please send us a written notice via email to dmca@danceoneradio.com. We will promptly investigate and take appropriate action in accordance 
+            with the Digital Millennium Copyright Act (DMCA). All music played on Dance One Radio is either licensed, royalty-free, or falls under 
+            fair use guidelines for radio broadcasting.
+          </p>
+        </div>
+
         {/* Bottom Bar */}
         <div className="border-t border-primary/20 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between">
           <p className="text-muted-foreground font-['Rajdhani'] text-sm">
             © 2024 Dance One Radio. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani'] text-sm">
+            <a href="/privacy" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani'] text-sm">
               Privacy Policy
             </a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani'] text-sm">
-              Terms of Service
+            <a href="/love" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani'] text-sm">
+              Love
             </a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani'] text-sm">
+            <a href="mailto:dmca@danceoneradio.com" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani'] text-sm">
               DMCA
             </a>
           </div>
