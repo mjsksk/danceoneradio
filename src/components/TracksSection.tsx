@@ -53,39 +53,39 @@ const TracksSection = () => {
     return `${cleanArtist} ${cleanTitle}`;
   };
 
-  // Fetch album art for tracks when tracks change
-  useEffect(() => {
-    const fetchAlbumArt = async () => {
-      for (const track of tracks) {
-        if (!albumArt[track.id]) {
-          try {
-            const cleanedQuery = cleanTrackForSearch(track.artist, track.title);
-            console.log(`🎵 Fetching album art for: "${track.artist} - ${track.title}" -> cleaned: "${cleanedQuery}"`);
-            const result = await AlbumArtService.getAlbumArt(cleanedQuery);
-            console.log(`🎵 Album art result for "${cleanedQuery}":`, result);
-            
-            // Be more strict about what we consider valid album art
-            if (result.imageUrl && 
-                !result.imageUrl.includes('unsplash.com') && 
-                !result.imageUrl.includes('placeholder') &&
-                !result.error) {
-              setAlbumArt(prev => ({...prev, [track.id]: result.imageUrl}));
-              console.log(`🎵 Using real album art for: ${cleanedQuery}`);
-            } else {
-              console.log(`🎵 No valid album art found for: ${cleanedQuery}, using station logo`);
-              // Don't set anything in albumArt state - this will make it fall back to station logo
-            }
-          } catch (error) {
-            console.error(`🎵 Failed to fetch album art for ${track.artist} - ${track.title}:`, error);
-          }
-        }
-      }
-    };
+  // Disabled album art fetching to avoid wrong images - always use station logo
+  // useEffect(() => {
+  //   const fetchAlbumArt = async () => {
+  //     for (const track of tracks) {
+  //       if (!albumArt[track.id]) {
+  //         try {
+  //           const cleanedQuery = cleanTrackForSearch(track.artist, track.title);
+  //           console.log(`🎵 Fetching album art for: "${track.artist} - ${track.title}" -> cleaned: "${cleanedQuery}"`);
+  //           const result = await AlbumArtService.getAlbumArt(cleanedQuery);
+  //           console.log(`🎵 Album art result for "${cleanedQuery}":`, result);
+  //           
+  //           // Be more strict about what we consider valid album art
+  //           if (result.imageUrl && 
+  //               !result.imageUrl.includes('unsplash.com') && 
+  //               !result.imageUrl.includes('placeholder') &&
+  //               !result.error) {
+  //             setAlbumArt(prev => ({...prev, [track.id]: result.imageUrl}));
+  //             console.log(`🎵 Using real album art for: ${cleanedQuery}`);
+  //           } else {
+  //             console.log(`🎵 No valid album art found for: ${cleanedQuery}, using station logo`);
+  //             // Don't set anything in albumArt state - this will make it fall back to station logo
+  //           }
+  //         } catch (error) {
+  //           console.error(`🎵 Failed to fetch album art for ${track.artist} - ${track.title}:`, error);
+  //         }
+  //       }
+  //     }
+  //   };
 
-    if (tracks.length > 0) {
-      fetchAlbumArt();
-    }
-  }, [tracks, albumArt]);
+  //   if (tracks.length > 0) {
+  //     fetchAlbumArt();
+  //   }
+  // }, [tracks, albumArt]);
 
   useEffect(() => {
     const fetchRecentTracks = async () => {
