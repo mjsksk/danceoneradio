@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, Download, Heart, Share2, Clock, RefreshCw } from 'lucide-react';
+import { Play, Pause, Download, Heart, Share2, Clock, RefreshCw, Radio } from 'lucide-react';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import stationLogo from '@/assets/dance-one-logo.png';
 
@@ -21,6 +21,7 @@ const TracksSection = () => {
   const [tracks, setTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [logoError, setLogoError] = useState<{[key: number]: boolean}>({});
 
   useEffect(() => {
     const fetchRecentTracks = async () => {
@@ -100,16 +101,20 @@ const TracksSection = () => {
                 {/* Album Art & Play Button & Track Info */}
                 <div className="flex items-center space-x-4 flex-1">
                   {/* Album Art */}
-                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-secondary/20 flex-shrink-0">
-                    <img 
-                      src={stationLogo} 
-                      alt="Track Album Art" 
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        // Fallback is already the station logo
-                        console.log('Using station logo for track:', track.title);
-                      }}
-                    />
+                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-secondary/20 flex-shrink-0 flex items-center justify-center">
+                    {logoError[track.id] ? (
+                      <Radio className="w-8 h-8 text-primary" />
+                    ) : (
+                      <img 
+                        src={stationLogo} 
+                        alt="Dance One Radio Logo" 
+                        className="w-full h-full object-contain"
+                        onError={() => {
+                          setLogoError(prev => ({...prev, [track.id]: true}));
+                          console.log('Station logo failed to load for track:', track.title);
+                        }}
+                      />
+                    )}
                   </div>
 
                   <Button
