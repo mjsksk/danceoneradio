@@ -34,24 +34,44 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
     if (!audioRef.current || audioContextRef.current) return;
 
     try {
+      console.log('Setting up audio analysis...');
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      
+      // Resume audio context if it's suspended
+      if (audioContext.state === 'suspended') {
+        audioContext.resume().then(() => {
+          console.log('Audio context resumed');
+        });
+      }
+      
       const analyser = audioContext.createAnalyser();
-      const source = audioContext.createMediaElementSource(audioRef.current);
       
-      analyser.fftSize = 64; // This gives us 32 frequency bins, we'll use 8
-      const bufferLength = analyser.frequencyBinCount;
-      const dataArray = new Uint8Array(bufferLength);
-      
-      source.connect(analyser);
-      analyser.connect(audioContext.destination);
-      
-      audioContextRef.current = audioContext;
-      analyserRef.current = analyser;
-      dataArrayRef.current = dataArray;
-      
-      startAudioAnalysis();
+      try {
+        const source = audioContext.createMediaElementSource(audioRef.current);
+        console.log('Media element source created successfully');
+        
+        analyser.fftSize = 64; // This gives us 32 frequency bins, we'll use 8
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+        
+        audioContextRef.current = audioContext;
+        analyserRef.current = analyser;
+        dataArrayRef.current = dataArray;
+        
+        console.log('Audio analysis setup complete');
+        startAudioAnalysis();
+      } catch (sourceError) {
+        console.warn('Failed to create media element source (likely CORS issue):', sourceError);
+        // Fallback to animated visualization
+        startFallbackAnimation();
+      }
     } catch (error) {
       console.error('Error setting up audio analysis:', error);
+      // Fallback to animated visualization
+      startFallbackAnimation();
     }
   };
 
@@ -84,7 +104,28 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
     updateFrequencyData();
   };
 
+  const startFallbackAnimation = () => {
+    console.log('Starting fallback animation');
+    const animateFallback = () => {
+      if (!isPlaying) return;
+      
+      // Create animated bars when real audio analysis isn't available
+      const bars = Array.from({ length: 8 }, (_, i) => {
+        const baseHeight = 25;
+        const variation = Math.sin(Date.now() * 0.01 + i * 0.5) * 15;
+        const randomVariation = Math.random() * 10;
+        return Math.max(20, baseHeight + variation + randomVariation);
+      });
+      
+      setFrequencyData(bars);
+      animationRef.current = requestAnimationFrame(animateFallback);
+    };
+    
+    animateFallback();
+  };
+
   const stopAudioAnalysis = () => {
+    console.log('Stopping audio analysis');
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
@@ -150,10 +191,11 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
         setIsPlaying(true);
         setIsLoading(false);
         
+        console.log('Audio started playing, setting up analysis...');
         // Set up audio analysis after successful play
         setTimeout(() => {
           setupAudioAnalysis();
-        }, 1000); // Wait a bit for audio to stabilize
+        }, 2000); // Wait a bit longer for audio to stabilize
       })
       .catch((error) => {
         console.error(`Failed to play stream ${currentUrl}:`, error);
@@ -234,12 +276,13 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
         {frequencyData.map((height, i) => (
           <div
             key={i}
-            className="w-2 bg-primary rounded-full transition-all duration-75 ease-out"
+            className="w-2 bg-primary rounded-full transition-all duration-100 ease-out"
             style={{
-              height: `${height}px`,
+              height: `${Math.max(20, Math.min(60, height))}px`,
               backgroundColor: isPlaying 
                 ? `hsl(${180 + (height / 60) * 60}, 70%, ${50 + (height / 60) * 20}%)` 
-                : 'hsl(var(--muted))'
+                : 'hsl(var(--muted))',
+              boxShadow: isPlaying ? `0 0 ${height / 10}px hsl(${180 + (height / 60) * 60}, 70%, ${50 + (height / 60) * 20}%)` : 'none'
             }}
           />
         ))}
