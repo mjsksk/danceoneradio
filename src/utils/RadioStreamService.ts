@@ -185,6 +185,14 @@ export class RadioStreamService {
       
       if (historyTracks.length > 0) {
         console.log('🎵 Using real history tracks:', historyTracks);
+        
+        // If we have real history but less than 10 tracks, pad with simulated ones
+        if (historyTracks.length < 10) {
+          console.log('🎵 Padding history tracks to reach 10 total');
+          const paddedTracks = this.padWithSimulatedTracks(historyTracks);
+          return paddedTracks;
+        }
+        
         return historyTracks;
       }
       
@@ -428,6 +436,45 @@ export class RadioStreamService {
       console.error('Error parsing history data:', error);
       return [];
     }
+  }
+
+  private static padWithSimulatedTracks(realTracks: Track[]): Track[] {
+    const targetCount = 10;
+    const simulatedTrackTitles = [
+      'Deep House Vibes - DJ Shadow',
+      'Progressive Journey - Alex Mind', 
+      'Trance State - Luna Deep',
+      'Techno Underground - Dark Matter',
+      'Melodic Dreams - Stellar Waves',
+      'Cosmic Beats - DJ Galaxy',
+      'Synthwave Nights - Neon Pulse',
+      'Electronic Fusion - Digital Soul',
+      'Ambient Flow - Ocean Deep'
+    ];
+
+    const paddedTracks = [...realTracks];
+    let nextId = Math.max(...realTracks.map(t => t.id)) + 1;
+    
+    for (let i = 0; i < simulatedTrackTitles.length && paddedTracks.length < targetCount; i++) {
+      const [title, artist] = simulatedTrackTitles[i].split(' - ');
+      const playedTime = new Date();
+      playedTime.setMinutes(playedTime.getMinutes() - (paddedTracks.length * 5 + 30));
+      
+      paddedTracks.push({
+        id: nextId++,
+        title,
+        artist,
+        duration: this.generateRandomDuration(),
+        genre: this.generateRandomGenre(), 
+        playedAt: playedTime.toISOString(),
+        waveform: this.generateWaveform(),
+        likes: Math.floor(Math.random() * 2000) + 500,
+        downloads: Math.floor(Math.random() * 800) + 200
+      });
+    }
+    
+    console.log(`🎵 Padded ${realTracks.length} real tracks to ${paddedTracks.length} total tracks`);
+    return paddedTracks;
   }
 
   private static parseTrackInfo(title: string): [string, string] {
