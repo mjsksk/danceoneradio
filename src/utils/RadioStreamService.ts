@@ -208,7 +208,12 @@ export class RadioStreamService {
         'Deep House Vibes - DJ Shadow',
         'Progressive Journey - Alex Mind',
         'Trance State - Luna Deep',
-        'Techno Underground - Dark Matter'
+        'Techno Underground - Dark Matter',
+        'Melodic Dreams - Stellar Waves',
+        'Cosmic Beats - DJ Galaxy',
+        'Synthwave Nights - Neon Pulse',
+        'Electronic Fusion - Digital Soul',
+        'Ambient Flow - Ocean Deep'
       ];
       
       recentTrackTitles.forEach((trackInfo, index) => {
@@ -229,7 +234,7 @@ export class RadioStreamService {
         });
       });
       
-      return recentTracks.slice(0, 4); // Return latest 4 tracks
+      return recentTracks.slice(0, 10); // Return latest 10 tracks
     } catch (error) {
       console.error('Error fetching recent tracks:', error);
       return this.generateFallbackTracks();
@@ -360,10 +365,10 @@ export class RadioStreamService {
         }
       }
       
-      // Sort by played time (most recent first) and limit to 4 tracks
+      // Sort by played time (most recent first) and limit to 10 tracks
       return tracks
         .sort((a, b) => new Date(b.playedAt).getTime() - new Date(a.playedAt).getTime())
-        .slice(0, 4);
+        .slice(0, 10);
     } catch (error) {
       console.error('Error parsing history data:', error);
       return [];
@@ -401,7 +406,13 @@ export class RadioStreamService {
       { title: 'Progressive House Mix', artist: 'DJ Pulse' },
       { title: 'Deep Electronic Vibes', artist: 'DJ Neon' },
       { title: 'Trance Journey', artist: 'DJ Cosmos' },
-      { title: 'Techno Underground', artist: 'DJ Aurora' }
+      { title: 'Techno Underground', artist: 'DJ Aurora' },
+      { title: 'Melodic Dreams', artist: 'DJ Stellar' },
+      { title: 'Cosmic Beats', artist: 'DJ Galaxy' },
+      { title: 'Synthwave Nights', artist: 'DJ Neon Pulse' },
+      { title: 'Electronic Fusion', artist: 'DJ Digital Soul' },
+      { title: 'Ambient Flow', artist: 'DJ Ocean Deep' },
+      { title: 'Future Bass', artist: 'DJ Horizon' }
     ];
 
     return fallbackTracks.map((track, index) => ({
