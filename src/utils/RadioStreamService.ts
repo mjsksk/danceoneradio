@@ -176,9 +176,15 @@ export class RadioStreamService {
 
   static async getRecentTracks(): Promise<Track[]> {
     try {
+      console.log('🎵 Starting to fetch recent tracks...');
+      
       // Try to fetch from the actual history feed first
+      console.log('🎵 Attempting to fetch track history...');
       const historyTracks = await this.fetchTrackHistory();
+      console.log('🎵 History fetch result:', historyTracks.length, 'tracks');
+      
       if (historyTracks.length > 0) {
+        console.log('🎵 Using real history tracks:', historyTracks);
         return historyTracks;
       }
       
@@ -243,51 +249,58 @@ export class RadioStreamService {
 
   private static async fetchTrackHistory(): Promise<Track[]> {
     try {
-      const historyUrl = 'http://s9.myradiostream.com:14296/admin.cgi?sid=1&mode=history';
+      // Try multiple history endpoints that might work
+      const historyUrls = [
+        'http://s9.myradiostream.com:14296/admin.cgi?sid=1&mode=history',
+        'http://s9.myradiostream.com:14296/played.html',
+        'http://s9.myradiostream.com:14296/history.html',
+        'http://s9.myradiostream.com:14296/currentsong?sid=1',
+        'http://s9.myradiostream.com:14296/stats?sid=1'
+      ];
       
       // Try CORS proxy services to bypass CORS restrictions
       const proxies = [
-        'https://api.allorigins.win/get?url=',
-        'https://corsproxy.io/?',
-        'https://cors-anywhere.herokuapp.com/'
+        'https://api.allorigins.win/get?url='
       ];
 
       for (const proxy of proxies) {
-        try {
-          const proxyUrl = `${proxy}${encodeURIComponent(historyUrl)}`;
-          console.log('Attempting to fetch history from:', proxyUrl);
-          
-          const response = await fetch(proxyUrl, {
-            method: 'GET',
-            headers: {
-              'Accept': 'text/html,application/xhtml+xml,application/xml',
-            },
-          });
+        for (const historyUrl of historyUrls) {
+          try {
+            const proxyUrl = `${proxy}${encodeURIComponent(historyUrl)}`;
+            console.log('Attempting to fetch history from:', proxyUrl);
+            
+            const response = await fetch(proxyUrl, {
+              method: 'GET',
+              headers: {
+                'Accept': 'text/html,application/xhtml+xml,application/xml',
+              },
+            });
 
-          if (response.ok) {
-            let data = await response.text();
-            console.log('Raw history response:', data.substring(0, 500) + '...');
-            
-            // If using allorigins, extract contents
-            if (proxy.includes('allorigins')) {
-              const json = JSON.parse(data);
-              data = json.contents;
-              console.log('Extracted history contents:', data.substring(0, 500) + '...');
-            }
-            
-            const tracks = this.parseHistoryData(data);
-            if (tracks.length > 0) {
-              console.log('Successfully fetched track history:', tracks);
-              return tracks;
+            if (response.ok) {
+              let data = await response.text();
+              console.log('Raw history response:', data.substring(0, 500) + '...');
+              
+              // If using allorigins, extract contents
+              if (proxy.includes('allorigins')) {
+                const json = JSON.parse(data);
+                data = json.contents;
+                console.log('Extracted history contents:', data.substring(0, 500) + '...');
+              }
+              
+              const tracks = this.parseHistoryData(data);
+              if (tracks.length > 0) {
+                console.log('Successfully fetched track history:', tracks);
+                return tracks;
+              } else {
+                console.log('No tracks found in history data, trying next URL...');
+              }
             } else {
-              console.log('No tracks found in history data, trying next proxy...');
+              console.log('History fetch failed with status:', response.status);
             }
-          } else {
-            console.log('History fetch failed with status:', response.status);
+          } catch (error) {
+            console.log(`Failed to fetch history from ${proxy}${historyUrl}:`, error);
+            continue;
           }
-        } catch (error) {
-          console.log(`Failed to fetch history from ${proxy}:`, error);
-          continue;
         }
       }
 
