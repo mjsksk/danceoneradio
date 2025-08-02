@@ -8,10 +8,7 @@ const Navigation = () => {
 
   const navItems = [
     { name: 'Home', href: '#home' },
-    { name: 'Live', href: '#live' },
-    { name: 'Shows', href: '#shows' },
     { name: 'DJs', href: '#djs' },
-    { name: 'Tracks', href: '#tracks' },
     { name: 'Contact', href: '#contact' }
   ];
 
@@ -39,9 +36,6 @@ const Navigation = () => {
                 {item.name}
               </a>
             ))}
-            <Button className="btn-cyber">
-              Listen Live
-            </Button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -71,9 +65,6 @@ const Navigation = () => {
                   {item.name}
                 </a>
               ))}
-              <Button className="btn-cyber w-full mt-4">
-                Listen Live
-              </Button>
             </div>
           </div>
         )}
