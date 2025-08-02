@@ -332,40 +332,45 @@ export class RadioStreamService {
           // Extract all text content between HTML tags
           const textMatches = line.match(/>([^<]+)</g);
           if (textMatches) {
+            let foundTrackInThisLine = false;
             for (const match of textMatches) {
               const content = match.replace(/[><]/g, '').trim();
               
               // Look for content that looks like a track (contains " - " and is not just numbers/time)
-              if (content.includes(' - ') && content.length > 5 && !content.match(/^\d+$/) && !content.match(/^\d{1,2}:\d{2}/)) {
-                const [artist, title] = content.split(' - ');
-                if (artist && title && artist.trim().length > 0 && title.trim().length > 0) {
+              if (content.includes(' - ') && content.length > 5 && !content.match(/^\d+$/) && !content.match(/^\d{1,2}:\d{2}/) && !foundTrackInThisLine) {
+                const parts = content.split(' - ');
+                if (parts.length >= 2) {
+                  const artist = parts[0].trim();
+                  const title = parts.slice(1).join(' - ').trim();
                   
-                  // Calculate played time
-                  const playedTime = new Date();
-                  if (timeMatch) {
-                    const timeParts = timeMatch[1].split(':');
-                    const hours = parseInt(timeParts[0]);
-                    const minutes = parseInt(timeParts[1]);
-                    const seconds = timeParts[2] ? parseInt(timeParts[2]) : 0;
-                    playedTime.setHours(hours, minutes, seconds, 0);
-                  } else {
-                    playedTime.setMinutes(playedTime.getMinutes() - tracks.length * 5);
+                  if (artist.length > 0 && title.length > 0) {
+                    // Calculate played time
+                    const playedTime = new Date();
+                    if (timeMatch) {
+                      const timeParts = timeMatch[1].split(':');
+                      const hours = parseInt(timeParts[0]);
+                      const minutes = parseInt(timeParts[1]);
+                      const seconds = timeParts[2] ? parseInt(timeParts[2]) : 0;
+                      playedTime.setHours(hours, minutes, seconds, 0);
+                    } else {
+                      playedTime.setMinutes(playedTime.getMinutes() - tracks.length * 5);
+                    }
+                    
+                    tracks.push({
+                      id: trackId++,
+                      title: title,
+                      artist: artist,
+                      duration: this.generateRandomDuration(),
+                      genre: this.generateRandomGenre(),
+                      playedAt: playedTime.toISOString(),
+                      waveform: this.generateWaveform(),
+                      likes: Math.floor(Math.random() * 2000) + 500,
+                      downloads: Math.floor(Math.random() * 800) + 200
+                    });
+                    
+                    console.log(`Found track ${tracks.length}: ${artist} - ${title}`);
+                    foundTrackInThisLine = true; // Prevent multiple tracks from same line
                   }
-                  
-                  tracks.push({
-                    id: trackId++,
-                    title: title.trim(),
-                    artist: artist.trim(),
-                    duration: this.generateRandomDuration(),
-                    genre: this.generateRandomGenre(),
-                    playedAt: playedTime.toISOString(),
-                    waveform: this.generateWaveform(),
-                    likes: Math.floor(Math.random() * 2000) + 500,
-                    downloads: Math.floor(Math.random() * 800) + 200
-                  });
-                  
-                  console.log(`Found track: ${artist.trim()} - ${title.trim()}`);
-                  break; // Move to next line after finding a track
                 }
               }
             }
@@ -400,7 +405,7 @@ export class RadioStreamService {
                 downloads: Math.floor(Math.random() * 800) + 200
               });
               
-              console.log(`Found plain text track: ${artist} - ${title}`);
+              console.log(`Found plain text track ${tracks.length}: ${artist} - ${title}`);
             }
           }
         }
