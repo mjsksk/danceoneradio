@@ -101,7 +101,7 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
       <div className="relative z-10">
         <div className="flex items-center justify-center mb-6">
         <div className="relative">
-          <div className="w-20 h-20 bg-gradient-to-r from-primary to-accent rounded-lg flex items-center justify-center pulse-cyber overflow-hidden">
+          <div className="w-40 h-40 bg-gradient-to-r from-primary to-accent rounded-lg flex items-center justify-center pulse-cyber overflow-hidden">
             {albumArt ? (
               <img 
                 src={albumArt} 
@@ -113,7 +113,7 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
               <img 
                 src={stationLogo} 
                 alt="Dance One Radio Logo" 
-                className="w-12 h-12 object-contain filter brightness-0 invert"
+                className="w-24 h-24 object-contain filter brightness-0 invert"
                 onError={(e) => {
                   // If station logo fails to load, fallback to Radio icon
                   e.currentTarget.style.display = 'none';
@@ -124,7 +124,7 @@ const LiveRadioPlayer = ({ streamUrls, streamTitle }: LiveRadioPlayerProps) => {
             )}
             {/* Fallback radio icon - hidden by default */}
             <Radio 
-              className="w-10 h-10 text-primary-foreground hidden" 
+              className="w-20 h-20 text-primary-foreground hidden" 
               style={{ display: albumArt ? 'none' : 'none' }}
             />
           </div>
