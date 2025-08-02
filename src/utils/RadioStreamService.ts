@@ -255,6 +255,8 @@ export class RadioStreamService {
       for (const proxy of proxies) {
         try {
           const proxyUrl = `${proxy}${encodeURIComponent(historyUrl)}`;
+          console.log('Attempting to fetch history from:', proxyUrl);
+          
           const response = await fetch(proxyUrl, {
             method: 'GET',
             headers: {
@@ -264,18 +266,24 @@ export class RadioStreamService {
 
           if (response.ok) {
             let data = await response.text();
+            console.log('Raw history response:', data.substring(0, 500) + '...');
             
             // If using allorigins, extract contents
             if (proxy.includes('allorigins')) {
               const json = JSON.parse(data);
               data = json.contents;
+              console.log('Extracted history contents:', data.substring(0, 500) + '...');
             }
             
             const tracks = this.parseHistoryData(data);
             if (tracks.length > 0) {
               console.log('Successfully fetched track history:', tracks);
               return tracks;
+            } else {
+              console.log('No tracks found in history data, trying next proxy...');
             }
+          } else {
+            console.log('History fetch failed with status:', response.status);
           }
         } catch (error) {
           console.log(`Failed to fetch history from ${proxy}:`, error);
@@ -283,6 +291,7 @@ export class RadioStreamService {
         }
       }
 
+      console.log('All history fetch attempts failed, returning empty array');
       return [];
     } catch (error) {
       console.error('Error fetching track history:', error);
@@ -293,40 +302,78 @@ export class RadioStreamService {
   private static parseHistoryData(data: string): Track[] {
     try {
       const tracks: Track[] = [];
+      console.log('Parsing history data, length:', data.length);
       
       // Parse HTML response from SHOUTcast admin interface
-      // Look for table rows containing track information
       const lines = data.split('\n');
       let trackId = 1;
       
-      for (let i = 0; i < lines.length; i++) {
+      for (let i = 0; i < lines.length && tracks.length < 10; i++) {
         const line = lines[i].trim();
         
-        // Look for lines containing track data (typically in table format)
-        if (line.includes('<td>') && line.includes(':')) {
-          // Extract time and track info
-          const timeMatch = line.match(/(\d{2}:\d{2}:\d{2})/);
-          const trackMatch = line.match(/>([^<]+)</g);
+        // Look for various patterns that might contain track information
+        // Pattern 1: HTML table cells with time and track info
+        if (line.includes('<td>') && (line.includes(':') || line.includes(' - '))) {
+          const timeMatch = line.match(/(\d{1,2}:\d{2}(?::\d{2})?)/);
           
-          if (timeMatch && trackMatch && trackMatch.length >= 2) {
-            const time = timeMatch[1];
-            let trackInfo = '';
-            
-            // Find the track title (usually the longest text content)
-            for (const match of trackMatch) {
+          // Extract all text content between HTML tags
+          const textMatches = line.match(/>([^<]+)</g);
+          if (textMatches) {
+            for (const match of textMatches) {
               const content = match.replace(/[><]/g, '').trim();
-              if (content && content.length > trackInfo.length && !content.match(/^\d+$/)) {
-                trackInfo = content;
+              
+              // Look for content that looks like a track (contains " - " and is not just numbers/time)
+              if (content.includes(' - ') && content.length > 5 && !content.match(/^\d+$/) && !content.match(/^\d{1,2}:\d{2}/)) {
+                const [artist, title] = content.split(' - ');
+                if (artist && title && artist.trim().length > 0 && title.trim().length > 0) {
+                  
+                  // Calculate played time
+                  const playedTime = new Date();
+                  if (timeMatch) {
+                    const timeParts = timeMatch[1].split(':');
+                    const hours = parseInt(timeParts[0]);
+                    const minutes = parseInt(timeParts[1]);
+                    const seconds = timeParts[2] ? parseInt(timeParts[2]) : 0;
+                    playedTime.setHours(hours, minutes, seconds, 0);
+                  } else {
+                    playedTime.setMinutes(playedTime.getMinutes() - tracks.length * 5);
+                  }
+                  
+                  tracks.push({
+                    id: trackId++,
+                    title: title.trim(),
+                    artist: artist.trim(),
+                    duration: this.generateRandomDuration(),
+                    genre: this.generateRandomGenre(),
+                    playedAt: playedTime.toISOString(),
+                    waveform: this.generateWaveform(),
+                    likes: Math.floor(Math.random() * 2000) + 500,
+                    downloads: Math.floor(Math.random() * 800) + 200
+                  });
+                  
+                  console.log(`Found track: ${artist.trim()} - ${title.trim()}`);
+                  break; // Move to next line after finding a track
+                }
               }
             }
+          }
+        }
+        
+        // Pattern 2: Plain text lines with track info (fallback)
+        else if (line.includes(' - ') && !line.includes('<') && !line.includes('>') && line.length > 10) {
+          // Skip lines that are obviously not tracks
+          if (line.includes('http') || line.includes('www') || line.includes('admin') || line.includes('mode=')) {
+            continue;
+          }
+          
+          const parts = line.split(' - ');
+          if (parts.length >= 2) {
+            const artist = parts[0].trim();
+            const title = parts.slice(1).join(' - ').trim();
             
-            if (trackInfo && !trackInfo.includes('html') && !trackInfo.includes('body')) {
-              const [title, artist] = this.parseTrackInfo(trackInfo);
-              
-              // Calculate played time based on the time found
+            if (artist.length > 0 && title.length > 0 && !artist.match(/^\d+$/) && !title.match(/^\d+$/)) {
               const playedTime = new Date();
-              const [hours, minutes, seconds] = time.split(':').map(Number);
-              playedTime.setHours(hours, minutes, seconds, 0);
+              playedTime.setMinutes(playedTime.getMinutes() - tracks.length * 5);
               
               tracks.push({
                 id: trackId++,
@@ -339,31 +386,14 @@ export class RadioStreamService {
                 likes: Math.floor(Math.random() * 2000) + 500,
                 downloads: Math.floor(Math.random() * 800) + 200
               });
+              
+              console.log(`Found plain text track: ${artist} - ${title}`);
             }
           }
         }
-        
-        // Also look for direct track listings in other formats
-        if (line.includes(' - ') && !line.includes('<') && line.length > 10) {
-          const [title, artist] = this.parseTrackInfo(line.trim());
-          if (title && artist && tracks.length < 10) {
-            const playedTime = new Date();
-            playedTime.setMinutes(playedTime.getMinutes() - tracks.length * 5);
-            
-            tracks.push({
-              id: trackId++,
-              title,
-              artist,
-              duration: this.generateRandomDuration(),
-              genre: this.generateRandomGenre(),
-              playedAt: playedTime.toISOString(),
-              waveform: this.generateWaveform(),
-              likes: Math.floor(Math.random() * 2000) + 500,
-              downloads: Math.floor(Math.random() * 800) + 200
-            });
-          }
-        }
       }
+      
+      console.log(`Parsed ${tracks.length} tracks from history`);
       
       // Sort by played time (most recent first) and limit to 10 tracks
       return tracks
