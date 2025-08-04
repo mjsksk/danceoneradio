@@ -69,9 +69,6 @@ const HeroSection = () => {
               className="h-96 md:h-[40rem] w-auto object-contain animate-neon-flicker"
             />
           </div>
-          <p className="text-xl md:text-2xl text-muted-foreground font-electrolize font-light max-w-2xl mx-auto leading-relaxed">
-            The future of electronic music broadcasting. Live DJ sets, exclusive tracks, and the heartbeat of dance culture.
-          </p>
         </div>
 
         {/* Live Player */}
