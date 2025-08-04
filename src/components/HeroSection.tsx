@@ -30,13 +30,18 @@ const HeroSection = () => {
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Image with Overlay */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${heroImage})` }}
+      {/* Background Video with Overlay */}
+      <video
+        className="absolute inset-0 w-full h-full object-cover"
+        autoPlay
+        muted
+        loop
+        playsInline
+        poster={heroImage}
       >
-        <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]"></div>
-      </div>
+        <source src="https://bcmfyjicqsxznrdeqkpf.supabase.co/storage/v1/object/sign/webvideos/Laser-Beam.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lYmFkZWFlYy05YjYyLTRhYTAtYWZhNC04ODdmZDU4MDRmMmMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ3ZWJ2aWRlb3MvTGFzZXItQmVhbS5tcDQiLCJpYXQiOjE3NTQzMTY2NzEsImV4cCI6MTc1NDkyMTQ3MX0.WRkRCv-cHQgqzMKwrL-817ibDqbgL0U4IhPIfLNJbd0" type="video/mp4" />
+      </video>
+      <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]"></div>
 
       {/* Animated Particles */}
       <div className="absolute inset-0">
