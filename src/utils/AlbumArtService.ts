@@ -119,7 +119,7 @@ export class AlbumArtService {
   }
 
   private static getDefaultAlbumArt(): string {
-    // Return a beautiful default music-themed image
-    return "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop&crop=center";
+    // Return the Dance One radio logo as fallback
+    return "/src/assets/dance-one-logo.png";
   }
 }
