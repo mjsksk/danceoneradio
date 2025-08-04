@@ -66,10 +66,10 @@ const HeroSection = () => {
             <img 
               src="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png" 
               alt="Dance One Radio" 
-              className="h-48 md:h-80 w-auto object-contain animate-neon-flicker"
+              className="h-96 md:h-[40rem] w-auto object-contain animate-neon-flicker"
             />
           </div>
-          <p className="text-xl md:text-2xl text-muted-foreground font-['Rajdhani'] font-light max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-muted-foreground font-electrolize font-light max-w-2xl mx-auto leading-relaxed">
             The future of electronic music broadcasting. Live DJ sets, exclusive tracks, and the heartbeat of dance culture.
           </p>
         </div>
