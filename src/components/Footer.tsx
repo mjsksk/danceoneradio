@@ -13,10 +13,13 @@ const Footer = () => {
       </div>
 
       <div className="container mx-auto px-4 relative">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Social Media and App Links */}
+        <div className="flex flex-col items-center text-center space-y-8">
+          {/* Social Media Links */}
           <div>
-            <div className="flex space-x-4 mb-8">
+            <h4 className="text-lg font-['Orbitron'] font-semibold text-primary mb-6">
+              Follow Us
+            </h4>
+            <div className="flex space-x-4 justify-center">
               <Button
                 variant="ghost"
                 size="icon"
@@ -51,53 +54,46 @@ const Footer = () => {
                 variant="ghost"
                 size="icon"
                 className="text-muted-foreground hover:text-primary hover:bg-primary/20"
+                asChild
               >
-                <Youtube className="w-5 h-5" />
+                <a href="https://www.youtube.com/@danceoneradio" target="_blank" rel="noopener noreferrer">
+                  <Youtube className="w-5 h-5" />
+                </a>
               </Button>
-            </div>
-
-            {/* Mobile App Links */}
-            <div>
-              <h5 className="text-sm font-['Orbitron'] font-semibold text-accent mb-4 uppercase tracking-wider">
-                Download Our App
-              </h5>
-              <div className="flex flex-col space-y-4">
-                <a 
-                  href="https://apps.apple.com/us/app/dance-one-radio/id578991926" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-block hover:opacity-80 transition-opacity"
-                >
-                  <img 
-                    src="/src/assets/app-store-badge.svg" 
-                    alt="Download on the App Store" 
-                    className="h-20 w-auto"
-                  />
-                </a>
-                <a 
-                  href="https://play.google.com/store/apps/details?id=com.danceoneradio&hl=en_US&pli=1" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-block hover:opacity-80 transition-opacity"
-                >
-                  <img 
-                    src="/src/assets/google-play-badge.png" 
-                    alt="Get it on Google Play" 
-                    className="h-20 w-auto"
-                  />
-                </a>
-              </div>
             </div>
           </div>
 
-          {/* Demo Submission */}
+          {/* Mobile App Links */}
           <div>
-            <h5 className="text-sm font-['Orbitron'] font-semibold text-accent mb-3 uppercase tracking-wider">
-              Submit Demo
-            </h5>
-            <Button className="btn-cyber w-full" size="sm">
-              Send Track
-            </Button>
+            <h4 className="text-lg font-['Orbitron'] font-semibold text-primary mb-6">
+              Download Our App
+            </h4>
+            <div className="flex flex-col sm:flex-row items-center gap-6 justify-center">
+              <a 
+                href="https://apps.apple.com/us/app/dance-one-radio/id578991926" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-block hover:opacity-80 transition-opacity"
+              >
+                <img 
+                  src="/src/assets/app-store-badge.svg" 
+                  alt="Download on the App Store" 
+                  className="h-16 w-auto"
+                />
+              </a>
+              <a 
+                href="https://play.google.com/store/apps/details?id=com.danceoneradio&hl=en_US&pli=1" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-block hover:opacity-80 transition-opacity"
+              >
+                <img 
+                  src="/src/assets/google-play-badge.png" 
+                  alt="Get it on Google Play" 
+                  className="h-16 w-auto"
+                />
+              </a>
+            </div>
           </div>
         </div>
 
