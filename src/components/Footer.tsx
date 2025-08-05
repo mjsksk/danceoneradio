@@ -31,22 +31,31 @@ const Footer = () => {
                 variant="ghost"
                 size="icon"
                 className="text-muted-foreground hover:text-primary hover:bg-primary/20"
+                asChild
               >
-                <Instagram className="w-5 h-5" />
+                <a href="https://instagram.com/danceoneradio" target="_blank" rel="noopener noreferrer">
+                  <Instagram className="w-5 h-5" />
+                </a>
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 className="text-muted-foreground hover:text-primary hover:bg-primary/20"
+                asChild
               >
-                <Twitter className="w-5 h-5" />
+                <a href="https://x.com/DanceOneRadio" target="_blank" rel="noopener noreferrer">
+                  <Twitter className="w-5 h-5" />
+                </a>
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 className="text-muted-foreground hover:text-primary hover:bg-primary/20"
+                asChild
               >
-                <Facebook className="w-5 h-5" />
+                <a href="https://www.facebook.com/danceoneradio" target="_blank" rel="noopener noreferrer">
+                  <Facebook className="w-5 h-5" />
+                </a>
               </Button>
               <Button
                 variant="ghost"
@@ -55,6 +64,39 @@ const Footer = () => {
               >
                 <Youtube className="w-5 h-5" />
               </Button>
+            </div>
+
+            {/* Mobile App Links */}
+            <div className="mt-8">
+              <h5 className="text-sm font-['Orbitron'] font-semibold text-accent mb-4 uppercase tracking-wider">
+                Download Our App
+              </h5>
+              <div className="flex flex-col space-y-3">
+                <a 
+                  href="https://apps.apple.com/us/app/dance-one-radio/id578991926" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-block hover:opacity-80 transition-opacity"
+                >
+                  <img 
+                    src="/src/assets/app-store-badge.svg" 
+                    alt="Download on the App Store" 
+                    className="h-10 w-auto"
+                  />
+                </a>
+                <a 
+                  href="https://play.google.com/store/apps/details?id=com.danceoneradio&hl=en_US&pli=1" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-block hover:opacity-80 transition-opacity"
+                >
+                  <img 
+                    src="/src/assets/google-play-badge.png" 
+                    alt="Get it on Google Play" 
+                    className="h-10 w-auto"
+                  />
+                </a>
+              </div>
             </div>
           </div>
 

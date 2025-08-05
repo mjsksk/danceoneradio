@@ -3,6 +3,7 @@ import HeroSection from '@/components/HeroSection';
 import ShowsSection from '@/components/ShowsSection';
 import DJSection from '@/components/DJSection';
 import TracksSection from '@/components/TracksSection';
+import Footer from '@/components/Footer';
 
 const Index = () => {
   return (
@@ -14,6 +15,7 @@ const Index = () => {
         <DJSection />
         <TracksSection />
       </main>
+      <Footer />
     </div>
   );
 };
