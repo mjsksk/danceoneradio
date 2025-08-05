@@ -13,20 +13,10 @@ const Footer = () => {
       </div>
 
       <div className="container mx-auto px-4 relative">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Brand Section */}
-          <div className="lg:col-span-2">
-            <div className="flex items-center mb-6">
-              <img 
-                src="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png" 
-                alt="Dance One Radio" 
-                className="h-16 w-auto object-contain"
-              />
-            </div>
-            <p className="text-muted-foreground font-['Rajdhani'] mb-6 max-w-md">
-              Broadcasting the future of electronic dance music. Join us every Friday at 5PM Pacific for biweekly episodes featuring brand new music and exclusive tracks.
-            </p>
-            <div className="flex space-x-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Social Media and App Links */}
+          <div>
+            <div className="flex space-x-4 mb-8">
               <Button
                 variant="ghost"
                 size="icon"
@@ -67,11 +57,11 @@ const Footer = () => {
             </div>
 
             {/* Mobile App Links */}
-            <div className="mt-8">
+            <div>
               <h5 className="text-sm font-['Orbitron'] font-semibold text-accent mb-4 uppercase tracking-wider">
                 Download Our App
               </h5>
-              <div className="flex flex-col space-y-3">
+              <div className="flex flex-col space-y-4">
                 <a 
                   href="https://apps.apple.com/us/app/dance-one-radio/id578991926" 
                   target="_blank" 
@@ -81,7 +71,7 @@ const Footer = () => {
                   <img 
                     src="/src/assets/app-store-badge.svg" 
                     alt="Download on the App Store" 
-                    className="h-10 w-auto"
+                    className="h-20 w-auto"
                   />
                 </a>
                 <a 
@@ -93,75 +83,21 @@ const Footer = () => {
                   <img 
                     src="/src/assets/google-play-badge.png" 
                     alt="Get it on Google Play" 
-                    className="h-10 w-auto"
+                    className="h-20 w-auto"
                   />
                 </a>
               </div>
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Demo Submission */}
           <div>
-            <h4 className="text-lg font-['Orbitron'] font-semibold text-primary mb-6">
-              Quick Links
-            </h4>
-            <ul className="space-y-3">
-              <li>
-                <a href="#live" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani']">
-                  Listen Live
-                </a>
-              </li>
-              <li>
-                <a href="#shows" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani']">
-                  Show Schedule
-                </a>
-              </li>
-              <li>
-                <a href="#djs" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani']">
-                  Featured DJs
-                </a>
-              </li>
-              <li>
-                <a href="#tracks" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani']">
-                  Latest Tracks
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani']">
-                  Mobile App
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h4 className="text-lg font-['Orbitron'] font-semibold text-primary mb-6">
-              Contact
-            </h4>
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <Mail className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground font-['Rajdhani']">
-                  hello@danceoneradio.com
-                </span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Phone className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground font-['Rajdhani']">
-                  +1 (555) 123-DANCE
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <h5 className="text-sm font-['Orbitron'] font-semibold text-accent mb-3 uppercase tracking-wider">
-                Submit Demo
-              </h5>
-              <Button className="btn-cyber w-full" size="sm">
-                Send Track
-              </Button>
-            </div>
+            <h5 className="text-sm font-['Orbitron'] font-semibold text-accent mb-3 uppercase tracking-wider">
+              Submit Demo
+            </h5>
+            <Button className="btn-cyber w-full" size="sm">
+              Send Track
+            </Button>
           </div>
         </div>
 
