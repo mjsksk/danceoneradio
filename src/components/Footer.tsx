@@ -14,123 +14,29 @@ const Footer = () => {
 
       <div className="container mx-auto px-4 relative">
         <div className="flex flex-col items-center text-center space-y-8">
-          {/* Social Media Links */}
-          <div>
-            <h4 className="text-lg font-['Orbitron'] font-semibold text-primary mb-6">
-              Follow Us
-            </h4>
-            <div className="flex space-x-4 justify-center">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-muted-foreground hover:text-primary hover:bg-primary/20"
-                asChild
-              >
-                <a href="https://instagram.com/danceoneradio" target="_blank" rel="noopener noreferrer">
-                  <Instagram className="w-5 h-5" />
-                </a>
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-muted-foreground hover:text-primary hover:bg-primary/20"
-                asChild
-              >
-                <a href="https://x.com/DanceOneRadio" target="_blank" rel="noopener noreferrer">
-                  <Twitter className="w-5 h-5" />
-                </a>
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-muted-foreground hover:text-primary hover:bg-primary/20"
-                asChild
-              >
-                <a href="https://www.facebook.com/danceoneradio" target="_blank" rel="noopener noreferrer">
-                  <Facebook className="w-5 h-5" />
-                </a>
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-muted-foreground hover:text-primary hover:bg-primary/20"
-                asChild
-              >
-                <a href="https://www.youtube.com/@danceoneradio" target="_blank" rel="noopener noreferrer">
-                  <Youtube className="w-5 h-5" />
-                </a>
-              </Button>
-            </div>
-          </div>
-
-          {/* Mobile App Links */}
-          <div>
-            <h4 className="text-lg font-['Orbitron'] font-semibold text-primary mb-6">
-              Download Our App
-            </h4>
-            <div className="flex flex-col sm:flex-row items-center gap-6 justify-center">
-              <a 
-                href="https://apps.apple.com/us/app/dance-one-radio/id578991926" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-block hover:opacity-80 transition-opacity"
-              >
-                <img 
-                  src="/src/assets/app-store-badge.svg" 
-                  alt="Download on the App Store" 
-                  className="h-16 w-auto"
+          {/* Newsletter */}
+          <div className="card-cyber p-6 w-full max-w-md">
+            <div className="text-center">
+              <h4 className="text-xl font-['Orbitron'] font-bold text-primary mb-3">
+                Stay Connected
+              </h4>
+              <p className="text-muted-foreground font-['Rajdhani'] mb-6">
+                Get notified about new shows, exclusive tracks, and special events
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="flex-1 px-4 py-2 bg-input border border-border rounded-md text-foreground font-['Rajdhani'] focus:outline-none focus:ring-2 focus:ring-primary"
                 />
-              </a>
-              <a 
-                href="https://play.google.com/store/apps/details?id=com.danceoneradio&hl=en_US&pli=1" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-block hover:opacity-80 transition-opacity"
-              >
-                <img 
-                  src="/src/assets/google-play-badge.png" 
-                  alt="Get it on Google Play" 
-                  className="h-16 w-auto"
-                />
-              </a>
+                <Button className="btn-cyber">
+                  Subscribe
+                </Button>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Newsletter */}
-        <div className="card-cyber p-6 mt-12">
-          <div className="text-center">
-            <h4 className="text-xl font-['Orbitron'] font-bold text-primary mb-3">
-              Stay Connected
-            </h4>
-            <p className="text-muted-foreground font-['Rajdhani'] mb-6">
-              Get notified about new shows, exclusive tracks, and special events
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-2 bg-input border border-border rounded-md text-foreground font-['Rajdhani'] focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <Button className="btn-cyber">
-                Subscribe
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* DMCA Notice */}
-        <div className="card-cyber p-6 mt-12 bg-primary/5">
-          <h4 className="text-lg font-['Orbitron'] font-semibold text-primary mb-4">
-            DMCA Notice
-          </h4>
-          <p className="text-muted-foreground font-['Rajdhani'] text-sm leading-relaxed">
-            Dance One Radio respects the intellectual property rights of others. If you believe that material on our platform infringes your copyright, 
-            please send us a written notice via email to dmca@danceoneradio.com. We will promptly investigate and take appropriate action in accordance 
-            with the Digital Millennium Copyright Act (DMCA). All music played on Dance One Radio is either licensed, royalty-free, or falls under 
-            fair use guidelines for radio broadcasting.
-          </p>
-        </div>
 
         {/* Bottom Bar */}
         <div className="border-t border-primary/20 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between">
@@ -144,7 +50,7 @@ const Footer = () => {
             <a href="/love" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani'] text-sm">
               Love
             </a>
-            <a href="mailto:dmca@danceoneradio.com" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani'] text-sm">
+            <a href="/dmca" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani'] text-sm">
               DMCA
             </a>
           </div>
