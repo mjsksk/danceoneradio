@@ -4,10 +4,8 @@ import { Volume2 } from 'lucide-react';
 import heroImage from '@/assets/hero-bg.jpg';
 import LiveRadioPlayer from './LiveRadioPlayer';
 import { RadioStreamService } from '@/utils/RadioStreamService';
-
 const HeroSection = () => {
   const [streamTitle, setStreamTitle] = useState('🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵');
-
   useEffect(() => {
     const fetchStreamMetadata = async () => {
       try {
@@ -24,75 +22,42 @@ const HeroSection = () => {
 
     // Update every 3 seconds for real-time updates
     const interval = setInterval(fetchStreamMetadata, 3000);
-
     return () => clearInterval(interval);
   }, []);
-
-  return (
-    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+  return <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Video with Overlay */}
-      <video
-        className="absolute inset-0 w-full h-full object-cover"
-        autoPlay
-        muted
-        loop
-        playsInline
-        poster={heroImage}
-      >
+      <video className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline poster={heroImage}>
         <source src="https://bcmfyjicqsxznrdeqkpf.supabase.co/storage/v1/object/sign/webvideos/Laser-Beam.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lYmFkZWFlYy05YjYyLTRhYTAtYWZhNC04ODdmZDU4MDRmMmMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ3ZWJ2aWRlb3MvTGFzZXItQmVhbS5tcDQiLCJpYXQiOjE3NTQzMTY2NzEsImV4cCI6MTc1NDkyMTQ3MX0.WRkRCv-cHQgqzMKwrL-817ibDqbgL0U4IhPIfLNJbd0" type="video/mp4" />
       </video>
       <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]"></div>
 
       {/* Animated Particles */}
       <div className="absolute inset-0">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-2 h-2 bg-primary/30 rounded-full animate-float"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 6}s`,
-              animationDuration: `${4 + Math.random() * 4}s`
-            }}
-          />
-        ))}
+        {[...Array(20)].map((_, i) => <div key={i} className="absolute w-2 h-2 bg-primary/30 rounded-full animate-float" style={{
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 6}s`,
+        animationDuration: `${4 + Math.random() * 4}s`
+      }} />)}
       </div>
 
       {/* Hero Content */}
       <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
         <div className="mb-8 animate-fade-in">
           <div className="flex justify-center mb-6">
-            <img 
-              src="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png" 
-              alt="Dance One Radio" 
-              className="h-96 md:h-[40rem] w-auto object-contain animate-neon-flicker"
-            />
+            <img src="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png" alt="Dance One Radio" className="h-96 md:h-[40rem] w-auto object-contain animate-neon-flicker" />
           </div>
         </div>
 
         {/* Live Player */}
         <div className="mb-8 animate-slide-up">
-          <LiveRadioPlayer 
-            streamUrls={[
-              "http://s9.myradiostream.com:14296/;",
-              "http://s9.myradiostream.com:14296/stream",
-              "http://s9.myradiostream.com:14296",
-              "https://live-radio-stream.online/dance-one-radio.mp3"
-            ]}
-            streamTitle={streamTitle}
-          />
+          <LiveRadioPlayer streamUrls={["http://s9.myradiostream.com:14296/;", "http://s9.myradiostream.com:14296/stream", "http://s9.myradiostream.com:14296", "https://live-radio-stream.online/dance-one-radio.mp3"]} streamTitle={streamTitle} />
         </div>
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
-          <Button className="btn-cyber" size="lg">
-            <Volume2 className="w-5 h-5 mr-2" />
-            Browse Shows
-          </Button>
-          <Button variant="outline" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground" size="lg">
-            Download App
-          </Button>
+          
+          
         </div>
       </div>
 
@@ -102,8 +67,6 @@ const HeroSection = () => {
           <div className="w-1 h-3 bg-primary rounded-full mt-2 animate-glow-pulse"></div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default HeroSection;
