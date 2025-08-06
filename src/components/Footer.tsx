@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Radio, Instagram, Twitter, Facebook, Youtube, Mail, Phone } from 'lucide-react';
+import { Radio, Instagram, X, Facebook, Youtube, Mail, Phone } from 'lucide-react';
 import appStoreBadge from '@/assets/app-store-badge.svg';
 import googlePlayBadge from '@/assets/google-play-badge.png';
 const Footer = () => {
@@ -25,7 +25,7 @@ const Footer = () => {
               </Button>
               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary hover:bg-primary/20" asChild>
                 <a href="https://x.com/DanceOneRadio" target="_blank" rel="noopener noreferrer">
-                  <Twitter className="w-5 h-5" />
+                  <X className="w-5 h-5" />
                 </a>
               </Button>
               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary hover:bg-primary/20" asChild>
@@ -46,10 +46,10 @@ const Footer = () => {
             
             <div className="flex flex-col sm:flex-row items-center gap-6 justify-center">
               <a href="https://apps.apple.com/us/app/dance-one-radio/id578991926" target="_blank" rel="noopener noreferrer" className="inline-block hover:opacity-80 transition-opacity">
-                <img src={appStoreBadge} alt="Download on the App Store" className="w-32 h-auto" />
+                <img src={appStoreBadge} alt="Download on the App Store" className="h-12 w-auto object-contain" />
               </a>
               <a href="https://play.google.com/store/apps/details?id=com.danceoneradio&hl=en_US&pli=1" target="_blank" rel="noopener noreferrer" className="inline-block hover:opacity-80 transition-opacity">
-                <img src={googlePlayBadge} alt="Get it on Google Play" className="w-32 h-auto" />
+                <img src={googlePlayBadge} alt="Get it on Google Play" className="h-12 w-auto object-contain" />
               </a>
             </div>
           </div>
