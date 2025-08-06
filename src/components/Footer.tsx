@@ -1,7 +1,10 @@
 import { Button } from '@/components/ui/button';
-import { Radio, Instagram, X, Facebook, Youtube, Mail, Phone } from 'lucide-react';
 import appStoreBadge from '@/assets/app-store-badge.svg';
 import googlePlayBadge from '@/assets/google-play-badge.png';
+import xIcon from '@/assets/x-icon.svg';
+import instagramIcon from '@/assets/instagram-icon.svg';
+import facebookIcon from '@/assets/facebook-icon.svg';
+import youtubeIcon from '@/assets/youtube-icon.svg';
 const Footer = () => {
   return <footer className="bg-card/50 border-t border-primary/20 py-16 relative overflow-hidden">
       {/* Background Pattern */}
@@ -20,22 +23,22 @@ const Footer = () => {
             <div className="flex space-x-4 justify-center">
               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary hover:bg-primary/20" asChild>
                 <a href="https://instagram.com/danceoneradio" target="_blank" rel="noopener noreferrer">
-                  <Instagram className="w-5 h-5" />
+                  <img src={instagramIcon} alt="Instagram" className="w-5 h-5 brightness-0 invert opacity-60 hover:opacity-100 transition-opacity" />
                 </a>
               </Button>
               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary hover:bg-primary/20" asChild>
                 <a href="https://x.com/DanceOneRadio" target="_blank" rel="noopener noreferrer">
-                  <X className="w-5 h-5" />
+                  <img src={xIcon} alt="X (Twitter)" className="w-5 h-5 brightness-0 invert opacity-60 hover:opacity-100 transition-opacity" />
                 </a>
               </Button>
               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary hover:bg-primary/20" asChild>
                 <a href="https://www.facebook.com/danceoneradio" target="_blank" rel="noopener noreferrer">
-                  <Facebook className="w-5 h-5" />
+                  <img src={facebookIcon} alt="Facebook" className="w-5 h-5 brightness-0 invert opacity-60 hover:opacity-100 transition-opacity" />
                 </a>
               </Button>
               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary hover:bg-primary/20" asChild>
                 <a href="https://www.youtube.com/@danceoneradio" target="_blank" rel="noopener noreferrer">
-                  <Youtube className="w-5 h-5" />
+                  <img src={youtubeIcon} alt="YouTube" className="w-5 h-5 brightness-0 invert opacity-60 hover:opacity-100 transition-opacity" />
                 </a>
               </Button>
             </div>
