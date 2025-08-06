@@ -114,9 +114,7 @@ const DJSection = () => {
               </div>
 
               {/* Follow Button */}
-              <Button className="w-full bg-secondary hover:bg-secondary/80 text-secondary-foreground">
-                Follow DJ
-              </Button>
+              
             </div>)}
         </div>
 
