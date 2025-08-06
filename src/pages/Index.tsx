@@ -3,6 +3,7 @@ import HeroSection from '@/components/HeroSection';
 import ShowsSection from '@/components/ShowsSection';
 import DJSection from '@/components/DJSection';
 import TracksSection from '@/components/TracksSection';
+import AdSenseUnit from '@/components/AdSenseUnit';
 import Footer from '@/components/Footer';
 
 const Index = () => {
@@ -12,6 +13,7 @@ const Index = () => {
       <main>
         <HeroSection />
         <ShowsSection />
+        <AdSenseUnit />
         <DJSection />
         <TracksSection />
       </main>
