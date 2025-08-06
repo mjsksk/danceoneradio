@@ -46,10 +46,10 @@ const Footer = () => {
             
             <div className="flex flex-col sm:flex-row items-center gap-6 justify-center">
               <a href="https://apps.apple.com/us/app/dance-one-radio/id578991926" target="_blank" rel="noopener noreferrer" className="inline-block hover:opacity-80 transition-opacity">
-                <img src={appStoreBadge} alt="Download on the App Store" className="h-14 w-auto" />
+                <img src={appStoreBadge} alt="Download on the App Store" className="w-32 h-auto" />
               </a>
               <a href="https://play.google.com/store/apps/details?id=com.danceoneradio&hl=en_US&pli=1" target="_blank" rel="noopener noreferrer" className="inline-block hover:opacity-80 transition-opacity">
-                <img src={googlePlayBadge} alt="Get it on Google Play" className="h-12 w-auto" />
+                <img src={googlePlayBadge} alt="Get it on Google Play" className="w-32 h-auto" />
               </a>
             </div>
           </div>
@@ -86,7 +86,7 @@ const Footer = () => {
             <a href="/love" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani'] text-sm">
               Love
             </a>
-            <a href="mailto:dmca@danceoneradio.com" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani'] text-sm">
+            <a href="/dmca" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani'] text-sm">
               DMCA
             </a>
           </div>
