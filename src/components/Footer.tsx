@@ -1,5 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Radio, Instagram, Twitter, Facebook, Youtube, Mail, Phone } from 'lucide-react';
+import appStoreBadge from '@/assets/app-store-badge.svg';
+import googlePlayBadge from '@/assets/google-play-badge.png';
 const Footer = () => {
   return <footer className="bg-card/50 border-t border-primary/20 py-16 relative overflow-hidden">
       {/* Background Pattern */}
@@ -44,10 +46,10 @@ const Footer = () => {
             
             <div className="flex flex-col sm:flex-row items-center gap-6 justify-center">
               <a href="https://apps.apple.com/us/app/dance-one-radio/id578991926" target="_blank" rel="noopener noreferrer" className="inline-block hover:opacity-80 transition-opacity">
-                <img src="/src/assets/app-store-badge.svg" alt="Download on the App Store" className="h-16 w-auto" />
+                <img src={appStoreBadge} alt="Download on the App Store" className="h-12 w-auto" />
               </a>
               <a href="https://play.google.com/store/apps/details?id=com.danceoneradio&hl=en_US&pli=1" target="_blank" rel="noopener noreferrer" className="inline-block hover:opacity-80 transition-opacity">
-                <img src="/src/assets/google-play-badge.png" alt="Get it on Google Play" className="h-16 w-auto" />
+                <img src={googlePlayBadge} alt="Get it on Google Play" className="h-12 w-auto" />
               </a>
             </div>
           </div>
