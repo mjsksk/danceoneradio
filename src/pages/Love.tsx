@@ -53,7 +53,7 @@ const Love = () => {
                 <p className="text-muted-foreground leading-relaxed mb-6">
                   <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
   <input type="hidden" name="cmd" value="_s-xclick" />
-  <input type="hidden" name="hosted_button_id" value="X3SUYFT3YSG5S" />
+  <input type="hidden" name="hosted_button_id" value="8KHUB494QFKYS" />
   <table>
     <tr>
       <td>
@@ -65,13 +65,13 @@ const Love = () => {
       <td>
         <select name="os0">
           <option value="Option 1">
-            Option 1 $15.00 USD - month(s)
+            Option 1 $1.00 USD - month(s)
           </option>
           <option value="Option 2">
-            Option 2 $20.00 USD - month(s)
+            Option 2 $5.00 USD - month(s)
           </option>
           <option value="Option 3">
-            Option 3 $30.00 USD - month(s)
+            Option 3 $10.00 USD - month(s)
           </option>
         </select>
       </td>
