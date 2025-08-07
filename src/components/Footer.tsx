@@ -48,12 +48,8 @@ const Footer = () => {
               <a href="https://apps.apple.com/us/app/dance-one-radio/id578991926" target="_blank" rel="noopener noreferrer" className="inline-block">
                 <Button variant="outline" className="h-12 px-6 border-primary/30 bg-card/50 hover:bg-primary/10 hover:border-primary/50 transition-all duration-300">
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 relative">
-                      {/* Apple logo inspired design */}
-                      <div className="w-5 h-6 bg-primary rounded-t-full rounded-bl-full relative">
-                        <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-card rounded-full"></div>
-                        <div className="absolute -top-1 right-2 w-1 h-1.5 bg-primary rounded-full transform rotate-12"></div>
-                      </div>
+                    <div className="w-6 h-6 flex items-center justify-center">
+                      <div className="w-4 h-5 bg-primary rounded-sm"></div>
                     </div>
                     <div className="text-left">
                       <div className="text-xs text-muted-foreground">Download on the</div>
@@ -65,10 +61,8 @@ const Footer = () => {
               <a href="https://play.google.com/store/apps/details?id=com.danceoneradio&hl=en_US&pli=1" target="_blank" rel="noopener noreferrer" className="inline-block">
                 <Button variant="outline" className="h-12 px-6 border-primary/30 bg-card/50 hover:bg-primary/10 hover:border-primary/50 transition-all duration-300">
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 relative">
-                      {/* Play button inspired design */}
-                      <div className="w-0 h-0 border-l-[12px] border-l-primary border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent ml-1"></div>
-                      <div className="absolute top-0 left-0 w-6 h-6 border-2 border-primary rounded-full"></div>
+                    <div className="w-6 h-6 flex items-center justify-center">
+                      <div className="w-0 h-0 border-l-[10px] border-l-primary border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent"></div>
                     </div>
                     <div className="text-left">
                       <div className="text-xs text-muted-foreground">Get it on</div>
