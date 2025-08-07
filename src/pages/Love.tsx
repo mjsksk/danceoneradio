@@ -1,8 +1,10 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Heart, Music, Radio, Users } from 'lucide-react';
+
 const Love = () => {
-  return <div className="min-h-screen bg-background text-foreground">
+  return (
+    <div className="min-h-screen bg-background text-foreground">
       <Navigation />
       
       <main className="pt-20 pb-16">
@@ -13,13 +15,9 @@ const Love = () => {
               <h1 className="text-4xl font-['Orbitron'] font-bold text-primary mb-4">
                 Love
               </h1>
-              <p className="text-xl text-muted-foreground font-['Rajdhani']">Dance One is operating its streams commercial-free. We are able to do that with your help, our listeners. 
-
-
- All donations go directly into helping the station operate on a non-commercial basis. Your money will help pay for anything that has to do with expenses for hardware, software, streamlining, development, and music licensing. If you appreciate all the hard work that goes into making this station one of the best dance radio stations on earth, please consider a donation using one of the PayPal options below. 
-
-
- You can make the change, and we really appreciate it.</p>
+              <p className="text-xl text-muted-foreground font-['Rajdhani']">
+                What we love about electronic music and our community
+              </p>
             </div>
             
             <div className="space-y-12 font-['Rajdhani'] text-lg">
@@ -44,14 +42,44 @@ const Love = () => {
               <section className="text-center">
                 <Radio className="w-16 h-16 text-accent mx-auto mb-6" />
                 <h2 className="text-3xl font-semibold text-accent mb-6">The Experience</h2>
-                
+                <p className="text-muted-foreground leading-relaxed">
+                  We love curating the perfect sonic journey for every moment. Whether you're working, relaxing, or dancing, 
+                  our carefully selected tracks and live DJ sets are designed to elevate your mood and transport you to another dimension.
+                </p>
               </section>
 
               <div className="card-cyber p-8 mt-12 text-center bg-primary/5">
                 <h3 className="text-2xl font-semibold text-primary mb-4">Share the Love</h3>
                 <p className="text-muted-foreground leading-relaxed mb-6">
-                  Music is meant to be shared. Tell your friends, family, and fellow music lovers about Dance One Radio. 
-                  Let's spread the love for electronic music together!
+                  <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+  <input type="hidden" name="cmd" value="_s-xclick" />
+  <input type="hidden" name="hosted_button_id" value="X3SUYFT3YSG5S" />
+  <table>
+    <tr>
+      <td>
+        <input type="hidden" name="on0" value="Payment Options"/>
+        Payment Options
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <select name="os0">
+          <option value="Option 1">
+            Option 1 $15.00 USD - month(s)
+          </option>
+          <option value="Option 2">
+            Option 2 $20.00 USD - month(s)
+          </option>
+          <option value="Option 3">
+            Option 3 $30.00 USD - month(s)
+          </option>
+        </select>
+      </td>
+    </tr>
+  </table>
+  <input type="hidden" name="currency_code" value="USD" />
+  <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_subscribeCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Subscribe" />
+</form>
                 </p>
                 <div className="flex justify-center space-x-4">
                   <Heart className="w-6 h-6 text-primary animate-pulse" />
@@ -65,6 +93,8 @@ const Love = () => {
       </main>
 
       <Footer />
-    </div>;
+    </div>
+  );
 };
+
 export default Love;
