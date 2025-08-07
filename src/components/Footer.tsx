@@ -44,12 +44,33 @@ const Footer = () => {
           {/* Mobile App Links */}
           <div>
             
-            <div className="flex flex-col sm:flex-row items-center gap-6 justify-center">
-              <a href="https://apps.apple.com/us/app/dance-one-radio/id578991926" target="_blank" rel="noopener noreferrer" className="inline-block hover:opacity-80 transition-opacity">
-                <img src={appStoreBadge} alt="Download on the App Store" className="h-12 w-auto object-contain" />
+            <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">
+              <a href="https://apps.apple.com/us/app/dance-one-radio/id578991926" target="_blank" rel="noopener noreferrer" className="inline-block">
+                <Button variant="outline" className="h-12 px-6 border-primary/30 bg-card/50 hover:bg-primary/10 hover:border-primary/50 transition-all duration-300">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 bg-primary rounded-sm flex items-center justify-center">
+                      <div className="w-4 h-4 bg-background rounded-sm"></div>
+                    </div>
+                    <div className="text-left">
+                      <div className="text-xs text-muted-foreground">Download on the</div>
+                      <div className="text-sm font-semibold text-foreground">App Store</div>
+                    </div>
+                  </div>
+                </Button>
               </a>
-              <a href="https://play.google.com/store/apps/details?id=com.danceoneradio&hl=en_US&pli=1" target="_blank" rel="noopener noreferrer" className="inline-block hover:opacity-80 transition-opacity">
-                <img src={googlePlayBadge} alt="Get it on Google Play" className="h-12 w-auto object-contain" />
+              <a href="https://play.google.com/store/apps/details?id=com.danceoneradio&hl=en_US&pli=1" target="_blank" rel="noopener noreferrer" className="inline-block">
+                <Button variant="outline" className="h-12 px-6 border-primary/30 bg-card/50 hover:bg-primary/10 hover:border-primary/50 transition-all duration-300">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 bg-primary rounded-sm flex items-center justify-center">
+                      <div className="w-2 h-2 bg-background rounded-full"></div>
+                      <div className="w-1 h-3 bg-background ml-1"></div>
+                    </div>
+                    <div className="text-left">
+                      <div className="text-xs text-muted-foreground">Get it on</div>
+                      <div className="text-sm font-semibold text-foreground">Google Play</div>
+                    </div>
+                  </div>
+                </Button>
               </a>
             </div>
           </div>
