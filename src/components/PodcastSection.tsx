@@ -23,7 +23,7 @@ const PodcastSection = () => {
 
       <div className="container mx-auto px-4 relative">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-card/30 backdrop-blur-sm border border-primary/20 rounded-lg p-6">
+          <div className="backdrop-blur-sm border border-primary/10 rounded-lg p-6" style={{ backgroundColor: 'transparent' }}>
             <div className="flex items-center gap-4 mb-6">
               <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/60 rounded-lg flex items-center justify-center">
                 <div className="w-8 h-8 bg-background/20 rounded-full flex items-center justify-center">

@@ -23,7 +23,8 @@ const Navigation = () => {
               <a
                 key={item.name}
                 href={item.href}
-                className="text-muted-foreground hover:text-primary transition-colors duration-300 font-['Rajdhani'] font-medium uppercase tracking-wider"
+                className="text-muted-foreground hover:text-primary transition-colors duration-300 font-medium text-sm tracking-tight"
+                style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
               >
                 {item.name}
               </a>
@@ -51,7 +52,8 @@ const Navigation = () => {
                 <a
                   key={item.name}
                   href={item.href}
-                  className="text-muted-foreground hover:text-primary transition-colors duration-300 font-['Rajdhani'] font-medium uppercase tracking-wider py-2"
+                  className="text-muted-foreground hover:text-primary transition-colors duration-300 font-medium text-sm tracking-tight py-2"
+                  style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.name}
