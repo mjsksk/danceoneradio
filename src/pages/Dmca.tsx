@@ -1,9 +1,7 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
-
 const Dmca = () => {
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <Navigation />
       <main className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
@@ -37,16 +35,12 @@ const Dmca = () => {
             </section>
 
             <section className="mt-8 pt-6 border-t border-primary/20">
-              <p className="text-muted-foreground font-['Rajdhani'] text-sm">
-                For DMCA-related inquiries, please contact: <a href="mailto:dmca@danceoneradio.com" className="text-primary hover:underline">dmca@danceoneradio.com</a>
-              </p>
+              
             </section>
           </div>
         </div>
       </main>
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Dmca;
