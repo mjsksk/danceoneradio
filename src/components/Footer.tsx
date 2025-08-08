@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
-import { Instagram, Facebook, Youtube, Twitter } from 'lucide-react';
+import { Instagram, Facebook, Youtube } from 'lucide-react';
+import xIcon from '@/assets/x-icon.svg';
 import appStoreBadge from '@/assets/app-store-badge.svg';
 import googlePlayBadge from '@/assets/google-play-badge.png';
 const Footer = () => {
@@ -25,7 +26,7 @@ const Footer = () => {
               </Button>
               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary hover:bg-primary/20" asChild>
                 <a href="https://x.com/DanceOneRadio" target="_blank" rel="noopener noreferrer">
-                  <Twitter className="w-5 h-5" />
+                  <img src={xIcon} alt="X" className="w-5 h-5 fill-current" />
                 </a>
               </Button>
               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary hover:bg-primary/20" asChild>
