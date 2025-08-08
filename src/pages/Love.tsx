@@ -1,10 +1,8 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Heart, Music, Radio, Users } from 'lucide-react';
-
 const Love = () => {
-  return (
-    <div className="min-h-screen bg-background text-foreground">
+  return <div className="min-h-screen bg-background text-foreground">
       <Navigation />
       
       <main className="pt-20 pb-16">
@@ -15,9 +13,13 @@ const Love = () => {
               <h1 className="text-4xl font-['Orbitron'] font-bold text-primary mb-4">
                 Love
               </h1>
-              <p className="text-xl text-muted-foreground font-['Rajdhani']">
-                What we love about electronic music and our community
-              </p>
+              <p className="text-xl text-muted-foreground font-['Rajdhani']">Dance One is operating its streams commercial-free. We can do that with your help, our listeners. All donations go directly into helping the station operate on a non-commercial basis. Your money will help cover expenses related to hardware, software, streamlining, development, and music licensing. 
+
+
+ If you appreciate all the hard work that goes into making this station one of the best dance radio stations on earth, please consider a donation using one of the PayPal options below. 
+
+
+ You can make the change, and we really appreciate it.</p>
             </div>
             
             <div className="space-y-12 font-['Rajdhani'] text-lg">
@@ -64,7 +66,7 @@ const Love = () => {
                       <table className="mx-auto">
                         <tr>
                           <td>
-                            <input type="hidden" name="on0" value="Payment Options"/>
+                            <input type="hidden" name="on0" value="Payment Options" />
                             <label className="text-muted-foreground mb-2 block">Payment Options</label>
                           </td>
                         </tr>
@@ -98,7 +100,7 @@ const Love = () => {
                       <table className="mx-auto">
                         <tr>
                           <td>
-                            <input type="hidden" name="on0" value="Payment Options"/>
+                            <input type="hidden" name="on0" value="Payment Options" />
                             <label className="text-muted-foreground mb-2 block">Payment Options</label>
                           </td>
                         </tr>
@@ -146,8 +148,6 @@ const Love = () => {
       </main>
 
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Love;
