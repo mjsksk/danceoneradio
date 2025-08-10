@@ -37,10 +37,25 @@ const Contact = () => {
           description: "Failed to send message. Please try again.",
           variant: "destructive",
         });
+        return;
+      }
+
+      // Send emails via edge function
+      const emailResponse = await supabase.functions.invoke('send-contact-email', {
+        body: contactData
+      });
+
+      if (emailResponse.error) {
+        console.error('Email error:', emailResponse.error);
+        toast({
+          title: "Message saved but email failed",
+          description: "Your message was saved but we couldn't send the confirmation email.",
+          variant: "destructive",
+        });
       } else {
         toast({
           title: "Message sent!",
-          description: "We'll get back to you as soon as possible.",
+          description: "We've received your message and sent you a confirmation email.",
         });
         (e.target as HTMLFormElement).reset();
       }
