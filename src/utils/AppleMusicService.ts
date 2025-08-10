@@ -24,7 +24,7 @@ interface AppleMusicSearchResponse {
 }
 
 export class AppleMusicService {
-  private static baseUrl = '/api/functions/v1/apple-music-search';
+  private static baseUrl = 'https://kjhjrjgfbyvfzztwgkzg.supabase.co/functions/v1/apple-music-search';
 
   static async searchTrack(artist: string, title: string): Promise<string | null> {
     try {

@@ -104,31 +104,31 @@ const TracksSection = () => {
   //   }
   // }, [tracks, albumArt]);
 
-  // Fetch Apple Music previews for tracks
-  useEffect(() => {
-    const fetchPreviews = async () => {
-      for (const track of tracks) {
-        if (!previewUrls[track.id]) {
-          try {
-            console.log(`🎵 Fetching Apple Music preview for: ${track.artist} - ${track.title}`);
-            const previewUrl = await AppleMusicService.getTrackPreview(track.id, track.artist, track.title);
-            if (previewUrl) {
-              setPreviewUrls(prev => ({...prev, [track.id]: previewUrl}));
-              console.log(`🎵 Found Apple Music preview for: ${track.artist} - ${track.title}`);
-            } else {
-              console.log(`🎵 No Apple Music preview found for: ${track.artist} - ${track.title}`);
-            }
-          } catch (error) {
-            console.error(`🎵 Failed to fetch Apple Music preview for ${track.artist} - ${track.title}:`, error);
-          }
-        }
-      }
-    };
+  // Temporarily disable Apple Music preview fetching to prevent loading errors
+  // useEffect(() => {
+  //   const fetchPreviews = async () => {
+  //     for (const track of tracks) {
+  //       if (!previewUrls[track.id]) {
+  //         try {
+  //           console.log(`🎵 Fetching Apple Music preview for: ${track.artist} - ${track.title}`);
+  //           const previewUrl = await AppleMusicService.getTrackPreview(track.id, track.artist, track.title);
+  //           if (previewUrl) {
+  //             setPreviewUrls(prev => ({...prev, [track.id]: previewUrl}));
+  //             console.log(`🎵 Found Apple Music preview for: ${track.artist} - ${track.title}`);
+  //           } else {
+  //             console.log(`🎵 No Apple Music preview found for: ${track.artist} - ${track.title}`);
+  //           }
+  //         } catch (error) {
+  //           console.error(`🎵 Failed to fetch Apple Music preview for ${track.artist} - ${track.title}:`, error);
+  //         }
+  //       }
+  //     }
+  //   };
 
-    if (tracks.length > 0) {
-      fetchPreviews();
-    }
-  }, [tracks, previewUrls]);
+  //   if (tracks.length > 0) {
+  //     fetchPreviews();
+  //   }
+  // }, [tracks, previewUrls]);
 
   useEffect(() => {
     const fetchRecentTracks = async () => {
@@ -177,7 +177,9 @@ const TracksSection = () => {
         }
       } else {
         console.log(`🎵 No Apple Music preview available for track ${trackId}`);
-        // Could add a fallback here to show a message or try alternative sources
+        // For now, just show visual feedback without playing audio
+        setPlayingTrack(trackId);
+        setTimeout(() => setPlayingTrack(null), 3000); // Auto-stop after 3 seconds
       }
     }
   };
