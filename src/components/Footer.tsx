@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Instagram, Facebook, Youtube } from 'lucide-react';
-import appStoreBadge from '@/assets/app-store-badge.svg';
-import googlePlayBadge from '@/assets/google-play-badge.png';
+import appStoreBadge from '@/assets/app-store-badge-new.svg';
+import googlePlayBadge from '@/assets/google-play-badge-new.svg';
 const Footer = () => {
   return <footer className="bg-card/50 border-t border-primary/20 py-16 relative overflow-hidden">
       {/* Background Pattern */}
@@ -48,30 +48,18 @@ const Footer = () => {
             
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">
               <a href="https://apps.apple.com/us/app/dance-one-radio/id578991926" target="_blank" rel="noopener noreferrer" className="inline-block">
-                <Button variant="outline" className="h-12 px-6 border-primary/30 bg-card/50 hover:bg-primary/10 hover:border-primary/50 transition-all duration-300">
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 flex items-center justify-center">
-                      <div className="w-4 h-5 bg-primary rounded-sm"></div>
-                    </div>
-                    <div className="text-left">
-                      <div className="text-xs text-muted-foreground">Download on the</div>
-                      <div className="text-sm font-semibold text-foreground">App Store</div>
-                    </div>
-                  </div>
-                </Button>
+                <img 
+                  src={appStoreBadge} 
+                  alt="Download on the App Store" 
+                  className="h-12 transition-opacity hover:opacity-80"
+                />
               </a>
               <a href="https://play.google.com/store/apps/details?id=com.danceoneradio&hl=en_US&pli=1" target="_blank" rel="noopener noreferrer" className="inline-block">
-                <Button variant="outline" className="h-12 px-6 border-primary/30 bg-card/50 hover:bg-primary/10 hover:border-primary/50 transition-all duration-300">
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 flex items-center justify-center">
-                      <div className="w-0 h-0 border-l-[10px] border-l-primary border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent"></div>
-                    </div>
-                    <div className="text-left">
-                      <div className="text-xs text-muted-foreground">Get it on</div>
-                      <div className="text-sm font-semibold text-foreground">Google Play</div>
-                    </div>
-                  </div>
-                </Button>
+                <img 
+                  src={googlePlayBadge} 
+                  alt="Get it on Google Play" 
+                  className="h-12 transition-opacity hover:opacity-80"
+                />
               </a>
             </div>
           </div>
