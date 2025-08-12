@@ -48,7 +48,7 @@ const Shows = () => {
           };
         });
         
-        setEpisodes(episodeList);
+        setEpisodes(episodeList.slice(0, 10));
       } catch (error) {
         console.error('Error fetching episodes:', error);
       } finally {
