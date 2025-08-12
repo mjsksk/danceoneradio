@@ -101,21 +101,23 @@ const LiveRadioPlayer = ({
     updateFrequencyData();
   };
   const startFallbackAnimation = () => {
-    console.log('🎵 Starting DIRECT DOM animation');
-    setDebugInfo('Using DIRECT DOM animation');
+    console.log('🎵 Starting ENHANCED FLUID animation');
+    setDebugInfo('Using ENHANCED FLUID animation');
     setAnimationActive(true);
 
     // Stop any existing analysis first
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
     }
+    
     let time = 0;
     let frameCount = 0;
     const animateFallback = () => {
-      time += 0.2;
+      time += 0.08; // Slower, more fluid movement
       frameCount++;
+      
       if (frameCount % 30 === 0) {
-        console.log('🎵 DIRECT animation frame:', frameCount);
+        console.log('🎵 FLUID animation frame:', frameCount);
       }
 
       // Find the EQ bars in the DOM and animate them directly
@@ -123,45 +125,131 @@ const LiveRadioPlayer = ({
       if (eqContainer) {
         const bars = eqContainer.querySelectorAll('[data-eq-bar]');
         bars.forEach((bar: any, i: number) => {
-          const bassBoost = i < 2 ? 2.0 : 1;
-          const trebleBoost = i > 5 ? 1.5 : 1;
+          // Enhanced fluid movement with multiple wave layers
+          const bassBoost = i < 3 ? 2.2 : 1;
+          const midBoost = i >= 3 && i <= 5 ? 1.8 : 1;
+          const trebleBoost = i > 5 ? 1.6 : 1;
+          
           const baseHeight = 35;
-          const primaryWave = Math.sin(time + i * 1.2) * 25 * bassBoost;
-          const secondaryWave = Math.sin(time * 3.1 + i * 0.7) * 15 * trebleBoost;
-          const randomVariation = (Math.random() - 0.5) * 10;
-          const height = Math.max(30, Math.min(70, baseHeight + primaryWave + secondaryWave + randomVariation));
-          const hue = 160 + height / 70 * 80;
-          const lightness = 45 + height / 70 * 25;
+          
+          // Multiple overlapping waves for more complex movement
+          const primaryWave = Math.sin(time + i * 0.8) * 20 * bassBoost;
+          const secondaryWave = Math.sin(time * 2.3 + i * 0.5) * 15 * midBoost;
+          const tertiaryWave = Math.sin(time * 4.1 + i * 1.1) * 8 * trebleBoost;
+          const quaternaryWave = Math.sin(time * 0.7 + i * 2.2) * 12;
+          
+          // Smooth random variation
+          const smoothRandom = Math.sin(time * 1.3 + i * 3.7) * 6;
+          
+          const height = Math.max(25, Math.min(75, 
+            baseHeight + primaryWave + secondaryWave + tertiaryWave + quaternaryWave + smoothRandom
+          ));
+          
+          // Enhanced color spectrum - spanning more hues with smoother transitions
+          const normalizedHeight = (height - 25) / 50; // 0 to 1
+          
+          // Color spectrum: Blue -> Cyan -> Green -> Yellow -> Orange -> Red -> Purple -> Pink
+          let hue, saturation, lightness;
+          
+          if (normalizedHeight < 0.14) {
+            // Deep blue to cyan
+            hue = 220 + (normalizedHeight / 0.14) * 40; // 220-260
+            saturation = 85 + normalizedHeight * 15;
+            lightness = 45 + normalizedHeight * 15;
+          } else if (normalizedHeight < 0.29) {
+            // Cyan to green  
+            const local = (normalizedHeight - 0.14) / 0.15;
+            hue = 180 + local * 40; // 180-220
+            saturation = 90 + local * 10;
+            lightness = 50 + local * 10;
+          } else if (normalizedHeight < 0.43) {
+            // Green to yellow
+            const local = (normalizedHeight - 0.29) / 0.14;
+            hue = 120 + local * 60; // 120-180
+            saturation = 85 + local * 15;
+            lightness = 55 + local * 10;
+          } else if (normalizedHeight < 0.57) {
+            // Yellow to orange
+            const local = (normalizedHeight - 0.43) / 0.14;
+            hue = 60 + local * 30; // 60-90
+            saturation = 90 + local * 10;
+            lightness = 60 + local * 10;
+          } else if (normalizedHeight < 0.71) {
+            // Orange to red
+            const local = (normalizedHeight - 0.57) / 0.14;
+            hue = 30 + local * 30; // 30-60
+            saturation = 85 + local * 15;
+            lightness = 55 + local * 15;
+          } else if (normalizedHeight < 0.86) {
+            // Red to purple
+            const local = (normalizedHeight - 0.71) / 0.15;
+            hue = 0 + local * 60; // 0-60 (wrapping to 300-360)
+            if (hue < 30) hue = 330 + hue; // Convert to purple range
+            saturation = 80 + local * 20;
+            lightness = 50 + local * 20;
+          } else {
+            // Purple to pink
+            const local = (normalizedHeight - 0.86) / 0.14;
+            hue = 300 + local * 30; // 300-330
+            saturation = 75 + local * 25;
+            lightness = 55 + local * 25;
+          }
+          
+          // Add subtle time-based color shifting
+          const timeShift = Math.sin(time * 0.5 + i * 0.3) * 15;
+          hue = (hue + timeShift + 360) % 360;
+          
+          // Enhanced glow effect based on height
+          const glowIntensity = normalizedHeight * 15 + 5;
+          const glowSpread = normalizedHeight * 8 + 2;
 
-          // Apply directly to DOM with fixed width to prevent oscillation
+          // Apply fluid transformations
           bar.style.height = `${height}px`;
-          bar.style.width = '16px'; // Fixed width to prevent oscillation
-          bar.style.minWidth = '16px';
-          bar.style.maxWidth = '16px';
-          bar.style.backgroundColor = `hsl(${hue}, 80%, ${lightness}%)`;
-          bar.style.boxShadow = `0 0 ${height / 8}px hsl(${hue}, 80%, ${lightness}%)`;
-          bar.style.transform = 'scaleX(1)'; // Remove scaleY to prevent width changes
+          bar.style.width = '18px'; // Slightly wider bars
+          bar.style.minWidth = '18px';
+          bar.style.maxWidth = '18px';
+          bar.style.backgroundColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+          bar.style.boxShadow = `
+            0 0 ${glowSpread}px hsl(${hue}, ${saturation}%, ${lightness}%),
+            0 0 ${glowIntensity}px hsl(${hue}, 100%, 80%),
+            inset 0 0 ${glowSpread/2}px hsl(${hue}, 100%, 90%)
+          `;
+          bar.style.transform = 'scaleX(1)';
+          bar.style.transition = 'none'; // Remove transitions for smoother animation
+          
+          // Add subtle border radius variation
+          const borderRadius = 8 + Math.sin(time * 2 + i) * 2;
+          bar.style.borderRadius = `${borderRadius}px`;
         });
       }
 
-      // Also update React state as backup
-      const bars = Array.from({
-        length: 8
-      }, (_, i) => {
-        const bassBoost = i < 2 ? 2.0 : 1;
-        const trebleBoost = i > 5 ? 1.5 : 1;
+      // Update React state as backup with enhanced data
+      const bars = Array.from({ length: 8 }, (_, i) => {
+        const bassBoost = i < 3 ? 2.2 : 1;
+        const midBoost = i >= 3 && i <= 5 ? 1.8 : 1;
+        const trebleBoost = i > 5 ? 1.6 : 1;
+        
         const baseHeight = 35;
-        const primaryWave = Math.sin(time + i * 1.2) * 25 * bassBoost;
-        const secondaryWave = Math.sin(time * 3.1 + i * 0.7) * 15 * trebleBoost;
-        const randomVariation = (Math.random() - 0.5) * 10;
-        return Math.max(30, Math.min(70, baseHeight + primaryWave + secondaryWave + randomVariation));
+        const primaryWave = Math.sin(time + i * 0.8) * 20 * bassBoost;
+        const secondaryWave = Math.sin(time * 2.3 + i * 0.5) * 15 * midBoost;
+        const tertiaryWave = Math.sin(time * 4.1 + i * 1.1) * 8 * trebleBoost;
+        const quaternaryWave = Math.sin(time * 0.7 + i * 2.2) * 12;
+        const smoothRandom = Math.sin(time * 1.3 + i * 3.7) * 6;
+        
+        return Math.max(25, Math.min(75, 
+          baseHeight + primaryWave + secondaryWave + tertiaryWave + quaternaryWave + smoothRandom
+        ));
       });
+      
       setFrequencyData(bars);
+      
       if (frameCount % 60 === 0) {
-        console.log('🎵 Heights:', bars.map(b => Math.round(b)));
+        console.log('🎵 Enhanced Heights:', bars.map(b => Math.round(b)));
       }
+      
       animationRef.current = requestAnimationFrame(animateFallback);
     };
+    
     animateFallback();
   };
   const stopAudioAnalysis = () => {
@@ -316,17 +404,73 @@ const LiveRadioPlayer = ({
         
       </div>
 
-      {/* Real-time Audio EQ Visualizer - Fixed container to prevent width oscillation */}
+      {/* Enhanced Real-time Audio EQ Visualizer with Fluid Color Spectrum */}
       <div className="flex items-end justify-center space-x-1 mb-6 h-20" data-eq-container>
-        {frequencyData.map((height, i) => <div key={i} data-eq-bar className="rounded-full transition-none shadow-lg flex-shrink-0" style={{
-          height: `${Math.max(30, Math.min(70, height))}px`,
-          width: '16px',
-          minWidth: '16px',
-          maxWidth: '16px',
-          backgroundColor: animationActive ? `hsl(${160 + height / 70 * 80}, 80%, ${45 + height / 70 * 25}%)` : 'hsl(var(--muted))',
-          boxShadow: animationActive ? `0 0 ${height / 8}px hsl(${160 + height / 70 * 80}, 80%, ${45 + height / 70 * 25}%)` : 'none',
-          willChange: 'height, background-color, box-shadow'
-        }} />)}
+        {frequencyData.map((height, i) => {
+          const normalizedHeight = (Math.max(25, Math.min(75, height)) - 25) / 50;
+          let hue, saturation, lightness;
+          
+          // Enhanced color spectrum calculation
+          if (normalizedHeight < 0.14) {
+            hue = 220 + (normalizedHeight / 0.14) * 40;
+            saturation = 85 + normalizedHeight * 15;
+            lightness = 45 + normalizedHeight * 15;
+          } else if (normalizedHeight < 0.29) {
+            const local = (normalizedHeight - 0.14) / 0.15;
+            hue = 180 + local * 40;
+            saturation = 90 + local * 10;
+            lightness = 50 + local * 10;
+          } else if (normalizedHeight < 0.43) {
+            const local = (normalizedHeight - 0.29) / 0.14;
+            hue = 120 + local * 60;
+            saturation = 85 + local * 15;
+            lightness = 55 + local * 10;
+          } else if (normalizedHeight < 0.57) {
+            const local = (normalizedHeight - 0.43) / 0.14;
+            hue = 60 + local * 30;
+            saturation = 90 + local * 10;
+            lightness = 60 + local * 10;
+          } else if (normalizedHeight < 0.71) {
+            const local = (normalizedHeight - 0.57) / 0.14;
+            hue = 30 + local * 30;
+            saturation = 85 + local * 15;
+            lightness = 55 + local * 15;
+          } else if (normalizedHeight < 0.86) {
+            const local = (normalizedHeight - 0.71) / 0.15;
+            hue = local < 0.5 ? 0 + local * 60 : 330 + (local - 0.5) * 60;
+            saturation = 80 + local * 20;
+            lightness = 50 + local * 20;
+          } else {
+            const local = (normalizedHeight - 0.86) / 0.14;
+            hue = 300 + local * 30;
+            saturation = 75 + local * 25;
+            lightness = 55 + local * 25;
+          }
+          
+          const glowIntensity = normalizedHeight * 15 + 5;
+          const glowSpread = normalizedHeight * 8 + 2;
+          
+          return (
+            <div 
+              key={i} 
+              data-eq-bar 
+              className="rounded-lg transition-none shadow-lg flex-shrink-0" 
+              style={{
+                height: `${Math.max(25, Math.min(75, height))}px`,
+                width: '18px',
+                minWidth: '18px',
+                maxWidth: '18px',
+                backgroundColor: animationActive 
+                  ? `hsl(${hue}, ${saturation}%, ${lightness}%)` 
+                  : 'hsl(var(--muted))',
+                boxShadow: animationActive 
+                  ? `0 0 ${glowSpread}px hsl(${hue}, ${saturation}%, ${lightness}%), 0 0 ${glowIntensity}px hsl(${hue}, 100%, 80%), inset 0 0 ${glowSpread/2}px hsl(${hue}, 100%, 90%)`
+                  : 'none',
+                willChange: 'height, background-color, box-shadow, border-radius'
+              }} 
+            />
+          );
+        })}
       </div>
       
 
