@@ -54,17 +54,17 @@ const HeroSection = () => {
           <LiveRadioPlayer streamUrls={["http://s9.myradiostream.com:14296/;", "http://s9.myradiostream.com:14296/stream", "http://s9.myradiostream.com:14296", "https://live-radio-stream.online/dance-one-radio.mp3"]} streamTitle={streamTitle} />
         </div>
 
+        {/* Scroll Indicator */}
+        <div className="mb-8 flex justify-center animate-float">
+          <div className="w-6 h-10 border-2 border-primary rounded-full flex justify-center">
+            <div className="w-1 h-3 bg-primary rounded-full mt-2 animate-glow-pulse"></div>
+          </div>
+        </div>
+
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
           
           
-        </div>
-      </div>
-
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 animate-float z-20">
-        <div className="w-6 h-10 border-2 border-primary rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-primary rounded-full mt-2 animate-glow-pulse"></div>
         </div>
       </div>
     </section>;
