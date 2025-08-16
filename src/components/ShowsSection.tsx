@@ -1,5 +1,4 @@
-import { Button } from '@/components/ui/button';
-import { Clock, Calendar, User, Play } from 'lucide-react';
+import PodcastPreview from './PodcastPreview';
 const ShowsSection = () => {
   return <section id="shows" className="py-20 relative">
       <div className="container mx-auto px-4">
@@ -14,14 +13,7 @@ const ShowsSection = () => {
         </div>
 
         <div className="max-w-4xl mx-auto">
-          <div className="card-cyber p-6 bg-transparent">
-            <iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameBorder="0" height="450" style={{
-            width: '100%',
-            maxWidth: '2500px',
-            overflow: 'hidden',
-            borderRadius: '10px'
-          }} sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.podcasts.apple.com/us/podcast/future-dance-anthems-with-mario/id1439656478" title="Future Dance Anthems with Mario Podcast" />
-          </div>
+          <PodcastPreview />
         </div>
       </div>
     </section>;
