@@ -16,7 +16,7 @@ const LiveRadioPlayer = ({
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
   const [albumArt, setAlbumArt] = useState<string | null>(null);
   const [isLoadingArt, setIsLoadingArt] = useState(false);
-  const [frequencyData, setFrequencyData] = useState<number[]>(new Array(8).fill(25));
+  const [frequencyData, setFrequencyData] = useState<number[]>(new Array(8).fill(20));
   const [debugInfo, setDebugInfo] = useState<string>('Waiting...');
   const [animationActive, setAnimationActive] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -113,7 +113,7 @@ const LiveRadioPlayer = ({
     let time = 0;
     let frameCount = 0;
     const animateFallback = () => {
-      time += 0.08; // Slower, more fluid movement
+      time += 0.12; // More responsive timing for music-like feel
       frameCount++;
       
       if (frameCount % 30 === 0) {
@@ -125,28 +125,31 @@ const LiveRadioPlayer = ({
       if (eqContainer) {
         const bars = eqContainer.querySelectorAll('[data-eq-bar]');
         bars.forEach((bar: any, i: number) => {
-          // Enhanced fluid movement with multiple wave layers
-          const bassBoost = i < 3 ? 2.2 : 1;
-          const midBoost = i >= 3 && i <= 5 ? 1.8 : 1;
-          const trebleBoost = i > 5 ? 1.6 : 1;
+          // More realistic frequency response simulation
+          const bassBoost = i < 2 ? 2.5 : i < 4 ? 1.8 : 1;
+          const midBoost = i >= 2 && i <= 4 ? 2.0 : i <= 6 ? 1.5 : 1;
+          const trebleBoost = i > 6 ? 1.7 : 1;
           
-          const baseHeight = 35;
+          const baseHeight = 30;
           
-          // Multiple overlapping waves for more complex movement
-          const primaryWave = Math.sin(time + i * 0.8) * 20 * bassBoost;
-          const secondaryWave = Math.sin(time * 2.3 + i * 0.5) * 15 * midBoost;
-          const tertiaryWave = Math.sin(time * 4.1 + i * 1.1) * 8 * trebleBoost;
-          const quaternaryWave = Math.sin(time * 0.7 + i * 2.2) * 12;
+          // More music-like wave patterns with varying frequencies
+          const bassWave = Math.sin(time * 0.8 + i * 0.4) * 18 * bassBoost;
+          const midWave = Math.sin(time * 1.5 + i * 0.7) * 12 * midBoost;
+          const trebleWave = Math.sin(time * 3.2 + i * 1.2) * 8 * trebleBoost;
           
-          // Smooth random variation
-          const smoothRandom = Math.sin(time * 1.3 + i * 3.7) * 6;
+          // Add percussion-like peaks
+          const kickPattern = Math.pow(Math.sin(time * 1.2), 8) * 15 * (i < 3 ? 1 : 0.3);
+          const snarePattern = Math.pow(Math.sin(time * 2.4 + Math.PI/2), 6) * 10 * (i >= 3 && i <= 5 ? 1 : 0.2);
           
-          const height = Math.max(25, Math.min(75, 
-            baseHeight + primaryWave + secondaryWave + tertiaryWave + quaternaryWave + smoothRandom
+          // Musical decay simulation
+          const decay = Math.exp(-Math.abs(Math.sin(time * 2 + i)) * 0.5) * 8;
+          
+          const height = Math.max(20, Math.min(70, 
+            baseHeight + bassWave + midWave + trebleWave + kickPattern + snarePattern + decay
           ));
           
           // Enhanced color spectrum - spanning more hues with smoother transitions
-          const normalizedHeight = (height - 25) / 50; // 0 to 1
+          const normalizedHeight = (height - 20) / 50; // 0 to 1
           
           // Color spectrum: Blue -> Cyan -> Green -> Yellow -> Orange -> Red -> Purple -> Pink
           let hue, saturation, lightness;
@@ -205,9 +208,9 @@ const LiveRadioPlayer = ({
 
           // Apply fluid transformations
           bar.style.height = `${height}px`;
-          bar.style.width = '18px'; // Slightly wider bars
-          bar.style.minWidth = '18px';
-          bar.style.maxWidth = '18px';
+          bar.style.width = '8px'; // Thinner bars for more realistic look
+          bar.style.minWidth = '8px';
+          bar.style.maxWidth = '8px';
           bar.style.backgroundColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
           bar.style.boxShadow = `
             0 0 ${glowSpread}px hsl(${hue}, ${saturation}%, ${lightness}%),
@@ -225,19 +228,20 @@ const LiveRadioPlayer = ({
 
       // Update React state as backup with enhanced data
       const bars = Array.from({ length: 8 }, (_, i) => {
-        const bassBoost = i < 3 ? 2.2 : 1;
-        const midBoost = i >= 3 && i <= 5 ? 1.8 : 1;
-        const trebleBoost = i > 5 ? 1.6 : 1;
+        const bassBoost = i < 2 ? 2.5 : i < 4 ? 1.8 : 1;
+        const midBoost = i >= 2 && i <= 4 ? 2.0 : i <= 6 ? 1.5 : 1;
+        const trebleBoost = i > 6 ? 1.7 : 1;
         
-        const baseHeight = 35;
-        const primaryWave = Math.sin(time + i * 0.8) * 20 * bassBoost;
-        const secondaryWave = Math.sin(time * 2.3 + i * 0.5) * 15 * midBoost;
-        const tertiaryWave = Math.sin(time * 4.1 + i * 1.1) * 8 * trebleBoost;
-        const quaternaryWave = Math.sin(time * 0.7 + i * 2.2) * 12;
-        const smoothRandom = Math.sin(time * 1.3 + i * 3.7) * 6;
+        const baseHeight = 30;
+        const bassWave = Math.sin(time * 0.8 + i * 0.4) * 18 * bassBoost;
+        const midWave = Math.sin(time * 1.5 + i * 0.7) * 12 * midBoost;
+        const trebleWave = Math.sin(time * 3.2 + i * 1.2) * 8 * trebleBoost;
+        const kickPattern = Math.pow(Math.sin(time * 1.2), 8) * 15 * (i < 3 ? 1 : 0.3);
+        const snarePattern = Math.pow(Math.sin(time * 2.4 + Math.PI/2), 6) * 10 * (i >= 3 && i <= 5 ? 1 : 0.2);
+        const decay = Math.exp(-Math.abs(Math.sin(time * 2 + i)) * 0.5) * 8;
         
-        return Math.max(25, Math.min(75, 
-          baseHeight + primaryWave + secondaryWave + tertiaryWave + quaternaryWave + smoothRandom
+        return Math.max(20, Math.min(70, 
+          baseHeight + bassWave + midWave + trebleWave + kickPattern + snarePattern + decay
         ));
       });
       
@@ -260,7 +264,7 @@ const LiveRadioPlayer = ({
       cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
     }
-    setFrequencyData(new Array(8).fill(25)); // Reset to base height
+    setFrequencyData(new Array(8).fill(20)); // Reset to base height
   };
   const handlePlayPause = () => {
     if (!audioRef.current) return;
@@ -405,9 +409,9 @@ const LiveRadioPlayer = ({
       </div>
 
       {/* Enhanced Real-time Audio EQ Visualizer with Fluid Color Spectrum */}
-      <div className="flex items-end justify-center space-x-1 mb-6 h-20" data-eq-container>
+      <div className="flex items-end justify-center space-x-2 mb-6 h-20" data-eq-container>
         {frequencyData.map((height, i) => {
-          const normalizedHeight = (Math.max(25, Math.min(75, height)) - 25) / 50;
+          const normalizedHeight = (Math.max(20, Math.min(70, height)) - 20) / 50;
           let hue, saturation, lightness;
           
           // Enhanced color spectrum calculation
@@ -454,12 +458,12 @@ const LiveRadioPlayer = ({
             <div 
               key={i} 
               data-eq-bar 
-              className="rounded-lg transition-none shadow-lg flex-shrink-0" 
+              className="rounded-full transition-none shadow-lg flex-shrink-0" 
               style={{
-                height: `${Math.max(25, Math.min(75, height))}px`,
-                width: '18px',
-                minWidth: '18px',
-                maxWidth: '18px',
+                height: `${Math.max(20, Math.min(70, height))}px`,
+                width: '8px',
+                minWidth: '8px',
+                maxWidth: '8px',
                 backgroundColor: animationActive 
                   ? `hsl(${hue}, ${saturation}%, ${lightness}%)` 
                   : 'hsl(var(--muted))',
