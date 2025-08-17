@@ -86,7 +86,7 @@ const PodcastPreview = () => {
 
       <div className="space-y-4 mb-6">
         {episodes.map((episode, index) => (
-          <Card key={episode.guid || index} className="bg-background/40 border-primary/20 p-4 hover:bg-background/60 transition-all duration-300 group">
+          <Card key={episode.guid || index} className="bg-transparent border-primary/20 p-4 hover:bg-primary/5 transition-all duration-300 group">
             <div className="flex items-start gap-4">
               <div className="bg-gradient-to-br from-neon to-neon-purple text-background rounded-lg w-10 h-10 flex items-center justify-center font-['Orbitron'] font-bold text-sm flex-shrink-0">
                 #{3 - index}
