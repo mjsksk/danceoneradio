@@ -16,7 +16,7 @@ const LiveRadioPlayer = ({
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
   const [albumArt, setAlbumArt] = useState<string | null>(null);
   const [isLoadingArt, setIsLoadingArt] = useState(false);
-  const [frequencyData, setFrequencyData] = useState<number[]>(new Array(8).fill(20));
+  const [frequencyData, setFrequencyData] = useState<number[]>(new Array(16).fill(20));
   const [debugInfo, setDebugInfo] = useState<string>('Waiting...');
   const [animationActive, setAnimationActive] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -83,10 +83,10 @@ const LiveRadioPlayer = ({
       }
       console.log('Real audio data detected:', dataSum);
 
-      // Group frequency data into 8 bars (we have 32 bins, so group by 4)
+      // Group frequency data into 16 bars (we have 32 bins, so group by 2)
       const bars = [];
-      const binsPerBar = Math.floor(dataArrayRef.current.length / 8);
-      for (let i = 0; i < 8; i++) {
+      const binsPerBar = Math.floor(dataArrayRef.current.length / 16);
+      for (let i = 0; i < 16; i++) {
         let sum = 0;
         for (let j = 0; j < binsPerBar; j++) {
           sum += dataArrayRef.current[i * binsPerBar + j];
@@ -148,54 +148,42 @@ const LiveRadioPlayer = ({
             baseHeight + bassWave + midWave + trebleWave + kickPattern + snarePattern + decay
           ));
           
-          // Enhanced color spectrum - spanning more hues with smoother transitions
-          const normalizedHeight = (height - 20) / 50; // 0 to 1
+          // Realistic spectrum-based colors based on frequency position
+          const frequencyPosition = i / 15; // 0 to 1 based on bar position
+          const normalizedHeight = Math.min(1, Math.max(0, (height - 20) / 50)); // 0 to 1
           
-          // Color spectrum: Blue -> Cyan -> Green -> Yellow -> Orange -> Red -> Purple -> Pink
+          // Realistic frequency spectrum colors: red (bass) -> orange -> yellow -> green -> blue -> purple (treble)
           let hue, saturation, lightness;
           
-          if (normalizedHeight < 0.14) {
-            // Deep blue to cyan
-            hue = 220 + (normalizedHeight / 0.14) * 40; // 220-260
+          if (frequencyPosition < 0.2) {
+            // Bass frequencies: Deep red to orange-red
+            hue = 0 + frequencyPosition * 40; // 0-8
+            saturation = 90 - normalizedHeight * 10;
+            lightness = 40 + normalizedHeight * 25;
+          } else if (frequencyPosition < 0.4) {
+            // Low-mid frequencies: Orange to yellow
+            const local = (frequencyPosition - 0.2) / 0.2;
+            hue = 20 + local * 40; // 20-60
             saturation = 85 + normalizedHeight * 15;
-            lightness = 45 + normalizedHeight * 15;
-          } else if (normalizedHeight < 0.29) {
-            // Cyan to green  
-            const local = (normalizedHeight - 0.14) / 0.15;
-            hue = 180 + local * 40; // 180-220
-            saturation = 90 + local * 10;
-            lightness = 50 + local * 10;
-          } else if (normalizedHeight < 0.43) {
-            // Green to yellow
-            const local = (normalizedHeight - 0.29) / 0.14;
+            lightness = 45 + normalizedHeight * 20;
+          } else if (frequencyPosition < 0.6) {
+            // Mid frequencies: Yellow to green
+            const local = (frequencyPosition - 0.4) / 0.2;
+            hue = 60 + local * 60; // 60-120
+            saturation = 80 + normalizedHeight * 20;
+            lightness = 50 + normalizedHeight * 15;
+          } else if (frequencyPosition < 0.8) {
+            // High-mid frequencies: Green to cyan
+            const local = (frequencyPosition - 0.6) / 0.2;
             hue = 120 + local * 60; // 120-180
-            saturation = 85 + local * 15;
-            lightness = 55 + local * 10;
-          } else if (normalizedHeight < 0.57) {
-            // Yellow to orange
-            const local = (normalizedHeight - 0.43) / 0.14;
-            hue = 60 + local * 30; // 60-90
-            saturation = 90 + local * 10;
-            lightness = 60 + local * 10;
-          } else if (normalizedHeight < 0.71) {
-            // Orange to red
-            const local = (normalizedHeight - 0.57) / 0.14;
-            hue = 30 + local * 30; // 30-60
-            saturation = 85 + local * 15;
-            lightness = 55 + local * 15;
-          } else if (normalizedHeight < 0.86) {
-            // Red to purple
-            const local = (normalizedHeight - 0.71) / 0.15;
-            hue = 0 + local * 60; // 0-60 (wrapping to 300-360)
-            if (hue < 30) hue = 330 + hue; // Convert to purple range
-            saturation = 80 + local * 20;
-            lightness = 50 + local * 20;
+            saturation = 75 + normalizedHeight * 25;
+            lightness = 55 + normalizedHeight * 15;
           } else {
-            // Purple to pink
-            const local = (normalizedHeight - 0.86) / 0.14;
-            hue = 300 + local * 30; // 300-330
-            saturation = 75 + local * 25;
-            lightness = 55 + local * 25;
+            // Treble frequencies: Cyan to blue to purple
+            const local = (frequencyPosition - 0.8) / 0.2;
+            hue = 180 + local * 120; // 180-300
+            saturation = 70 + normalizedHeight * 30;
+            lightness = 60 + normalizedHeight * 20;
           }
           
           // Add subtle time-based color shifting
@@ -208,9 +196,9 @@ const LiveRadioPlayer = ({
 
           // Apply fluid transformations
           bar.style.height = `${height}px`;
-          bar.style.width = '8px'; // Thinner bars for more realistic look
-          bar.style.minWidth = '8px';
-          bar.style.maxWidth = '8px';
+          bar.style.width = '5px'; // Thinner bars for more bars
+          bar.style.minWidth = '5px';
+          bar.style.maxWidth = '5px';
           bar.style.backgroundColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
           bar.style.boxShadow = `
             0 0 ${glowSpread}px hsl(${hue}, ${saturation}%, ${lightness}%),
@@ -227,7 +215,7 @@ const LiveRadioPlayer = ({
       }
 
       // Update React state as backup with enhanced data
-      const bars = Array.from({ length: 8 }, (_, i) => {
+      const bars = Array.from({ length: 16 }, (_, i) => {
         const bassBoost = i < 2 ? 2.5 : i < 4 ? 1.8 : 1;
         const midBoost = i >= 2 && i <= 4 ? 2.0 : i <= 6 ? 1.5 : 1;
         const trebleBoost = i > 6 ? 1.7 : 1;
@@ -264,7 +252,7 @@ const LiveRadioPlayer = ({
       cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
     }
-    setFrequencyData(new Array(8).fill(20)); // Reset to base height
+    setFrequencyData(new Array(16).fill(20)); // Reset to base height
   };
   const handlePlayPause = () => {
     if (!audioRef.current) return;
@@ -409,46 +397,43 @@ const LiveRadioPlayer = ({
       </div>
 
       {/* Enhanced Real-time Audio EQ Visualizer with Fluid Color Spectrum */}
-      <div className="flex items-end justify-center space-x-2 mb-6 h-20" data-eq-container>
+      <div className="flex items-end justify-center space-x-1 mb-6 h-20" data-eq-container>
         {frequencyData.map((height, i) => {
-          const normalizedHeight = (Math.max(20, Math.min(70, height)) - 20) / 50;
+          const frequencyPosition = i / 15; // 0 to 1 based on bar position
+          const normalizedHeight = Math.min(1, Math.max(0, (height - 20) / 50)); // 0 to 1
+          
+          // Realistic frequency spectrum colors
           let hue, saturation, lightness;
           
-          // Enhanced color spectrum calculation
-          if (normalizedHeight < 0.14) {
-            hue = 220 + (normalizedHeight / 0.14) * 40;
+          if (frequencyPosition < 0.2) {
+            // Bass frequencies: Deep red to orange-red
+            hue = 0 + frequencyPosition * 40;
+            saturation = 90 - normalizedHeight * 10;
+            lightness = 40 + normalizedHeight * 25;
+          } else if (frequencyPosition < 0.4) {
+            // Low-mid frequencies: Orange to yellow
+            const local = (frequencyPosition - 0.2) / 0.2;
+            hue = 20 + local * 40;
             saturation = 85 + normalizedHeight * 15;
-            lightness = 45 + normalizedHeight * 15;
-          } else if (normalizedHeight < 0.29) {
-            const local = (normalizedHeight - 0.14) / 0.15;
-            hue = 180 + local * 40;
-            saturation = 90 + local * 10;
-            lightness = 50 + local * 10;
-          } else if (normalizedHeight < 0.43) {
-            const local = (normalizedHeight - 0.29) / 0.14;
+            lightness = 45 + normalizedHeight * 20;
+          } else if (frequencyPosition < 0.6) {
+            // Mid frequencies: Yellow to green
+            const local = (frequencyPosition - 0.4) / 0.2;
+            hue = 60 + local * 60;
+            saturation = 80 + normalizedHeight * 20;
+            lightness = 50 + normalizedHeight * 15;
+          } else if (frequencyPosition < 0.8) {
+            // High-mid frequencies: Green to cyan
+            const local = (frequencyPosition - 0.6) / 0.2;
             hue = 120 + local * 60;
-            saturation = 85 + local * 15;
-            lightness = 55 + local * 10;
-          } else if (normalizedHeight < 0.57) {
-            const local = (normalizedHeight - 0.43) / 0.14;
-            hue = 60 + local * 30;
-            saturation = 90 + local * 10;
-            lightness = 60 + local * 10;
-          } else if (normalizedHeight < 0.71) {
-            const local = (normalizedHeight - 0.57) / 0.14;
-            hue = 30 + local * 30;
-            saturation = 85 + local * 15;
-            lightness = 55 + local * 15;
-          } else if (normalizedHeight < 0.86) {
-            const local = (normalizedHeight - 0.71) / 0.15;
-            hue = local < 0.5 ? 0 + local * 60 : 330 + (local - 0.5) * 60;
-            saturation = 80 + local * 20;
-            lightness = 50 + local * 20;
+            saturation = 75 + normalizedHeight * 25;
+            lightness = 55 + normalizedHeight * 15;
           } else {
-            const local = (normalizedHeight - 0.86) / 0.14;
-            hue = 300 + local * 30;
-            saturation = 75 + local * 25;
-            lightness = 55 + local * 25;
+            // Treble frequencies: Cyan to blue to purple
+            const local = (frequencyPosition - 0.8) / 0.2;
+            hue = 180 + local * 120;
+            saturation = 70 + normalizedHeight * 30;
+            lightness = 60 + normalizedHeight * 20;
           }
           
           const glowIntensity = normalizedHeight * 15 + 5;
@@ -461,9 +446,9 @@ const LiveRadioPlayer = ({
               className="rounded-full transition-none shadow-lg flex-shrink-0" 
               style={{
                 height: `${Math.max(20, Math.min(70, height))}px`,
-                width: '8px',
-                minWidth: '8px',
-                maxWidth: '8px',
+                width: '5px',
+                minWidth: '5px',
+                maxWidth: '5px',
                 backgroundColor: animationActive 
                   ? `hsl(${hue}, ${saturation}%, ${lightness}%)` 
                   : 'hsl(var(--muted))',
