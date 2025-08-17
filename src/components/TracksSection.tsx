@@ -204,23 +204,40 @@ const TracksSection = () => {
     window.open(appleMusicUrl, '_blank');
   };
 
-  const handleShare = (track: Track) => {
+  const handleShare = async (track: Track) => {
+    console.log('🎵 Share button clicked for track:', track.title);
     const shareText = `🎵 Now playing: ${track.title} by ${track.artist} on Dance One Radio`;
     const shareUrl = window.location.href;
     
-    if (navigator.share) {
-      navigator.share({
-        title: `${track.title} - ${track.artist}`,
-        text: shareText,
-        url: shareUrl,
-      }).catch(console.error);
-    } else {
-      // Fallback to copying to clipboard
+    try {
+      if (navigator.share) {
+        console.log('🎵 Using native share API');
+        await navigator.share({
+          title: `${track.title} - ${track.artist}`,
+          text: shareText,
+          url: shareUrl,
+        });
+        console.log('🎵 Native share completed');
+      } else {
+        console.log('🎵 Falling back to clipboard');
+        const textToCopy = `${shareText}\n${shareUrl}`;
+        await navigator.clipboard.writeText(textToCopy);
+        console.log('🎵 Track info copied to clipboard');
+        
+        // Show some visual feedback
+        alert('Track info copied to clipboard!');
+      }
+    } catch (error) {
+      console.error('🎵 Share failed:', error);
+      // Fallback for older browsers
       const textToCopy = `${shareText}\n${shareUrl}`;
-      navigator.clipboard.writeText(textToCopy).then(() => {
-        // You could add a toast notification here
-        console.log('Track info copied to clipboard');
-      }).catch(console.error);
+      try {
+        await navigator.clipboard.writeText(textToCopy);
+        alert('Track info copied to clipboard!');
+      } catch (clipboardError) {
+        console.error('🎵 Clipboard fallback failed:', clipboardError);
+        alert('Unable to share. Please copy this manually: ' + textToCopy);
+      }
     }
   };
 
