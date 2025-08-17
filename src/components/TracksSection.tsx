@@ -198,6 +198,32 @@ const TracksSection = () => {
     }
   };
 
+  const handleTrackClick = (track: Track) => {
+    const query = encodeURIComponent(`${track.artist} ${track.title}`);
+    const appleMusicUrl = `https://music.apple.com/search?term=${query}`;
+    window.open(appleMusicUrl, '_blank');
+  };
+
+  const handleShare = (track: Track) => {
+    const shareText = `🎵 Now playing: ${track.title} by ${track.artist} on Dance One Radio`;
+    const shareUrl = window.location.href;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: `${track.title} - ${track.artist}`,
+        text: shareText,
+        url: shareUrl,
+      }).catch(console.error);
+    } else {
+      // Fallback to copying to clipboard
+      const textToCopy = `${shareText}\n${shareUrl}`;
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        // You could add a toast notification here
+        console.log('Track info copied to clipboard');
+      }).catch(console.error);
+    }
+  };
+
   return (
     <section id="tracks" className="py-20 relative">
       <div className="container mx-auto px-4">
@@ -273,24 +299,24 @@ const TracksSection = () => {
                     )}
                   </Button>
 
-                  <div className="flex-1">
-                    <h3 className="text-xl font-['Orbitron'] font-bold text-primary mb-1">
-                      {track.title}
-                    </h3>
-                    <p className="text-lg text-accent font-['Rajdhani'] font-medium mb-1">
-                      {track.artist}
-                    </p>
-                    <div className="flex items-center space-x-4 text-sm text-muted-foreground font-['Rajdhani']">
-                      <span>{track.genre}</span>
-                      <span>•</span>
-                      <div className="flex items-center">
-                        <Clock className="w-3 h-3 mr-1" />
-                        {track.duration}
-                      </div>
-                      <span>•</span>
-                      <span>{new Date(track.playedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                    </div>
-                  </div>
+                   <div className="flex-1 cursor-pointer" onClick={() => handleTrackClick(track)}>
+                     <h3 className="text-xl font-['Orbitron'] font-bold text-primary mb-1 hover:text-neon transition-colors">
+                       {track.title}
+                     </h3>
+                     <p className="text-lg text-accent font-['Rajdhani'] font-medium mb-1 hover:text-neon-purple transition-colors">
+                       {track.artist}
+                     </p>
+                     <div className="flex items-center space-x-4 text-sm text-muted-foreground font-['Rajdhani']">
+                       <span>{track.genre}</span>
+                       <span>•</span>
+                       <div className="flex items-center">
+                         <Clock className="w-3 h-3 mr-1" />
+                         {track.duration}
+                       </div>
+                       <span>•</span>
+                       <span>{new Date(track.playedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                     </div>
+                   </div>
                 </div>
 
                 {/* Waveform Visualization */}
@@ -321,13 +347,14 @@ const TracksSection = () => {
                     >
                       <Heart className="w-4 h-4" />
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-muted-foreground hover:text-primary hover:bg-primary/20"
-                    >
-                      <Share2 className="w-4 h-4" />
-                    </Button>
+                     <Button
+                       variant="ghost"
+                       size="icon"
+                       className="text-muted-foreground hover:text-primary hover:bg-primary/20"
+                       onClick={() => handleShare(track)}
+                     >
+                       <Share2 className="w-4 h-4" />
+                     </Button>
                   </div>
                 </div>
               </div>
