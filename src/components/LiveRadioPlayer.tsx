@@ -16,7 +16,7 @@ const LiveRadioPlayer = ({
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
   const [albumArt, setAlbumArt] = useState<string | null>(null);
   const [isLoadingArt, setIsLoadingArt] = useState(false);
-  const [frequencyData, setFrequencyData] = useState<number[]>(new Array(16).fill(20));
+  const [frequencyData, setFrequencyData] = useState<number[]>(new Array(32).fill(20));
   const [debugInfo, setDebugInfo] = useState<string>('Waiting...');
   const [animationActive, setAnimationActive] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -83,10 +83,10 @@ const LiveRadioPlayer = ({
       }
       console.log('Real audio data detected:', dataSum);
 
-      // Group frequency data into 16 bars (we have 32 bins, so group by 2)
+      // Group frequency data into 32 bars (we have 32 bins, so use each bin)
       const bars = [];
-      const binsPerBar = Math.floor(dataArrayRef.current.length / 16);
-      for (let i = 0; i < 16; i++) {
+      const binsPerBar = Math.floor(dataArrayRef.current.length / 32);
+      for (let i = 0; i < 32; i++) {
         let sum = 0;
         for (let j = 0; j < binsPerBar; j++) {
           sum += dataArrayRef.current[i * binsPerBar + j];
@@ -149,7 +149,7 @@ const LiveRadioPlayer = ({
           ));
           
           // Realistic spectrum-based colors based on frequency position
-          const frequencyPosition = i / 15; // 0 to 1 based on bar position
+          const frequencyPosition = i / 31; // 0 to 1 based on bar position
           const normalizedHeight = Math.min(1, Math.max(0, (height - 20) / 50)); // 0 to 1
           
           // Realistic frequency spectrum colors: red (bass) -> orange -> yellow -> green -> blue -> purple (treble)
@@ -196,9 +196,9 @@ const LiveRadioPlayer = ({
 
           // Apply fluid transformations
           bar.style.height = `${height}px`;
-          bar.style.width = '5px'; // Thinner bars for more bars
-          bar.style.minWidth = '5px';
-          bar.style.maxWidth = '5px';
+          bar.style.width = '3px'; // Thinner bars for more bars
+          bar.style.minWidth = '3px';
+          bar.style.maxWidth = '3px';
           bar.style.backgroundColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
           bar.style.boxShadow = `
             0 0 ${glowSpread}px hsl(${hue}, ${saturation}%, ${lightness}%),
@@ -215,7 +215,7 @@ const LiveRadioPlayer = ({
       }
 
       // Update React state as backup with enhanced data
-      const bars = Array.from({ length: 16 }, (_, i) => {
+      const bars = Array.from({ length: 32 }, (_, i) => {
         const bassBoost = i < 2 ? 2.5 : i < 4 ? 1.8 : 1;
         const midBoost = i >= 2 && i <= 4 ? 2.0 : i <= 6 ? 1.5 : 1;
         const trebleBoost = i > 6 ? 1.7 : 1;
@@ -252,7 +252,7 @@ const LiveRadioPlayer = ({
       cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
     }
-    setFrequencyData(new Array(16).fill(20)); // Reset to base height
+    setFrequencyData(new Array(32).fill(20)); // Reset to base height
   };
   const handlePlayPause = () => {
     if (!audioRef.current) return;
@@ -397,9 +397,9 @@ const LiveRadioPlayer = ({
       </div>
 
       {/* Enhanced Real-time Audio EQ Visualizer with Fluid Color Spectrum */}
-      <div className="flex items-end justify-center space-x-1 mb-6 h-20" data-eq-container>
+      <div className="flex items-end justify-center space-x-0.5 mb-6 h-20 w-full px-4" data-eq-container>
         {frequencyData.map((height, i) => {
-          const frequencyPosition = i / 15; // 0 to 1 based on bar position
+          const frequencyPosition = i / 31; // 0 to 1 based on bar position
           const normalizedHeight = Math.min(1, Math.max(0, (height - 20) / 50)); // 0 to 1
           
           // Realistic frequency spectrum colors
@@ -446,9 +446,9 @@ const LiveRadioPlayer = ({
               className="rounded-full transition-none shadow-lg flex-shrink-0" 
               style={{
                 height: `${Math.max(20, Math.min(70, height))}px`,
-                width: '5px',
-                minWidth: '5px',
-                maxWidth: '5px',
+                width: '3px',
+                minWidth: '3px',
+                maxWidth: '3px',
                 backgroundColor: animationActive 
                   ? `hsl(${hue}, ${saturation}%, ${lightness}%)` 
                   : 'hsl(var(--muted))',
