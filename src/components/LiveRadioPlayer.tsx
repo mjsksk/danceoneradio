@@ -16,7 +16,7 @@ const LiveRadioPlayer = ({
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
   const [albumArt, setAlbumArt] = useState<string | null>(null);
   const [isLoadingArt, setIsLoadingArt] = useState(false);
-  const [frequencyData, setFrequencyData] = useState<number[]>(new Array(32).fill(20));
+  const [frequencyData, setFrequencyData] = useState<number[]>(new Array(64).fill(20));
   const [debugInfo, setDebugInfo] = useState<string>('Waiting...');
   const [animationActive, setAnimationActive] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -47,16 +47,16 @@ const LiveRadioPlayer = ({
       try {
         const source = audioContext.createMediaElementSource(audioRef.current);
         console.log('Media element source created successfully');
-        analyser.fftSize = 64; // This gives us 32 frequency bins, we'll use 8
-        const bufferLength = analyser.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
-        source.connect(analyser);
-        analyser.connect(audioContext.destination);
-        audioContextRef.current = audioContext;
-        analyserRef.current = analyser;
-        dataArrayRef.current = dataArray;
-        console.log('Audio analysis setup complete');
-        startAudioAnalysis();
+      analyser.fftSize = 128; // This gives us 64 frequency bins
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      source.connect(analyser);
+      analyser.connect(audioContext.destination);
+      audioContextRef.current = audioContext;
+      analyserRef.current = analyser;
+      dataArrayRef.current = dataArray;
+      console.log('Audio analysis setup complete');
+      startAudioAnalysis();
       } catch (sourceError) {
         console.warn('Failed to create media element source (likely CORS issue):', sourceError);
         // Fallback to animated visualization
@@ -83,10 +83,10 @@ const LiveRadioPlayer = ({
       }
       console.log('Real audio data detected:', dataSum);
 
-      // Group frequency data into 32 bars (we have 32 bins, so use each bin)
+      // Group frequency data into 64 bars (we have 64 bins, so use each bin)
       const bars = [];
-      const binsPerBar = Math.floor(dataArrayRef.current.length / 32);
-      for (let i = 0; i < 32; i++) {
+      const binsPerBar = Math.floor(dataArrayRef.current.length / 64);
+      for (let i = 0; i < 64; i++) {
         let sum = 0;
         for (let j = 0; j < binsPerBar; j++) {
           sum += dataArrayRef.current[i * binsPerBar + j];
@@ -196,9 +196,9 @@ const LiveRadioPlayer = ({
 
           // Apply fluid transformations
           bar.style.height = `${height}px`;
-          bar.style.width = '3px'; // Thinner bars for more bars
-          bar.style.minWidth = '3px';
-          bar.style.maxWidth = '3px';
+          bar.style.width = '2px'; // Even thinner bars for 64 bars
+          bar.style.minWidth = '2px';
+          bar.style.maxWidth = '2px';
           bar.style.backgroundColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
           bar.style.boxShadow = `
             0 0 ${glowSpread}px hsl(${hue}, ${saturation}%, ${lightness}%),
@@ -215,17 +215,17 @@ const LiveRadioPlayer = ({
       }
 
       // Update React state as backup with enhanced data
-      const bars = Array.from({ length: 32 }, (_, i) => {
-        const bassBoost = i < 2 ? 2.5 : i < 4 ? 1.8 : 1;
-        const midBoost = i >= 2 && i <= 4 ? 2.0 : i <= 6 ? 1.5 : 1;
-        const trebleBoost = i > 6 ? 1.7 : 1;
+      const bars = Array.from({ length: 64 }, (_, i) => {
+        const bassBoost = i < 4 ? 2.5 : i < 8 ? 1.8 : 1;
+        const midBoost = i >= 4 && i <= 8 ? 2.0 : i <= 12 ? 1.5 : 1;
+        const trebleBoost = i > 12 ? 1.7 : 1;
         
         const baseHeight = 30;
-        const bassWave = Math.sin(time * 0.8 + i * 0.4) * 18 * bassBoost;
-        const midWave = Math.sin(time * 1.5 + i * 0.7) * 12 * midBoost;
-        const trebleWave = Math.sin(time * 3.2 + i * 1.2) * 8 * trebleBoost;
-        const kickPattern = Math.pow(Math.sin(time * 1.2), 8) * 15 * (i < 3 ? 1 : 0.3);
-        const snarePattern = Math.pow(Math.sin(time * 2.4 + Math.PI/2), 6) * 10 * (i >= 3 && i <= 5 ? 1 : 0.2);
+        const bassWave = Math.sin(time * 0.8 + i * 0.2) * 18 * bassBoost;
+        const midWave = Math.sin(time * 1.5 + i * 0.35) * 12 * midBoost;
+        const trebleWave = Math.sin(time * 3.2 + i * 0.6) * 8 * trebleBoost;
+        const kickPattern = Math.pow(Math.sin(time * 1.2), 8) * 15 * (i < 6 ? 1 : 0.3);
+        const snarePattern = Math.pow(Math.sin(time * 2.4 + Math.PI/2), 6) * 10 * (i >= 6 && i <= 10 ? 1 : 0.2);
         const decay = Math.exp(-Math.abs(Math.sin(time * 2 + i)) * 0.5) * 8;
         
         return Math.max(20, Math.min(70, 
@@ -252,7 +252,7 @@ const LiveRadioPlayer = ({
       cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
     }
-    setFrequencyData(new Array(32).fill(20)); // Reset to base height
+    setFrequencyData(new Array(64).fill(20)); // Reset to base height
   };
   const handlePlayPause = () => {
     if (!audioRef.current) return;
@@ -399,7 +399,7 @@ const LiveRadioPlayer = ({
       {/* Enhanced Real-time Audio EQ Visualizer with Fluid Color Spectrum */}
       <div className="flex items-end justify-center space-x-0.5 mb-6 h-20 w-full px-4" data-eq-container>
         {frequencyData.map((height, i) => {
-          const frequencyPosition = i / 31; // 0 to 1 based on bar position
+          const frequencyPosition = i / 63; // 0 to 1 based on bar position
           const normalizedHeight = Math.min(1, Math.max(0, (height - 20) / 50)); // 0 to 1
           
           // Realistic frequency spectrum colors
