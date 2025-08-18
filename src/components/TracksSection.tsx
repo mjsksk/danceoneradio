@@ -207,7 +207,7 @@ const TracksSection = () => {
   const handleShare = (track: Track) => {
     console.log('🎵 Share button clicked for track:', track.title);
     const shareText = `🎵 Now playing: ${track.title} by ${track.artist} on Dance One Radio`;
-    const shareUrl = encodeURIComponent(window.location.href);
+    const shareUrl = encodeURIComponent('https://danceoneradio.com');
     const text = encodeURIComponent(shareText);
     
     // Create social media sharing URLs
