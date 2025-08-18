@@ -204,41 +204,80 @@ const TracksSection = () => {
     window.open(appleMusicUrl, '_blank');
   };
 
-  const handleShare = async (track: Track) => {
+  const handleShare = (track: Track) => {
     console.log('🎵 Share button clicked for track:', track.title);
     const shareText = `🎵 Now playing: ${track.title} by ${track.artist} on Dance One Radio`;
-    const shareUrl = window.location.href;
+    const shareUrl = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(shareText);
     
-    try {
-      if (navigator.share) {
-        console.log('🎵 Using native share API');
-        await navigator.share({
-          title: `${track.title} - ${track.artist}`,
-          text: shareText,
-          url: shareUrl,
-        });
-        console.log('🎵 Native share completed');
-      } else {
-        console.log('🎵 Falling back to clipboard');
-        const textToCopy = `${shareText}\n${shareUrl}`;
-        await navigator.clipboard.writeText(textToCopy);
-        console.log('🎵 Track info copied to clipboard');
-        
-        // Show some visual feedback
-        alert('Track info copied to clipboard!');
-      }
-    } catch (error) {
-      console.error('🎵 Share failed:', error);
-      // Fallback for older browsers
-      const textToCopy = `${shareText}\n${shareUrl}`;
-      try {
-        await navigator.clipboard.writeText(textToCopy);
-        alert('Track info copied to clipboard!');
-      } catch (clipboardError) {
-        console.error('🎵 Clipboard fallback failed:', clipboardError);
-        alert('Unable to share. Please copy this manually: ' + textToCopy);
-      }
-    }
+    // Create social media sharing URLs
+    const shareUrls = {
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}&quote=${text}`,
+      twitter: `https://twitter.com/intent/tweet?text=${text}&url=${shareUrl}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`,
+      whatsapp: `https://wa.me/?text=${text}%20${shareUrl}`,
+      telegram: `https://t.me/share/url?url=${shareUrl}&text=${text}`
+    };
+    
+    // Show sharing options popup
+    const platforms = [
+      { name: 'Facebook', url: shareUrls.facebook, color: '#1877F2' },
+      { name: 'X (Twitter)', url: shareUrls.twitter, color: '#000000' },
+      { name: 'LinkedIn', url: shareUrls.linkedin, color: '#0A66C2' },
+      { name: 'WhatsApp', url: shareUrls.whatsapp, color: '#25D366' },
+      { name: 'Telegram', url: shareUrls.telegram, color: '#0088CC' }
+    ];
+    
+    // Create a simple popup with sharing options
+    const popup = document.createElement('div');
+    popup.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: hsl(var(--card));
+      border: 1px solid hsl(var(--border));
+      border-radius: 8px;
+      padding: 20px;
+      z-index: 1000;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      min-width: 300px;
+    `;
+    
+    popup.innerHTML = `
+      <h3 style="margin: 0 0 15px 0; color: hsl(var(--foreground)); font-family: 'Orbitron', sans-serif;">Share Track</h3>
+      <p style="margin: 0 0 15px 0; color: hsl(var(--muted-foreground)); font-size: 14px;">${track.title} by ${track.artist}</p>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        ${platforms.map(platform => `
+          <button onclick="window.open('${platform.url}', '_blank', 'width=600,height=400'); document.body.removeChild(this.closest('div').parentElement)" 
+                  style="padding: 10px 15px; background: ${platform.color}; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+            Share on ${platform.name}
+          </button>
+        `).join('')}
+        <button onclick="document.body.removeChild(this.parentElement)" 
+                style="padding: 10px 15px; background: hsl(var(--secondary)); color: hsl(var(--secondary-foreground)); border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">
+          Cancel
+        </button>
+      </div>
+    `;
+    
+    // Add backdrop
+    const backdrop = document.createElement('div');
+    backdrop.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+    `;
+    backdrop.onclick = () => document.body.removeChild(backdrop);
+    
+    document.body.appendChild(backdrop);
+    backdrop.appendChild(popup);
+    
+    console.log('🎵 Social sharing popup opened');
   };
 
   return (
