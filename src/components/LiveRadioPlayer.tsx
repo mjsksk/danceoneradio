@@ -47,7 +47,9 @@ const LiveRadioPlayer = ({
       try {
         const source = audioContext.createMediaElementSource(audioRef.current);
         console.log('Media element source created successfully');
-      analyser.fftSize = 128; // This gives us 64 frequency bins
+      // Increase FFT size for better frequency resolution
+      analyser.fftSize = 256; // This gives us 128 frequency bins for 64 bars
+      analyser.smoothingTimeConstant = 0.8; // Add smoothing for realistic behavior
       const bufferLength = analyser.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
       source.connect(analyser);
@@ -83,17 +85,46 @@ const LiveRadioPlayer = ({
       }
       console.log('Real audio data detected:', dataSum);
 
-      // Group frequency data into 64 bars (we have 64 bins, so use each bin)
+      // Map frequency bins to Hz ranges and create 64 bars
       const bars = [];
+      const nyquist = 22050; // Typical Nyquist frequency for 44.1kHz audio
       const binsPerBar = Math.floor(dataArrayRef.current.length / 64);
+      
       for (let i = 0; i < 64; i++) {
+        // Calculate frequency range for this bar
+        const startFreq = (i * nyquist) / 64;
+        const endFreq = ((i + 1) * nyquist) / 64;
+        
         let sum = 0;
+        let count = 0;
+        
+        // Average frequency data for this Hz range
         for (let j = 0; j < binsPerBar; j++) {
-          sum += dataArrayRef.current[i * binsPerBar + j];
+          const binIndex = i * binsPerBar + j;
+          if (binIndex < dataArrayRef.current.length) {
+            sum += dataArrayRef.current[binIndex];
+            count++;
+          }
         }
-        const average = sum / binsPerBar;
-        // Normalize to 20-60 pixel range for visual appeal
-        bars.push(Math.max(20, average / 255 * 40 + 20));
+        
+        const average = count > 0 ? sum / count : 0;
+        
+        // Apply frequency-specific weighting
+        let weight = 1;
+        if (startFreq < 200) {
+          // Bass frequencies - boost for visibility
+          weight = 1.5;
+        } else if (startFreq < 2000) {
+          // Mid frequencies - normal
+          weight = 1.2;
+        } else {
+          // Treble frequencies - slightly reduced
+          weight = 1.0;
+        }
+        
+        // Normalize to 20-70 pixel range with frequency weighting
+        const height = Math.max(20, Math.min(70, (average / 255) * 50 * weight + 20));
+        bars.push(height);
       }
       setFrequencyData(bars);
       animationRef.current = requestAnimationFrame(updateFrequencyData);
@@ -101,8 +132,8 @@ const LiveRadioPlayer = ({
     updateFrequencyData();
   };
   const startFallbackAnimation = () => {
-    console.log('🎵 Starting ENHANCED FLUID animation');
-    setDebugInfo('Using ENHANCED FLUID animation');
+    console.log('🎵 Starting FREQUENCY-BASED animation');
+    setDebugInfo('Using frequency-based EQ simulation');
     setAnimationActive(true);
 
     // Stop any existing analysis first
@@ -112,91 +143,120 @@ const LiveRadioPlayer = ({
     
     let time = 0;
     let frameCount = 0;
+    
+    // Create independent oscillators for different frequency ranges
+    const bassOscillators = Array.from({ length: 16 }, (_, i) => ({
+      frequency: 0.3 + i * 0.05, // Slow, bass-like patterns
+      amplitude: 2.0 + Math.random() * 1.5,
+      phase: Math.random() * Math.PI * 2
+    }));
+    
+    const midOscillators = Array.from({ length: 32 }, (_, i) => ({
+      frequency: 0.8 + i * 0.1, // Mid-range patterns
+      amplitude: 1.2 + Math.random() * 1.0,
+      phase: Math.random() * Math.PI * 2
+    }));
+    
+    const trebleOscillators = Array.from({ length: 16 }, (_, i) => ({
+      frequency: 2.0 + i * 0.3, // Fast, treble-like patterns
+      amplitude: 0.8 + Math.random() * 0.7,
+      phase: Math.random() * Math.PI * 2
+    }));
+    
     const animateFallback = () => {
-      time += 0.12; // More responsive timing for music-like feel
+      time += 0.05; // Realistic timing
       frameCount++;
       
       if (frameCount % 30 === 0) {
-        console.log('🎵 FLUID animation frame:', frameCount);
+        console.log('🎵 FREQUENCY animation frame:', frameCount);
       }
+
+      // Calculate frequency-based heights for each bar
+      const bars = Array.from({ length: 64 }, (_, i) => {
+        const frequencyHz = (i / 63) * 22050; // Map to Hz range 0-22kHz
+        let height = 25; // Base height
+        
+        // Bass frequencies (20-200 Hz) - bars 0-15
+        if (i < 16) {
+          const osc = bassOscillators[i];
+          const bassResponse = Math.sin(time * osc.frequency + osc.phase) * osc.amplitude;
+          const kickPattern = Math.pow(Math.sin(time * 0.5), 6) * 20; // Kick drum simulation
+          height += bassResponse * 15 + kickPattern * (16 - i) / 16;
+        }
+        // Mid frequencies (200-2000 Hz) - bars 16-47
+        else if (i < 48) {
+          const midIndex = i - 16;
+          const osc = midOscillators[midIndex];
+          const midResponse = Math.sin(time * osc.frequency + osc.phase) * osc.amplitude;
+          const snarePattern = Math.pow(Math.sin(time * 1.3 + Math.PI/3), 4) * 12; // Snare simulation
+          const vocalPattern = Math.sin(time * 0.7 + midIndex * 0.1) * 8; // Vocal range simulation
+          height += midResponse * 12 + snarePattern * (midIndex > 8 && midIndex < 24 ? 1 : 0.3) + vocalPattern;
+        }
+        // Treble frequencies (2000-22000 Hz) - bars 48-63
+        else {
+          const trebleIndex = i - 48;
+          const osc = trebleOscillators[trebleIndex];
+          const trebleResponse = Math.sin(time * osc.frequency + osc.phase) * osc.amplitude;
+          const hihatPattern = Math.pow(Math.sin(time * 4 + trebleIndex * 0.5), 3) * 6; // Hi-hat simulation
+          const sparklePattern = Math.sin(time * 2.5 + trebleIndex * 0.8) * 4; // High-end sparkle
+          height += trebleResponse * 8 + hihatPattern + sparklePattern;
+        }
+        
+        // Add musical decay and attack
+        const envelope = Math.exp(-Math.abs(Math.sin(time * 1.5 + i * 0.1)) * 0.3) * 5;
+        height += envelope;
+        
+        // Random variations to simulate natural music
+        const randomNoise = (Math.random() - 0.5) * 3;
+        height += randomNoise;
+        
+        return Math.max(20, Math.min(70, height));
+      });
 
       // Find the EQ bars in the DOM and animate them directly
       const eqContainer = document.querySelector('[data-eq-container]');
       if (eqContainer) {
-        const bars = eqContainer.querySelectorAll('[data-eq-bar]');
-        bars.forEach((bar: any, i: number) => {
-          // More realistic frequency response simulation
-          const bassBoost = i < 2 ? 2.5 : i < 4 ? 1.8 : 1;
-          const midBoost = i >= 2 && i <= 4 ? 2.0 : i <= 6 ? 1.5 : 1;
-          const trebleBoost = i > 6 ? 1.7 : 1;
-          
-          const baseHeight = 30;
-          
-          // More music-like wave patterns with varying frequencies
-          const bassWave = Math.sin(time * 0.8 + i * 0.4) * 18 * bassBoost;
-          const midWave = Math.sin(time * 1.5 + i * 0.7) * 12 * midBoost;
-          const trebleWave = Math.sin(time * 3.2 + i * 1.2) * 8 * trebleBoost;
-          
-          // Add percussion-like peaks
-          const kickPattern = Math.pow(Math.sin(time * 1.2), 8) * 15 * (i < 3 ? 1 : 0.3);
-          const snarePattern = Math.pow(Math.sin(time * 2.4 + Math.PI/2), 6) * 10 * (i >= 3 && i <= 5 ? 1 : 0.2);
-          
-          // Musical decay simulation
-          const decay = Math.exp(-Math.abs(Math.sin(time * 2 + i)) * 0.5) * 8;
-          
-          const height = Math.max(20, Math.min(70, 
-            baseHeight + bassWave + midWave + trebleWave + kickPattern + snarePattern + decay
-          ));
-          
-          // Realistic spectrum-based colors based on frequency position
-          const frequencyPosition = i / 31; // 0 to 1 based on bar position
+        const domBars = eqContainer.querySelectorAll('[data-eq-bar]');
+        domBars.forEach((bar: any, i: number) => {
+          const height = bars[i];
+          const frequencyPosition = i / 63; // 0 to 1 based on bar position
           const normalizedHeight = Math.min(1, Math.max(0, (height - 20) / 50)); // 0 to 1
           
-          // Realistic frequency spectrum colors: red (bass) -> orange -> yellow -> green -> blue -> purple (treble)
+          // Realistic frequency spectrum colors based on Hz
           let hue, saturation, lightness;
           
-          if (frequencyPosition < 0.2) {
-            // Bass frequencies: Deep red to orange-red
-            hue = 0 + frequencyPosition * 40; // 0-8
-            saturation = 90 - normalizedHeight * 10;
-            lightness = 40 + normalizedHeight * 25;
-          } else if (frequencyPosition < 0.4) {
-            // Low-mid frequencies: Orange to yellow
-            const local = (frequencyPosition - 0.2) / 0.2;
-            hue = 20 + local * 40; // 20-60
+          if (frequencyPosition < 0.25) {
+            // Bass frequencies: Deep red to orange
+            hue = 0 + frequencyPosition * 60; // 0-15
             saturation = 85 + normalizedHeight * 15;
-            lightness = 45 + normalizedHeight * 20;
-          } else if (frequencyPosition < 0.6) {
-            // Mid frequencies: Yellow to green
-            const local = (frequencyPosition - 0.4) / 0.2;
-            hue = 60 + local * 60; // 60-120
+            lightness = 35 + normalizedHeight * 30;
+          } else if (frequencyPosition < 0.5) {
+            // Low-mid frequencies: Orange to yellow
+            const local = (frequencyPosition - 0.25) / 0.25;
+            hue = 15 + local * 45; // 15-60
             saturation = 80 + normalizedHeight * 20;
-            lightness = 50 + normalizedHeight * 15;
-          } else if (frequencyPosition < 0.8) {
+            lightness = 40 + normalizedHeight * 25;
+          } else if (frequencyPosition < 0.75) {
             // High-mid frequencies: Green to cyan
-            const local = (frequencyPosition - 0.6) / 0.2;
-            hue = 120 + local * 60; // 120-180
+            const local = (frequencyPosition - 0.5) / 0.25;
+            hue = 60 + local * 120; // 60-180
             saturation = 75 + normalizedHeight * 25;
-            lightness = 55 + normalizedHeight * 15;
+            lightness = 45 + normalizedHeight * 20;
           } else {
-            // Treble frequencies: Cyan to blue to purple
-            const local = (frequencyPosition - 0.8) / 0.2;
+            // Treble frequencies: Cyan to purple
+            const local = (frequencyPosition - 0.75) / 0.25;
             hue = 180 + local * 120; // 180-300
             saturation = 70 + normalizedHeight * 30;
-            lightness = 60 + normalizedHeight * 20;
+            lightness = 50 + normalizedHeight * 15;
           }
-          
-          // Add subtle time-based color shifting
-          const timeShift = Math.sin(time * 0.5 + i * 0.3) * 15;
-          hue = (hue + timeShift + 360) % 360;
           
           // Enhanced glow effect based on height
           const glowIntensity = normalizedHeight * 15 + 5;
           const glowSpread = normalizedHeight * 8 + 2;
 
-          // Apply fluid transformations
+          // Apply frequency-based styling
           bar.style.height = `${height}px`;
-          bar.style.width = '2px'; // Even thinner bars for 64 bars
+          bar.style.width = '2px';
           bar.style.minWidth = '2px';
           bar.style.maxWidth = '2px';
           bar.style.backgroundColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
@@ -205,38 +265,15 @@ const LiveRadioPlayer = ({
             0 0 ${glowIntensity}px hsl(${hue}, 100%, 80%),
             inset 0 0 ${glowSpread/2}px hsl(${hue}, 100%, 90%)
           `;
-          bar.style.transform = 'scaleX(1)';
-          bar.style.transition = 'none'; // Remove transitions for smoother animation
-          
-          // Add subtle border radius variation
-          const borderRadius = 8 + Math.sin(time * 2 + i) * 2;
-          bar.style.borderRadius = `${borderRadius}px`;
+          bar.style.transition = 'none';
+          bar.style.borderRadius = '8px';
         });
       }
 
-      // Update React state as backup with enhanced data
-      const bars = Array.from({ length: 64 }, (_, i) => {
-        const bassBoost = i < 4 ? 2.5 : i < 8 ? 1.8 : 1;
-        const midBoost = i >= 4 && i <= 8 ? 2.0 : i <= 12 ? 1.5 : 1;
-        const trebleBoost = i > 12 ? 1.7 : 1;
-        
-        const baseHeight = 30;
-        const bassWave = Math.sin(time * 0.8 + i * 0.2) * 18 * bassBoost;
-        const midWave = Math.sin(time * 1.5 + i * 0.35) * 12 * midBoost;
-        const trebleWave = Math.sin(time * 3.2 + i * 0.6) * 8 * trebleBoost;
-        const kickPattern = Math.pow(Math.sin(time * 1.2), 8) * 15 * (i < 6 ? 1 : 0.3);
-        const snarePattern = Math.pow(Math.sin(time * 2.4 + Math.PI/2), 6) * 10 * (i >= 6 && i <= 10 ? 1 : 0.2);
-        const decay = Math.exp(-Math.abs(Math.sin(time * 2 + i)) * 0.5) * 8;
-        
-        return Math.max(20, Math.min(70, 
-          baseHeight + bassWave + midWave + trebleWave + kickPattern + snarePattern + decay
-        ));
-      });
-      
       setFrequencyData(bars);
       
       if (frameCount % 60 === 0) {
-        console.log('🎵 Enhanced Heights:', bars.map(b => Math.round(b)));
+        console.log('🎵 Frequency Heights:', bars.map(b => Math.round(b)));
       }
       
       animationRef.current = requestAnimationFrame(animateFallback);
