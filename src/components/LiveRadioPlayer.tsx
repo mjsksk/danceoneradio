@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Radio } from 'lucide-react';
 import { AlbumArtService } from '@/utils/AlbumArtService';
+import { RadioStreamService } from '@/utils/RadioStreamService';
 import stationLogo from '@/assets/dance-one-logo.png';
 interface LiveRadioPlayerProps {
   streamUrls: string[];
@@ -9,7 +10,7 @@ interface LiveRadioPlayerProps {
 }
 const LiveRadioPlayer = ({
   streamUrls,
-  streamTitle
+  streamTitle: initialStreamTitle
 }: LiveRadioPlayerProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -19,6 +20,7 @@ const LiveRadioPlayer = ({
   const [frequencyData, setFrequencyData] = useState<number[]>(new Array(64).fill(20));
   const [debugInfo, setDebugInfo] = useState<string>('Waiting...');
   const [animationActive, setAnimationActive] = useState(false);
+  const [currentStreamTitle, setCurrentStreamTitle] = useState(initialStreamTitle);
   const audioRef = useRef<HTMLAudioElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -329,11 +331,11 @@ const LiveRadioPlayer = ({
   // Fetch album art when stream title changes
   useEffect(() => {
     const fetchAlbumArt = async () => {
-      if (!streamTitle || streamTitle.includes('Dance One Radio - The Future')) return;
+      if (!currentStreamTitle || currentStreamTitle.includes('Dance One Radio - The Future')) return;
       setIsLoadingArt(true);
       try {
-        const cleanedQuery = cleanTrackForSearch(streamTitle);
-        console.log(`🎵 Radio: Fetching album art for: "${streamTitle}" -> cleaned: "${cleanedQuery}"`);
+        const cleanedQuery = cleanTrackForSearch(currentStreamTitle);
+        console.log(`🎵 Radio: Fetching album art for: "${currentStreamTitle}" -> cleaned: "${cleanedQuery}"`);
         const result = await AlbumArtService.getAlbumArt(cleanedQuery);
         if (result.imageUrl) {
           setAlbumArt(result.imageUrl);
@@ -350,7 +352,30 @@ const LiveRadioPlayer = ({
       }
     };
     fetchAlbumArt();
-  }, [streamTitle]);
+  }, [currentStreamTitle]);
+
+  // Real-time stream metadata fetching - independent of parent
+  useEffect(() => {
+    const fetchStreamMetadata = async () => {
+      try {
+        const metadata = await RadioStreamService.getStreamMetadata();
+        const formattedTitle = RadioStreamService.formatTitle(metadata);
+        if (formattedTitle !== currentStreamTitle) {
+          console.log('🎵 LivePlayer: Stream metadata updated:', formattedTitle);
+          setCurrentStreamTitle(formattedTitle);
+        }
+      } catch (error) {
+        console.error('🎵 LivePlayer: Error fetching stream metadata:', error);
+      }
+    };
+
+    // Initial fetch
+    fetchStreamMetadata();
+    
+    // Update every 2 seconds for real-time updates
+    const interval = setInterval(fetchStreamMetadata, 2000);
+    return () => clearInterval(interval);
+  }, [currentStreamTitle]);
 
   // Cleanup audio context on unmount
   useEffect(() => {
@@ -420,7 +445,7 @@ const LiveRadioPlayer = ({
         <div className="relative overflow-hidden bg-background/20 rounded-md p-2 mb-2">
           <div className="animate-scroll whitespace-nowrap">
             <span className="text-sm text-foreground font-['Rajdhani'] font-medium">
-              {streamTitle.replace(/Frequency\s*&\s*/gi, '') // Remove "Frequency &"
+              {currentStreamTitle.replace(/Frequency\s*&\s*/gi, '') // Remove "Frequency &"
               .replace(/&amp;/g, '&') // Convert HTML entity to normal ampersand
               .replace(/amp;/g, '') // Remove remaining "amp;" text
               .replace(/🎵/g, '') // Remove music note icons
