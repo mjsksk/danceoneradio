@@ -35,6 +35,7 @@ export class RadioStreamService {
       ];
 
       const endpoints = [
+        'http://s9.myradiostream.com:14296/currentsong?sid=1', // Real current song endpoint - WORKING!
         'http://s9.myradiostream.com:14296/7.html',
         'http://s9.myradiostream.com:14296/stats',
         'http://s9.myradiostream.com:14296/status-json.xsl'
@@ -147,6 +148,20 @@ export class RadioStreamService {
     console.log(`🔍 Parsing data from ${endpoint}:`, data.substring(0, 100));
     
     try {
+      // Parse current song endpoint (plain text)
+      if (endpoint.includes('currentsong')) {
+        console.log('🔍 Parsing as current song plain text format');
+        const title = data.trim();
+        if (title && title.length > 0) {
+          const metadata = {
+            title: title,
+            status: 'live'
+          };
+          console.log('✅ Parsed current song metadata:', metadata);
+          return metadata;
+        }
+      }
+      
       // Parse SHOUTcast 7.html format
       if (endpoint.includes('7.html')) {
         console.log('🔍 Parsing as SHOUTcast 7.html format');
