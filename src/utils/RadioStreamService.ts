@@ -23,6 +23,9 @@ export class RadioStreamService {
   private static streamUrl = 'http://s9.myradiostream.com:14296/';
   
   static async getStreamMetadata(): Promise<StreamMetadata | null> {
+    const startTime = Date.now();
+    console.log('🔍 RadioStreamService: Starting metadata fetch at', new Date().toISOString());
+    
     try {
       // Try CORS proxy services to bypass CORS restrictions
       const proxies = [
@@ -40,39 +43,53 @@ export class RadioStreamService {
       for (const proxy of proxies) {
         for (const endpoint of endpoints) {
           try {
+            console.log(`🔍 Trying: ${proxy}${endpoint}`);
             const proxyUrl = `${proxy}${encodeURIComponent(endpoint)}`;
             const response = await fetch(proxyUrl, {
               method: 'GET',
               headers: {
                 'Accept': 'application/json,text/html,application/xhtml+xml,application/xml',
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
               },
             });
 
             if (response.ok) {
               let data = await response.text();
+              console.log(`🔍 Raw response from ${endpoint}:`, data.substring(0, 200));
               
               // If using allorigins, extract contents
               if (proxy.includes('allorigins')) {
                 const json = JSON.parse(data);
                 data = json.contents;
+                console.log(`🔍 Extracted contents:`, data);
               }
               
               const metadata = this.parseStreamData(data, endpoint);
+              console.log(`🔍 Parsed metadata:`, metadata);
               if (metadata) {
+                const elapsed = Date.now() - startTime;
+                console.log(`✅ Got metadata in ${elapsed}ms:`, metadata);
                 return metadata;
               }
+            } else {
+              console.log(`❌ Response not OK: ${response.status} ${response.statusText}`);
             }
           } catch (error) {
-            console.log(`Failed to fetch from ${proxy}${endpoint}:`, error);
+            console.log(`❌ Failed to fetch from ${proxy}${endpoint}:`, error);
             continue;
           }
         }
       }
 
       // Fallback to a simulated live title
-      return this.generateLiveTitle();
+      console.log('🔄 All endpoints failed, using fallback');
+      const fallback = this.generateLiveTitle();
+      console.log('🔄 Fallback metadata:', fallback);
+      return fallback;
     } catch (error) {
-      console.error('Error fetching stream metadata:', error);
+      console.error('💥 Error fetching stream metadata:', error);
       return this.generateLiveTitle();
     }
   }
@@ -127,48 +144,66 @@ export class RadioStreamService {
   }
 
   private static parseStreamData(data: string, endpoint: string): StreamMetadata | null {
+    console.log(`🔍 Parsing data from ${endpoint}:`, data.substring(0, 100));
+    
     try {
       // Parse SHOUTcast 7.html format
       if (endpoint.includes('7.html')) {
+        console.log('🔍 Parsing as SHOUTcast 7.html format');
         const lines = data.split(',');
+        console.log('🔍 Split lines:', lines);
+        
         if (lines.length >= 7) {
           let title = lines[6] || 'Dance One Radio';
           // Clean up HTML tags from title
           title = title.replace(/<[^>]*>/g, '').trim();
           
-          return {
+          const metadata = {
             listeners: lines[0],
             status: lines[1] === '1' ? 'live' : 'offline',
             title: title,
             bitrate: lines[5] || '128kbps'
           };
+          
+          console.log('✅ Parsed SHOUTcast metadata:', metadata);
+          return metadata;
+        } else {
+          console.log('❌ Invalid SHOUTcast format - not enough lines');
         }
       }
 
       // Parse JSON format
       if (data.startsWith('{')) {
+        console.log('🔍 Parsing as JSON format');
         const json = JSON.parse(data);
-        return {
+        const metadata = {
           title: json.songtitle || json.title || json.streamtitle,
           listeners: json.listeners,
           bitrate: json.bitrate,
           status: json.status
         };
+        console.log('✅ Parsed JSON metadata:', metadata);
+        return metadata;
       }
 
       // Parse XML format
       if (data.includes('<SONGTITLE>')) {
+        console.log('🔍 Parsing as XML format');
         const titleMatch = data.match(/<SONGTITLE>(.*?)<\/SONGTITLE>/i);
         const listenersMatch = data.match(/<CURRENTLISTENERS>(.*?)<\/CURRENTLISTENERS>/i);
         
-        return {
+        const metadata = {
           title: titleMatch?.[1] || 'Dance One Radio',
           listeners: listenersMatch?.[1],
           status: 'live'
         };
+        console.log('✅ Parsed XML metadata:', metadata);
+        return metadata;
       }
+      
+      console.log('❌ Unknown data format');
     } catch (error) {
-      console.error('Error parsing stream data:', error);
+      console.error('💥 Error parsing stream data:', error);
     }
 
     return null;
@@ -579,12 +614,18 @@ export class RadioStreamService {
   }
 
   static formatTitle(metadata: StreamMetadata | null): string {
+    console.log('🔍 Formatting title from metadata:', metadata);
+    
     if (!metadata?.title) {
-      return '🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵';
+      const fallback = '🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵';
+      console.log('🔄 Using fallback title:', fallback);
+      return fallback;
     }
 
     const title = metadata.title;
+    const formatted = `🎵 ${title} 🎵`;
+    console.log('✅ Formatted title:', formatted);
     
-    return `🎵 ${title} 🎵`;
+    return formatted;
   }
 }

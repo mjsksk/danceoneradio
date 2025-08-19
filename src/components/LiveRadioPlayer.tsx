@@ -358,11 +358,19 @@ const LiveRadioPlayer = ({
   useEffect(() => {
     const fetchStreamMetadata = async () => {
       try {
+        console.log('🎵 LivePlayer: Fetching stream metadata...');
         const metadata = await RadioStreamService.getStreamMetadata();
+        console.log('🎵 LivePlayer: Raw metadata received:', metadata);
+        
         const formattedTitle = RadioStreamService.formatTitle(metadata);
+        console.log('🎵 LivePlayer: Formatted title:', formattedTitle);
+        console.log('🎵 LivePlayer: Current title state:', currentStreamTitle);
+        
         if (formattedTitle !== currentStreamTitle) {
-          console.log('🎵 LivePlayer: Stream metadata updated:', formattedTitle);
+          console.log('🎵 LivePlayer: Stream metadata updated from:', currentStreamTitle, 'to:', formattedTitle);
           setCurrentStreamTitle(formattedTitle);
+        } else {
+          console.log('🎵 LivePlayer: No change in metadata, keeping current title');
         }
       } catch (error) {
         console.error('🎵 LivePlayer: Error fetching stream metadata:', error);
@@ -370,11 +378,19 @@ const LiveRadioPlayer = ({
     };
 
     // Initial fetch
+    console.log('🎵 LivePlayer: Setting up metadata fetching...');
     fetchStreamMetadata();
     
     // Update every 2 seconds for real-time updates
-    const interval = setInterval(fetchStreamMetadata, 2000);
-    return () => clearInterval(interval);
+    const interval = setInterval(() => {
+      console.log('🎵 LivePlayer: Interval tick - fetching metadata...');
+      fetchStreamMetadata();
+    }, 2000);
+    
+    return () => {
+      console.log('🎵 LivePlayer: Cleaning up metadata interval');
+      clearInterval(interval);
+    };
   }, [currentStreamTitle]);
 
   // Cleanup audio context on unmount
