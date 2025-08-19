@@ -20,8 +20,8 @@ const HeroSection = () => {
     // Fetch immediately
     fetchStreamMetadata();
 
-    // Update every 3 seconds for real-time updates
-    const interval = setInterval(fetchStreamMetadata, 3000);
+    // Update every 1 second for real-time updates
+    const interval = setInterval(fetchStreamMetadata, 1000);
     return () => clearInterval(interval);
   }, []);
   return <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
