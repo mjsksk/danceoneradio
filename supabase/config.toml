@@ -2,3 +2,6 @@ project_id = "upbwlnpycrbhxahjztrf"
 
 [functions.send-contact-email]
 verify_jwt = false
+
+[functions.stream-metadata]
+verify_jwt = false

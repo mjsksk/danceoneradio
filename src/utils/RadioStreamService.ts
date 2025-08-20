@@ -29,7 +29,7 @@ export class RadioStreamService {
     try {
       // Try our Supabase Edge Function first (bypasses CORS)
       console.log('🔍 Trying Supabase Edge Function...');
-      const supabaseUrl = 'https://pnjswnylmmyjmovxrtoo.supabase.co/functions/v1/stream-metadata';
+      const supabaseUrl = 'https://upbwlnpycrbhxahjztrf.supabase.co/functions/v1/stream-metadata';
       
       const response = await fetch(supabaseUrl, {
         method: 'GET',
