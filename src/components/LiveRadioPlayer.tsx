@@ -310,8 +310,8 @@ const LiveRadioPlayer = ({
 
   // Clean and format track info for better album art search
   const cleanTrackForSearch = (streamTitle: string): string => {
-    // Extract song title from the formatted stream title
-    const songMatch = streamTitle.match(/🎵\s*(.*?)\s*🎵/);
+    // Extract song title from the formatted stream title (handle multiple emojis)
+    const songMatch = streamTitle.match(/🎵+\s*(.*?)\s*🎵+/);
     const songTitle = songMatch ? songMatch[1] : streamTitle;
 
     // Clean the title for better search results

@@ -604,7 +604,8 @@ export class RadioStreamService {
     }
 
     const title = metadata.title;
-    const formatted = `🎵 ${title} 🎵`;
+    // Don't add emojis if they're already there
+    const formatted = title.includes('🎵') ? title : `🎵 ${title} 🎵`;
     console.log('✅ Formatted title:', formatted);
     
     return formatted;
