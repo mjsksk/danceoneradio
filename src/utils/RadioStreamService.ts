@@ -29,30 +29,25 @@ export class RadioStreamService {
     try {
       // Try our Supabase Edge Function first (bypasses CORS)
       console.log('🔍 Trying Supabase Edge Function...');
-      const supabaseUrl = 'https://upbwlnpycrbhxahjztrf.supabase.co/functions/v1/stream-metadata';
       
-      const response = await fetch(supabaseUrl, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Cache-Control': 'no-cache'
-        }
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data, error } = await supabase.functions.invoke('stream-metadata', {
+        body: {}
       });
 
-      if (response.ok) {
-        const metadata = await response.json();
-        console.log('✅ Got metadata from Edge Function:', metadata);
+      if (!error && data) {
+        console.log('✅ Got metadata from Edge Function:', data);
         
         // Add the music note emojis for consistency
-        if (metadata.title && !metadata.title.includes('🎵')) {
-          metadata.title = `🎵 ${metadata.title} 🎵`;
+        if (data.title && !data.title.includes('🎵')) {
+          data.title = `🎵 ${data.title} 🎵`;
         }
         
         const elapsed = Date.now() - startTime;
-        console.log(`✅ Got real metadata in ${elapsed}ms:`, metadata);
-        return metadata;
+        console.log(`✅ Got real metadata in ${elapsed}ms:`, data);
+        return data;
       } else {
-        console.log(`❌ Edge Function failed: ${response.status} ${response.statusText}`);
+        console.log(`❌ Edge Function failed:`, error);
       }
 
       // Fallback to a simulated live title
