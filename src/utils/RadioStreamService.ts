@@ -27,65 +27,36 @@ export class RadioStreamService {
     console.log('🔍 RadioStreamService: Starting metadata fetch at', new Date().toISOString());
     
     try {
-      // Try CORS proxy services to bypass CORS restrictions
-      const proxies = [
-        'https://api.allorigins.win/get?url=',
-        'https://corsproxy.io/?',
-        'https://cors-anywhere.herokuapp.com/'
-      ];
-
-      const endpoints = [
-        'http://s9.myradiostream.com:14296/currentsong?sid=1', // Real current song endpoint - WORKING!
-        'http://s9.myradiostream.com:14296/7.html',
-        'http://s9.myradiostream.com:14296/stats',
-        'http://s9.myradiostream.com:14296/status-json.xsl'
-      ];
-
-      for (const proxy of proxies) {
-        for (const endpoint of endpoints) {
-          try {
-            console.log(`🔍 Trying: ${proxy}${endpoint}`);
-            const proxyUrl = `${proxy}${encodeURIComponent(endpoint)}`;
-            const response = await fetch(proxyUrl, {
-              method: 'GET',
-              headers: {
-                'Accept': 'application/json,text/html,application/xhtml+xml,application/xml',
-                'Cache-Control': 'no-cache, no-store, must-revalidate',
-                'Pragma': 'no-cache',
-                'Expires': '0'
-              },
-            });
-
-            if (response.ok) {
-              let data = await response.text();
-              console.log(`🔍 Raw response from ${endpoint}:`, data.substring(0, 200));
-              
-              // If using allorigins, extract contents
-              if (proxy.includes('allorigins')) {
-                const json = JSON.parse(data);
-                data = json.contents;
-                console.log(`🔍 Extracted contents:`, data);
-              }
-              
-              const metadata = this.parseStreamData(data, endpoint);
-              console.log(`🔍 Parsed metadata:`, metadata);
-              if (metadata) {
-                const elapsed = Date.now() - startTime;
-                console.log(`✅ Got metadata in ${elapsed}ms:`, metadata);
-                return metadata;
-              }
-            } else {
-              console.log(`❌ Response not OK: ${response.status} ${response.statusText}`);
-            }
-          } catch (error) {
-            console.log(`❌ Failed to fetch from ${proxy}${endpoint}:`, error);
-            continue;
-          }
+      // Try our Supabase Edge Function first (bypasses CORS)
+      console.log('🔍 Trying Supabase Edge Function...');
+      const supabaseUrl = 'https://pnjswnylmmyjmovxrtoo.supabase.co/functions/v1/stream-metadata';
+      
+      const response = await fetch(supabaseUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache'
         }
+      });
+
+      if (response.ok) {
+        const metadata = await response.json();
+        console.log('✅ Got metadata from Edge Function:', metadata);
+        
+        // Add the music note emojis for consistency
+        if (metadata.title && !metadata.title.includes('🎵')) {
+          metadata.title = `🎵 ${metadata.title} 🎵`;
+        }
+        
+        const elapsed = Date.now() - startTime;
+        console.log(`✅ Got real metadata in ${elapsed}ms:`, metadata);
+        return metadata;
+      } else {
+        console.log(`❌ Edge Function failed: ${response.status} ${response.statusText}`);
       }
 
       // Fallback to a simulated live title
-      console.log('🔄 All endpoints failed, using fallback');
+      console.log('🔄 Edge Function failed, using fallback');
       const fallback = this.generateLiveTitle();
       console.log('🔄 Fallback metadata:', fallback);
       return fallback;
