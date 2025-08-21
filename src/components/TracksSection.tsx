@@ -304,7 +304,7 @@ const TracksSection = () => {
               <div className="text-muted-foreground">Loading recent tracks...</div>
             </div>
           ) : (
-            tracks.filter(track => track.title !== "Dance One Radio").map((track, index) => (
+            tracks.filter(track => !track.title.includes("Dance One Radio")).map((track, index) => (
             <div
               key={track.id}
               className="card-cyber p-6 animate-fade-in"
