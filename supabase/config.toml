@@ -5,3 +5,12 @@ verify_jwt = false
 
 [functions.stream-metadata]
 verify_jwt = false
+
+[functions.newsletter-subscribe]
+verify_jwt = false
+
+[functions.newsletter-campaign]
+verify_jwt = false
+
+[functions.newsletter-unsubscribe]
+verify_jwt = false

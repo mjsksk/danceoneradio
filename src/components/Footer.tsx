@@ -1,8 +1,21 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Instagram, Facebook, Youtube } from 'lucide-react';
 import appStoreBadge from '@/assets/app-store-badge-new.svg';
 import googlePlayBadge from '@/assets/google-play-badge-new.svg';
+import { useNewsletter } from '@/hooks/useNewsletter';
 const Footer = () => {
+  const [email, setEmail] = useState('');
+  const { subscribe, isSubmitting } = useNewsletter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const success = await subscribe(email);
+    if (success) {
+      setEmail(''); // Clear the form on success
+    }
+  };
+
   return <footer className="bg-card/50 border-t border-primary/20 py-16 relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
@@ -74,12 +87,23 @@ const Footer = () => {
             <p className="text-muted-foreground font-['Rajdhani'] mb-6">
               Get notified about new shows, exclusive tracks, and special events
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <input type="email" placeholder="Enter your email" className="flex-1 px-4 py-2 bg-input border border-border rounded-md text-foreground font-['Rajdhani'] focus:outline-none focus:ring-2 focus:ring-primary" />
-              <Button className="btn-cyber">
-                Subscribe
+            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+              <input 
+                type="email" 
+                placeholder="Enter your email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="flex-1 px-4 py-2 bg-input border border-border rounded-md text-foreground font-['Rajdhani'] focus:outline-none focus:ring-2 focus:ring-primary" 
+                required
+              />
+              <Button 
+                type="submit" 
+                className="btn-cyber"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Subscribing...' : 'Subscribe'}
               </Button>
-            </div>
+            </form>
           </div>
         </div>
 
