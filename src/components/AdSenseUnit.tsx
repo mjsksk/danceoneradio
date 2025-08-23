@@ -7,8 +7,11 @@ declare global {
 }
 
 const AdSenseUnit = () => {
+  console.log('🚨 AdSenseUnit component is rendering!');
+  
   useEffect(() => {
     console.log('🔥 AdSense component mounted! Time:', new Date().toISOString());
+    alert('AdSense component mounted!');
     
     // Check if AdSense script is loaded
     const scripts = document.querySelectorAll('script[src*="adsbygoogle"]');
