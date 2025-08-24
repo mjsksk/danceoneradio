@@ -22,6 +22,7 @@ const LiveRadioPlayer = ({
   const [debugInfo, setDebugInfo] = useState<string>('Waiting...');
   const [animationActive, setAnimationActive] = useState(false);
   const [currentStreamTitle, setCurrentStreamTitle] = useState(initialStreamTitle);
+  const [isStreamLive, setIsStreamLive] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -363,9 +364,14 @@ const LiveRadioPlayer = ({
         const metadata = await RadioStreamService.getStreamMetadata();
         console.log('🎵 LivePlayer: Raw metadata received:', metadata);
         
+        // Check if stream is live based on metadata availability and content
+        const streamIsLive = metadata && metadata.title && !metadata.title.includes('Dance One Radio - The Future');
+        setIsStreamLive(streamIsLive);
+        
         const formattedTitle = RadioStreamService.formatTitle(metadata);
         console.log('🎵 LivePlayer: Formatted title:', formattedTitle);
         console.log('🎵 LivePlayer: Current title state:', currentStreamTitle);
+        console.log('🎵 LivePlayer: Stream is live:', streamIsLive);
         
         if (formattedTitle !== currentStreamTitle) {
           console.log('🎵 LivePlayer: Stream metadata updated from:', currentStreamTitle, 'to:', formattedTitle);
@@ -375,6 +381,7 @@ const LiveRadioPlayer = ({
         }
       } catch (error) {
         console.error('🎵 LivePlayer: Error fetching stream metadata:', error);
+        setIsStreamLive(false);
       }
     };
 
@@ -460,7 +467,7 @@ const LiveRadioPlayer = ({
       <div className="text-center mb-6">
         <div className="flex items-center justify-center gap-2 mb-2">
           <h3 className="text-lg font-['Orbitron'] font-semibold text-primary">NOW PLAYING</h3>
-          {isPlaying && (
+          {(isStreamLive || isPlaying) && (
             <Badge variant="destructive" className="bg-destructive text-destructive-foreground text-xs font-semibold animate-pulse">
               LIVE
             </Badge>
