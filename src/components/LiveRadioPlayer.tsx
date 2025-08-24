@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Play, Pause, Radio } from 'lucide-react';
 import { AlbumArtService } from '@/utils/AlbumArtService';
 import { RadioStreamService } from '@/utils/RadioStreamService';
@@ -457,7 +458,14 @@ const LiveRadioPlayer = ({
       </div>
       
       <div className="text-center mb-6">
-        <h3 className="text-lg font-['Orbitron'] font-semibold text-primary mb-2">NOW PLAYING</h3>
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <h3 className="text-lg font-['Orbitron'] font-semibold text-primary">NOW PLAYING</h3>
+          {isPlaying && (
+            <Badge variant="destructive" className="bg-destructive text-destructive-foreground text-xs font-semibold animate-pulse">
+              LIVE
+            </Badge>
+          )}
+        </div>
         <div className="relative overflow-hidden bg-background/20 rounded-md p-2 mb-2">
           <div className="animate-scroll whitespace-nowrap">
             <span className="text-sm text-foreground font-['Rajdhani'] font-medium">
