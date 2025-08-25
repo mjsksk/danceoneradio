@@ -19,7 +19,7 @@ const PopupPlayerPage = () => {
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
   const [albumArt, setAlbumArt] = useState<string | null>(null);
   const [isLoadingArt, setIsLoadingArt] = useState(false);
-  const [frequencyData, setFrequencyData] = useState<number[]>(new Array(32).fill(20));
+  const [frequencyData, setFrequencyData] = useState<number[]>(new Array(64).fill(20));
   const [currentStreamTitle, setCurrentStreamTitle] = useState('Dance One Radio - The Future of Dance Music');
   const [isStreamLive, setIsStreamLive] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -34,38 +34,73 @@ const PopupPlayerPage = () => {
   };
 
   const startFallbackAnimation = () => {
+    console.log('🎵 Starting FREQUENCY-BASED animation');
     let time = 0;
+    let frameCount = 0;
+    
+    // Create independent oscillators for different frequency ranges
+    const bassOscillators = Array.from({ length: 16 }, (_, i) => ({
+      frequency: 0.3 + i * 0.05, // Slow, bass-like patterns
+      amplitude: 2.0 + Math.random() * 1.5,
+      phase: Math.random() * Math.PI * 2
+    }));
+    
+    const midOscillators = Array.from({ length: 32 }, (_, i) => ({
+      frequency: 0.8 + i * 0.1, // Mid-range patterns
+      amplitude: 1.2 + Math.random() * 1.0,
+      phase: Math.random() * Math.PI * 2
+    }));
+    
+    const trebleOscillators = Array.from({ length: 16 }, (_, i) => ({
+      frequency: 2.0 + i * 0.3, // Fast, treble-like patterns
+      amplitude: 0.8 + Math.random() * 0.7,
+      phase: Math.random() * Math.PI * 2
+    }));
     
     const animateFallback = () => {
-      time += 0.05;
+      time += 0.05; // Realistic timing
+      frameCount++;
       
-      const bars = Array.from({ length: 32 }, (_, i) => {
-        const frequencyHz = (i / 31) * 22050;
-        let height = 15;
+      // Calculate frequency-based heights for each bar
+      const bars = Array.from({ length: 64 }, (_, i) => {
+        const frequencyHz = (i / 63) * 22050; // Map to Hz range 0-22kHz
+        let height = 25; // Base height
         
-        if (i < 8) {
-          const bassResponse = Math.sin(time * (0.3 + i * 0.05)) * (2.0 + Math.random() * 1.5);
-          const kickPattern = Math.pow(Math.sin(time * 0.5), 6) * 15;
-          height += bassResponse * 10 + kickPattern * (8 - i) / 8;
-        } else if (i < 24) {
-          const midIndex = i - 8;
-          const midResponse = Math.sin(time * (0.8 + midIndex * 0.1)) * (1.2 + Math.random() * 1.0);
-          const snarePattern = Math.pow(Math.sin(time * 1.3 + Math.PI/3), 4) * 8;
-          height += midResponse * 8 + snarePattern * (midIndex > 4 && midIndex < 12 ? 1 : 0.3);
-        } else {
-          const trebleIndex = i - 24;
-          const trebleResponse = Math.sin(time * (2.0 + trebleIndex * 0.3)) * (0.8 + Math.random() * 0.7);
-          const hihatPattern = Math.pow(Math.sin(time * 4 + trebleIndex * 0.5), 3) * 4;
-          height += trebleResponse * 6 + hihatPattern;
+        // Bass frequencies (20-200 Hz) - bars 0-15
+        if (i < 16) {
+          const osc = bassOscillators[i];
+          const bassResponse = Math.sin(time * osc.frequency + osc.phase) * osc.amplitude;
+          const kickPattern = Math.pow(Math.sin(time * 0.5), 6) * 20; // Kick drum simulation
+          height += bassResponse * 15 + kickPattern * (16 - i) / 16;
+        }
+        // Mid frequencies (200-2000 Hz) - bars 16-47
+        else if (i < 48) {
+          const midIndex = i - 16;
+          const osc = midOscillators[midIndex];
+          const midResponse = Math.sin(time * osc.frequency + osc.phase) * osc.amplitude;
+          const snarePattern = Math.pow(Math.sin(time * 1.3 + Math.PI/3), 4) * 12; // Snare simulation
+          const vocalPattern = Math.sin(time * 0.7 + midIndex * 0.1) * 8; // Vocal range simulation
+          height += midResponse * 12 + snarePattern * (midIndex > 8 && midIndex < 24 ? 1 : 0.3) + vocalPattern;
+        }
+        // Treble frequencies (2000-22000 Hz) - bars 48-63
+        else {
+          const trebleIndex = i - 48;
+          const osc = trebleOscillators[trebleIndex];
+          const trebleResponse = Math.sin(time * osc.frequency + osc.phase) * osc.amplitude;
+          const hihatPattern = Math.pow(Math.sin(time * 4 + trebleIndex * 0.5), 3) * 6; // Hi-hat simulation
+          const sparklePattern = Math.sin(time * 2.5 + trebleIndex * 0.8) * 4; // High-end sparkle
+          height += trebleResponse * 8 + hihatPattern + sparklePattern;
         }
         
-        const envelope = Math.exp(-Math.abs(Math.sin(time * 1.5 + i * 0.1)) * 0.3) * 3;
+        // Add musical decay and attack
+        const envelope = Math.exp(-Math.abs(Math.sin(time * 1.5 + i * 0.1)) * 0.3) * 5;
         height += envelope;
         
-        const randomNoise = (Math.random() - 0.5) * 2;
+        // Random variations to simulate natural music
+        const randomNoise = (Math.random() - 0.5) * 3;
         height += randomNoise;
         
-        return Math.max(15, Math.min(50, height));
+        return Math.max(20, Math.min(70, height));
       });
 
       setFrequencyData(bars);
@@ -76,11 +111,12 @@ const PopupPlayerPage = () => {
   };
 
   const stopAudioAnalysis = () => {
+    console.log('🎵 Stopping audio analysis');
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
     }
-    setFrequencyData(new Array(32).fill(15));
+    setFrequencyData(new Array(64).fill(20)); // Reset to base height
   };
 
   const handlePlayPause = () => {
@@ -168,20 +204,24 @@ const PopupPlayerPage = () => {
   const attemptPlay = () => {
     if (!audioRef.current) return;
     const currentUrl = streamUrls[currentUrlIndex];
+    console.log('🎵 Popup: Attempting to play:', currentUrl);
     audioRef.current.src = currentUrl;
+    audioRef.current.load(); // Force load the new source
     audioRef.current.play().then(() => {
+      console.log('🎵 Popup: Audio started playing successfully');
       setIsPlaying(true);
       setIsLoading(false);
       setTimeout(() => {
+        console.log('🎵 Popup: Starting EQ animation');
         startFallbackAnimation();
       }, 500);
     }).catch(error => {
-      console.error(`Failed to play stream ${currentUrl}:`, error);
+      console.error(`🎵 Popup: Failed to play stream ${currentUrl}:`, error);
       if (tryNextUrl()) {
         setTimeout(attemptPlay, 1000);
       } else {
         setIsLoading(false);
-        console.error('All stream URLs failed');
+        console.error('🎵 Popup: All stream URLs failed');
       }
     });
   };
@@ -248,7 +288,7 @@ const PopupPlayerPage = () => {
           {/* Visualizer */}
           <div className="flex items-end justify-center gap-1 h-20 px-4" data-eq-container>
             {frequencyData.map((height, index) => {
-              const frequencyPosition = index / 31;
+              const frequencyPosition = index / 63;
               let hue, saturation, lightness;
               
               if (frequencyPosition < 0.25) {
@@ -278,9 +318,9 @@ const PopupPlayerPage = () => {
                   className="bg-primary/80 rounded-sm transition-none"
                   style={{
                     height: `${height}px`,
-                    width: '4px',
+                    width: '2px',
                     backgroundColor: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
-                    boxShadow: `0 0 6px hsl(${hue}, ${saturation}%, ${lightness}%)`
+                    boxShadow: `0 0 4px hsl(${hue}, ${saturation}%, ${lightness}%)`
                   }}
                   data-eq-bar
                 />
@@ -307,7 +347,23 @@ const PopupPlayerPage = () => {
           </div>
         </div>
 
-        <audio ref={audioRef} preload="none" />
+        <audio ref={audioRef} preload="none" crossOrigin="anonymous" onError={(e) => {
+          console.error('🎵 Popup: Audio element error:', e);
+          stopAudioAnalysis();
+          if (tryNextUrl()) {
+            setTimeout(attemptPlay, 1000);
+          } else {
+            setIsLoading(false);
+            setIsPlaying(false);
+          }
+        }} onPause={() => {
+          console.log('🎵 Popup: Audio paused');
+          setIsPlaying(false);
+          stopAudioAnalysis();
+        }} onPlay={() => {
+          console.log('🎵 Popup: Audio started playing');
+          setIsPlaying(true);
+        }} />
       </div>
     </div>
   );
