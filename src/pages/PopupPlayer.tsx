@@ -1,29 +1,26 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Play, Pause, Radio, X, Maximize2 } from 'lucide-react';
+import { Play, Pause, Radio } from 'lucide-react';
 import { AlbumArtService } from '@/utils/AlbumArtService';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import stationLogo from '@/assets/dance-one-logo.png';
 
-interface PopupPlayerProps {
-  streamUrls: string[];
-  streamTitle: string;
-  onClose: () => void;
-}
-
-const PopupPlayer = ({
-  streamUrls,
-  streamTitle: initialStreamTitle,
-  onClose
-}: PopupPlayerProps) => {
+const PopupPlayerPage = () => {
+  // Get stream URLs from URL params or use defaults
+  const urlParams = new URLSearchParams(window.location.search);
+  const streamUrls = [
+    'https://streams.radio.co/s2c3cc784b/listen',
+    'https://radio.garden/api/ara/content/listen/eQXf2wN8/channel.mp3'
+  ];
+  
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
   const [albumArt, setAlbumArt] = useState<string | null>(null);
   const [isLoadingArt, setIsLoadingArt] = useState(false);
   const [frequencyData, setFrequencyData] = useState<number[]>(new Array(32).fill(20));
-  const [currentStreamTitle, setCurrentStreamTitle] = useState(initialStreamTitle);
+  const [currentStreamTitle, setCurrentStreamTitle] = useState('Dance One Radio - The Future of Dance Music');
   const [isStreamLive, setIsStreamLive] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const animationRef = useRef<number | null>(null);
@@ -190,18 +187,8 @@ const PopupPlayer = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="card-cyber p-6 w-full max-w-lg relative overflow-hidden">
-        {/* Close button */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onClose}
-          className="absolute top-4 right-4 z-10 text-muted-foreground hover:text-foreground"
-        >
-          <X className="h-4 w-4" />
-        </Button>
-
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="card-cyber p-8 w-full max-w-lg relative overflow-hidden">
         {/* Background blur */}
         <div className="absolute inset-0 opacity-20">
           <img
@@ -212,44 +199,45 @@ const PopupPlayer = ({
         </div>
 
         {/* Main content */}
-        <div className="relative z-10 space-y-6">
+        <div className="relative z-10 space-y-8">
           {/* Header */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <Radio className="h-5 w-5 text-primary" />
-              <span className="font-bold text-lg">Dance One Radio</span>
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="flex items-center gap-2">
+                <Radio className="h-6 w-6 text-primary" />
+                <span className="font-bold text-xl">Dance One Radio</span>
+              </div>
+              <Badge 
+                variant={isStreamLive && isPlaying ? "default" : "secondary"}
+                className={`font-mono text-xs ${
+                  isStreamLive && isPlaying 
+                    ? "bg-red-500 text-white animate-pulse" 
+                    : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {isStreamLive && isPlaying ? "LIVE" : "OFFLINE"}
+              </Badge>
             </div>
-            <Badge 
-              variant={isStreamLive && isPlaying ? "default" : "secondary"}
-              className={`font-mono text-xs ${
-                isStreamLive && isPlaying 
-                  ? "bg-red-500 text-white animate-pulse" 
-                  : "bg-muted text-muted-foreground"
-              }`}
-            >
-              {isStreamLive && isPlaying ? "LIVE" : "OFFLINE"}
-            </Badge>
+            <p className="text-sm text-muted-foreground">Pop-up Player</p>
           </div>
 
           {/* Album art and info */}
-          <div className="flex gap-4">
-            <div className="relative">
-              <div className="w-20 h-20 rounded-lg overflow-hidden bg-muted flex-shrink-0">
-                {isLoadingArt ? (
-                  <div className="w-full h-full animate-pulse bg-muted-foreground/20" />
-                ) : (
-                  <img
-                    src={albumArt || stationLogo}
-                    alt="Album art"
-                    className="w-full h-full object-cover"
-                  />
-                )}
-              </div>
+          <div className="text-center space-y-4">
+            <div className="w-32 h-32 rounded-xl overflow-hidden bg-muted mx-auto">
+              {isLoadingArt ? (
+                <div className="w-full h-full animate-pulse bg-muted-foreground/20" />
+              ) : (
+                <img
+                  src={albumArt || stationLogo}
+                  alt="Album art"
+                  className="w-full h-full object-cover"
+                />
+              )}
             </div>
 
-            <div className="flex-1 min-w-0">
-              <div className="text-sm text-muted-foreground mb-1">Now Playing</div>
-              <div className="font-audiowide text-sm leading-tight overflow-hidden">
+            <div>
+              <div className="text-xs text-muted-foreground mb-1">Now Playing</div>
+              <div className="font-audiowide text-sm leading-tight px-4">
                 <div className="whitespace-nowrap animate-scroll-x">
                   {currentStreamTitle}
                 </div>
@@ -258,7 +246,7 @@ const PopupPlayer = ({
           </div>
 
           {/* Visualizer */}
-          <div className="flex items-end justify-center gap-1 h-16 px-4" data-eq-container>
+          <div className="flex items-end justify-center gap-1 h-20 px-4" data-eq-container>
             {frequencyData.map((height, index) => {
               const frequencyPosition = index / 31;
               let hue, saturation, lightness;
@@ -290,9 +278,9 @@ const PopupPlayer = ({
                   className="bg-primary/80 rounded-sm transition-none"
                   style={{
                     height: `${height}px`,
-                    width: '3px',
+                    width: '4px',
                     backgroundColor: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
-                    boxShadow: `0 0 4px hsl(${hue}, ${saturation}%, ${lightness}%)`
+                    boxShadow: `0 0 6px hsl(${hue}, ${saturation}%, ${lightness}%)`
                   }}
                   data-eq-bar
                 />
@@ -306,14 +294,14 @@ const PopupPlayer = ({
               onClick={handlePlayPause}
               disabled={isLoading}
               size="lg"
-              className="rounded-full w-16 h-16"
+              className="rounded-full w-20 h-20 text-lg"
             >
               {isLoading ? (
-                <div className="animate-spin rounded-full h-6 w-6 border-2 border-current border-t-transparent" />
+                <div className="animate-spin rounded-full h-8 w-8 border-3 border-current border-t-transparent" />
               ) : isPlaying ? (
-                <Pause className="h-6 w-6" />
+                <Pause className="h-8 w-8" />
               ) : (
-                <Play className="h-6 w-6 ml-1" />
+                <Play className="h-8 w-8 ml-1" />
               )}
             </Button>
           </div>
@@ -325,4 +313,4 @@ const PopupPlayer = ({
   );
 };
 
-export default PopupPlayer;
+export default PopupPlayerPage;

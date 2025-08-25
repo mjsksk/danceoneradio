@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Play, Pause, Radio, ExternalLink } from 'lucide-react';
-import PopupPlayer from './PopupPlayer';
 import { AlbumArtService } from '@/utils/AlbumArtService';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import stationLogo from '@/assets/dance-one-logo.png';
@@ -24,7 +23,6 @@ const LiveRadioPlayer = ({
   const [animationActive, setAnimationActive] = useState(false);
   const [currentStreamTitle, setCurrentStreamTitle] = useState(initialStreamTitle);
   const [isStreamLive, setIsStreamLive] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -577,7 +575,17 @@ const LiveRadioPlayer = ({
         </Button>
 
         <Button 
-          onClick={() => setShowPopup(true)} 
+          onClick={() => {
+            const width = 400;
+            const height = 600;
+            const left = (screen.width - width) / 2;
+            const top = (screen.height - height) / 2;
+            window.open(
+              '/popup-player', 
+              'popup-player', 
+              `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=no,toolbar=no,menubar=no,location=no,directories=no,status=no`
+            );
+          }} 
           variant="outline" 
           className="w-full" 
           size="sm"
@@ -600,15 +608,6 @@ const LiveRadioPlayer = ({
         setIsPlaying(false);
         stopAudioAnalysis();
       }} />
-
-      {/* Pop-up Player */}
-      {showPopup && (
-        <PopupPlayer
-          streamUrls={streamUrls}
-          streamTitle={currentStreamTitle}
-          onClose={() => setShowPopup(false)}
-        />
-      )}
       </div>
     </div>;
 };
