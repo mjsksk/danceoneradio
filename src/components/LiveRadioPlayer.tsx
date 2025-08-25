@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Play, Pause, Radio } from 'lucide-react';
+import { Play, Pause, Radio, ExternalLink } from 'lucide-react';
+import PopupPlayer from './PopupPlayer';
 import { AlbumArtService } from '@/utils/AlbumArtService';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import stationLogo from '@/assets/dance-one-logo.png';
@@ -23,6 +24,7 @@ const LiveRadioPlayer = ({
   const [animationActive, setAnimationActive] = useState(false);
   const [currentStreamTitle, setCurrentStreamTitle] = useState(initialStreamTitle);
   const [isStreamLive, setIsStreamLive] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -560,18 +562,30 @@ const LiveRadioPlayer = ({
       </div>
       
 
-      <Button onClick={handlePlayPause} className="btn-cyber w-full" size="lg" disabled={isLoading}>
-        {isLoading ? <>
-            <div className="w-5 h-5 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            LOADING...
-          </> : isPlaying ? <>
-            <Pause className="w-5 h-5 mr-2" />
-            PAUSE STREAM
-          </> : <>
-            <Play className="w-5 h-5 mr-2" />
-            LISTEN LIVE
-          </>}
-      </Button>
+      <div className="space-y-3">
+        <Button onClick={handlePlayPause} className="btn-cyber w-full" size="lg" disabled={isLoading}>
+          {isLoading ? <>
+              <div className="w-5 h-5 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              LOADING...
+            </> : isPlaying ? <>
+              <Pause className="w-5 h-5 mr-2" />
+              PAUSE STREAM
+            </> : <>
+              <Play className="w-5 h-5 mr-2" />
+              LISTEN LIVE
+            </>}
+        </Button>
+
+        <Button 
+          onClick={() => setShowPopup(true)} 
+          variant="outline" 
+          className="w-full" 
+          size="sm"
+        >
+          <ExternalLink className="w-4 h-4 mr-2" />
+          Open Pop-up Player
+        </Button>
+      </div>
 
       <audio ref={audioRef} preload="none" crossOrigin="anonymous" onError={() => {
         console.error('Audio element error');
@@ -586,6 +600,15 @@ const LiveRadioPlayer = ({
         setIsPlaying(false);
         stopAudioAnalysis();
       }} />
+
+      {/* Pop-up Player */}
+      {showPopup && (
+        <PopupPlayer
+          streamUrls={streamUrls}
+          streamTitle={currentStreamTitle}
+          onClose={() => setShowPopup(false)}
+        />
+      )}
       </div>
     </div>;
 };
