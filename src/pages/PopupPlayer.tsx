@@ -127,19 +127,13 @@ const PopupPlayerPage = () => {
     setFrequencyData(new Array(64).fill(20)); // Reset to base height
   };
 
-  const handlePlayPause = async () => {
-    console.log('🚀 POPUP: === PLAY BUTTON CLICKED ===');
-    console.log('🚀 POPUP: Current state - isPlaying:', isPlaying, 'isLoading:', isLoading);
+  const handlePlayPause = () => {
+    console.log('🚀 POPUP: Play/Pause button clicked, isPlaying:', isPlaying);
     
     if (!audioRef.current) {
       console.error('🚀 POPUP: ❌ Audio ref is null!');
-      alert('Audio element not found!');
       return;
     }
-
-    console.log('🚀 POPUP: Audio element:', audioRef.current);
-    console.log('🚀 POPUP: Audio ready state:', audioRef.current.readyState);
-    console.log('🚀 POPUP: Audio network state:', audioRef.current.networkState);
     
     if (isPlaying) {
       console.log('🚀 POPUP: Pausing audio');
@@ -150,22 +144,6 @@ const PopupPlayerPage = () => {
       console.log('🚀 POPUP: ▶️ Starting playback process...');
       setIsLoading(true);
       setCurrentUrlIndex(0);
-      
-      // Try to resume any suspended audio context first
-      try {
-        if (window.AudioContext || (window as any).webkitAudioContext) {
-          const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-          const tempContext = new AudioContext();
-          if (tempContext.state === 'suspended') {
-            console.log('🚀 POPUP: Resuming audio context...');
-            await tempContext.resume();
-          }
-          tempContext.close();
-        }
-      } catch (e) {
-        console.log('🚀 POPUP: Audio context issue:', e);
-      }
-      
       attemptPlay();
     }
   };
@@ -239,74 +217,42 @@ const PopupPlayerPage = () => {
     };
   }, []);
 
-  const attemptPlay = async () => {
-    console.log('🚀 POPUP: === ATTEMPT PLAY START ===');
-    
+  const attemptPlay = () => {
     if (!audioRef.current) {
-      console.error('🚀 POPUP: ❌ Audio ref is null in attemptPlay');
-      alert('Audio element missing!');
+      console.error('🚀 POPUP: Audio ref is null in attemptPlay');
       setIsLoading(false);
       return;
     }
     
     const currentUrl = streamUrls[currentUrlIndex];
-    console.log('🚀 POPUP: 🎯 Attempting stream:', currentUrl);
-    console.log('🚀 POPUP: Stream index:', currentUrlIndex, 'of', streamUrls.length);
+    console.log('🚀 POPUP: Attempting stream:', currentUrl, 'at index:', currentUrlIndex);
     
-    try {
-      // Reset audio element completely
-      console.log('🚀 POPUP: Resetting audio element...');
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      audioRef.current.src = '';
+    // Use the same approach as the main player
+    audioRef.current.src = currentUrl;
+    audioRef.current.play().then(() => {
+      console.log('🚀 POPUP: ✅ Audio started playing successfully');
+      setIsPlaying(true);
+      setIsLoading(false);
       
-      // Set new source
-      console.log('🚀 POPUP: Setting source:', currentUrl);
-      audioRef.current.src = currentUrl;
-      audioRef.current.load();
+      // Start animation after successful playback
+      setTimeout(() => {
+        console.log('🚀 POPUP: Starting EQ animation');
+        startFallbackAnimation();
+      }, 500);
+    }).catch(error => {
+      console.error(`🚀 POPUP: ❌ Failed to play stream ${currentUrl}:`, error);
       
-      // Wait a moment for load
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      console.log('🚀 POPUP: Audio ready state after load:', audioRef.current.readyState);
-      console.log('🚀 POPUP: Audio network state after load:', audioRef.current.networkState);
-      
-      // Attempt play
-      console.log('🚀 POPUP: 🎵 Calling play()...');
-      const playPromise = audioRef.current.play();
-      
-      if (playPromise !== undefined) {
-        await playPromise;
-        console.log('🚀 POPUP: ✅ SUCCESS! Audio playing');
-        setIsPlaying(true);
-        setIsLoading(false);
-        
-        setTimeout(() => {
-          console.log('🚀 POPUP: Starting EQ animation');
-          startFallbackAnimation();
-        }, 500);
-        
-      } else {
-        console.warn('🚀 POPUP: ⚠️ Play promise undefined');
-        setIsLoading(false);
-      }
-      
-    } catch (error) {
-      console.error('🚀 POPUP: ❌ PLAY FAILED:', error);
-      console.error('🚀 POPUP: Error name:', error.name);
-      console.error('🚀 POPUP: Error message:', error.message);
-      
-      // Try next URL if available
       if (tryNextUrl()) {
-        console.log('🚀 POPUP: 🔄 Trying next URL in 1 second...');
+        console.log('🚀 POPUP: Trying next URL...');
         setTimeout(attemptPlay, 1000);
       } else {
-        console.error('🚀 POPUP: ❌ ALL STREAMS FAILED');
         setIsLoading(false);
         setIsPlaying(false);
-        alert('Failed to play any stream. Check console for details.');
+        console.error('🚀 POPUP: ❌ All stream URLs failed');
+        // Instead of alert, just log the error
+        console.error('All streams failed. Check network connection and stream availability.');
       }
-    }
+    });
   };
 
   return (
@@ -434,31 +380,11 @@ const PopupPlayerPage = () => {
           ref={audioRef} 
           preload="none" 
           crossOrigin="anonymous"
-          onLoadStart={() => console.log('🚀 POPUP: 📡 Load started')}
-          onLoadedMetadata={() => console.log('🚀 POPUP: 📊 Metadata loaded')}
-          onLoadedData={() => console.log('🚀 POPUP: 💾 Data loaded')}
-          onCanPlay={() => console.log('🚀 POPUP: ✅ Can play')}
-          onCanPlayThrough={() => console.log('🚀 POPUP: ✅ Can play through')}
-          onPlay={() => {
-            console.log('🚀 POPUP: ▶️ Audio PLAY event fired');
-            setIsPlaying(true);
-          }}
-          onPlaying={() => console.log('🚀 POPUP: 🎵 Audio PLAYING event')}
-          onPause={() => {
-            console.log('🚀 POPUP: ⏸️ Audio PAUSED');
-            setIsPlaying(false);
-            stopAudioAnalysis();
-          }}
-          onEnded={() => console.log('🚀 POPUP: 🔚 Audio ENDED')}
           onError={(e) => {
             const error = e.currentTarget.error;
             console.error('🚀 POPUP: ❌ AUDIO ERROR:', {
               code: error?.code,
-              message: error?.message,
-              MEDIA_ERR_ABORTED: error?.code === 1,
-              MEDIA_ERR_NETWORK: error?.code === 2,
-              MEDIA_ERR_DECODE: error?.code === 3,
-              MEDIA_ERR_SRC_NOT_SUPPORTED: error?.code === 4
+              message: error?.message
             });
             stopAudioAnalysis();
             if (tryNextUrl()) {
@@ -467,10 +393,16 @@ const PopupPlayerPage = () => {
               setIsLoading(false);
               setIsPlaying(false);
             }
+          }} 
+          onPause={() => {
+            console.log('🚀 POPUP: ⏸️ Audio PAUSED');
+            setIsPlaying(false);
+            stopAudioAnalysis();
+          }} 
+          onPlay={() => {
+            console.log('🚀 POPUP: ▶️ Audio PLAY event fired');
+            setIsPlaying(true);
           }}
-          onStalled={() => console.log('🚀 POPUP: ⏳ Audio STALLED')}
-          onSuspend={() => console.log('🚀 POPUP: ⏸️ Audio SUSPENDED')}
-          onWaiting={() => console.log('🚀 POPUP: ⏳ Audio WAITING')}
         />
       </div>
     </div>
