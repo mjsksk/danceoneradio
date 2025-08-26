@@ -205,25 +205,36 @@ const PopupPlayerPage = () => {
     if (!audioRef.current) return;
     const currentUrl = streamUrls[currentUrlIndex];
     console.log('🎵 Popup: Attempting to play:', currentUrl);
+    
+    // Set source and load
     audioRef.current.src = currentUrl;
-    audioRef.current.load(); // Force load the new source
-    audioRef.current.play().then(() => {
-      console.log('🎵 Popup: Audio started playing successfully');
-      setIsPlaying(true);
-      setIsLoading(false);
-      setTimeout(() => {
-        console.log('🎵 Popup: Starting EQ animation');
-        startFallbackAnimation();
-      }, 500);
-    }).catch(error => {
-      console.error(`🎵 Popup: Failed to play stream ${currentUrl}:`, error);
-      if (tryNextUrl()) {
-        setTimeout(attemptPlay, 1000);
-      } else {
+    audioRef.current.load();
+    
+    // Add a small delay before playing to ensure source is loaded
+    setTimeout(() => {
+      if (!audioRef.current) return;
+      
+      audioRef.current.play().then(() => {
+        console.log('🎵 Popup: Audio started playing successfully');
+        setIsPlaying(true);
         setIsLoading(false);
-        console.error('🎵 Popup: All stream URLs failed');
-      }
-    });
+        
+        // Start animation after successful playback
+        setTimeout(() => {
+          console.log('🎵 Popup: Starting EQ animation');
+          startFallbackAnimation();
+        }, 500);
+      }).catch(error => {
+        console.error(`🎵 Popup: Failed to play stream ${currentUrl}:`, error);
+        if (tryNextUrl()) {
+          setTimeout(attemptPlay, 1000);
+        } else {
+          setIsLoading(false);
+          setIsPlaying(false);
+          console.error('🎵 Popup: All stream URLs failed');
+        }
+      });
+    }, 100);
   };
 
   return (
@@ -347,23 +358,39 @@ const PopupPlayerPage = () => {
           </div>
         </div>
 
-        <audio ref={audioRef} preload="none" crossOrigin="anonymous" onError={(e) => {
-          console.error('🎵 Popup: Audio element error:', e);
-          stopAudioAnalysis();
-          if (tryNextUrl()) {
-            setTimeout(attemptPlay, 1000);
-          } else {
-            setIsLoading(false);
+        <audio 
+          ref={audioRef} 
+          preload="none" 
+          crossOrigin="anonymous"
+          onError={(e) => {
+            console.error('🎵 Popup: Audio element error:', e);
+            stopAudioAnalysis();
+            if (tryNextUrl()) {
+              setTimeout(attemptPlay, 1000);
+            } else {
+              setIsLoading(false);
+              setIsPlaying(false);
+            }
+          }} 
+          onPause={() => {
+            console.log('🎵 Popup: Audio paused');
             setIsPlaying(false);
-          }
-        }} onPause={() => {
-          console.log('🎵 Popup: Audio paused');
-          setIsPlaying(false);
-          stopAudioAnalysis();
-        }} onPlay={() => {
-          console.log('🎵 Popup: Audio started playing');
-          setIsPlaying(true);
-        }} />
+            stopAudioAnalysis();
+          }} 
+          onPlay={() => {
+            console.log('🎵 Popup: Audio started playing');
+            setIsPlaying(true);
+          }}
+          onCanPlay={() => {
+            console.log('🎵 Popup: Audio can play');
+          }}
+          onLoadStart={() => {
+            console.log('🎵 Popup: Audio load started');
+          }}
+          onLoadedData={() => {
+            console.log('🎵 Popup: Audio data loaded');
+          }}
+        />
       </div>
     </div>
   );
