@@ -7,12 +7,17 @@ import { RadioStreamService } from '@/utils/RadioStreamService';
 import stationLogo from '@/assets/dance-one-logo.png';
 
 const PopupPlayerPage = () => {
+  console.log('🎵 POPUP: PopupPlayerPage component mounted');
+  
   // Get stream URLs from URL params or use defaults
   const urlParams = new URLSearchParams(window.location.search);
+  console.log('🎵 POPUP: URL params:', urlParams.toString());
+  
   const streamUrls = [
     'https://streams.radio.co/s2c3cc784b/listen',
     'https://radio.garden/api/ara/content/listen/eQXf2wN8/channel.mp3'
   ];
+  console.log('🎵 POPUP: Stream URLs configured:', streamUrls);
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -120,12 +125,19 @@ const PopupPlayerPage = () => {
   };
 
   const handlePlayPause = () => {
-    if (!audioRef.current) return;
+    console.log('🎵 POPUP: Play/Pause button clicked, isPlaying:', isPlaying);
+    if (!audioRef.current) {
+      console.error('🎵 POPUP: Audio ref is null!');
+      return;
+    }
+    
     if (isPlaying) {
+      console.log('🎵 POPUP: Pausing audio');
       audioRef.current.pause();
       setIsPlaying(false);
       stopAudioAnalysis();
     } else {
+      console.log('🎵 POPUP: Starting playback');
       setIsLoading(true);
       setCurrentUrlIndex(0);
       attemptPlay();
@@ -202,39 +214,58 @@ const PopupPlayerPage = () => {
   }, []);
 
   const attemptPlay = () => {
-    if (!audioRef.current) return;
+    if (!audioRef.current) {
+      console.error('🎵 POPUP: Audio ref is null in attemptPlay');
+      return;
+    }
+    
     const currentUrl = streamUrls[currentUrlIndex];
-    console.log('🎵 Popup: Attempting to play:', currentUrl);
+    console.log('🎵 POPUP: Attempting to play stream:', currentUrl, 'at index:', currentUrlIndex);
+    
+    // Reset audio element
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
     
     // Set source and load
     audioRef.current.src = currentUrl;
+    console.log('🎵 POPUP: Source set, loading...');
     audioRef.current.load();
     
-    // Add a small delay before playing to ensure source is loaded
-    setTimeout(() => {
-      if (!audioRef.current) return;
-      
-      audioRef.current.play().then(() => {
-        console.log('🎵 Popup: Audio started playing successfully');
+    // Try to play immediately (browsers may block this)
+    const playPromise = audioRef.current.play();
+    
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        console.log('🎵 POPUP: ✅ Audio started playing successfully');
         setIsPlaying(true);
         setIsLoading(false);
         
         // Start animation after successful playback
         setTimeout(() => {
-          console.log('🎵 Popup: Starting EQ animation');
+          console.log('🎵 POPUP: Starting EQ animation');
           startFallbackAnimation();
         }, 500);
       }).catch(error => {
-        console.error(`🎵 Popup: Failed to play stream ${currentUrl}:`, error);
+        console.error(`🎵 POPUP: ❌ Failed to play stream ${currentUrl}:`, error);
+        console.error('🎵 POPUP: Error details:', {
+          name: error.name,
+          message: error.message,
+          code: error.code
+        });
+        
         if (tryNextUrl()) {
+          console.log('🎵 POPUP: Trying next URL...');
           setTimeout(attemptPlay, 1000);
         } else {
           setIsLoading(false);
           setIsPlaying(false);
-          console.error('🎵 Popup: All stream URLs failed');
+          console.error('🎵 POPUP: ❌ All stream URLs failed');
         }
       });
-    }, 100);
+    } else {
+      console.warn('🎵 POPUP: Play promise is undefined');
+      setIsLoading(false);
+    }
   };
 
   return (
