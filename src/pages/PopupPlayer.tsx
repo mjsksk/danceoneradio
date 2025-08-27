@@ -63,7 +63,7 @@ const PopupPlayerPage = () => {
 
   const attemptPlay = () => {
     if (!audioRef.current) {
-      console.error('🚀 POPUP: No audio ref');
+      console.log('🚀 POPUP: No audio ref available');
       setIsLoading(false);
       return;
     }
@@ -73,18 +73,22 @@ const PopupPlayerPage = () => {
     
     audioRef.current.src = currentUrl;
     audioRef.current.play().then(() => {
-      console.log('🚀 POPUP: ✅ Audio playing successfully');
+      console.log('🚀 POPUP: ✅ Audio started playing successfully');
       setIsPlaying(true);
       setIsLoading(false);
-      startVisualizer();
-    }).catch(error => {
-      console.error('🚀 POPUP: ❌ Play failed:', error);
       
+      // Start animation with delay like the working player
+      setTimeout(() => {
+        console.log('🚀 POPUP: Starting EQ animation');
+        startVisualizer();
+      }, 500);
+    }).catch(error => {
+      console.error(`🚀 POPUP: ❌ Failed to play stream ${currentUrl}:`, error);
       if (tryNextUrl()) {
         console.log('🚀 POPUP: Trying next URL...');
-        setTimeout(attemptPlay, 1000);
+        setTimeout(attemptPlay, 1000); // Try next URL after 1 second
       } else {
-        console.error('🚀 POPUP: All URLs failed');
+        console.error('🚀 POPUP: All stream URLs failed');
         setIsLoading(false);
         setIsPlaying(false);
       }
