@@ -127,7 +127,7 @@ const PopupPlayerPage = () => {
     setFrequencyData(new Array(64).fill(20)); // Reset to base height
   };
 
-  const handlePlayPause = () => {
+  const handlePlayPause = async () => {
     console.log('🚀 POPUP: Play/Pause button clicked, isPlaying:', isPlaying);
     
     if (!audioRef.current) {
@@ -143,8 +143,48 @@ const PopupPlayerPage = () => {
     } else {
       console.log('🚀 POPUP: ▶️ Starting playback process...');
       setIsLoading(true);
-      setCurrentUrlIndex(0);
-      attemptPlay();
+      
+      // Set the stream URL and try to play
+      const streamUrl = streamUrls[0];
+      console.log('🚀 POPUP: Setting stream URL:', streamUrl);
+      
+      try {
+        audioRef.current.src = streamUrl;
+        audioRef.current.load(); // Force reload the audio element
+        
+        console.log('🚀 POPUP: Attempting to play...');
+        await audioRef.current.play();
+        
+        console.log('🚀 POPUP: ✅ Audio started playing successfully');
+        setIsPlaying(true);
+        setIsLoading(false);
+        
+        // Start animation after successful playback
+        setTimeout(() => {
+          console.log('🚀 POPUP: Starting EQ animation');
+          startFallbackAnimation();
+        }, 500);
+        
+      } catch (error) {
+        console.error('🚀 POPUP: ❌ Failed to play audio:', error);
+        setIsLoading(false);
+        setIsPlaying(false);
+        
+        // Try alternative stream
+        if (streamUrls.length > 1) {
+          console.log('🚀 POPUP: Trying alternative stream...');
+          try {
+            audioRef.current.src = streamUrls[1];
+            audioRef.current.load();
+            await audioRef.current.play();
+            setIsPlaying(true);
+            startFallbackAnimation();
+          } catch (altError) {
+            console.error('🚀 POPUP: ❌ Alternative stream also failed:', altError);
+            alert('Unable to play the radio stream. Please check your internet connection.');
+          }
+        }
+      }
     }
   };
 
@@ -217,43 +257,6 @@ const PopupPlayerPage = () => {
     };
   }, []);
 
-  const attemptPlay = () => {
-    if (!audioRef.current) {
-      console.error('🚀 POPUP: Audio ref is null in attemptPlay');
-      setIsLoading(false);
-      return;
-    }
-    
-    const currentUrl = streamUrls[currentUrlIndex];
-    console.log('🚀 POPUP: Attempting stream:', currentUrl, 'at index:', currentUrlIndex);
-    
-    // Use the same approach as the main player
-    audioRef.current.src = currentUrl;
-    audioRef.current.play().then(() => {
-      console.log('🚀 POPUP: ✅ Audio started playing successfully');
-      setIsPlaying(true);
-      setIsLoading(false);
-      
-      // Start animation after successful playback
-      setTimeout(() => {
-        console.log('🚀 POPUP: Starting EQ animation');
-        startFallbackAnimation();
-      }, 500);
-    }).catch(error => {
-      console.error(`🚀 POPUP: ❌ Failed to play stream ${currentUrl}:`, error);
-      
-      if (tryNextUrl()) {
-        console.log('🚀 POPUP: Trying next URL...');
-        setTimeout(attemptPlay, 1000);
-      } else {
-        setIsLoading(false);
-        setIsPlaying(false);
-        console.error('🚀 POPUP: ❌ All stream URLs failed');
-        // Instead of alert, just log the error
-        console.error('All streams failed. Check network connection and stream availability.');
-      }
-    });
-  };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -387,13 +390,9 @@ const PopupPlayerPage = () => {
               message: error?.message
             });
             stopAudioAnalysis();
-            if (tryNextUrl()) {
-              setTimeout(attemptPlay, 1000);
-            } else {
-              setIsLoading(false);
-              setIsPlaying(false);
-            }
-          }} 
+            setIsLoading(false);
+            setIsPlaying(false);
+          }}
           onPause={() => {
             console.log('🚀 POPUP: ⏸️ Audio PAUSED');
             setIsPlaying(false);
