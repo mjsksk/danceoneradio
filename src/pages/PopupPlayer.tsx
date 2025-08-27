@@ -127,7 +127,7 @@ const PopupPlayerPage = () => {
     setFrequencyData(new Array(64).fill(20)); // Reset to base height
   };
 
-  const handlePlayPause = async () => {
+  const handlePlayPause = () => {
     console.log('🚀 POPUP: Play/Pause button clicked, isPlaying:', isPlaying);
     
     if (!audioRef.current) {
@@ -143,49 +143,45 @@ const PopupPlayerPage = () => {
     } else {
       console.log('🚀 POPUP: ▶️ Starting playback process...');
       setIsLoading(true);
+      setCurrentUrlIndex(0);
+      attemptPlay();
+    }
+  };
+
+  const attemptPlay = () => {
+    if (!audioRef.current) {
+      console.error('🚀 POPUP: Audio ref is null in attemptPlay');
+      setIsLoading(false);
+      return;
+    }
+    
+    const currentUrl = streamUrls[currentUrlIndex];
+    console.log('🚀 POPUP: Attempting stream:', currentUrl, 'at index:', currentUrlIndex);
+    
+    audioRef.current.src = currentUrl;
+    audioRef.current.play().then(() => {
+      console.log('🚀 POPUP: ✅ Audio started playing successfully');
+      setIsPlaying(true);
+      setIsLoading(false);
       
-      // Set the stream URL and try to play
-      const streamUrl = streamUrls[0];
-      console.log('🚀 POPUP: Setting stream URL:', streamUrl);
+      // Start animation after successful playback
+      setTimeout(() => {
+        console.log('🚀 POPUP: Starting EQ animation');
+        startFallbackAnimation();
+      }, 500);
+    }).catch(error => {
+      console.error(`🚀 POPUP: ❌ Failed to play stream ${currentUrl}:`, error);
       
-      try {
-        audioRef.current.src = streamUrl;
-        audioRef.current.load(); // Force reload the audio element
-        
-        console.log('🚀 POPUP: Attempting to play...');
-        await audioRef.current.play();
-        
-        console.log('🚀 POPUP: ✅ Audio started playing successfully');
-        setIsPlaying(true);
-        setIsLoading(false);
-        
-        // Start animation after successful playback
-        setTimeout(() => {
-          console.log('🚀 POPUP: Starting EQ animation');
-          startFallbackAnimation();
-        }, 500);
-        
-      } catch (error) {
-        console.error('🚀 POPUP: ❌ Failed to play audio:', error);
+      if (tryNextUrl()) {
+        console.log('🚀 POPUP: Trying next URL...');
+        setTimeout(attemptPlay, 1000);
+      } else {
         setIsLoading(false);
         setIsPlaying(false);
-        
-        // Try alternative stream
-        if (streamUrls.length > 1) {
-          console.log('🚀 POPUP: Trying alternative stream...');
-          try {
-            audioRef.current.src = streamUrls[1];
-            audioRef.current.load();
-            await audioRef.current.play();
-            setIsPlaying(true);
-            startFallbackAnimation();
-          } catch (altError) {
-            console.error('🚀 POPUP: ❌ Alternative stream also failed:', altError);
-            alert('Unable to play the radio stream. Please check your internet connection.');
-          }
-        }
+        console.error('🚀 POPUP: ❌ All stream URLs failed');
+        // Remove alert - just log the error
       }
-    }
+    });
   };
 
   const cleanTrackForSearch = (streamTitle: string): string => {
@@ -390,8 +386,12 @@ const PopupPlayerPage = () => {
               message: error?.message
             });
             stopAudioAnalysis();
-            setIsLoading(false);
-            setIsPlaying(false);
+            if (tryNextUrl()) {
+              setTimeout(attemptPlay, 1000);
+            } else {
+              setIsLoading(false);
+              setIsPlaying(false);
+            }
           }}
           onPause={() => {
             console.log('🚀 POPUP: ⏸️ Audio PAUSED');
