@@ -58,54 +58,55 @@ const PopupPlayerPage = () => {
     setFrequencyData(new Array(20).fill(25));
   }, []);
 
-  const attemptPlay = async () => {
+  const handlePlay = useCallback(async () => {
+    console.log('🚀 POPUP: Play button clicked');
+    
     if (!audioRef.current) {
       console.error('🚀 POPUP: No audio element');
       setError('Audio not available');
-      setIsLoading(false);
       return;
     }
 
-    const currentUrl = streamUrls[currentUrlIndex];
-    console.log('🚀 POPUP: Attempting to play:', currentUrl);
-
-    try {
-      audioRef.current.src = currentUrl;
-      audioRef.current.volume = 1;
-      audioRef.current.muted = false;
-      
-      await audioRef.current.play();
-      
-      console.log('🚀 POPUP: ✅ Playback started');
-      setIsPlaying(true);
-      setIsLoading(false);
-      setError(null);
-      
-      // Start visualizer after a short delay
-      setTimeout(startVisualizer, 300);
-      
-    } catch (err) {
-      console.error(`🚀 POPUP: ❌ Failed to play stream ${currentUrl}:`, err);
-      
-      if (tryNextUrl()) {
-        console.log('🚀 POPUP: Trying next URL...');
-        setTimeout(attemptPlay, 1000);
-      } else {
-        console.error('🚀 POPUP: All stream URLs failed');
-        setError('All streams unavailable');
-        setIsLoading(false);
-        setIsPlaying(false);
-      }
-    }
-  };
-
-  const handlePlay = useCallback(async () => {
-    console.log('🚀 POPUP: Play button clicked');
     setIsLoading(true);
     setError(null);
     setCurrentUrlIndex(0); // Reset to first URL
-    attemptPlay();
-  }, [startVisualizer]);
+
+    const attemptPlayback = async (urlIndex: number): Promise<void> => {
+      if (urlIndex >= streamUrls.length) {
+        setError('All streams unavailable');
+        setIsLoading(false);
+        setIsPlaying(false);
+        return;
+      }
+
+      const currentUrl = streamUrls[urlIndex];
+      console.log(`🚀 POPUP: Attempting to play stream ${urlIndex + 1}:`, currentUrl);
+
+      try {
+        if (audioRef.current) {
+          audioRef.current.src = currentUrl;
+          audioRef.current.volume = 1;
+          audioRef.current.muted = false;
+          
+          await audioRef.current.play();
+          
+          console.log('🚀 POPUP: ✅ Playback started successfully');
+          setIsPlaying(true);
+          setIsLoading(false);
+          setError(null);
+          
+          // Start visualizer after a short delay
+          setTimeout(startVisualizer, 300);
+        }
+      } catch (err) {
+        console.error(`🚀 POPUP: ❌ Failed to play stream ${currentUrl}:`, err);
+        // Try next URL after 1 second
+        setTimeout(() => attemptPlayback(urlIndex + 1), 1000);
+      }
+    };
+
+    attemptPlayback(0);
+  }, [startVisualizer, streamUrls]);
 
   const handlePause = useCallback(() => {
     console.log('🚀 POPUP: Pausing...');
