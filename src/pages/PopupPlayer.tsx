@@ -1,273 +1,185 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Play, Pause, Radio } from 'lucide-react';
-import { AlbumArtService } from '@/utils/AlbumArtService';
-import { RadioStreamService } from '@/utils/RadioStreamService';
+import { Play, Pause, Radio, Volume2 } from 'lucide-react';
 import stationLogo from '@/assets/dance-one-logo.png';
 
 const PopupPlayerPage = () => {
-  console.log('🚀 POPUP: PopupPlayerPage component mounted!');
-  console.log('🚀 POPUP: Current URL:', window.location.href);
+  console.log('🚀 POPUP: PopupPlayerPage mounted');
   
-  const streamUrls = [
-    'https://streams.radio.co/s2c3cc784b/listen',
-    'https://radio.garden/api/ara/content/listen/eQXf2wN8/channel.mp3'
-  ];
+  // Use a single reliable stream URL
+  const streamUrl = 'https://streams.radio.co/s2c3cc784b/listen';
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
-  const [albumArt, setAlbumArt] = useState<string | null>(null);
-  const [isLoadingArt, setIsLoadingArt] = useState(false);
-  const [currentStreamTitle, setCurrentStreamTitle] = useState('Dance One Radio - The Future of Dance Music');
-  const [isStreamLive, setIsStreamLive] = useState(false);
-  const [frequencyData, setFrequencyData] = useState<number[]>(new Array(32).fill(25));
+  const [error, setError] = useState<string | null>(null);
+  const [frequencyData, setFrequencyData] = useState<number[]>(new Array(20).fill(25));
   
   const audioRef = useRef<HTMLAudioElement>(null);
   const animationRef = useRef<number | null>(null);
 
-  const tryNextUrl = () => {
-    if (currentUrlIndex < streamUrls.length - 1) {
-      setCurrentUrlIndex(prev => prev + 1);
-      return true;
-    }
-    return false;
-  };
-
-  const startVisualizer = () => {
+  const startVisualizer = useCallback(() => {
     let time = 0;
     
     const animate = () => {
-      time += 0.05;
-      
-      const bars = Array.from({ length: 32 }, (_, i) => {
-        const frequency = (i / 31) * 3; // 0 to 3
-        const height = 25 + Math.sin(time * (0.5 + frequency)) * 15 + Math.random() * 10;
-        return Math.max(15, Math.min(60, height));
+      time += 0.1;
+      const bars = Array.from({ length: 20 }, (_, i) => {
+        const frequency = (i / 19) * 3;
+        const height = 20 + Math.sin(time * (0.8 + frequency)) * 15 + Math.random() * 8;
+        return Math.max(10, Math.min(50, height));
       });
       
       setFrequencyData(bars);
-      animationRef.current = requestAnimationFrame(animate);
+      if (isPlaying) {
+        animationRef.current = requestAnimationFrame(animate);
+      }
     };
     
     animate();
-  };
+  }, [isPlaying]);
 
-  const stopVisualizer = () => {
+  const stopVisualizer = useCallback(() => {
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
     }
-    setFrequencyData(new Array(32).fill(25));
-  };
+    setFrequencyData(new Array(20).fill(25));
+  }, []);
 
-  const attemptPlay = () => {
+  const handlePlay = useCallback(async () => {
+    console.log('🚀 POPUP: Play button clicked');
+    
     if (!audioRef.current) {
-      console.log('🚀 POPUP: No audio ref available');
-      setIsLoading(false);
+      console.error('🚀 POPUP: No audio element');
+      setError('Audio not available');
       return;
     }
-    
-    const currentUrl = streamUrls[currentUrlIndex];
-    console.log('🚀 POPUP: Attempting to play:', currentUrl);
-    
-    audioRef.current.src = currentUrl;
-    audioRef.current.play().then(() => {
-      console.log('🚀 POPUP: ✅ Audio started playing successfully');
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Reset audio element
+      audioRef.current.currentTime = 0;
+      audioRef.current.volume = 1;
+      audioRef.current.muted = false;
+      audioRef.current.src = streamUrl;
+      
+      console.log('🚀 POPUP: Starting playback...');
+      await audioRef.current.play();
+      
+      console.log('🚀 POPUP: ✅ Playback started');
       setIsPlaying(true);
       setIsLoading(false);
       
-      // Start animation with delay like the working player
-      setTimeout(() => {
-        console.log('🚀 POPUP: Starting EQ animation');
-        startVisualizer();
-      }, 500);
-    }).catch(error => {
-      console.error(`🚀 POPUP: ❌ Failed to play stream ${currentUrl}:`, error);
-      if (tryNextUrl()) {
-        console.log('🚀 POPUP: Trying next URL...');
-        setTimeout(attemptPlay, 1000); // Try next URL after 1 second
-      } else {
-        console.error('🚀 POPUP: All stream URLs failed');
-        setIsLoading(false);
-        setIsPlaying(false);
-      }
-    });
-  };
-
-  const handlePlayPause = () => {
-    console.log('🚀 POPUP: Play/Pause clicked, isPlaying:', isPlaying);
-    
-    if (!audioRef.current) {
-      console.error('🚀 POPUP: No audio element found');
-      return;
+      // Start visualizer after a short delay
+      setTimeout(startVisualizer, 300);
+      
+    } catch (err) {
+      console.error('🚀 POPUP: ❌ Play failed:', err);
+      setError('Failed to play stream');
+      setIsLoading(false);
+      setIsPlaying(false);
     }
+  }, [startVisualizer, streamUrl]);
+
+  const handlePause = useCallback(() => {
+    console.log('🚀 POPUP: Pausing...');
+    
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    
+    setIsPlaying(false);
+    stopVisualizer();
+  }, [stopVisualizer]);
+
+  const handlePlayPause = useCallback(() => {
+    if (isLoading) return;
     
     if (isPlaying) {
-      console.log('🚀 POPUP: Pausing');
-      audioRef.current.pause();
-      setIsPlaying(false);
-      stopVisualizer();
+      handlePause();
     } else {
-      console.log('🚀 POPUP: Starting playback');
-      setIsLoading(true);
-      setCurrentUrlIndex(0);
-      attemptPlay();
+      handlePlay();
     }
-  };
-
-  const cleanTrackForSearch = (streamTitle: string): string => {
-    const songMatch = streamTitle.match(/🎵+\s*(.*?)\s*🎵+/);
-    const songTitle = songMatch ? songMatch[1] : streamTitle;
-
-    return songTitle
-      .replace(/&amp;/g, '&')
-      .replace(/&apos;/g, "'")
-      .replace(/\(.*?extended.*?\)/gi, '')
-      .replace(/\(.*?remix.*?\)/gi, '')
-      .replace(/\(.*?edit.*?\)/gi, '')
-      .replace(/\(.*?mix.*?\)/gi, '')
-      .replace(/\[.*?\]/g, '')
-      .replace(/feat\..*$/gi, '')
-      .replace(/ft\..*$/gi, '')
-      .replace(/vs\..*$/gi, '')
-      .replace(/\d{4}$/, '')
-      .replace(/[^\w\s&'-]/g, '')
-      .replace(/Dance One Radio.*$/gi, '')
-      .trim();
-  };
-
-  // Fetch album art when stream title changes
-  useEffect(() => {
-    const fetchAlbumArt = async () => {
-      if (!currentStreamTitle || currentStreamTitle.includes('Dance One Radio - The Future')) return;
-      
-      setIsLoadingArt(true);
-      try {
-        const cleanedQuery = cleanTrackForSearch(currentStreamTitle);
-        const result = await AlbumArtService.getAlbumArt(cleanedQuery);
-        setAlbumArt(result.imageUrl || null);
-      } catch (error) {
-        console.error('Error fetching album art:', error);
-        setAlbumArt(null);
-      } finally {
-        setIsLoadingArt(false);
-      }
-    };
-    
-    fetchAlbumArt();
-  }, [currentStreamTitle]);
-
-  // Fetch stream metadata
-  useEffect(() => {
-    const fetchStreamMetadata = async () => {
-      try {
-        const metadata = await RadioStreamService.getStreamMetadata();
-        const streamIsLive = metadata && metadata.title && !metadata.title.includes('Dance One Radio - The Future');
-        setIsStreamLive(streamIsLive);
-        
-        const formattedTitle = RadioStreamService.formatTitle(metadata);
-        if (formattedTitle !== currentStreamTitle) {
-          setCurrentStreamTitle(formattedTitle);
-        }
-      } catch (error) {
-        console.error('Error fetching stream metadata:', error);
-        setIsStreamLive(false);
-      }
-    };
-
-    fetchStreamMetadata();
-    const interval = setInterval(fetchStreamMetadata, 5000);
-    
-    return () => clearInterval(interval);
-  }, [currentStreamTitle]);
+  }, [isPlaying, isLoading, handlePlay, handlePause]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       stopVisualizer();
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      }
     };
-  }, []);
+  }, [stopVisualizer]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="card-cyber p-6 w-full max-w-sm relative overflow-hidden">
-        {/* Background blur */}
-        <div className="absolute inset-0 opacity-20">
-          <img
-            src={albumArt || stationLogo}
-            alt=""
-            className="w-full h-full object-cover blur-xl scale-110"
-          />
+      <div className="bg-card border border-border rounded-lg p-8 w-full max-w-md shadow-lg">
+        
+        {/* Header */}
+        <div className="text-center mb-6">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Radio className="h-6 w-6 text-primary" />
+            <h1 className="text-xl font-bold">Dance One Radio</h1>
+          </div>
+          <Badge variant={isPlaying ? "default" : "secondary"} className="text-sm">
+            {isPlaying ? "LIVE" : "OFFLINE"}
+          </Badge>
         </div>
 
-        {/* Main content */}
-        <div className="relative z-10 space-y-6 text-center">
-          {/* Header */}
-          <div>
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Radio className="h-5 w-5 text-primary" />
-              <span className="font-bold">Dance One Radio</span>
-              <Badge 
-                variant={isStreamLive && isPlaying ? "default" : "secondary"}
-                className={`text-xs ${
-                  isStreamLive && isPlaying 
-                    ? "bg-red-500 text-white animate-pulse" 
-                    : "bg-muted text-muted-foreground"
-                }`}
-              >
-                {isStreamLive && isPlaying ? "LIVE" : "OFFLINE"}
-              </Badge>
-            </div>
-            <p className="text-xs text-muted-foreground">Pop-up Player</p>
+        {/* Station Logo */}
+        <div className="flex justify-center mb-6">
+          <div className="w-32 h-32 rounded-lg overflow-hidden bg-muted">
+            <img
+              src={stationLogo}
+              alt="Dance One Radio"
+              className="w-full h-full object-cover"
+            />
           </div>
+        </div>
 
-          {/* Album art */}
-          <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted mx-auto">
-            {isLoadingArt ? (
-              <div className="w-full h-full animate-pulse bg-muted-foreground/20" />
-            ) : (
-              <img
-                src={albumArt || stationLogo}
-                alt="Album art"
-                className="w-full h-full object-cover"
-              />
-            )}
+        {/* Now Playing */}
+        <div className="text-center mb-6">
+          <p className="text-sm text-muted-foreground mb-1">Now Playing</p>
+          <p className="font-medium">
+            {isPlaying ? "Dance One Radio - Live Stream" : "Ready to Play"}
+          </p>
+        </div>
+
+        {/* Audio Visualizer */}
+        <div className="flex items-end justify-center gap-1 h-16 mb-6">
+          {frequencyData.map((height, index) => (
+            <div
+              key={index}
+              className="bg-primary rounded-sm transition-all duration-100"
+              style={{
+                height: `${height}px`,
+                width: '4px',
+                opacity: isPlaying ? 1 : 0.3,
+                backgroundColor: `hsl(${280 + index * 3}, 70%, 60%)`,
+                boxShadow: isPlaying ? `0 0 4px hsl(${280 + index * 3}, 70%, 60%)` : 'none'
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="text-center mb-4">
+            <p className="text-sm text-destructive">{error}</p>
           </div>
+        )}
 
-          {/* Now playing */}
-          <div>
-            <div className="text-xs text-muted-foreground mb-1">Now Playing</div>
-            <div className="font-audiowide text-xs leading-tight px-2">
-              <div className="truncate">
-                {currentStreamTitle}
-              </div>
-            </div>
-          </div>
-
-          {/* Visualizer */}
-          <div className="flex items-end justify-center gap-1 h-12">
-            {frequencyData.map((height, index) => (
-              <div
-                key={index}
-                className="bg-primary/80 rounded-sm transition-none"
-                style={{
-                  height: `${height}px`,
-                  width: '3px',
-                  backgroundColor: `hsl(${280 + index * 2}, 70%, 60%)`,
-                  boxShadow: `0 0 4px hsl(${280 + index * 2}, 70%, 60%)`
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Play button */}
+        {/* Controls */}
+        <div className="flex items-center justify-center gap-4">
           <Button
             onClick={handlePlayPause}
             disabled={isLoading}
             size="lg"
-            className="rounded-full w-16 h-16"
+            className="rounded-full w-16 h-16 flex items-center justify-center"
           >
             {isLoading ? (
               <div className="animate-spin rounded-full h-6 w-6 border-2 border-current border-t-transparent" />
@@ -277,32 +189,40 @@ const PopupPlayerPage = () => {
               <Play className="h-6 w-6 ml-1" />
             )}
           </Button>
+          
+          {isPlaying && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Volume2 className="h-4 w-4" />
+              <span>Streaming...</span>
+            </div>
+          )}
         </div>
 
-        {/* Audio element */}
+        {/* Audio Element */}
         <audio 
-          ref={audioRef} 
-          preload="none" 
-          crossOrigin="anonymous"
+          ref={audioRef}
+          preload="none"
           onError={(e) => {
-            const error = e.currentTarget.error;
-            console.error('🚀 POPUP: Audio error:', error?.code, error?.message);
+            console.error('🚀 POPUP: Audio error:', e.currentTarget.error);
+            setError('Stream unavailable');
+            setIsLoading(false);
+            setIsPlaying(false);
             stopVisualizer();
-            if (tryNextUrl()) {
-              setTimeout(attemptPlay, 1000);
-            } else {
-              setIsLoading(false);
-              setIsPlaying(false);
-            }
-          }} 
+          }}
           onPause={() => {
             console.log('🚀 POPUP: Audio paused');
             setIsPlaying(false);
             stopVisualizer();
-          }} 
+          }}
           onPlay={() => {
-            console.log('🚀 POPUP: Audio playing');
+            console.log('🚀 POPUP: Audio started');
             setIsPlaying(true);
+          }}
+          onLoadStart={() => {
+            console.log('🚀 POPUP: Loading stream...');
+          }}
+          onCanPlay={() => {
+            console.log('🚀 POPUP: Stream ready to play');
           }}
         />
       </div>
