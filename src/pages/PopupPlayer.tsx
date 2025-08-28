@@ -7,7 +7,8 @@ import { RadioStreamService } from '@/utils/RadioStreamService';
 import stationLogo from '@/assets/dance-one-logo.png';
 
 const PopupPlayerPage = () => {
-  console.log('🚀 POPUP: PopupPlayerPage component loaded');
+  console.log('🚀 POPUP: PopupPlayerPage component mounted!');
+  console.log('🚀 POPUP: Current URL:', window.location.href);
   
   const streamUrls = [
     'https://streams.radio.co/s2c3cc784b/listen',
