@@ -7,16 +7,28 @@ import stationLogo from '@/assets/dance-one-logo.png';
 const PopupPlayerPage = () => {
   console.log('🚀 POPUP: PopupPlayerPage mounted');
   
-  // Use a single reliable stream URL
-  const streamUrl = 'https://streams.radio.co/s2c3cc784b/listen';
+  // Use same stream URLs as the working main player
+  const streamUrls = [
+    'https://streams.radio.co/s2c3cc784b/listen',
+    'https://radio.garden/api/ara/content/listen/eQXf2wN8/channel.mp3'
+  ];
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
   const [frequencyData, setFrequencyData] = useState<number[]>(new Array(20).fill(25));
   
   const audioRef = useRef<HTMLAudioElement>(null);
   const animationRef = useRef<number | null>(null);
+
+  const tryNextUrl = () => {
+    if (currentUrlIndex < streamUrls.length - 1) {
+      setCurrentUrlIndex(prev => prev + 1);
+      return true;
+    }
+    return false;
+  };
 
   const startVisualizer = useCallback(() => {
     let time = 0;
@@ -46,42 +58,54 @@ const PopupPlayerPage = () => {
     setFrequencyData(new Array(20).fill(25));
   }, []);
 
-  const handlePlay = useCallback(async () => {
-    console.log('🚀 POPUP: Play button clicked');
-    
+  const attemptPlay = async () => {
     if (!audioRef.current) {
       console.error('🚀 POPUP: No audio element');
       setError('Audio not available');
+      setIsLoading(false);
       return;
     }
 
-    setIsLoading(true);
-    setError(null);
+    const currentUrl = streamUrls[currentUrlIndex];
+    console.log('🚀 POPUP: Attempting to play:', currentUrl);
 
     try {
-      // Reset audio element
-      audioRef.current.currentTime = 0;
+      audioRef.current.src = currentUrl;
       audioRef.current.volume = 1;
       audioRef.current.muted = false;
-      audioRef.current.src = streamUrl;
       
-      console.log('🚀 POPUP: Starting playback...');
       await audioRef.current.play();
       
       console.log('🚀 POPUP: ✅ Playback started');
       setIsPlaying(true);
       setIsLoading(false);
+      setError(null);
       
       // Start visualizer after a short delay
       setTimeout(startVisualizer, 300);
       
     } catch (err) {
-      console.error('🚀 POPUP: ❌ Play failed:', err);
-      setError('Failed to play stream');
-      setIsLoading(false);
-      setIsPlaying(false);
+      console.error(`🚀 POPUP: ❌ Failed to play stream ${currentUrl}:`, err);
+      
+      if (tryNextUrl()) {
+        console.log('🚀 POPUP: Trying next URL...');
+        setTimeout(attemptPlay, 1000);
+      } else {
+        console.error('🚀 POPUP: All stream URLs failed');
+        setError('All streams unavailable');
+        setIsLoading(false);
+        setIsPlaying(false);
+      }
     }
-  }, [startVisualizer, streamUrl]);
+  };
+
+  const handlePlay = useCallback(async () => {
+    console.log('🚀 POPUP: Play button clicked');
+    setIsLoading(true);
+    setError(null);
+    setCurrentUrlIndex(0); // Reset to first URL
+    attemptPlay();
+  }, [startVisualizer]);
 
   const handlePause = useCallback(() => {
     console.log('🚀 POPUP: Pausing...');
