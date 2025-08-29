@@ -1,89 +1,33 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Play, Pause, Radio } from 'lucide-react';
 import stationLogo from '@/assets/dance-one-logo.png';
 
 const PopupPlayerPage = () => {
-  console.log('🚀🚀🚀 POPUP PLAYER MOUNTED 🚀🚀🚀 - window.location:', window.location.href);
-  
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
   const audioRef = useRef<HTMLAudioElement>(null);
   
-  // Try multiple stream URLs like the working player
-  const streamUrls = [
-    'https://streams.radio.co/s2c3cc784b/listen',
-    'https://radio.garden/api/ara/content/listen/eQXf2wN8/channel.mp3'
-  ];
-  const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
-
-  const tryNextStream = () => {
-    console.log('🚀 POPUP: Trying next stream, current index:', currentUrlIndex, 'total URLs:', streamUrls.length);
-    if (currentUrlIndex < streamUrls.length - 1) {
-      setCurrentUrlIndex(prev => prev + 1);
-      return true;
-    }
-    return false;
-  };
+  // Simple, reliable stream URL
+  const streamUrl = 'https://streams.radio.co/s2c3cc784b/listen';
 
   const handlePlayPause = async () => {
-    console.log('🚀 POPUP: Play/Pause clicked, isPlaying:', isPlaying);
-    
-    if (!audioRef.current) {
-      console.error('🚀 POPUP: No audio ref');
-      return;
-    }
+    if (!audioRef.current) return;
     
     if (isPlaying) {
-      console.log('🚀 POPUP: Pausing audio');
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      console.log('🚀 POPUP: Starting playback');
       setIsLoading(true);
-      setError(null);
-      setCurrentUrlIndex(0); // Reset to first URL
-      await attemptPlay();
-    }
-  };
-
-  const attemptPlay = async () => {
-    if (!audioRef.current) return;
-    
-    const currentUrl = streamUrls[currentUrlIndex];
-    console.log('🚀 POPUP: Attempting to play URL:', currentUrl, 'index:', currentUrlIndex, 'audioRef available:', !!audioRef.current);
-    
-    try {
-      // Clear any previous source
-      audioRef.current.src = '';
-      audioRef.current.load();
-      
-      // Set new source
-      audioRef.current.src = currentUrl;
-      audioRef.current.load();
-      
-      console.log('🚀 POPUP: Calling play()...');
-      await audioRef.current.play();
-      
-      console.log('🚀 POPUP: ✅ Play successful!');
-      setIsPlaying(true);
-      setIsLoading(false);
-      setError(null);
-      
-    } catch (err) {
-      console.error('🚀 POPUP: ❌ Play failed:', err);
-      
-      if (tryNextStream()) {
-        console.log('🚀 POPUP: Trying next URL in 1 second...');
-        setTimeout(() => attemptPlay(), 1000);
-      } else {
-        console.error('🚀 POPUP: All streams failed');
-        setError('Unable to connect to stream');
+      try {
+        audioRef.current.src = streamUrl;
+        await audioRef.current.play();
+        setIsPlaying(true);
+      } catch (error) {
+        console.error('Failed to play stream:', error);
+      } finally {
         setIsLoading(false);
-        setIsPlaying(false);
       }
     }
   };
@@ -121,55 +65,31 @@ const PopupPlayerPage = () => {
         </div>
 
         {/* Play Button */}
-          <Button
-            onClick={() => {
-              console.log('🚀🚀🚀 POPUP PLAY BUTTON CLICKED 🚀🚀🚀');
-              handlePlayPause();
-            }}
-            disabled={isLoading}
-            size="lg"
-            className="rounded-full w-16 h-16"
-          >
-            {isLoading ? (
-              <div className="animate-spin rounded-full h-6 w-6 border-2 border-current border-t-transparent" />
-            ) : isPlaying ? (
-              <Pause className="h-6 w-6" />
-            ) : (
-              <Play className="h-6 w-6 ml-1" />
-            )}
-          </Button>
-
-        {/* Error Display */}
-        {error && (
-          <div className="text-sm text-destructive bg-destructive/10 p-2 rounded">
-            {error}
-          </div>
-        )}
+        <Button
+          onClick={handlePlayPause}
+          disabled={isLoading}
+          size="lg"
+          className="rounded-full w-16 h-16"
+        >
+          {isLoading ? (
+            <div className="animate-spin rounded-full h-6 w-6 border-2 border-current border-t-transparent" />
+          ) : isPlaying ? (
+            <Pause className="h-6 w-6" />
+          ) : (
+            <Play className="h-6 w-6 ml-1" />
+          )}
+        </Button>
 
         {/* Audio Element */}
         <audio 
           ref={audioRef}
-          preload="none"
-          crossOrigin="anonymous"
-          onPlay={() => {
-            console.log('🚀 POPUP: Audio onPlay event');
-            setIsPlaying(true);
-            setError(null);
-          }}
-          onPause={() => {
-            console.log('🚀 POPUP: Audio onPause event');
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          onEnded={() => setIsPlaying(false)}
+          onError={() => {
             setIsPlaying(false);
-          }}
-          onError={(e) => {
-            console.error('🚀 POPUP: Audio onError event:', e);
-            setError('Stream connection failed');
             setIsLoading(false);
-            setIsPlaying(false);
           }}
-          onLoadStart={() => console.log('🚀 POPUP: Audio loadstart')}
-          onCanPlay={() => console.log('🚀 POPUP: Audio canplay')}
-          onCanPlayThrough={() => console.log('🚀 POPUP: Audio canplaythrough')}
-          onLoadedData={() => console.log('🚀 POPUP: Audio loadeddata')}
         />
       </div>
     </div>
