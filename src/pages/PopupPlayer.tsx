@@ -1,54 +1,21 @@
-import { useState, useRef, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Play, Pause, Radio } from 'lucide-react';
+import { Radio } from 'lucide-react';
 import stationLogo from '@/assets/dance-one-logo.png';
 
 const PopupPlayerPage = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  
-  // Simple, reliable stream URL
-  const streamUrl = 'https://streams.radio.co/s2c3cc784b/listen';
-
-  const handlePlayPause = async () => {
-    if (!audioRef.current) return;
-    
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      setIsLoading(true);
-      try {
-        audioRef.current.src = streamUrl;
-        await audioRef.current.play();
-        setIsPlaying(true);
-      } catch (error) {
-        console.error('Failed to play stream:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="bg-card border rounded-lg p-6 w-full max-w-sm space-y-6 text-center">
+      <div className="bg-card border rounded-lg p-6 w-full max-w-md space-y-6 text-center">
         {/* Header */}
         <div>
           <div className="flex items-center justify-center gap-2 mb-2">
             <Radio className="h-5 w-5 text-primary" />
-            <span className="font-bold">Dance One Radio</span>
-            <Badge variant={isPlaying ? "default" : "secondary"}>
-              {isPlaying ? "LIVE" : "OFFLINE"}
-            </Badge>
+            <span className="font-bold text-lg">Dance One Radio</span>
           </div>
-          <p className="text-sm text-muted-foreground">Pop-up Player</p>
+          <p className="text-sm text-muted-foreground">Live Stream Player</p>
         </div>
 
         {/* Logo */}
-        <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted mx-auto">
+        <div className="w-20 h-20 rounded-lg overflow-hidden bg-muted mx-auto mb-4">
           <img
             src={stationLogo}
             alt="Dance One Radio"
@@ -56,41 +23,32 @@ const PopupPlayerPage = () => {
           />
         </div>
 
-        {/* Now Playing */}
-        <div>
-          <div className="text-sm text-muted-foreground mb-1">Now Playing</div>
-          <div className="font-medium">
-            {isPlaying ? "Dance One Radio - Live Stream" : "Ready to Play"}
-          </div>
+        {/* Embedded Radio Player */}
+        <div className="w-full">
+          <iframe
+            src="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FDanceOneRadio%2F"
+            frameBorder="0"
+            className="w-full h-32 rounded-lg"
+            allow="autoplay"
+            title="Dance One Radio Player"
+          />
         </div>
 
-        {/* Play Button */}
-        <Button
-          onClick={handlePlayPause}
-          disabled={isLoading}
-          size="lg"
-          className="rounded-full w-16 h-16"
-        >
-          {isLoading ? (
-            <div className="animate-spin rounded-full h-6 w-6 border-2 border-current border-t-transparent" />
-          ) : isPlaying ? (
-            <Pause className="h-6 w-6" />
-          ) : (
-            <Play className="h-6 w-6 ml-1" />
-          )}
-        </Button>
+        {/* Alternative HTML5 Audio Fallback */}
+        <div className="w-full">
+          <audio 
+            controls 
+            className="w-full"
+            preload="none"
+          >
+            <source src="https://streams.radio.co/s2c3cc784b/listen" type="audio/mpeg" />
+            Your browser does not support the audio element.
+          </audio>
+        </div>
 
-        {/* Audio Element */}
-        <audio 
-          ref={audioRef}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
-          onEnded={() => setIsPlaying(false)}
-          onError={() => {
-            setIsPlaying(false);
-            setIsLoading(false);
-          }}
-        />
+        <div className="text-xs text-muted-foreground">
+          Use the player above to listen to Dance One Radio live
+        </div>
       </div>
     </div>
   );
