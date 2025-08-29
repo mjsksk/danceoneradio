@@ -16,6 +16,7 @@ const PopupPlayerPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
   const [frequencyData, setFrequencyData] = useState<number[]>(new Array(32).fill(25));
+  const [error, setError] = useState<string | null>(null);
   
   const audioRef = useRef<HTMLAudioElement>(null);
   const animationRef = useRef<number | null>(null);
@@ -55,38 +56,46 @@ const PopupPlayerPage = () => {
     setFrequencyData(new Array(32).fill(25));
   };
 
-  const attemptPlay = () => {
+  const attemptPlay = async () => {
     console.log('🚀 POPUP: attemptPlay called');
     if (!audioRef.current) {
       console.log('🚀 POPUP: No audio ref available');
       return;
     }
     
+    setError(null);
     const currentUrl = streamUrls[currentUrlIndex];
     console.log('🚀 POPUP: Attempting to play:', currentUrl);
     
-    audioRef.current.src = currentUrl;
-    audioRef.current.play().then(() => {
+    try {
+      // Ensure the audio element is properly configured
+      audioRef.current.src = currentUrl;
+      audioRef.current.load(); // Force reload
+      
+      await audioRef.current.play();
       console.log('🚀 POPUP: ✅ Audio started playing successfully');
       setIsPlaying(true);
       setIsLoading(false);
       
-      // Start the animation immediately like the working player
+      // Start the animation
       setTimeout(() => {
         console.log('🚀 POPUP: Starting EQ animation');
         startFallbackAnimation();
       }, 500);
-    }).catch(error => {
+    } catch (error) {
       console.error(`🚀 POPUP: ❌ Failed to play stream ${currentUrl}:`, error);
+      setError(`Failed to connect to stream`);
+      
       if (tryNextUrl()) {
         console.log('🚀 POPUP: Trying next URL...');
-        setTimeout(attemptPlay, 1000); // Try next URL after 1 second
+        setTimeout(() => attemptPlay(), 1000); // Try next URL after 1 second
       } else {
         console.error('🚀 POPUP: All stream URLs failed');
         setIsLoading(false);
         setIsPlaying(false);
+        setError('All streams are currently unavailable');
       }
-    });
+    }
   };
 
   const handlePlayPause = () => {
@@ -202,20 +211,23 @@ const PopupPlayerPage = () => {
           </Button>
         </div>
 
-        {/* Audio element - exact same as working player */}
+        {/* Error message */}
+        {error && (
+          <div className="text-center mt-4 p-2 bg-destructive/10 text-destructive rounded-lg text-xs">
+            {error}
+          </div>
+        )}
+
+        {/* Audio element */}
         <audio 
           ref={audioRef} 
-          preload="none" 
-          crossOrigin="anonymous"
-          onError={() => {
-            console.error('🚀 POPUP: Audio element error');
+          preload="none"
+          onError={(e) => {
+            console.error('🚀 POPUP: Audio element error:', e);
+            setError('Stream connection failed');
             stopAnimation();
-            if (tryNextUrl()) {
-              setTimeout(attemptPlay, 1000);
-            } else {
-              setIsLoading(false);
-              setIsPlaying(false);
-            }
+            setIsLoading(false);
+            setIsPlaying(false);
           }} 
           onPause={() => {
             console.log('🚀 POPUP: Audio paused');
@@ -225,6 +237,13 @@ const PopupPlayerPage = () => {
           onPlay={() => {
             console.log('🚀 POPUP: Audio playing');
             setIsPlaying(true);
+            setError(null);
+          }}
+          onLoadStart={() => {
+            console.log('🚀 POPUP: Audio load start');
+          }}
+          onCanPlay={() => {
+            console.log('🚀 POPUP: Audio can play');
           }}
         />
       </div>
