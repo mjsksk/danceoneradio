@@ -5,32 +5,85 @@ import { Play, Pause, Radio } from 'lucide-react';
 import stationLogo from '@/assets/dance-one-logo.png';
 
 const PopupPlayerPage = () => {
+  console.log('🚀 POPUP: Component mounted');
+  
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
   const audioRef = useRef<HTMLAudioElement>(null);
-  const streamUrl = 'https://streams.radio.co/s2c3cc784b/listen';
+  
+  // Try multiple stream URLs like the working player
+  const streamUrls = [
+    'https://streams.radio.co/s2c3cc784b/listen',
+    'https://radio.garden/api/ara/content/listen/eQXf2wN8/channel.mp3'
+  ];
+  const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
+
+  const tryNextStream = () => {
+    console.log('🚀 POPUP: Trying next stream, current index:', currentUrlIndex);
+    if (currentUrlIndex < streamUrls.length - 1) {
+      setCurrentUrlIndex(prev => prev + 1);
+      return true;
+    }
+    return false;
+  };
 
   const handlePlayPause = async () => {
-    if (!audioRef.current) return;
+    console.log('🚀 POPUP: Play/Pause clicked, isPlaying:', isPlaying);
+    
+    if (!audioRef.current) {
+      console.error('🚀 POPUP: No audio ref');
+      return;
+    }
     
     if (isPlaying) {
+      console.log('🚀 POPUP: Pausing audio');
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
+      console.log('🚀 POPUP: Starting playback');
       setIsLoading(true);
       setError(null);
+      setCurrentUrlIndex(0); // Reset to first URL
+      await attemptPlay();
+    }
+  };
+
+  const attemptPlay = async () => {
+    if (!audioRef.current) return;
+    
+    const currentUrl = streamUrls[currentUrlIndex];
+    console.log('🚀 POPUP: Attempting to play URL:', currentUrl, 'index:', currentUrlIndex);
+    
+    try {
+      // Clear any previous source
+      audioRef.current.src = '';
+      audioRef.current.load();
       
-      try {
-        audioRef.current.src = streamUrl;
-        await audioRef.current.play();
-        setIsPlaying(true);
-      } catch (err) {
-        console.error('Failed to play:', err);
+      // Set new source
+      audioRef.current.src = currentUrl;
+      audioRef.current.load();
+      
+      console.log('🚀 POPUP: Calling play()...');
+      await audioRef.current.play();
+      
+      console.log('🚀 POPUP: ✅ Play successful!');
+      setIsPlaying(true);
+      setIsLoading(false);
+      setError(null);
+      
+    } catch (err) {
+      console.error('🚀 POPUP: ❌ Play failed:', err);
+      
+      if (tryNextStream()) {
+        console.log('🚀 POPUP: Trying next URL in 1 second...');
+        setTimeout(() => attemptPlay(), 1000);
+      } else {
+        console.error('🚀 POPUP: All streams failed');
         setError('Unable to connect to stream');
-      } finally {
         setIsLoading(false);
+        setIsPlaying(false);
       }
     }
   };
@@ -93,13 +146,27 @@ const PopupPlayerPage = () => {
         {/* Audio Element */}
         <audio 
           ref={audioRef}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
-          onError={() => {
+          preload="none"
+          crossOrigin="anonymous"
+          onPlay={() => {
+            console.log('🚀 POPUP: Audio onPlay event');
+            setIsPlaying(true);
+            setError(null);
+          }}
+          onPause={() => {
+            console.log('🚀 POPUP: Audio onPause event');
+            setIsPlaying(false);
+          }}
+          onError={(e) => {
+            console.error('🚀 POPUP: Audio onError event:', e);
             setError('Stream connection failed');
             setIsLoading(false);
             setIsPlaying(false);
           }}
+          onLoadStart={() => console.log('🚀 POPUP: Audio loadstart')}
+          onCanPlay={() => console.log('🚀 POPUP: Audio canplay')}
+          onCanPlayThrough={() => console.log('🚀 POPUP: Audio canplaythrough')}
+          onLoadedData={() => console.log('🚀 POPUP: Audio loadeddata')}
         />
       </div>
     </div>
