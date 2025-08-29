@@ -5,7 +5,7 @@ import { Play, Pause, Radio } from 'lucide-react';
 import stationLogo from '@/assets/dance-one-logo.png';
 
 const PopupPlayerPage = () => {
-  console.log('🚀 POPUP: Component mounted - window.location:', window.location.href);
+  console.log('🚀🚀🚀 POPUP PLAYER MOUNTED 🚀🚀🚀 - window.location:', window.location.href);
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -121,20 +121,23 @@ const PopupPlayerPage = () => {
         </div>
 
         {/* Play Button */}
-        <Button
-          onClick={handlePlayPause}
-          disabled={isLoading}
-          size="lg"
-          className="rounded-full w-16 h-16"
-        >
-          {isLoading ? (
-            <div className="animate-spin rounded-full h-6 w-6 border-2 border-current border-t-transparent" />
-          ) : isPlaying ? (
-            <Pause className="h-6 w-6" />
-          ) : (
-            <Play className="h-6 w-6 ml-1" />
-          )}
-        </Button>
+          <Button
+            onClick={() => {
+              console.log('🚀🚀🚀 POPUP PLAY BUTTON CLICKED 🚀🚀🚀');
+              handlePlayPause();
+            }}
+            disabled={isLoading}
+            size="lg"
+            className="rounded-full w-16 h-16"
+          >
+            {isLoading ? (
+              <div className="animate-spin rounded-full h-6 w-6 border-2 border-current border-t-transparent" />
+            ) : isPlaying ? (
+              <Pause className="h-6 w-6" />
+            ) : (
+              <Play className="h-6 w-6 ml-1" />
+            )}
+          </Button>
 
         {/* Error Display */}
         {error && (
