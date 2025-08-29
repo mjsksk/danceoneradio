@@ -5,7 +5,7 @@ import { Play, Pause, Radio } from 'lucide-react';
 import stationLogo from '@/assets/dance-one-logo.png';
 
 const PopupPlayerPage = () => {
-  console.log('🚀 POPUP: Component mounted');
+  console.log('🚀 POPUP: Component mounted - window.location:', window.location.href);
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -21,7 +21,7 @@ const PopupPlayerPage = () => {
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
 
   const tryNextStream = () => {
-    console.log('🚀 POPUP: Trying next stream, current index:', currentUrlIndex);
+    console.log('🚀 POPUP: Trying next stream, current index:', currentUrlIndex, 'total URLs:', streamUrls.length);
     if (currentUrlIndex < streamUrls.length - 1) {
       setCurrentUrlIndex(prev => prev + 1);
       return true;
@@ -54,7 +54,7 @@ const PopupPlayerPage = () => {
     if (!audioRef.current) return;
     
     const currentUrl = streamUrls[currentUrlIndex];
-    console.log('🚀 POPUP: Attempting to play URL:', currentUrl, 'index:', currentUrlIndex);
+    console.log('🚀 POPUP: Attempting to play URL:', currentUrl, 'index:', currentUrlIndex, 'audioRef available:', !!audioRef.current);
     
     try {
       // Clear any previous source
