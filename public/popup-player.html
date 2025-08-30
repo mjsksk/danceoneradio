@@ -223,7 +223,13 @@
         const status = document.getElementById('status');
         const errorDiv = document.getElementById('error');
         
-        const streamUrl = 'https://streams.radio.co/s2c3cc784b/listen';
+        const streamUrls = [
+            "http://s9.myradiostream.com:14296/;",
+            "http://s9.myradiostream.com:14296/stream", 
+            "http://s9.myradiostream.com:14296",
+            "https://live-radio-stream.online/dance-one-radio.mp3"
+        ];
+        let currentStreamIndex = 0;
         let isPlaying = false;
         let metadataInterval = null;
         let userHasInteracted = false;
@@ -289,37 +295,50 @@
         function togglePlay() {
             console.log('🎵 Toggle play clicked - Current state:', { isPlaying, audioSrc: audio.src, muted: audio.muted, volume: audio.volume });
             
-            if (!audio.src) {
-                console.log('🔗 Setting audio source to:', streamUrl);
-                audio.src = streamUrl;
-                // Force unmute and set volume
-                audio.muted = false;
-                audio.volume = 0.7;
-                console.log('🔊 Audio configured - muted:', audio.muted, 'volume:', audio.volume);
-            }
-            
             if (isPlaying) {
                 console.log('⏸ Pausing audio');
                 audio.pause();
+                return;
+            }
+            
+            // Start playback
+            console.log('▶ Starting playback...');
+            showLoading(true);
+            hideError();
+            tryCurrentStream();
+        }
+        
+        function tryCurrentStream() {
+            const currentUrl = streamUrls[currentStreamIndex];
+            console.log(`🔗 Trying stream ${currentStreamIndex + 1}/${streamUrls.length}: ${currentUrl}`);
+            
+            // Configure audio
+            audio.muted = false;
+            audio.volume = 0.7;
+            audio.src = currentUrl;
+            audio.load();
+            
+            console.log('🎯 About to play - muted:', audio.muted, 'volume:', audio.volume, 'src:', audio.src);
+            
+            audio.play().then(() => {
+                console.log('✅ Audio play() promise resolved successfully');
+                showLoading(false);
+            }).catch(err => {
+                console.error(`❌ Stream ${currentStreamIndex + 1} failed:`, err);
+                tryNextStream();
+            });
+        }
+        
+        function tryNextStream() {
+            currentStreamIndex++;
+            if (currentStreamIndex < streamUrls.length) {
+                console.log(`🔄 Trying next stream (${currentStreamIndex + 1}/${streamUrls.length})`);
+                setTimeout(tryCurrentStream, 1000); // Wait 1 second before trying next
             } else {
-                console.log('▶ Starting playback...');
-                showLoading(true);
-                hideError();
-                
-                // Ensure audio is properly configured before play
-                audio.muted = false;
-                audio.volume = 0.7;
-                audio.load(); // Reload the audio element
-                
-                console.log('🎯 About to play - muted:', audio.muted, 'volume:', audio.volume, 'src:', audio.src);
-                
-                audio.play().then(() => {
-                    console.log('✅ Audio play() promise resolved successfully');
-                }).catch(err => {
-                    console.error('❌ Audio play() promise rejected:', err);
-                    showLoading(false);
-                    showError(`Playback failed: ${err.message}. Try clicking again or check your browser's audio settings.`);
-                });
+                console.log('❌ All streams failed');
+                showLoading(false);
+                showError('All stream sources failed. Please check your internet connection and try again.');
+                currentStreamIndex = 0; // Reset for next attempt
             }
         }
         
