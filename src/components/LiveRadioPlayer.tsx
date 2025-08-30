@@ -581,7 +581,7 @@ const LiveRadioPlayer = ({
             const left = (screen.width - width) / 2;
             const top = (screen.height - height) / 2;
             window.open(
-              '/popup-player', 
+              '/popup-player.html', 
               'popup-player', 
               `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=no,toolbar=no,menubar=no,location=no,directories=no,status=no`
             );
