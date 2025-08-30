@@ -401,6 +401,23 @@ const LiveRadioPlayer = ({
     };
   }, [currentStreamTitle]);
 
+  // Add beforeunload listener when audio is playing
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isPlaying) {
+        e.preventDefault();
+        e.returnValue = 'Audio is currently playing. Are you sure you want to leave?';
+        return 'Audio is currently playing. Are you sure you want to leave?';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isPlaying]);
+
   // Cleanup audio context on unmount
   useEffect(() => {
     return () => {
