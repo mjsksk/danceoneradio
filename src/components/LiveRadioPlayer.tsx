@@ -576,6 +576,12 @@ const LiveRadioPlayer = ({
 
         <Button 
           onClick={() => {
+            // Pause main player to avoid overlapping streams
+            if (isPlaying && audioRef.current) {
+              audioRef.current.pause();
+              stopAudioAnalysis();
+            }
+            
             const width = 400;
             const height = 600;
             const left = (screen.width - width) / 2;
@@ -585,7 +591,7 @@ const LiveRadioPlayer = ({
               'popup-player', 
               `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=no,toolbar=no,menubar=no,location=no,directories=no,status=no`
             );
-          }} 
+          }}
           variant="outline" 
           className="w-full" 
           size="sm"
