@@ -35,15 +35,28 @@ const PopupPlayerPage = () => {
     setUserInteracted(true);
 
     try {
-      audioRef.current.src = streamUrl;
-      await audioRef.current.play();
+      const audio = audioRef.current;
+      
+      // CRITICAL: Unmute the audio element
+      audio.muted = false;
+      audio.volume = 0.7; // Set reasonable volume
+      
+      console.log('🎵 Attempting to play stream:', streamUrl);
+      console.log('🔊 Audio muted:', audio.muted, 'Volume:', audio.volume);
+      
+      audio.src = streamUrl;
+      audio.load(); // Ensure audio is loaded
+      
+      await audio.play();
       setIsPlaying(true);
       setIsLoading(false);
+      
+      console.log('✅ Audio playing successfully');
       return true;
     } catch (error) {
-      console.error('HTML5 player failed:', error);
+      console.error('❌ HTML5 player failed:', error);
       setIsLoading(false);
-      setError('HTML5 player failed to start');
+      setError(`HTML5 player failed: ${error.message}`);
       return false;
     }
   };
@@ -67,11 +80,16 @@ const PopupPlayerPage = () => {
         setIsPlaying(false);
       } else {
         try {
+          // Ensure audio is unmuted before playing
+          audioRef.current.muted = false;
+          audioRef.current.volume = 0.7;
+          
+          console.log('🎵 Resume playback - muted:', audioRef.current.muted);
           await audioRef.current.play();
           setIsPlaying(true);
         } catch (error) {
-          console.error('Playback failed:', error);
-          setError('Playback failed');
+          console.error('❌ Playback failed:', error);
+          setError(`Playback failed: ${error.message}`);
         }
       }
     } else {
@@ -168,27 +186,31 @@ const PopupPlayerPage = () => {
         {currentPlayer === 'radio-co' && (
           <div className="w-full border rounded-lg overflow-hidden">
             <iframe
-              src="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FDanceOneRadio%2F"
+              src="https://www.radio.co/player/embed/s2c3cc784b"
               frameBorder="0"
               className="w-full h-32"
               allow="autoplay"
-              title="Dance One Radio Player"
+              title="Dance One Radio - Radio.co Player"
             />
           </div>
         )}
 
         {/* Secondary Player - HTML5 Audio */}
         {currentPlayer === 'html5' && (
-          <div className="w-full">
+          <div className="w-full space-y-2">
             <audio 
               ref={audioRef}
               controls 
               className="w-full"
               preload="none"
+              muted={false}
             >
               <source src={streamUrl} type="audio/mpeg" />
               Your browser does not support the audio element.
             </audio>
+            <div className="text-xs text-muted-foreground">
+              Make sure volume is up and not muted
+            </div>
           </div>
         )}
 
