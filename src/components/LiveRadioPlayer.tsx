@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Play, Pause, Radio, ExternalLink } from 'lucide-react';
 import { AlbumArtService } from '@/utils/AlbumArtService';
 import { RadioStreamService } from '@/utils/RadioStreamService';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "./ui/alert-dialog";
 import stationLogo from '@/assets/dance-one-logo.png';
 interface LiveRadioPlayerProps {
   streamUrls: string[];
@@ -23,6 +24,8 @@ const LiveRadioPlayer = ({
   const [animationActive, setAnimationActive] = useState(false);
   const [currentStreamTitle, setCurrentStreamTitle] = useState(initialStreamTitle);
   const [isStreamLive, setIsStreamLive] = useState(false);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -401,22 +404,48 @@ const LiveRadioPlayer = ({
     };
   }, [currentStreamTitle]);
 
-  // Add beforeunload listener when audio is playing
+  // Custom navigation blocking when audio is playing
   useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (isPlaying) {
+    const handleLinkClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const link = target.closest('a');
+      
+      if (link && isPlaying && !link.href.includes('#')) {
         e.preventDefault();
-        e.returnValue = 'Are you sure you want to leave current playing audio?';
-        return 'Are you sure you want to leave current playing audio?';
+        setPendingHref(link.href);
+        setShowLeaveDialog(true);
       }
     };
 
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isPlaying) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
+
+    document.addEventListener('click', handleLinkClick);
     window.addEventListener('beforeunload', handleBeforeUnload);
     
     return () => {
+      document.removeEventListener('click', handleLinkClick);
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [isPlaying]);
+
+  const handleLeaveConfirm = () => {
+    if (pendingHref) {
+      window.location.href = pendingHref;
+    }
+    setShowLeaveDialog(false);
+    setPendingHref(null);
+  };
+
+  const handleLeaveCancel = () => {
+    setShowLeaveDialog(false);
+    setPendingHref(null);
+  };
 
   // Cleanup audio context on unmount
   useEffect(() => {
@@ -632,6 +661,22 @@ const LiveRadioPlayer = ({
         stopAudioAnalysis();
       }} />
       </div>
+
+      {/* Custom leave confirmation dialog */}
+      <AlertDialog open={showLeaveDialog} onOpenChange={setShowLeaveDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Leave site?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to leave current playing audio?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleLeaveCancel}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleLeaveConfirm}>Leave</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>;
 };
 export default LiveRadioPlayer;
