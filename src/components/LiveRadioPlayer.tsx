@@ -406,8 +406,8 @@ const LiveRadioPlayer = ({
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (isPlaying) {
         e.preventDefault();
-        e.returnValue = 'Audio is currently playing. Are you sure you want to leave?';
-        return 'Audio is currently playing. Are you sure you want to leave?';
+        e.returnValue = 'Are you sure you want to leave current playing audio?';
+        return 'Are you sure you want to leave current playing audio?';
       }
     };
 
