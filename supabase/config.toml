@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.newsletter-unsubscribe]
 verify_jwt = false
+
+[functions.apple-music-search]
+verify_jwt = false

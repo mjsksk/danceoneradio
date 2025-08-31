@@ -104,31 +104,31 @@ const TracksSection = () => {
   //   }
   // }, [tracks, albumArt]);
 
-  // Temporarily disable Apple Music preview fetching to prevent loading errors
-  // useEffect(() => {
-  //   const fetchPreviews = async () => {
-  //     for (const track of tracks) {
-  //       if (!previewUrls[track.id]) {
-  //         try {
-  //           console.log(`🎵 Fetching Apple Music preview for: ${track.artist} - ${track.title}`);
-  //           const previewUrl = await AppleMusicService.getTrackPreview(track.id, track.artist, track.title);
-  //           if (previewUrl) {
-  //             setPreviewUrls(prev => ({...prev, [track.id]: previewUrl}));
-  //             console.log(`🎵 Found Apple Music preview for: ${track.artist} - ${track.title}`);
-  //           } else {
-  //             console.log(`🎵 No Apple Music preview found for: ${track.artist} - ${track.title}`);
-  //           }
-  //         } catch (error) {
-  //           console.error(`🎵 Failed to fetch Apple Music preview for ${track.artist} - ${track.title}:`, error);
-  //         }
-  //       }
-  //     }
-  //   };
+  // Enable Apple Music preview fetching now that the API token is configured
+  useEffect(() => {
+    const fetchPreviews = async () => {
+      for (const track of tracks) {
+        if (!previewUrls[track.id]) {
+          try {
+            console.log(`🎵 Fetching Apple Music preview for: ${track.artist} - ${track.title}`);
+            const previewUrl = await AppleMusicService.getTrackPreview(track.id, track.artist, track.title);
+            if (previewUrl) {
+              setPreviewUrls(prev => ({...prev, [track.id]: previewUrl}));
+              console.log(`🎵 Found Apple Music preview for: ${track.artist} - ${track.title}`);
+            } else {
+              console.log(`🎵 No Apple Music preview found for: ${track.artist} - ${track.title}`);
+            }
+          } catch (error) {
+            console.error(`🎵 Failed to fetch Apple Music preview for ${track.artist} - ${track.title}:`, error);
+          }
+        }
+      }
+    };
 
-  //   if (tracks.length > 0) {
-  //     fetchPreviews();
-  //   }
-  // }, [tracks, previewUrls]);
+    if (tracks.length > 0) {
+      fetchPreviews();
+    }
+  }, [tracks, previewUrls]);
 
   useEffect(() => {
     const fetchRecentTracks = async () => {
@@ -342,16 +342,24 @@ const TracksSection = () => {
 
                   <Button
                     onClick={() => handlePlayPause(track.id)}
-                    className={`w-16 h-16 rounded-full ${
+                    className={`w-16 h-16 rounded-full relative ${
                       playingTrack === track.id
                         ? 'bg-primary text-primary-foreground animate-glow-pulse'
+                        : previewUrls[track.id]
+                        ? 'bg-green-600 hover:bg-green-700 text-white'
                         : 'bg-secondary hover:bg-secondary/80'
                     }`}
+                    disabled={!previewUrls[track.id] && playingTrack !== track.id}
                   >
                     {playingTrack === track.id ? (
                       <Pause className="w-6 h-6" />
                     ) : (
                       <Play className="w-6 h-6 ml-1" />
+                    )}
+                    {previewUrls[track.id] && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background">
+                        <div className="w-full h-full bg-green-400 rounded-full animate-ping"></div>
+                      </div>
                     )}
                   </Button>
 
