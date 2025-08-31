@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -37,15 +38,15 @@ const PopupPlayerPage = () => {
     try {
       const audio = audioRef.current;
       
-      // CRITICAL: Unmute the audio element
+      // CRITICAL: Ensure audio is NOT muted and has proper volume
       audio.muted = false;
-      audio.volume = 0.7; // Set reasonable volume
+      audio.volume = 0.7;
       
       console.log('🎵 Attempting to play stream:', streamUrl);
-      console.log('🔊 Audio muted:', audio.muted, 'Volume:', audio.volume);
+      console.log('🔊 Audio state - muted:', audio.muted, 'volume:', audio.volume);
       
       audio.src = streamUrl;
-      audio.load(); // Ensure audio is loaded
+      audio.load();
       
       await audio.play();
       setIsPlaying(true);
@@ -114,6 +115,10 @@ const PopupPlayerPage = () => {
   useEffect(() => {
     if (audioRef.current) {
       const audio = audioRef.current;
+      
+      // CRITICAL: Set audio to unmuted on initialization
+      audio.muted = false;
+      audio.volume = 0.7;
       
       const handlePlay = () => setIsPlaying(true);
       const handlePause = () => setIsPlaying(false);
@@ -203,13 +208,12 @@ const PopupPlayerPage = () => {
               controls 
               className="w-full"
               preload="none"
-              muted={false}
             >
               <source src={streamUrl} type="audio/mpeg" />
               Your browser does not support the audio element.
             </audio>
             <div className="text-xs text-muted-foreground">
-              Make sure volume is up and not muted
+              Audio is unmuted and ready to play
             </div>
           </div>
         )}
