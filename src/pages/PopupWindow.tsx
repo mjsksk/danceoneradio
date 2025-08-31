@@ -1,34 +1,84 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { Radio } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Play, Pause, Volume2, VolumeX, Radio } from 'lucide-react';
 import stationLogo from '@/assets/dance-one-logo.png';
-import { RadioStreamService } from '@/utils/RadioStreamService';
 
 const PopupWindow = () => {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [volume, setVolume] = useState(0.7);
+  const [isMuted, setIsMuted] = useState(false);
   const [currentTrack, setCurrentTrack] = useState('🎵 Dance One Radio - Live Electronic Music');
 
-  // Fetch stream metadata
-  useEffect(() => {
-    const fetchMetadata = async () => {
-      try {
-        const metadata = await RadioStreamService.getStreamMetadata();
-        const formattedTitle = RadioStreamService.formatTitle(metadata);
-        setCurrentTrack(formattedTitle);
-      } catch (error) {
-        console.error('Error fetching metadata:', error);
-      }
-    };
+  const streamUrl = 'http://s9.myradiostream.com:14296/';
 
-    fetchMetadata();
-    const interval = setInterval(fetchMetadata, 3000);
-    return () => clearInterval(interval);
-  }, []);
+  // Audio controls
+  const togglePlay = async () => {
+    if (!audioRef.current) return;
+
+    try {
+      setIsLoading(true);
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      }
+    } catch (error) {
+      console.error('Error controlling audio:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const toggleMute = () => {
+    if (!audioRef.current) return;
+    const newMuted = !isMuted;
+    audioRef.current.muted = newMuted;
+    setIsMuted(newMuted);
+  };
+
+  const handleVolumeChange = (newVolume: number) => {
+    if (!audioRef.current) return;
+    const volumeValue = newVolume / 100;
+    audioRef.current.volume = volumeValue;
+    setVolume(volumeValue);
+  };
+
+  // Audio event handlers
+  const handleAudioPlay = () => setIsPlaying(true);
+  const handleAudioPause = () => setIsPlaying(false);
+  const handleAudioError = (e: any) => {
+    console.error('Audio error:', e);
+    setIsPlaying(false);
+    setIsLoading(false);
+  };
 
   // Set window title
   useEffect(() => {
     document.title = `🎵 ${currentTrack} - Dance One Radio`;
   }, [currentTrack]);
+
+  // Initialize audio
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio.volume = volume;
+    audio.addEventListener('play', handleAudioPlay);
+    audio.addEventListener('pause', handleAudioPause);
+    audio.addEventListener('error', handleAudioError);
+
+    return () => {
+      audio.removeEventListener('play', handleAudioPlay);
+      audio.removeEventListener('pause', handleAudioPause);
+      audio.removeEventListener('error', handleAudioError);
+    };
+  }, [volume]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-accent/10 p-4">
@@ -68,22 +118,71 @@ const PopupWindow = () => {
           </div>
         </div>
 
-        {/* Radio.co Player */}
-        <div className="p-4">
-          <div className="border-2 border-primary/20 rounded-lg overflow-hidden bg-muted/10">
-            <iframe
-              src="https://www.radio.co/player/embed/s2c3cc784b"
-              frameBorder="0"
-              className="w-full h-40"
-              allow="autoplay"
-              title="Dance One Radio Player"
-            />
-          </div>
+        {/* Audio Player */}
+        <div className="p-6">
+          <audio
+            ref={audioRef}
+            src={streamUrl}
+            preload="none"
+            crossOrigin="anonymous"
+          />
           
-          {/* Instructions */}
-          <div className="text-xs text-muted-foreground text-center mt-4 space-y-1">
-            <div>Use the play button above to start listening</div>
-            <div>Volume and controls are built into the player</div>
+          {/* Player Controls */}
+          <div className="space-y-4">
+            {/* Play/Pause Button */}
+            <div className="flex justify-center">
+              <Button
+                onClick={togglePlay}
+                disabled={isLoading}
+                size="lg"
+                className="w-16 h-16 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg"
+              >
+                {isLoading ? (
+                  <div className="w-6 h-6 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                ) : isPlaying ? (
+                  <Pause className="w-8 h-8" />
+                ) : (
+                  <Play className="w-8 h-8 ml-1" />
+                )}
+              </Button>
+            </div>
+
+            {/* Volume Control */}
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleMute}
+                className="p-2"
+              >
+                {isMuted ? (
+                  <VolumeX className="w-4 h-4" />
+                ) : (
+                  <Volume2 className="w-4 h-4" />
+                )}
+              </Button>
+              
+              <div className="flex-1">
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={isMuted ? 0 : volume * 100}
+                  onChange={(e) => handleVolumeChange(Number(e.target.value))}
+                  className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer slider"
+                />
+              </div>
+              
+              <span className="text-xs text-muted-foreground w-8 text-right">
+                {Math.round((isMuted ? 0 : volume) * 100)}%
+              </span>
+            </div>
+          </div>
+
+          {/* Stream Info */}
+          <div className="text-xs text-center text-muted-foreground mt-4 space-y-1">
+            <div>Live Stream: {streamUrl}</div>
+            <div>Click play to start listening</div>
           </div>
         </div>
       </Card>
