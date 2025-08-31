@@ -2,7 +2,8 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Download, Monitor, Check, Shield, Zap, Settings, Bell, Headphones } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Download, Monitor, Check, Shield, Zap, Settings, Bell, Headphones, Github, AlertTriangle } from 'lucide-react';
 import { useState } from 'react';
 
 const Downloads = () => {
@@ -66,12 +67,20 @@ The app structure has been created but requires building first.`);
                   Windows Desktop App
                 </Badge>
                 <h1 className="text-4xl md:text-6xl font-bold gradient-text mb-6">
-                  Download Dance One Radio
+                  Dance One Radio Desktop App
                 </h1>
                 <p className="text-xl text-muted-foreground mb-8">
-                  Experience the ultimate electronic music streaming with our feature-rich Windows desktop application
+                  Build your own enhanced Windows desktop application with system tray controls and global hotkeys
                 </p>
               </div>
+              
+              {/* Important Notice */}
+              <Alert className="mb-8">
+                <AlertTriangle className="w-4 h-4" />
+                <AlertDescription>
+                  <strong>Build Required:</strong> The desktop app must be built from source code. Pre-built executables are not available due to hosting platform limitations.
+                </AlertDescription>
+              </Alert>
               
               {/* Download Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -81,33 +90,23 @@ The app structure has been created but requires building first.`);
                   className="gap-2 text-lg px-8 py-6"
                   disabled={downloadStarted}
                 >
-                  {downloadStarted ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Starting Download...
-                    </>
-                  ) : (
-                    <>
-                      <Download className="w-5 h-5" />
-                      Download Installer (Recommended)
-                    </>
-                  )}
+                  <Github className="w-5 h-5" />
+                  Get Source Code & Build Instructions
                 </Button>
                 
                 <Button 
                   variant="outline" 
                   size="lg"
-                  onClick={() => handleDownload('portable')}
+                  onClick={() => window.open('https://docs.lovable.dev/', '_blank')}
                   className="gap-2 text-lg px-8 py-6"
-                  disabled={downloadStarted}
                 >
-                  <Download className="w-5 h-5" />
-                  Portable Version
+                  <Monitor className="w-5 h-5" />
+                  View Documentation
                 </Button>
               </div>
 
               <div className="text-sm text-muted-foreground">
-                Version 1.0.0 • ~50 MB • Windows 10+ • Free Download
+                Version 1.0.0 • Source Code Available • Windows 10+ • Node.js Required
               </div>
             </div>
           </div>

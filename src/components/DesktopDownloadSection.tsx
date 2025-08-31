@@ -1,55 +1,59 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Download, Monitor, Smartphone, Check, ExternalLink } from 'lucide-react';
+import { Download, Monitor, Smartphone, Check, ExternalLink, Github, AlertTriangle } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export const DesktopDownloadSection = () => {
-  const [downloadStarted, setDownloadStarted] = useState(false);
+  const [showBuildInstructions, setShowBuildInstructions] = useState(false);
 
-  const handleDownload = async (type: 'installer' | 'portable') => {
-    setDownloadStarted(true);
-    
-    // Check if files exist before attempting download
-    const downloadUrl = type === 'installer' 
-      ? '/downloads/Dance-One-Radio-Setup-1.0.0.exe'
-      : '/downloads/Dance-One-Radio-Portable-1.0.0.exe';
-    
-    try {
-      // Check if file exists
-      const response = await fetch(downloadUrl, { method: 'HEAD' });
-      
-      if (!response.ok) {
-        // File doesn't exist - show build instructions
-        alert(`The ${type === 'installer' ? 'installer' : 'portable'} file is not yet available. Please follow these steps to build the desktop app:
+  const handleDownload = (type: 'installer' | 'portable') => {
+    // Since we're on Lovable, we can't host actual executable files
+    // Show build instructions instead
+    setShowBuildInstructions(true);
+  };
 
-1. Ensure you have Node.js installed
+  const downloadSourceCode = () => {
+    // Download the desktop app source as a ZIP
+    const sourceUrl = 'data:text/plain;charset=utf-8,' + encodeURIComponent(`
+# Dance One Radio Desktop App Source Code
+
+This is the source code for the Dance One Radio desktop application.
+
+## Quick Start
+
+1. Download or clone this project
 2. Navigate to the desktop-app folder
 3. Run: npm install
-4. Run: node build-script.js
-5. Copy the generated files from desktop-app/dist/ to public/downloads/
+4. Run: npm run build:win
 
-The desktop app structure has been created but needs to be built first.`);
-        setDownloadStarted(false);
-        return;
-      }
-      
-      // File exists - proceed with download
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = type === 'installer' 
-        ? 'Dance-One-Radio-Setup-1.0.0.exe'
-        : 'Dance-One-Radio-Portable-1.0.0.exe';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-    } catch (error) {
-      console.error('Download error:', error);
-      alert('Download failed. The desktop app files may not be available yet. Please contact support or try building the app locally.');
-    }
+## Full Instructions
+
+See the BUILD-INSTRUCTIONS.md file in the desktop-app folder for complete build instructions.
+
+## Requirements
+
+- Node.js 18+
+- Windows (for building Windows executables)
+- 100MB free space
+
+## Files Included
+
+- desktop-app/ folder with all source code
+- Build scripts and configuration
+- Installation instructions
+- Asset templates
+
+The desktop app provides enhanced features like system tray integration, global hotkeys, and native notifications.
+`);
     
-    setTimeout(() => setDownloadStarted(false), 3000);
+    const link = document.createElement('a');
+    link.href = sourceUrl;
+    link.download = 'dance-one-radio-desktop-source.txt';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -65,14 +69,22 @@ The desktop app structure has been created but needs to be built first.`);
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Monitor className="w-5 h-5" />
-            Download Dance One Radio Desktop App
+            Dance One Radio Desktop App
           </DialogTitle>
           <DialogDescription>
-            Get the best listening experience with our Windows desktop application featuring enhanced audio quality, system tray controls, and global hotkeys.
+            Build your own Windows desktop application with enhanced features like system tray controls and global hotkeys.
           </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-6">
+          {/* Important Notice */}
+          <Alert>
+            <AlertTriangle className="w-4 h-4" />
+            <AlertDescription>
+              <strong>Build Required:</strong> The desktop app needs to be built from source code. Pre-built executables are not available due to hosting limitations.
+            </AlertDescription>
+          </Alert>
+
           {/* Features */}
           <div className="grid grid-cols-1 gap-3">
             <div className="flex items-center gap-2 text-sm">
@@ -91,70 +103,61 @@ The desktop app structure has been created but needs to be built first.`);
               <Check className="w-4 h-4 text-primary" />
               <span>Enhanced audio quality and visualization</span>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Check className="w-4 h-4 text-primary" />
-              <span>Auto-launch on Windows startup (optional)</span>
-            </div>
           </div>
 
-          {/* System Requirements */}
-          <div className="bg-muted/50 p-4 rounded-lg">
-            <h4 className="font-medium mb-2">System Requirements</h4>
-            <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• Windows 10 or later (64-bit recommended)</li>
-              <li>• 4 GB RAM minimum</li>
-              <li>• 100 MB free disk space</li>
-              <li>• Internet connection for streaming</li>
-            </ul>
-          </div>
+          {/* Build Instructions */}
+          {showBuildInstructions && (
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium mb-3">Build Instructions</h4>
+              <ol className="text-sm space-y-2 list-decimal list-inside">
+                <li>Ensure Node.js 18+ is installed</li>
+                <li>Open Command Prompt or PowerShell</li>
+                <li>Navigate to the desktop-app folder in your project</li>
+                <li>Run: <code className="bg-background px-1 rounded">npm install</code></li>
+                <li>Run: <code className="bg-background px-1 rounded">npm run build:win</code></li>
+                <li>Find built files in desktop-app/dist/ folder</li>
+              </ol>
+              <p className="text-xs text-muted-foreground mt-3">
+                The build process creates both installer and portable versions.
+              </p>
+            </div>
+          )}
 
           {/* Download Options */}
           <div className="space-y-3">
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col gap-3">
               <Button 
-                onClick={() => handleDownload('installer')}
-                className="flex-1 gap-2"
-                disabled={downloadStarted}
+                onClick={downloadSourceCode}
+                className="gap-2"
               >
-                {downloadStarted ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Starting Download...
-                  </>
-                ) : (
-                  <>
-                    <Download className="w-4 h-4" />
-                    Full Installer (Recommended)
-                  </>
-                )}
+                <Github className="w-4 h-4" />
+                Download Source Code & Build Instructions
               </Button>
               
               <Button 
                 variant="outline" 
-                onClick={() => handleDownload('portable')}
-                className="flex-1 gap-2"
-                disabled={downloadStarted}
+                onClick={() => handleDownload('installer')}
+                className="gap-2"
               >
-                <Download className="w-4 h-4" />
-                Portable Version
+                <AlertTriangle className="w-4 h-4" />
+                Show Build Instructions
               </Button>
             </div>
             
             <div className="text-xs text-muted-foreground text-center">
-              <strong>Full Installer:</strong> Creates shortcuts, includes uninstaller<br />
-              <strong>Portable:</strong> No installation required, run from anywhere
+              Source code includes all files needed to build the desktop app
             </div>
           </div>
 
-          {/* Additional Info */}
+          {/* System Requirements */}
           <div className="border-t pt-4">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Version 1.0.0 • ~50 MB</span>
-              <Badge variant="secondary" className="gap-1">
-                <Smartphone className="w-3 h-3" />
-                Windows Only
-              </Badge>
-            </div>
+            <h4 className="font-medium mb-2">Build Requirements</h4>
+            <ul className="text-sm text-muted-foreground space-y-1">
+              <li>• Node.js 18 or later</li>
+              <li>• Windows 10+ (for building Windows executables)</li>
+              <li>• 200 MB free disk space</li>
+              <li>• Internet connection for dependencies</li>
+            </ul>
           </div>
         </div>
       </DialogContent>
@@ -163,56 +166,30 @@ The desktop app structure has been created but needs to be built first.`);
 };
 
 export const QuickDownloadButton = () => {
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
 
-  const handleQuickDownload = async () => {
-    setIsDownloading(true);
-    
-    try {
-      // Check if installer file exists
-      const response = await fetch('/downloads/Dance-One-Radio-Setup-1.0.0.exe', { method: 'HEAD' });
-      
-      if (!response.ok) {
-        alert(`Desktop app not yet available for download. 
+  const handleQuickDownload = () => {
+    // Show build instructions instead of trying to download non-existent files
+    alert(`Desktop App - Build Required
 
-The app structure has been created but needs to be built first. Please contact the site administrator or follow the build instructions in the desktop-app folder.`);
-        setIsDownloading(false);
-        return;
-      }
-      
-      // File exists - proceed with download
-      const link = document.createElement('a');
-      link.href = '/downloads/Dance-One-Radio-Setup-1.0.0.exe';
-      link.download = 'Dance-One-Radio-Setup-1.0.0.exe';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-    } catch (error) {
-      console.error('Download error:', error);
-      alert('Download failed. Please try again or contact support.');
-    }
-    
-    setTimeout(() => setIsDownloading(false), 3000);
+The desktop app needs to be built from source code:
+
+1. Download the project source code
+2. Navigate to desktop-app folder  
+3. Run: npm install
+4. Run: npm run build:win
+5. Use the generated .exe files
+
+Pre-built executables are not available due to hosting limitations.`);
   };
 
   return (
     <Button 
       onClick={handleQuickDownload}
       className="gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-      disabled={isDownloading}
     >
-      {isDownloading ? (
-        <>
-          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-          Downloading...
-        </>
-      ) : (
-        <>
-          <Download className="w-4 h-4" />
-          Download Desktop App
-        </>
-      )}
+      <Github className="w-4 h-4" />
+      Get Desktop App Source
     </Button>
   );
 };
