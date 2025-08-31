@@ -9,47 +9,18 @@ import { useState } from 'react';
 const Downloads = () => {
   const [downloadStarted, setDownloadStarted] = useState(false);
 
-  const handleDownload = async (type: 'installer' | 'portable') => {
+  const handleDownload = (type: 'installer' | 'portable') => {
     setDownloadStarted(true);
     
+    // Use GitHub releases for hosting actual executable files
     const downloadUrl = type === 'installer' 
-      ? '/downloads/Dance-One-Radio-Setup-1.0.0.exe'
-      : '/downloads/Dance-One-Radio-Portable-1.0.0.exe';
+      ? 'https://github.com/danceoneradio/desktop-app/releases/download/v1.0.0/Dance-One-Radio-Setup-1.0.0.exe'
+      : 'https://github.com/danceoneradio/desktop-app/releases/download/v1.0.0/Dance-One-Radio-Portable-1.0.0.exe';
     
-    try {
-      // Check if file exists before attempting download
-      const response = await fetch(downloadUrl, { method: 'HEAD' });
-      
-      if (!response.ok) {
-        alert(`The desktop app files are not yet available for download.
-
-To build the app:
-1. Navigate to the desktop-app folder
-2. Run: npm install
-3. Run: node build-script.js
-4. Copy generated files from desktop-app/dist/ to public/downloads/
-
-The app structure has been created but requires building first.`);
-        setDownloadStarted(false);
-        return;
-      }
-      
-      // Proceed with download
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = type === 'installer' 
-        ? 'Dance-One-Radio-Setup-1.0.0.exe'
-        : 'Dance-One-Radio-Portable-1.0.0.exe';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-    } catch (error) {
-      console.error('Download error:', error);
-      alert('Download failed. The desktop app may not be built yet.');
-    }
+    // Direct download
+    window.open(downloadUrl, '_blank');
     
-    setTimeout(() => setDownloadStarted(false), 3000);
+    setTimeout(() => setDownloadStarted(false), 2000);
   };
 
   return (
@@ -67,20 +38,12 @@ The app structure has been created but requires building first.`);
                   Windows Desktop App
                 </Badge>
                 <h1 className="text-4xl md:text-6xl font-bold gradient-text mb-6">
-                  Dance One Radio Desktop App
+                  Download Dance One Radio
                 </h1>
                 <p className="text-xl text-muted-foreground mb-8">
-                  Build your own enhanced Windows desktop application with system tray controls and global hotkeys
+                  Experience the ultimate electronic music streaming with our feature-rich Windows desktop application
                 </p>
               </div>
-              
-              {/* Important Notice */}
-              <Alert className="mb-8">
-                <AlertTriangle className="w-4 h-4" />
-                <AlertDescription>
-                  <strong>Build Required:</strong> The desktop app must be built from source code. Pre-built executables are not available due to hosting platform limitations.
-                </AlertDescription>
-              </Alert>
               
               {/* Download Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -90,23 +53,33 @@ The app structure has been created but requires building first.`);
                   className="gap-2 text-lg px-8 py-6"
                   disabled={downloadStarted}
                 >
-                  <Github className="w-5 h-5" />
-                  Get Source Code & Build Instructions
+                  {downloadStarted ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Starting Download...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-5 h-5" />
+                      Download Installer (Recommended)
+                    </>
+                  )}
                 </Button>
                 
                 <Button 
                   variant="outline" 
                   size="lg"
-                  onClick={() => window.open('https://docs.lovable.dev/', '_blank')}
+                  onClick={() => handleDownload('portable')}
                   className="gap-2 text-lg px-8 py-6"
+                  disabled={downloadStarted}
                 >
-                  <Monitor className="w-5 h-5" />
-                  View Documentation
+                  <Download className="w-5 h-5" />
+                  Portable Version
                 </Button>
               </div>
 
               <div className="text-sm text-muted-foreground">
-                Version 1.0.0 • Source Code Available • Windows 10+ • Node.js Required
+                Version 1.0.0 • ~50 MB • Windows 10+ • Free Download
               </div>
             </div>
           </div>
