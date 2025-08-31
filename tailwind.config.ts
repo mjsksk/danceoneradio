@@ -71,6 +71,7 @@ export default {
 			fontFamily: {
 				'audiowide': ['Audiowide', 'cursive'],
 				'electrolize': ['Electrolize', 'sans-serif'],
+				'inter': ['Inter', 'sans-serif'],
 			},
 			keyframes: {
 				'accordion-down': {

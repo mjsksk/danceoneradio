@@ -543,7 +543,7 @@ const LiveRadioPlayer = ({
         </div>
         <div className="relative overflow-hidden bg-background/20 rounded-md p-2 mb-2">
           <div className="animate-scroll whitespace-nowrap">
-            <span className="text-sm text-foreground font-['Rajdhani'] font-medium">
+            <span className="text-sm text-foreground font-inter font-medium">
               {currentStreamTitle.replace(/Frequency\s*&\s*/gi, '') // Remove "Frequency &"
               .replace(/&amp;/g, '&') // Convert HTML entity to normal ampersand
               .replace(/amp;/g, '') // Remove remaining "amp;" text
