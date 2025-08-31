@@ -11,10 +11,9 @@ export const DesktopDownloadSection = () => {
   const handleDownload = (type: 'installer' | 'portable') => {
     setDownloadStarted(true);
     
-    // TODO: Replace with your actual GitHub repository URLs after upload
     const downloadUrl = type === 'installer' 
-      ? 'https://github.com/YOUR_USERNAME/YOUR_REPO/releases/download/v1.0.0/Dance-One-Radio-Setup-1.0.0.exe'
-      : 'https://github.com/YOUR_USERNAME/YOUR_REPO/releases/download/v1.0.0/Dance-One-Radio-Portable-1.0.0.exe';
+      ? 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.0/Dance-One-Radio-Setup-1.0.0.exe'
+      : 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.0/Dance-One-Radio-Portable-1.0.0.exe';
     
     window.open(downloadUrl, '_blank');
     
@@ -145,8 +144,7 @@ export const QuickDownloadButton = () => {
   const handleQuickDownload = () => {
     setIsDownloading(true);
     
-    // TODO: Replace with your actual GitHub repository URL after upload
-    const downloadUrl = 'https://github.com/YOUR_USERNAME/YOUR_REPO/releases/download/v1.0.0/Dance-One-Radio-Setup-1.0.0.exe';
+    const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.0/Dance-One-Radio-Setup-1.0.0.exe';
     window.open(downloadUrl, '_blank');
     
     setTimeout(() => setIsDownloading(false), 2000);
