@@ -42,7 +42,7 @@ const DJSection = () => {
     name: "Mario",
     role: "Future Dance Anthems Host",
     genre: "Electronic Dance Music",
-    image: "/lovable-uploads/ba6a92fa-e132-4643-8d4c-abc0bab124f1.png",
+    image: "/lovable-uploads/f807b27f-9eaf-4d20-b3f5-4bad24538a4e.png",
     bio: "Host of Future Dance Anthems, bringing you the latest electronic music",
     socials: {
       instagram: "@mario",
