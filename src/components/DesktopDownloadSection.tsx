@@ -9,17 +9,15 @@ export const DesktopDownloadSection = () => {
   const [downloadStarted, setDownloadStarted] = useState(false);
 
   const handleDownload = (type: 'installer' | 'portable') => {
-    setDownloadStarted(true);
-    
-    // Use GitHub releases or CDN for hosting actual executable files
-    const downloadUrl = type === 'installer' 
-      ? 'https://github.com/danceoneradio/desktop-app/releases/download/v1.0.0/Dance-One-Radio-Setup-1.0.0.exe'
-      : 'https://github.com/danceoneradio/desktop-app/releases/download/v1.0.0/Dance-One-Radio-Portable-1.0.0.exe';
-    
-    // Direct download
-    window.open(downloadUrl, '_blank');
-    
-    setTimeout(() => setDownloadStarted(false), 2000);
+    // For now, show instructions since executables need to be built and hosted
+    alert(`Desktop app coming soon! 
+
+To get the ${type} version:
+1. Download the source code from our repository
+2. Follow the build instructions to create the executable
+3. Or wait for our official release
+
+Visit our Downloads page for detailed instructions.`);
   };
 
   return (
@@ -144,13 +142,10 @@ export const QuickDownloadButton = () => {
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handleQuickDownload = () => {
-    setIsDownloading(true);
-    
-    // Direct download from GitHub releases or CDN
-    const downloadUrl = 'https://github.com/danceoneradio/desktop-app/releases/download/v1.0.0/Dance-One-Radio-Setup-1.0.0.exe';
-    window.open(downloadUrl, '_blank');
-    
-    setTimeout(() => setIsDownloading(false), 2000);
+    // Show instructions since executable needs to be built and hosted
+    alert(`Desktop app coming soon!
+
+Download the source code and build instructions from our Downloads page, or wait for our official release.`);
   };
 
   return (
