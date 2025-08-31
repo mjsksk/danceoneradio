@@ -4,6 +4,7 @@ import { Instagram, Facebook, Youtube } from 'lucide-react';
 import appStoreBadge from '@/assets/app-store-badge-new.svg';
 import googlePlayBadge from '@/assets/google-play-badge-new.svg';
 import { useNewsletter } from '@/hooks/useNewsletter';
+import { QuickDownloadButton } from './DesktopDownloadSection';
 const Footer = () => {
   const [email, setEmail] = useState('');
   const { subscribe, isSubmitting } = useNewsletter();
@@ -54,6 +55,11 @@ const Footer = () => {
                 </a>
               </Button>
             </div>
+          </div>
+
+          {/* Desktop App Download */}
+          <div>
+            <QuickDownloadButton />
           </div>
 
           {/* Mobile App Links */}
