@@ -5,6 +5,8 @@ import { Play, Pause, Radio } from 'lucide-react';
 import { AlbumArtService } from '@/utils/AlbumArtService';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "./ui/alert-dialog";
+import { useDesktopIntegration } from '@/hooks/useDesktopIntegration';
+import { DesktopPlayerControls } from './DesktopPlayerControls';
 import stationLogo from '@/assets/dance-one-logo.png';
 interface LiveRadioPlayerProps {
   streamUrls: string[];
@@ -26,6 +28,9 @@ const LiveRadioPlayer = ({
   const [isStreamLive, setIsStreamLive] = useState(false);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const [pendingHref, setPendingHref] = useState<string | null>(null);
+
+  // Desktop integration
+  const { showNotification } = useDesktopIntegration();
   const audioRef = useRef<HTMLAudioElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -404,6 +409,16 @@ const LiveRadioPlayer = ({
     };
   }, [currentStreamTitle]);
 
+  // Desktop notification for track changes
+  useEffect(() => {
+    if (isPlaying && currentStreamTitle && !currentStreamTitle.includes('Dance One Radio - The Future')) {
+      const cleanedTitle = cleanTrackForSearch(currentStreamTitle);
+      if (cleanedTitle) {
+        showNotification('Now Playing', cleanedTitle);
+      }
+    }
+  }, [currentStreamTitle, isPlaying, showNotification]);
+
   // Custom navigation blocking when audio is playing
   useEffect(() => {
     const handleLinkClick = (e: MouseEvent) => {
@@ -619,6 +634,16 @@ const LiveRadioPlayer = ({
               LISTEN LIVE
             </>}
         </Button>
+
+        {/* Desktop Controls */}
+        <DesktopPlayerControls 
+          isPlaying={isPlaying}
+          onTogglePlayback={handlePlayPause}
+          currentTrack={{
+            title: cleanTrackForSearch(currentStreamTitle),
+            artist: 'Dance One Radio'
+          }}
+        />
 
       </div>
 
