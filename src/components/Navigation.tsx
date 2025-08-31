@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Radio, Volume2 } from 'lucide-react';
+import { DesktopDownloadSection } from './DesktopDownloadSection';
 import logo from '@/assets/dance-one-logo.png';
 
 const Navigation = () => {
@@ -9,6 +10,7 @@ const Navigation = () => {
   const navItems = [
     { name: 'Home', href: '/' },
     { name: 'Shows', href: '/shows' },
+    { name: 'Downloads', href: '/downloads' },
     { name: 'Privacy', href: '/privacy' },
     { name: 'Love', href: '/love' },
     { name: 'Contact', href: '/contact' }
@@ -17,9 +19,9 @@ const Navigation = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-primary/20">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-center h-16">
+        <div className="flex items-center justify-between h-16">
           {/* Desktop Navigation - Centered */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-8 flex-1 justify-center">
             {navItems.map((item) => (
               <a
                 key={item.name}
@@ -30,6 +32,11 @@ const Navigation = () => {
                 {item.name}
               </a>
             ))}
+          </div>
+
+          {/* Desktop Download Button */}
+          <div className="hidden md:block">
+            <DesktopDownloadSection />
           </div>
 
           {/* Mobile Menu Button - Positioned on the right */}
@@ -60,6 +67,10 @@ const Navigation = () => {
                   {item.name}
                 </a>
               ))}
+              {/* Mobile Download Button */}
+              <div className="pt-2">
+                <DesktopDownloadSection />
+              </div>
             </div>
           </div>
         )}

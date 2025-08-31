@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Volume2 } from 'lucide-react';
+import { QuickDownloadButton } from './DesktopDownloadSection';
 import heroImage from '@/assets/hero-bg.jpg';
 import LiveRadioPlayer from './LiveRadioPlayer';
 import { RadioStreamService } from '@/utils/RadioStreamService';
@@ -63,8 +64,13 @@ const HeroSection = () => {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
-          
-          
+          <QuickDownloadButton />
+          <Button variant="outline" asChild>
+            <a href="/shows" className="gap-2">
+              <Volume2 className="w-4 h-4" />
+              View All Shows
+            </a>
+          </Button>
         </div>
       </div>
     </section>;
