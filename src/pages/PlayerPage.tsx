@@ -47,19 +47,6 @@ const PlayerPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/10 flex flex-col">
-      {/* Header */}
-      <header className="bg-card/80 backdrop-blur-sm border-b border-border/50 p-4 flex items-center gap-3">
-        <img 
-          src={stationLogo} 
-          alt="Dance One Radio" 
-          className="h-8 w-8 object-contain"
-        />
-        <div>
-          <h1 className="text-lg font-bold text-primary">Dance One Radio</h1>
-          <p className="text-xs text-muted-foreground">Live Stream Player</p>
-        </div>
-      </header>
-
       {/* Main Player Content */}
       <main className="flex-1 p-4 flex flex-col justify-center">
         <div className="max-w-md mx-auto w-full">
