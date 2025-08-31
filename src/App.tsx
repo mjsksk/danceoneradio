@@ -9,31 +9,40 @@ import Privacy from "./pages/Privacy";
 import Love from "./pages/Love";
 import Dmca from "./pages/Dmca";
 import Contact from "./pages/Contact";
-import PopupPlayerPage from "./pages/PopupPlayer";
 import NotFound from "./pages/NotFound";
+import PopupPlayer from "./components/PopupPlayer";
+import { usePopupPlayer } from "./hooks/usePopupPlayer";
+import { PopupPlayerContext } from "./contexts/PopupPlayerContext";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/shows" element={<Shows />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/love" element={<Love />} />
-          <Route path="/dmca" element={<Dmca />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/popup-player" element={<PopupPlayerPage />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const { isOpen, openPlayer, closePlayer, togglePlayer } = usePopupPlayer();
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <PopupPlayerContext.Provider value={{ isOpen, openPlayer, closePlayer, togglePlayer }}>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/shows" element={<Shows />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/love" element={<Love />} />
+              <Route path="/dmca" element={<Dmca />} />
+              <Route path="/contact" element={<Contact />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            {/* Global Popup Player */}
+            <PopupPlayer isOpen={isOpen} onClose={closePlayer} />
+          </BrowserRouter>
+        </PopupPlayerContext.Provider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

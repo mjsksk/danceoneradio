@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Play, Pause, Radio, ExternalLink } from 'lucide-react';
+import { Play, Pause, Radio, ExternalLink, Maximize2 } from 'lucide-react';
 import { AlbumArtService } from '@/utils/AlbumArtService';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "./ui/alert-dialog";
+import { usePopupPlayerContext } from '@/contexts/PopupPlayerContext';
 import stationLogo from '@/assets/dance-one-logo.png';
 interface LiveRadioPlayerProps {
   streamUrls: string[];
@@ -14,6 +15,7 @@ const LiveRadioPlayer = ({
   streamUrls,
   streamTitle: initialStreamTitle
 }: LiveRadioPlayerProps) => {
+  const { openPlayer } = usePopupPlayerContext();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
@@ -621,29 +623,13 @@ const LiveRadioPlayer = ({
         </Button>
 
         <Button 
-          onClick={() => {
-            // Pause main player to avoid overlapping streams
-            if (isPlaying && audioRef.current) {
-              audioRef.current.pause();
-              stopAudioAnalysis();
-            }
-            
-            const width = 400;
-            const height = 600;
-            const left = (screen.width - width) / 2;
-            const top = (screen.height - height) / 2;
-            window.open(
-              '/popup-player.html', 
-              'popup-player', 
-              `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=no,toolbar=no,menubar=no,location=no,directories=no,status=no`
-            );
-          }}
+          onClick={openPlayer}
           variant="outline" 
           className="w-full" 
           size="sm"
         >
-          <ExternalLink className="w-4 h-4 mr-2" />
-          Open Pop-up Player
+          <Maximize2 className="w-4 h-4 mr-2" />
+          Open Popup Player
         </Button>
       </div>
 
