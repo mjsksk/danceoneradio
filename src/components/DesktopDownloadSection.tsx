@@ -7,25 +7,48 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 export const DesktopDownloadSection = () => {
   const [downloadStarted, setDownloadStarted] = useState(false);
 
-  const handleDownload = (type: 'installer' | 'portable') => {
+  const handleDownload = async (type: 'installer' | 'portable') => {
     setDownloadStarted(true);
     
-    // In a real app, these would be actual download URLs
+    // Check if files exist before attempting download
     const downloadUrl = type === 'installer' 
       ? '/downloads/Dance-One-Radio-Setup-1.0.0.exe'
       : '/downloads/Dance-One-Radio-Portable-1.0.0.exe';
     
-    // Create download link
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.download = type === 'installer' 
-      ? 'Dance-One-Radio-Setup-1.0.0.exe'
-      : 'Dance-One-Radio-Portable-1.0.0.exe';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      // Check if file exists
+      const response = await fetch(downloadUrl, { method: 'HEAD' });
+      
+      if (!response.ok) {
+        // File doesn't exist - show build instructions
+        alert(`The ${type === 'installer' ? 'installer' : 'portable'} file is not yet available. Please follow these steps to build the desktop app:
+
+1. Ensure you have Node.js installed
+2. Navigate to the desktop-app folder
+3. Run: npm install
+4. Run: node build-script.js
+5. Copy the generated files from desktop-app/dist/ to public/downloads/
+
+The desktop app structure has been created but needs to be built first.`);
+        setDownloadStarted(false);
+        return;
+      }
+      
+      // File exists - proceed with download
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = type === 'installer' 
+        ? 'Dance-One-Radio-Setup-1.0.0.exe'
+        : 'Dance-One-Radio-Portable-1.0.0.exe';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Download failed. The desktop app files may not be available yet. Please contact support or try building the app locally.');
+    }
     
-    // Reset after a few seconds
     setTimeout(() => setDownloadStarted(false), 3000);
   };
 
@@ -142,16 +165,33 @@ export const DesktopDownloadSection = () => {
 export const QuickDownloadButton = () => {
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const handleQuickDownload = () => {
+  const handleQuickDownload = async () => {
     setIsDownloading(true);
     
-    // Auto-download the recommended installer
-    const link = document.createElement('a');
-    link.href = '/downloads/Dance-One-Radio-Setup-1.0.0.exe';
-    link.download = 'Dance-One-Radio-Setup-1.0.0.exe';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      // Check if installer file exists
+      const response = await fetch('/downloads/Dance-One-Radio-Setup-1.0.0.exe', { method: 'HEAD' });
+      
+      if (!response.ok) {
+        alert(`Desktop app not yet available for download. 
+
+The app structure has been created but needs to be built first. Please contact the site administrator or follow the build instructions in the desktop-app folder.`);
+        setIsDownloading(false);
+        return;
+      }
+      
+      // File exists - proceed with download
+      const link = document.createElement('a');
+      link.href = '/downloads/Dance-One-Radio-Setup-1.0.0.exe';
+      link.download = 'Dance-One-Radio-Setup-1.0.0.exe';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Download failed. Please try again or contact support.');
+    }
     
     setTimeout(() => setIsDownloading(false), 3000);
   };

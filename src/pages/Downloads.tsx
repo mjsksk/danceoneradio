@@ -8,21 +8,45 @@ import { useState } from 'react';
 const Downloads = () => {
   const [downloadStarted, setDownloadStarted] = useState(false);
 
-  const handleDownload = (type: 'installer' | 'portable') => {
+  const handleDownload = async (type: 'installer' | 'portable') => {
     setDownloadStarted(true);
     
     const downloadUrl = type === 'installer' 
       ? '/downloads/Dance-One-Radio-Setup-1.0.0.exe'
       : '/downloads/Dance-One-Radio-Portable-1.0.0.exe';
     
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.download = type === 'installer' 
-      ? 'Dance-One-Radio-Setup-1.0.0.exe'
-      : 'Dance-One-Radio-Portable-1.0.0.exe';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      // Check if file exists before attempting download
+      const response = await fetch(downloadUrl, { method: 'HEAD' });
+      
+      if (!response.ok) {
+        alert(`The desktop app files are not yet available for download.
+
+To build the app:
+1. Navigate to the desktop-app folder
+2. Run: npm install
+3. Run: node build-script.js
+4. Copy generated files from desktop-app/dist/ to public/downloads/
+
+The app structure has been created but requires building first.`);
+        setDownloadStarted(false);
+        return;
+      }
+      
+      // Proceed with download
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = type === 'installer' 
+        ? 'Dance-One-Radio-Setup-1.0.0.exe'
+        : 'Dance-One-Radio-Portable-1.0.0.exe';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Download failed. The desktop app may not be built yet.');
+    }
     
     setTimeout(() => setDownloadStarted(false), 3000);
   };
