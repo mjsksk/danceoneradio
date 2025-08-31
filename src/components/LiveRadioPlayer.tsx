@@ -12,10 +12,12 @@ import stationLogo from '@/assets/dance-one-logo.png';
 interface LiveRadioPlayerProps {
   streamUrls: string[];
   streamTitle: string;
+  hidePopupButton?: boolean;
 }
 const LiveRadioPlayer = ({
   streamUrls,
-  streamTitle: initialStreamTitle
+  streamTitle: initialStreamTitle,
+  hidePopupButton = false
 }: LiveRadioPlayerProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -624,7 +626,7 @@ const LiveRadioPlayer = ({
 
       <div className="space-y-3">
         <div className="flex gap-2">
-          <Button onClick={handlePlayPause} className="btn-cyber flex-1" size="lg" disabled={isLoading}>
+          <Button onClick={handlePlayPause} className={`btn-cyber ${hidePopupButton ? 'w-full' : 'flex-1'}`} size="lg" disabled={isLoading}>
             {isLoading ? <>
                 <div className="w-5 h-5 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 LOADING...
@@ -636,7 +638,7 @@ const LiveRadioPlayer = ({
                 LISTEN LIVE
               </>}
           </Button>
-          <PopupPlayerButton variant="outline" size="lg" />
+          {!hidePopupButton && <PopupPlayerButton variant="outline" size="lg" />}
         </div>
 
         {/* Desktop Controls */}

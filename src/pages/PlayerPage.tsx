@@ -70,7 +70,8 @@ const PlayerPage = () => {
               "http://s9.myradiostream.com:14296", 
               "https://live-radio-stream.online/dance-one-radio.mp3"
             ]} 
-            streamTitle={streamTitle} 
+            streamTitle={streamTitle}
+            hidePopupButton={true}
           />
         </div>
       </main>

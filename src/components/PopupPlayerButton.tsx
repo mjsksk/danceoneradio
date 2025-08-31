@@ -21,9 +21,9 @@ const PopupPlayerButton = ({
     setIsOpening(true);
     
     try {
-      // Calculate center position
-      const width = 400;
-      const height = 500;
+      // Calculate center position with fixed ratio for optimal fit
+      const width = 420;
+      const height = 580;
       const left = Math.round((window.screen.width - width) / 2);
       const top = Math.round((window.screen.height - height) / 2);
       
