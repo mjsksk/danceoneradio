@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Radio, Volume2 } from 'lucide-react';
-import { DesktopDownloadSection } from './DesktopDownloadSection';
+
 import logo from '@/assets/dance-one-logo.png';
 
 const Navigation = () => {
@@ -34,10 +34,6 @@ const Navigation = () => {
             ))}
           </div>
 
-          {/* Desktop Download Button */}
-          <div className="hidden md:block">
-            <DesktopDownloadSection />
-          </div>
 
           {/* Mobile Menu Button - Positioned on the right */}
           <div className="md:hidden absolute right-4">
@@ -67,10 +63,6 @@ const Navigation = () => {
                   {item.name}
                 </a>
               ))}
-              {/* Mobile Download Button */}
-              <div className="pt-2">
-                <DesktopDownloadSection />
-              </div>
             </div>
           </div>
         )}
