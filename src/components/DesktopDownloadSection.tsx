@@ -9,15 +9,14 @@ export const DesktopDownloadSection = () => {
   const [downloadStarted, setDownloadStarted] = useState(false);
 
   const handleDownload = (type: 'installer' | 'portable') => {
-    // For now, show instructions since executables need to be built and hosted
-    alert(`Desktop app coming soon! 
-
-To get the ${type} version:
-1. Download the source code from our repository
-2. Follow the build instructions to create the executable
-3. Or wait for our official release
-
-Visit our Downloads page for detailed instructions.`);
+    setDownloadStarted(true);
+    
+    // These URLs need to point to actual files hosted on GitHub Releases or CDN
+    // For now, redirect to instructions until files are uploaded
+    const instructionsUrl = window.location.origin + '/downloads';
+    window.open(instructionsUrl, '_blank');
+    
+    setTimeout(() => setDownloadStarted(false), 2000);
   };
 
   return (
@@ -142,10 +141,12 @@ export const QuickDownloadButton = () => {
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handleQuickDownload = () => {
-    // Show instructions since executable needs to be built and hosted
-    alert(`Desktop app coming soon!
-
-Download the source code and build instructions from our Downloads page, or wait for our official release.`);
+    setIsDownloading(true);
+    
+    // Redirect to downloads page with instructions
+    window.location.href = '/downloads';
+    
+    setTimeout(() => setIsDownloading(false), 2000);
   };
 
   return (
