@@ -62,15 +62,6 @@ const HeroSection = () => {
           </div>
         </div>
 
-        {/* CTA Buttons */}
-        <div className="flex justify-center animate-fade-in">
-          <Button variant="outline" asChild>
-            <a href="/shows" className="gap-2">
-              <Volume2 className="w-4 h-4" />
-              View All Shows
-            </a>
-          </Button>
-        </div>
       </div>
     </section>;
 };
