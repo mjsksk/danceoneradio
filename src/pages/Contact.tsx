@@ -80,6 +80,25 @@ const Contact = () => {
           
           {/* Contact Form */}
           <div className="bg-card/50 backdrop-blur-sm border border-border rounded-lg p-6">
+            {/* Demo Submission Guidelines */}
+            <div className="mb-8 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+              <p className="text-sm text-foreground leading-relaxed">
+                We love listening to new music, but please keep in mind that we are
+                looking for music that can be played on our station.
+                We are looking for projects that possess superior quality
+                and are supported by artists who are serious about their
+                careers and the dance community as a whole.
+              </p>
+              <p className="text-sm text-foreground leading-relaxed mt-3">
+                After we've reviewed your materials, we can then fill you in on
+                more of the particulars of how our networks might be able to assist you.
+                To send us your demo contact us via email for further instructions.
+              </p>
+              <p className="text-sm text-foreground leading-relaxed mt-3 font-medium">
+                Thanks for your interest in us.
+              </p>
+            </div>
+            
             <h2 className="text-2xl font-semibold mb-6 text-foreground">Send us a message</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
