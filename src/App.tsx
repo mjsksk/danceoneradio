@@ -10,6 +10,7 @@ import Privacy from "./pages/Privacy";
 import Love from "./pages/Love";
 import Dmca from "./pages/Dmca";
 import Contact from "./pages/Contact";
+import PlayerPage from "./pages/PlayerPage";
 
 import NotFound from "./pages/NotFound";
 
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/love" element={<Love />} />
           <Route path="/dmca" element={<Dmca />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/player" element={<PlayerPage />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

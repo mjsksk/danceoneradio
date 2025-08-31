@@ -7,6 +7,7 @@ import { RadioStreamService } from '@/utils/RadioStreamService';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "./ui/alert-dialog";
 import { useDesktopIntegration } from '@/hooks/useDesktopIntegration';
 import { DesktopPlayerControls } from './DesktopPlayerControls';
+import PopupPlayerButton from './PopupPlayerButton';
 import stationLogo from '@/assets/dance-one-logo.png';
 interface LiveRadioPlayerProps {
   streamUrls: string[];
@@ -622,18 +623,21 @@ const LiveRadioPlayer = ({
       
 
       <div className="space-y-3">
-        <Button onClick={handlePlayPause} className="btn-cyber w-full" size="lg" disabled={isLoading}>
-          {isLoading ? <>
-              <div className="w-5 h-5 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              LOADING...
-            </> : isPlaying ? <>
-              <Pause className="w-5 h-5 mr-2" />
-              PAUSE STREAM
-            </> : <>
-              <Play className="w-5 h-5 mr-2" />
-              LISTEN LIVE
-            </>}
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handlePlayPause} className="btn-cyber flex-1" size="lg" disabled={isLoading}>
+            {isLoading ? <>
+                <div className="w-5 h-5 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                LOADING...
+              </> : isPlaying ? <>
+                <Pause className="w-5 h-5 mr-2" />
+                PAUSE STREAM
+              </> : <>
+                <Play className="w-5 h-5 mr-2" />
+                LISTEN LIVE
+              </>}
+          </Button>
+          <PopupPlayerButton variant="outline" size="lg" />
+        </div>
 
         {/* Desktop Controls */}
         <DesktopPlayerControls 
