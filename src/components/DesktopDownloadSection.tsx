@@ -11,10 +11,12 @@ export const DesktopDownloadSection = () => {
   const handleDownload = (type: 'installer' | 'portable') => {
     setDownloadStarted(true);
     
-    // These URLs need to point to actual files hosted on GitHub Releases or CDN
-    // For now, redirect to instructions until files are uploaded
-    const instructionsUrl = window.location.origin + '/downloads';
-    window.open(instructionsUrl, '_blank');
+    // TODO: Replace with your actual GitHub repository URLs after upload
+    const downloadUrl = type === 'installer' 
+      ? 'https://github.com/YOUR_USERNAME/YOUR_REPO/releases/download/v1.0.0/Dance-One-Radio-Setup-1.0.0.exe'
+      : 'https://github.com/YOUR_USERNAME/YOUR_REPO/releases/download/v1.0.0/Dance-One-Radio-Portable-1.0.0.exe';
+    
+    window.open(downloadUrl, '_blank');
     
     setTimeout(() => setDownloadStarted(false), 2000);
   };
@@ -143,8 +145,9 @@ export const QuickDownloadButton = () => {
   const handleQuickDownload = () => {
     setIsDownloading(true);
     
-    // Redirect to downloads page with instructions
-    window.location.href = '/downloads';
+    // TODO: Replace with your actual GitHub repository URL after upload
+    const downloadUrl = 'https://github.com/YOUR_USERNAME/YOUR_REPO/releases/download/v1.0.0/Dance-One-Radio-Setup-1.0.0.exe';
+    window.open(downloadUrl, '_blank');
     
     setTimeout(() => setIsDownloading(false), 2000);
   };
