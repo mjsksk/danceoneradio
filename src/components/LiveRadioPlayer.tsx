@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Play, Pause, Radio, ExternalLink } from 'lucide-react';
+import { Play, Pause, Radio } from 'lucide-react';
 import { AlbumArtService } from '@/utils/AlbumArtService';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "./ui/alert-dialog";
@@ -620,31 +620,6 @@ const LiveRadioPlayer = ({
             </>}
         </Button>
 
-        <Button 
-          onClick={() => {
-            // Pause main player to avoid overlapping streams
-            if (isPlaying && audioRef.current) {
-              audioRef.current.pause();
-              stopAudioAnalysis();
-            }
-            
-            const width = 450;
-            const height = 650;
-            const left = (screen.width - width) / 2;
-            const top = (screen.height - height) / 2;
-            window.open(
-              '/player-window', 
-              'radio-popup-player', 
-              `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=no,toolbar=no,menubar=no,location=no,directories=no,status=no`
-            );
-          }}
-          variant="outline" 
-          className="w-full" 
-          size="sm"
-        >
-          <ExternalLink className="w-4 h-4 mr-2" />
-          Open Popup Player
-        </Button>
       </div>
 
       <audio ref={audioRef} preload="none" crossOrigin="anonymous" onError={() => {
