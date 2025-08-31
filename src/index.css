@@ -205,7 +205,7 @@
   
   /* Scrolling text animation */
   .animate-scroll {
-    animation: scroll-text 30s linear infinite;
+    animation: scroll-text 15s linear infinite;
   }
   
   @keyframes scroll-text {
