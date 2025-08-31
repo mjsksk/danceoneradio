@@ -26,6 +26,8 @@ const TracksSection = () => {
   const [logoError, setLogoError] = useState<{[key: number]: boolean}>({});
   const [albumArt, setAlbumArt] = useState<{[key: number]: string | null}>({});
   const [previewUrls, setPreviewUrls] = useState<{[key: number]: string | null}>({});
+  const [loadingPreviews, setLoadingPreviews] = useState<{[key: number]: boolean}>({});
+  const [previewErrors, setPreviewErrors] = useState<{[key: number]: string}>({});
   const [audioRef, setAudioRef] = useState<HTMLAudioElement | null>(null);
 
   // Initialize audio element
@@ -107,28 +109,38 @@ const TracksSection = () => {
   // Enable Apple Music preview fetching now that the API token is configured
   useEffect(() => {
     const fetchPreviews = async () => {
+      console.log('🎵 Starting to fetch Apple Music previews for', tracks.length, 'tracks');
+      
       for (const track of tracks) {
-        if (!previewUrls[track.id]) {
+        if (!previewUrls[track.id] && !loadingPreviews[track.id] && !previewErrors[track.id]) {
+          setLoadingPreviews(prev => ({...prev, [track.id]: true}));
+          
           try {
             console.log(`🎵 Fetching Apple Music preview for: ${track.artist} - ${track.title}`);
             const previewUrl = await AppleMusicService.getTrackPreview(track.id, track.artist, track.title);
+            
             if (previewUrl) {
               setPreviewUrls(prev => ({...prev, [track.id]: previewUrl}));
-              console.log(`🎵 Found Apple Music preview for: ${track.artist} - ${track.title}`);
+              console.log(`🎵 ✅ Found Apple Music preview for: ${track.artist} - ${track.title}`);
             } else {
-              console.log(`🎵 No Apple Music preview found for: ${track.artist} - ${track.title}`);
+              setPreviewErrors(prev => ({...prev, [track.id]: 'No preview available'}));
+              console.log(`🎵 ❌ No Apple Music preview found for: ${track.artist} - ${track.title}`);
             }
           } catch (error) {
-            console.error(`🎵 Failed to fetch Apple Music preview for ${track.artist} - ${track.title}:`, error);
+            console.error(`🎵 ❌ Failed to fetch Apple Music preview for ${track.artist} - ${track.title}:`, error);
+            setPreviewErrors(prev => ({...prev, [track.id]: error.message || 'Failed to fetch preview'}));
+          } finally {
+            setLoadingPreviews(prev => ({...prev, [track.id]: false}));
           }
         }
       }
     };
 
     if (tracks.length > 0) {
+      console.log('🎵 Tracks loaded, starting preview fetch process');
       fetchPreviews();
     }
-  }, [tracks, previewUrls]);
+  }, [tracks, previewUrls, loadingPreviews, previewErrors]);
 
   useEffect(() => {
     const fetchRecentTracks = async () => {
@@ -350,15 +362,33 @@ const TracksSection = () => {
                         : 'bg-secondary hover:bg-secondary/80'
                     }`}
                     disabled={!previewUrls[track.id] && playingTrack !== track.id}
+                    title={
+                      loadingPreviews[track.id] 
+                        ? 'Loading preview...' 
+                        : previewUrls[track.id] 
+                        ? 'Play 30-second preview' 
+                        : previewErrors[track.id] 
+                        ? `Preview not available: ${previewErrors[track.id]}`
+                        : 'No preview available'
+                    }
                   >
-                    {playingTrack === track.id ? (
+                    {loadingPreviews[track.id] ? (
+                      <div className="w-6 h-6 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    ) : playingTrack === track.id ? (
                       <Pause className="w-6 h-6" />
                     ) : (
                       <Play className="w-6 h-6 ml-1" />
                     )}
-                    {previewUrls[track.id] && (
+                    
+                    {previewUrls[track.id] && !loadingPreviews[track.id] && (
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background">
                         <div className="w-full h-full bg-green-400 rounded-full animate-ping"></div>
+                      </div>
+                    )}
+                    
+                    {previewErrors[track.id] && !loadingPreviews[track.id] && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-background text-xs flex items-center justify-center">
+                        ✕
                       </div>
                     )}
                   </Button>
