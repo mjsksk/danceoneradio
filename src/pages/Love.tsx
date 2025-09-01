@@ -1,5 +1,6 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import { Button } from '@/components/ui/button';
 import { Heart, Music, Radio, Users } from 'lucide-react';
 const Love = () => {
   return <div className="min-h-screen bg-background text-foreground">
@@ -43,11 +44,20 @@ const Love = () => {
 
               <section className="text-center">
                 <Radio className="w-16 h-16 text-accent mx-auto mb-6" />
-                <h2 className="text-3xl font-semibold text-accent mb-6">The Experience</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  We love curating the perfect sonic journey for every moment. Whether you're working, relaxing, or dancing, 
-                  our carefully selected tracks and live DJ sets are designed to elevate your mood and transport you to another dimension.
+                <h2 className="text-3xl font-semibold text-accent mb-6">Official Merchandise</h2>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  Show your love for Dance One Radio with our exclusive merchandise collection. From stylish apparel to unique accessories, 
+                  each item is designed with our signature aesthetic to help you represent the electronic music lifestyle wherever you go.
                 </p>
+                <Button asChild className="btn-cyber">
+                  <a 
+                    href="https://www.cafepress.com/shop/danceone/products?designId=91970401" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    Shop Merchandise
+                  </a>
+                </Button>
               </section>
 
               <div className="card-cyber p-8 mt-12 text-center bg-primary/5">
