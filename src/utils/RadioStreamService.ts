@@ -212,41 +212,10 @@ export class RadioStreamService {
         return historyTracks;
       }
       
-      console.log('🎵 Using fallback tracks since history failed - excluding current track');
+      console.log('🎵 History endpoints failed - returning empty tracks array');
       
-      // Fallback with simulated historical tracks only (don't include current track)
+      // Return empty array when real history data is not available
       const recentTracks: Track[] = [];
-      
-      // Add some recent tracks (simulated)
-      const recentTrackTitles = [
-        'Deep House Vibes - DJ Shadow',
-        'Progressive Journey - Alex Mind',
-        'Trance State - Luna Deep',
-        'Techno Underground - Dark Matter',
-        'Melodic Dreams - Stellar Waves',
-        'Cosmic Beats - DJ Galaxy',
-        'Synthwave Nights - Neon Pulse',
-        'Electronic Fusion - Digital Soul',
-        'Ambient Flow - Ocean Deep'
-      ];
-      
-      recentTrackTitles.forEach((trackInfo, index) => {
-        const [title, artist] = trackInfo.split(' - ');
-        const playedTime = new Date();
-        playedTime.setMinutes(playedTime.getMinutes() - (index + 1) * 15);
-        
-        recentTracks.push({
-          id: index + 2,
-          title,
-          artist,
-          duration: this.generateRandomDuration(),
-          genre: this.generateRandomGenre(),
-          playedAt: playedTime.toISOString(),
-          waveform: this.generateWaveform(),
-          likes: Math.floor(Math.random() * 2000) + 500,
-          downloads: Math.floor(Math.random() * 800) + 200
-        });
-      });
       
       console.log('🎵 Total tracks before slicing:', recentTracks.length);
       const finalTracks = recentTracks.slice(0, 10);
@@ -254,9 +223,8 @@ export class RadioStreamService {
       return finalTracks; // Return latest 10 tracks
     } catch (error) {
       console.error('Error fetching recent tracks:', error);
-      const fallbackTracks = this.generateFallbackTracks();
-      console.log('🎵 Using fallback tracks:', fallbackTracks.length, fallbackTracks);
-      return fallbackTracks;
+      // Return empty array instead of fake tracks when error occurs
+      return [];
     }
   }
 
