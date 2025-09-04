@@ -5,12 +5,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface StreamMetadata {
-  title: string;
-  status: string;
-  timestamp: string;
-}
-
 interface Track {
   title: string;
   artist: string;
@@ -33,108 +27,104 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    console.log('🔍 Fetching current stream metadata...');
+    console.log('🔍 Fetching track history from radio stream...');
     
-    // Fetch current stream metadata
-    const streamUrl = 'http://s9.myradiostream.com:14296/currentsong?sid=1';
-    const response = await fetch(streamUrl);
+    // Fetch from the specific history endpoint
+    const historyUrl = 'http://s9.myradiostream.com:14296/admin.cgi?sid=1&mode=history';
+    let historyData = '';
     
-    if (!response.ok) {
-      throw new Error(`Failed to fetch stream metadata: ${response.status}`);
-    }
-    
-    const currentTrack = await response.text();
-    console.log('✅ Current track from stream:', currentTrack);
+    try {
+      console.log('📡 Attempting direct fetch from:', historyUrl);
+      const response = await fetch(historyUrl, {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        },
+      });
 
-    if (!currentTrack || currentTrack.trim() === '') {
-      console.log('❌ No current track data available');
-      return new Response(JSON.stringify({ error: 'No current track data' }), {
+      if (response.ok) {
+        historyData = await response.text();
+        console.log('✅ History data fetched:', historyData.substring(0, 200) + '...');
+      } else {
+        console.log('❌ History fetch failed with status:', response.status);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.log('❌ Direct fetch failed, trying alternative methods:', error);
+      
+      // Fallback to current song endpoint if history fails
+      try {
+        const currentResponse = await fetch('http://s9.myradiostream.com:14296/currentsong?sid=1');
+        if (currentResponse.ok) {
+          const currentTrack = await currentResponse.text();
+          console.log('🎵 Got current track as fallback:', currentTrack);
+          historyData = currentTrack;
+        }
+      } catch (fallbackError) {
+        console.log('❌ Fallback also failed:', fallbackError);
+        throw new Error('All endpoints failed');
+      }
+    }
+
+    if (!historyData || historyData.trim() === '') {
+      console.log('❌ No history data available');
+      return new Response(JSON.stringify({ error: 'No history data available' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
-    // Parse the track info (assuming format: "Artist - Title" or "Title")
-    const parseTrackInfo = (trackStr: string) => {
-      const cleanTrack = trackStr.trim();
-      
-      // Try to split by " - " first
-      if (cleanTrack.includes(' - ')) {
-        const parts = cleanTrack.split(' - ');
-        return {
-          artist: parts[0].trim(),
-          title: parts.slice(1).join(' - ').trim()
-        };
-      }
-      
-      // If no " - " separator, treat as title only
-      return {
-        artist: 'Unknown Artist',
-        title: cleanTrack
-      };
-    };
+    // Parse the history data
+    const tracks = parseHistoryData(historyData);
+    console.log('🎯 Parsed tracks:', tracks.length);
 
-    const { artist, title } = parseTrackInfo(currentTrack);
-    console.log('🎯 Parsed track:', { artist, title });
-
-    // Check if this track is already the most recent in our database
-    const { data: recentTrack, error: recentError } = await supabase
-      .from('radio_track_history')
-      .select('*')
-      .order('played_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (recentError && recentError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
-      console.error('❌ Error fetching recent track:', recentError);
-      // Continue anyway - we'll add the track regardless
+    if (tracks.length === 0) {
+      console.log('❌ No tracks found in history data');
+      return new Response(JSON.stringify({ error: 'No tracks found in history' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
 
-    // If the current track is different from the most recent, add it to history
-    if (!recentTrack || recentTrack.title !== title || recentTrack.artist !== artist) {
-      console.log('🆕 New track detected, adding to history');
-      
-      const trackData: Track = {
-        title,
-        artist,
-        played_at: new Date().toISOString(),
-        duration: '3:30', // Default duration
-        genre: 'Electronic', // Default genre
-        source_url: streamUrl
-      };
-
-      const { data: insertData, error: insertError } = await supabase
+    // Store tracks in database
+    let newTracksAdded = 0;
+    
+    for (const track of tracks) {
+      // Check if track already exists
+      const { data: existingTrack } = await supabase
         .from('radio_track_history')
-        .insert([trackData])
-        .select()
+        .select('id')
+        .eq('title', track.title)
+        .eq('artist', track.artist)
+        .eq('played_at', track.played_at)
         .single();
 
-      if (insertError) {
-        console.error('❌ Error inserting track:', insertError);
-        throw insertError;
-      }
+      if (!existingTrack) {
+        const { error: insertError } = await supabase
+          .from('radio_track_history')
+          .insert([track]);
 
-      console.log('✅ Track added to history:', insertData);
-      
-      return new Response(JSON.stringify({ 
-        success: true, 
-        message: 'New track added to history',
-        track: insertData
-      }), {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    } else {
-      console.log('🔄 Track unchanged, no update needed');
-      return new Response(JSON.stringify({ 
-        success: true, 
-        message: 'Track unchanged',
-        track: recentTrack
-      }), {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+        if (!insertError) {
+          newTracksAdded++;
+          console.log('✅ Added new track:', track.title, 'by', track.artist);
+        } else {
+          console.log('❌ Error inserting track:', insertError);
+        }
+      }
     }
+
+    console.log(`🎵 Processing complete: ${newTracksAdded} new tracks added`);
+    
+    return new Response(JSON.stringify({ 
+      success: true, 
+      message: `${newTracksAdded} new tracks added`,
+      totalTracks: tracks.length,
+      tracks: tracks.slice(0, 5) // Return first 5 for debugging
+    }), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
 
   } catch (error) {
     console.error('💥 Error in track history updater:', error);
@@ -147,3 +137,105 @@ Deno.serve(async (req) => {
     });
   }
 });
+
+function parseHistoryData(data: string): Track[] {
+  const tracks: Track[] = [];
+  console.log('🔍 Parsing history data, length:', data.length);
+  console.log('📋 First 500 chars:', data.substring(0, 500));
+
+  try {
+    // Try to parse different formats that might be returned
+    
+    // Format 1: Plain text track info (one per line)
+    if (data.includes('\n') || data.includes('\r')) {
+      const lines = data.split(/\r?\n/).filter(line => line.trim());
+      console.log('📝 Found', lines.length, 'lines to parse');
+      
+      lines.forEach((line, index) => {
+        const trackInfo = parseTrackInfo(line.trim());
+        if (trackInfo) {
+          const playedTime = new Date();
+          playedTime.setMinutes(playedTime.getMinutes() - (index * 5)); // Assume 5min intervals
+          
+          tracks.push({
+            ...trackInfo,
+            played_at: playedTime.toISOString(),
+            source_url: 'http://s9.myradiostream.com:14296/admin.cgi?sid=1&mode=history'
+          });
+        }
+      });
+    }
+    
+    // Format 2: HTML format
+    else if (data.includes('<') && data.includes('>')) {
+      console.log('🌐 Parsing HTML format');
+      // Look for common HTML patterns in streaming history
+      const titleMatches = data.match(/<title[^>]*>([^<]+)<\/title>/gi);
+      const trackMatches = data.match(/(?:title|track|song)[:=]\s*([^<\n\r]+)/gi);
+      
+      if (titleMatches) {
+        titleMatches.forEach((match, index) => {
+          const content = match.replace(/<[^>]+>/g, '').trim();
+          const trackInfo = parseTrackInfo(content);
+          if (trackInfo) {
+            const playedTime = new Date();
+            playedTime.setMinutes(playedTime.getMinutes() - (index * 5));
+            
+            tracks.push({
+              ...trackInfo,
+              played_at: playedTime.toISOString(),
+              source_url: 'http://s9.myradiostream.com:14296/admin.cgi?sid=1&mode=history'
+            });
+          }
+        });
+      }
+    }
+    
+    // Format 3: Single track (current song fallback)
+    else {
+      console.log('🎵 Parsing as single track');
+      const trackInfo = parseTrackInfo(data.trim());
+      if (trackInfo) {
+        tracks.push({
+          ...trackInfo,
+          played_at: new Date().toISOString(),
+          source_url: 'http://s9.myradiostream.com:14296/currentsong?sid=1'
+        });
+      }
+    }
+
+  } catch (error) {
+    console.error('❌ Error parsing history data:', error);
+  }
+
+  console.log('✅ Parsed', tracks.length, 'tracks');
+  return tracks;
+}
+
+function parseTrackInfo(trackStr: string): { title: string; artist: string; duration?: string; genre?: string } | null {
+  if (!trackStr || trackStr.trim() === '') {
+    return null;
+  }
+
+  const cleanTrack = trackStr.trim();
+  console.log('🔍 Parsing track string:', cleanTrack);
+  
+  // Try different patterns
+  if (cleanTrack.includes(' - ')) {
+    const parts = cleanTrack.split(' - ');
+    return {
+      artist: parts[0].trim(),
+      title: parts.slice(1).join(' - ').trim(),
+      duration: '3:30', // Default duration
+      genre: 'Electronic' // Default genre
+    };
+  }
+  
+  // If no separator, treat as title with generic artist
+  return {
+    artist: 'Dance One Radio',
+    title: cleanTrack,
+    duration: '3:30',
+    genre: 'Electronic'
+  };
+}
