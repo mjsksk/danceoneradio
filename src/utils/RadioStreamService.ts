@@ -264,7 +264,28 @@ export class RadioStreamService {
       }
 
       if (!tracks || tracks.length === 0) {
-        console.log('📭 No tracks found in database');
+        console.log('📭 No tracks found in database, generating initial tracks');
+        
+        // Generate some initial tracks based on current playing track
+        const currentMetadata = await this.getStreamMetadata();
+        if (currentMetadata?.title) {
+          const [title, artist] = this.parseTrackInfo(currentMetadata.title);
+          
+          const initialTrack: Track = {
+            id: 1,
+            title,
+            artist,
+            duration: this.generateRandomDuration(),
+            genre: this.generateRandomGenre(),
+            playedAt: new Date().toISOString(),
+            waveform: this.generateWaveform(),
+            likes: Math.floor(Math.random() * 2000) + 500,
+            downloads: Math.floor(Math.random() * 800) + 200
+          };
+
+          return [initialTrack];
+        }
+        
         return [];
       }
 
@@ -488,17 +509,6 @@ export class RadioStreamService {
     return paddedTracks;
   }
 
-  private static parseTrackInfo(title: string): [string, string] {
-    // Try to parse "Artist - Title" or "Title - Artist" format
-    if (title.includes(' - ')) {
-      const parts = title.split(' - ');
-      return [parts[1] || parts[0], parts[0]];
-    }
-    
-    // Fallback to just using title as song name with generic artist
-    return [title.replace('Dance One Radio - ', ''), 'Dance One Radio'];
-  }
-
   private static generateRandomDuration(): string {
     const minutes = Math.floor(Math.random() * 4) + 4; // 4-7 minutes
     const seconds = Math.floor(Math.random() * 60);
@@ -556,5 +566,21 @@ export class RadioStreamService {
     console.log('✅ Formatted title:', formatted);
     
     return formatted;
+  }
+
+  static parseTrackInfo(trackStr: string): [string, string] {
+    const cleanTrack = trackStr.replace(/🎵/g, '').trim();
+    
+    // Try to split by " - " first
+    if (cleanTrack.includes(' - ')) {
+      const parts = cleanTrack.split(' - ');
+      return [
+        parts.slice(1).join(' - ').trim() || parts[0].trim(), // title
+        parts[0].trim() // artist
+      ];
+    }
+    
+    // If no " - " separator, treat as title with generic artist
+    return [cleanTrack, 'Dance One Radio'];
   }
 }

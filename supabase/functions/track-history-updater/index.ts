@@ -83,10 +83,11 @@ Deno.serve(async (req) => {
       .select('*')
       .order('played_at', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     if (recentError && recentError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
       console.error('❌ Error fetching recent track:', recentError);
+      // Continue anyway - we'll add the track regardless
     }
 
     // If the current track is different from the most recent, add it to history
