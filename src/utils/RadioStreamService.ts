@@ -288,7 +288,46 @@ export class RadioStreamService {
     try {
       console.log('🎵 Fetching track history from database...');
       
-      // First, trigger the track history updater to ensure we have current data
+      // Import supabase client first
+      const { supabase } = await import('@/integrations/supabase/client');
+      
+      // First, trigger the track history updater and get current track immediately
+      console.log('🎵 Getting current track from radio stream...');
+      try {
+        const currentResponse = await fetch('http://s9.myradiostream.com:14296/currentsong?sid=1');
+        if (currentResponse.ok) {
+          const currentTrack = await currentResponse.text();
+          console.log('🎵 Current track from radio:', currentTrack);
+          
+          if (currentTrack && currentTrack.trim() !== '') {
+            // Parse and add the current track directly to database
+            const [title, artist] = this.parseTrackInfo(currentTrack);
+            
+            const trackData = {
+              title,
+              artist, 
+              played_at: new Date().toISOString(),
+              duration: '3:30',
+              genre: 'Electronic',
+              source_url: 'http://s9.myradiostream.com:14296/currentsong?sid=1'
+            };
+
+            const { data: insertedTrack, error: insertError } = await supabase
+              .from('radio_track_history')
+              .insert([trackData])
+              .select()
+              .single();
+
+            if (!insertError && insertedTrack) {
+              console.log('✅ Added current track to database:', insertedTrack);
+            }
+          }
+        }
+      } catch (error) {
+        console.log('⚠️ Could not fetch current track:', error);
+      }
+
+      // Try to trigger the track history updater
       try {
         const updateResponse = await fetch('https://upbwlnpycrbhxahjztrf.supabase.co/functions/v1/track-history-updater', {
           method: 'POST',
@@ -306,8 +345,6 @@ export class RadioStreamService {
       }
 
       // Fetch track history from database
-      const { supabase } = await import('@/integrations/supabase/client');
-      
       const { data: tracks, error } = await supabase
         .from('radio_track_history')
         .select('*')
