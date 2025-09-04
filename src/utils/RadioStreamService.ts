@@ -230,65 +230,62 @@ export class RadioStreamService {
 
   private static async fetchTrackHistory(): Promise<Track[]> {
     try {
-      // Try multiple history endpoints that might work
-      const historyUrls = [
-        'http://s9.myradiostream.com:14296/admin.cgi?sid=1&mode=history',
-        'http://s9.myradiostream.com:14296/played.html',
-        'http://s9.myradiostream.com:14296/history.html',
-        'http://s9.myradiostream.com:14296/currentsong?sid=1',
-        'http://s9.myradiostream.com:14296/stats?sid=1'
-      ];
+      console.log('🎵 Fetching track history from database...');
       
-      // Try CORS proxy services to bypass CORS restrictions
-      const proxies = [
-        'https://api.allorigins.win/get?url='
-      ];
-
-      for (const proxy of proxies) {
-        for (const historyUrl of historyUrls) {
-          try {
-            const proxyUrl = `${proxy}${encodeURIComponent(historyUrl)}`;
-            console.log('Attempting to fetch history from:', proxyUrl);
-            
-            const response = await fetch(proxyUrl, {
-              method: 'GET',
-              headers: {
-                'Accept': 'text/html,application/xhtml+xml,application/xml',
-              },
-            });
-
-            if (response.ok) {
-              let data = await response.text();
-              console.log('Raw history response:', data.substring(0, 500) + '...');
-              
-              // If using allorigins, extract contents
-              if (proxy.includes('allorigins')) {
-                const json = JSON.parse(data);
-                data = json.contents;
-                console.log('Extracted history contents:', data.substring(0, 500) + '...');
-              }
-              
-              const tracks = this.parseHistoryData(data);
-              if (tracks.length > 0) {
-                console.log('Successfully fetched track history:', tracks);
-                return tracks;
-              } else {
-                console.log('No tracks found in history data, trying next URL...');
-              }
-            } else {
-              console.log('History fetch failed with status:', response.status);
-            }
-          } catch (error) {
-            console.log(`Failed to fetch history from ${proxy}${historyUrl}:`, error);
-            continue;
+      // First, trigger the track history updater to ensure we have current data
+      try {
+        const updateResponse = await fetch('https://upbwlnpycrbhxahjztrf.supabase.co/functions/v1/track-history-updater', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
           }
+        });
+        
+        if (updateResponse.ok) {
+          const updateResult = await updateResponse.json();
+          console.log('✅ Track history updater result:', updateResult);
         }
+      } catch (updateError) {
+        console.log('⚠️ Track history updater failed:', updateError);
       }
 
-      console.log('All history fetch attempts failed, returning empty array');
-      return [];
+      // Fetch track history from database
+      const { supabase } = await import('@/integrations/supabase/client');
+      
+      const { data: tracks, error } = await supabase
+        .from('radio_track_history')
+        .select('*')
+        .order('played_at', { ascending: false })
+        .limit(20);
+
+      if (error) {
+        console.error('❌ Error fetching track history from database:', error);
+        return [];
+      }
+
+      if (!tracks || tracks.length === 0) {
+        console.log('📭 No tracks found in database');
+        return [];
+      }
+
+      console.log('✅ Fetched track history from database:', tracks.length, 'tracks');
+
+      // Convert database records to Track interface
+      const historyTracks: Track[] = tracks.map((track, index) => ({
+        id: index + 1,
+        title: track.title,
+        artist: track.artist,
+        duration: track.duration || this.generateRandomDuration(),
+        genre: track.genre || this.generateRandomGenre(),
+        playedAt: track.played_at,
+        waveform: this.generateWaveform(),
+        likes: Math.floor(Math.random() * 2000) + 500,
+        downloads: Math.floor(Math.random() * 800) + 200
+      }));
+
+      return historyTracks;
     } catch (error) {
-      console.error('Error fetching track history:', error);
+      console.error('💥 Error fetching track history:', error);
       return [];
     }
   }

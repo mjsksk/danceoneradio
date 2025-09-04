@@ -101,6 +101,39 @@ export type Database = {
         }
         Relationships: []
       }
+      radio_track_history: {
+        Row: {
+          artist: string
+          created_at: string
+          duration: string | null
+          genre: string | null
+          id: string
+          played_at: string
+          source_url: string | null
+          title: string
+        }
+        Insert: {
+          artist: string
+          created_at?: string
+          duration?: string | null
+          genre?: string | null
+          id?: string
+          played_at?: string
+          source_url?: string | null
+          title: string
+        }
+        Update: {
+          artist?: string
+          created_at?: string
+          duration?: string | null
+          genre?: string | null
+          id?: string
+          played_at?: string
+          source_url?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

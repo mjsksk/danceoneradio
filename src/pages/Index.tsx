@@ -5,8 +5,12 @@ import DJSection from '@/components/DJSection';
 import TracksSection from '@/components/TracksSection';
 import AdSenseUnit from '@/components/AdSenseUnit';
 import Footer from '@/components/Footer';
+import { useTrackHistoryUpdater } from '@/hooks/useTrackHistoryUpdater';
 
 const Index = () => {
+  // Keep track history updated
+  useTrackHistoryUpdater();
+
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       <Navigation />
