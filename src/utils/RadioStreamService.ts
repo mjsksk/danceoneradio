@@ -212,28 +212,10 @@ export class RadioStreamService {
         return historyTracks;
       }
       
-      console.log('🎵 Using fallback tracks since history failed');
+      console.log('🎵 Using fallback tracks since history failed - excluding current track');
       
-      // Fallback to existing logic if history feed fails
-      const currentMetadata = await this.getStreamMetadata();
+      // Fallback with simulated historical tracks only (don't include current track)
       const recentTracks: Track[] = [];
-      
-      // Generate recent tracks based on current playing + some mock recent ones
-      if (currentMetadata?.title) {
-        const [title, artist] = this.parseTrackInfo(currentMetadata.title);
-        
-        recentTracks.push({
-          id: 1,
-          title,
-          artist,
-          duration: this.generateRandomDuration(),
-          genre: this.generateRandomGenre(),
-          playedAt: new Date().toISOString(),
-          waveform: this.generateWaveform(),
-          likes: Math.floor(Math.random() * 2000) + 500,
-          downloads: Math.floor(Math.random() * 800) + 200
-        });
-      }
       
       // Add some recent tracks (simulated)
       const recentTrackTitles = [
