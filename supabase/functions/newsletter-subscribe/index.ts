@@ -83,9 +83,9 @@ const handler = async (req: Request): Promise<Response> => {
     
     try {
       await resend.emails.send({
-        from: "Dance One Radio <noreply@resend.dev>",
+        from: "Dance One Radio <noreply@danceoneradio.com>",
         to: [email],
-        subject: "Welcome to Dance One Radio Newsletter! 🎵",
+        subject: "Welcome to Dance One Radio Newsletter!",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="text-align: center; margin-bottom: 30px;">
