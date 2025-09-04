@@ -194,93 +194,15 @@ export class RadioStreamService {
     try {
       console.log('🎵 Starting to fetch recent tracks...');
       
-      // Try to fetch from the actual history feed first
-      console.log('🎵 Attempting to fetch track history...');
+      // Only fetch real tracks from database - no fake tracks
+      console.log('🎵 Fetching real track history from database...');
       const historyTracks = await this.fetchTrackHistory();
       console.log('🎵 History fetch result:', historyTracks.length, 'tracks');
       
-      if (historyTracks.length > 0) {
-        console.log('🎵 Using real history tracks:', historyTracks);
-        
-        // If we have real history but less than 10 tracks, pad with simulated ones
-        if (historyTracks.length < 10) {
-          console.log('🎵 Padding history tracks to reach 10 total');
-          const paddedTracks = this.padWithSimulatedTracks(historyTracks);
-          return paddedTracks;
-        }
-        
-        return historyTracks;
-      }
-      
-      console.log('🎵 History endpoints failed - generating fallback tracks with current song');
-      
-      // Generate fallback tracks when database is empty
-      const recentTracks: Track[] = [];
-      
-      // Try to get current playing track as the first track
-      try {
-        const currentMetadata = await this.getStreamMetadata();
-        if (currentMetadata?.title) {
-          const [title, artist] = this.parseTrackInfo(currentMetadata.title);
-          
-          const currentTrack: Track = {
-            id: 1,
-            title,
-            artist,
-            duration: this.generateRandomDuration(),
-            genre: this.generateRandomGenre(),
-            playedAt: new Date().toISOString(),
-            waveform: this.generateWaveform(),
-            likes: Math.floor(Math.random() * 2000) + 500,
-            downloads: Math.floor(Math.random() * 800) + 200
-          };
-
-          recentTracks.push(currentTrack);
-          console.log('🎵 Added current track as fallback:', currentTrack);
-        }
-      } catch (error) {
-        console.log('⚠️ Could not fetch current track for fallback:', error);
-      }
-      
-      // Add some additional fallback tracks if we still have less than 5
-      if (recentTracks.length < 5) {
-        const fallbackTracks = [
-          'DJ Shadow - Deep House Vibes',
-          'Alex Mind - Progressive Journey', 
-          'Luna Deep - Trance State',
-          'Dark Matter - Techno Underground',
-          'Stellar Waves - Melodic Dreams'
-        ];
-        
-        fallbackTracks.forEach((trackInfo, index) => {
-          if (recentTracks.length >= 5) return;
-          
-          const [artist, title] = trackInfo.split(' - ');
-          const playedTime = new Date();
-          playedTime.setMinutes(playedTime.getMinutes() - (index + 2) * 15);
-          
-          recentTracks.push({
-            id: recentTracks.length + 1,
-            title,
-            artist,
-            duration: this.generateRandomDuration(),
-            genre: this.generateRandomGenre(),
-            playedAt: playedTime.toISOString(),
-            waveform: this.generateWaveform(),
-            likes: Math.floor(Math.random() * 2000) + 500,
-            downloads: Math.floor(Math.random() * 800) + 200
-          });
-        });
-      }
-      
-      console.log('🎵 Total tracks before slicing:', recentTracks.length);
-      const finalTracks = recentTracks.slice(0, 10);
-      console.log('🎵 Final tracks to return:', finalTracks.length, finalTracks);
-      return finalTracks; // Return latest 10 tracks
+      return historyTracks; // Only return real tracks
     } catch (error) {
       console.error('Error fetching recent tracks:', error);
-      // Return empty array instead of fake tracks when error occurs
-      return [];
+      return []; // Return empty array if error
     }
   }
 
@@ -357,28 +279,7 @@ export class RadioStreamService {
       }
 
       if (!tracks || tracks.length === 0) {
-        console.log('📭 No tracks found in database, generating initial tracks');
-        
-        // Generate some initial tracks based on current playing track
-        const currentMetadata = await this.getStreamMetadata();
-        if (currentMetadata?.title) {
-          const [title, artist] = this.parseTrackInfo(currentMetadata.title);
-          
-          const initialTrack: Track = {
-            id: 1,
-            title,
-            artist,
-            duration: this.generateRandomDuration(),
-            genre: this.generateRandomGenre(),
-            playedAt: new Date().toISOString(),
-            waveform: this.generateWaveform(),
-            likes: Math.floor(Math.random() * 2000) + 500,
-            downloads: Math.floor(Math.random() * 800) + 200
-          };
-
-          return [initialTrack];
-        }
-        
+        console.log('📭 No tracks found in database - waiting for real data');
         return [];
       }
 
@@ -563,87 +464,6 @@ export class RadioStreamService {
     }
   }
 
-  private static padWithSimulatedTracks(realTracks: Track[]): Track[] {
-    const targetCount = 10;
-    const simulatedTrackTitles = [
-      'Deep House Vibes - DJ Shadow',
-      'Progressive Journey - Alex Mind', 
-      'Trance State - Luna Deep',
-      'Techno Underground - Dark Matter',
-      'Melodic Dreams - Stellar Waves',
-      'Cosmic Beats - DJ Galaxy',
-      'Synthwave Nights - Neon Pulse',
-      'Electronic Fusion - Digital Soul',
-      'Ambient Flow - Ocean Deep'
-    ];
-
-    const paddedTracks = [...realTracks];
-    let nextId = Math.max(...realTracks.map(t => t.id)) + 1;
-    
-    for (let i = 0; i < simulatedTrackTitles.length && paddedTracks.length < targetCount; i++) {
-      const [title, artist] = simulatedTrackTitles[i].split(' - ');
-      const playedTime = new Date();
-      playedTime.setMinutes(playedTime.getMinutes() - (paddedTracks.length * 5 + 30));
-      
-      paddedTracks.push({
-        id: nextId++,
-        title,
-        artist,
-        duration: this.generateRandomDuration(),
-        genre: this.generateRandomGenre(), 
-        playedAt: playedTime.toISOString(),
-        waveform: this.generateWaveform(),
-        likes: Math.floor(Math.random() * 2000) + 500,
-        downloads: Math.floor(Math.random() * 800) + 200
-      });
-    }
-    
-    console.log(`🎵 Padded ${realTracks.length} real tracks to ${paddedTracks.length} total tracks`);
-    return paddedTracks;
-  }
-
-  private static generateRandomDuration(): string {
-    const minutes = Math.floor(Math.random() * 4) + 4; // 4-7 minutes
-    const seconds = Math.floor(Math.random() * 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  }
-
-  private static generateRandomGenre(): string {
-    const genres = ['Progressive House', 'Deep House', 'Trance', 'Techno', 'Electronic'];
-    return genres[Math.floor(Math.random() * genres.length)];
-  }
-
-  private static generateWaveform(): number[] {
-    return Array.from({ length: 12 }, () => Math.floor(Math.random() * 20) + 10);
-  }
-
-  private static generateFallbackTracks(): Track[] {
-    const fallbackTracks = [
-      { title: 'Progressive House Mix', artist: 'DJ Pulse' },
-      { title: 'Deep Electronic Vibes', artist: 'DJ Neon' },
-      { title: 'Trance Journey', artist: 'DJ Cosmos' },
-      { title: 'Techno Underground', artist: 'DJ Aurora' },
-      { title: 'Melodic Dreams', artist: 'DJ Stellar' },
-      { title: 'Cosmic Beats', artist: 'DJ Galaxy' },
-      { title: 'Synthwave Nights', artist: 'DJ Neon Pulse' },
-      { title: 'Electronic Fusion', artist: 'DJ Digital Soul' },
-      { title: 'Ambient Flow', artist: 'DJ Ocean Deep' },
-      { title: 'Future Bass', artist: 'DJ Horizon' }
-    ];
-
-    return fallbackTracks.map((track, index) => ({
-      id: index + 1,
-      title: track.title,
-      artist: track.artist,
-      duration: this.generateRandomDuration(),
-      genre: this.generateRandomGenre(),
-      playedAt: new Date(Date.now() - index * 15 * 60 * 1000).toISOString(),
-      waveform: this.generateWaveform(),
-      likes: Math.floor(Math.random() * 2000) + 500,
-      downloads: Math.floor(Math.random() * 800) + 200
-    }));
-  }
-
   static formatTitle(metadata: StreamMetadata | null): string {
     console.log('🔍 Formatting title from metadata:', metadata);
     
@@ -675,5 +495,20 @@ export class RadioStreamService {
     
     // If no " - " separator, treat as title with generic artist
     return [cleanTrack, 'Dance One Radio'];
+  }
+
+  private static generateRandomDuration(): string {
+    const minutes = Math.floor(Math.random() * 4) + 4; // 4-7 minutes
+    const seconds = Math.floor(Math.random() * 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  private static generateRandomGenre(): string {
+    const genres = ['Progressive House', 'Deep House', 'Trance', 'Techno', 'Electronic'];
+    return genres[Math.floor(Math.random() * genres.length)];
+  }
+
+  private static generateWaveform(): number[] {
+    return Array.from({ length: 12 }, () => Math.floor(Math.random() * 20) + 10);
   }
 }
