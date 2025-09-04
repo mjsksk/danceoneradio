@@ -4,6 +4,7 @@ import { Play, Pause, Download, Heart, Share2, Clock, RefreshCw, Radio } from 'l
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import { AlbumArtService } from '@/utils/AlbumArtService';
 import { AppleMusicService } from '@/utils/AppleMusicService';
+import { supabase } from '@/integrations/supabase/client';
 import stationLogo from '/lovable-uploads/72d04e54-23af-4f4a-bf39-efcc6c6b2150.png';
 
 interface Track {
@@ -159,9 +160,33 @@ const TracksSection = () => {
 
     fetchRecentTracks();
     
-    // Refresh tracks every 30 seconds for testing (was 5 minutes)
-    const interval = setInterval(fetchRecentTracks, 30 * 1000);
-    return () => clearInterval(interval);
+    // Set up real-time subscription for new tracks
+    console.log('🎵 Setting up real-time subscription for track history');
+    const channel = supabase
+      .channel('radio-track-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'radio_track_history'
+        },
+        (payload) => {
+          console.log('🎵 New track detected via real-time:', payload.new);
+          // Refresh tracks when new ones are added
+          fetchRecentTracks();
+        }
+      )
+      .subscribe();
+    
+    // Also refresh tracks every 2 minutes as backup
+    const interval = setInterval(fetchRecentTracks, 2 * 60 * 1000);
+    
+    return () => {
+      console.log('🎵 Cleaning up real-time subscription');
+      supabase.removeChannel(channel);
+      clearInterval(interval);
+    };
   }, []);
 
   const handlePlayPause = async (trackId: number) => {
