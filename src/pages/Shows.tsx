@@ -88,7 +88,12 @@ const Shows = () => {
                   <Play className="w-5 h-5 mr-2" />
                   Listen Now
                 </Button>
-                <Button variant="outline" size="lg" className="text-lg px-8 py-4 hover:scale-105 transition-transform">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="text-lg px-8 py-4 hover:scale-105 transition-transform"
+                  onClick={() => window.open('https://podcasts.apple.com/us/podcast/future-dance-anthems-with-mario/id1439656478', '_blank')}
+                >
                   <ExternalLink className="w-5 h-5 mr-2" />
                   Apple Podcasts
                 </Button>
