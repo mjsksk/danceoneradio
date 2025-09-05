@@ -285,8 +285,18 @@ export class RadioStreamService {
 
       console.log('✅ Fetched track history from database:', tracks.length, 'tracks');
 
+      // Deduplicate tracks based on title and artist (frontend safety measure)
+      const uniqueTracks = tracks.filter((track, index, self) => 
+        index === self.findIndex(t => 
+          t.title.toLowerCase() === track.title.toLowerCase() && 
+          t.artist.toLowerCase() === track.artist.toLowerCase()
+        )
+      );
+
+      console.log('✅ Unique tracks after deduplication:', uniqueTracks.length);
+
       // Convert database records to Track interface
-      const historyTracks: Track[] = tracks.map((track, index) => ({
+      const historyTracks: Track[] = uniqueTracks.map((track, index) => ({
         id: index + 1,
         title: track.title,
         artist: track.artist,
