@@ -91,16 +91,21 @@ Deno.serve(async (req) => {
     let newTracksAdded = 0;
     
     for (const track of tracks) {
-      // Check if track already exists
+      // Check if track already exists (without checking exact played_at to avoid duplicates)
       const { data: existingTrack } = await supabase
         .from('radio_track_history')
-        .select('id')
+        .select('id, played_at')
         .eq('title', track.title)
         .eq('artist', track.artist)
-        .eq('played_at', track.played_at)
+        .order('played_at', { ascending: false })
+        .limit(1)
         .single();
 
-      if (!existingTrack) {
+      // Only add if no existing track found, or if the last occurrence was more than 30 minutes ago
+      const shouldAdd = !existingTrack || 
+        (new Date().getTime() - new Date(existingTrack.played_at).getTime()) > 30 * 60 * 1000;
+
+      if (shouldAdd) {
         const { error: insertError } = await supabase
           .from('radio_track_history')
           .insert([track]);
@@ -111,6 +116,8 @@ Deno.serve(async (req) => {
         } else {
           console.log('❌ Error inserting track:', insertError);
         }
+      } else {
+        console.log('⏭️ Skipping duplicate track:', track.title, 'by', track.artist);
       }
     }
 
