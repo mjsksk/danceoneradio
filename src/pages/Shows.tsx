@@ -55,6 +55,7 @@ const Shows = () => {
         }
         
         const items = xmlDoc.querySelectorAll('item');
+        console.log(`Found ${items.length} episodes in RSS feed`);
         
         const episodeList: Episode[] = Array.from(items).map(item => {
           const description = item.querySelector('description')?.textContent || '';
