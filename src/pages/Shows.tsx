@@ -19,6 +19,7 @@ interface Episode {
 
 const Shows = () => {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
+  const [totalEpisodes, setTotalEpisodes] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
   const [bgLoaded, setBgLoaded] = useState(false);
@@ -73,6 +74,7 @@ const Shows = () => {
         });
         
         setEpisodes(episodeList.slice(0, 10));
+        setTotalEpisodes(episodeList.length);
       } catch (error) {
         console.error('Error fetching episodes:', error);
       } finally {
@@ -143,13 +145,13 @@ const Shows = () => {
     });
   };
 
-  const handleShareEpisode = async (episode: Episode, episodeIndex: number) => {
-    const episodeUrl = `${window.location.origin}/shows#episode-${episodes.length - episodeIndex}`;
-    const shareData = {
-      title: `${episode.title} - Future Dance Anthems with Mario`,
-      text: `Listen to "${episode.title}" from Future Dance Anthems with Mario podcast. ${episode.description.substring(0, 100)}...`,
-      url: episodeUrl
-    };
+   const handleShareEpisode = async (episode: Episode, episodeIndex: number) => {
+     const episodeUrl = `${window.location.origin}/shows#episode-${totalEpisodes - episodeIndex}`;
+     const shareData = {
+       title: `${episode.title} - Future Dance Anthems with Mario`,
+       text: `Listen to "${episode.title}" from Future Dance Anthems with Mario podcast. ${episode.description.substring(0, 100)}...`,
+       url: episodeUrl
+     };
 
     try {
       if (navigator.share && navigator.canShare?.(shareData)) {
@@ -238,7 +240,7 @@ const Shows = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card className="card-cyber p-6 text-center">
                   <div className="text-3xl font-['Orbitron'] font-bold text-neon mb-2">
-                    {episodes.length}
+                    {totalEpisodes}
                   </div>
                   <div className="text-muted-foreground">Total Episodes</div>
                 </Card>
@@ -283,14 +285,14 @@ const Shows = () => {
                       <div className="flex flex-col lg:flex-row gap-8">
                         {/* Episode Number Badge */}
                         <div className="lg:w-20 flex lg:flex-col items-center lg:items-start gap-4">
-                          <div className="bg-gradient-to-br from-neon to-neon-purple text-background rounded-full w-16 h-16 flex items-center justify-center font-['Orbitron'] font-bold text-lg">
-                            #{episodes.length - index}
-                          </div>
+                           <div className="bg-gradient-to-br from-neon to-neon-purple text-background rounded-full w-16 h-16 flex items-center justify-center font-['Orbitron'] font-bold text-lg">
+                             #{totalEpisodes - index}
+                           </div>
                         </div>
 
                         {/* Episode Content */}
                         <div className="flex-1 space-y-4">
-                          <div id={`episode-${episodes.length - index}`}>
+                          <div id={`episode-${totalEpisodes - index}`}>
                             <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold mb-3 text-primary group-hover:text-neon transition-colors">
                               {episode.title}
                             </h3>
