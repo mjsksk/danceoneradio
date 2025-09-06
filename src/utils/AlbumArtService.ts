@@ -4,45 +4,49 @@ interface AlbumArtResponse {
 }
 
 export class AlbumArtService {
-  private static cache = new Map<string, string>();
+  private static cache = new Map<string, Promise<AlbumArtResponse>>();
+  private static requestQueue = new Map<string, number>();
+  private static maxConcurrentRequests = 3;
 
   static async getAlbumArt(songTitle: string): Promise<AlbumArtResponse> {
-    // Clean the song title for better search results
     const cleanTitle = this.cleanSongTitle(songTitle);
     
-    // Check cache first
+    // Return cached promise if available
     if (this.cache.has(cleanTitle)) {
-      return { imageUrl: this.cache.get(cleanTitle)! };
+      return await this.cache.get(cleanTitle)!;
     }
 
-    try {
-      // Try multiple sources for album art
-      const sources = [
-        () => this.searchLastFM(cleanTitle),
-        () => this.searchDeezer(cleanTitle),
-        () => this.searchiTunes(cleanTitle),
-        () => this.searchMusicBrainz(cleanTitle)
-      ];
+    // Create and cache the promise
+    const searchPromise = this.performAlbumArtSearch(cleanTitle);
+    this.cache.set(cleanTitle, searchPromise);
+    
+    return await searchPromise;
+  }
 
-      for (const searchFunction of sources) {
-        try {
-          const result = await searchFunction();
-          if (result.imageUrl) {
-            this.cache.set(cleanTitle, result.imageUrl);
-            return result;
-          }
-        } catch (error) {
-          console.log('Album art search failed, trying next source:', error);
-          continue;
-        }
+  private static async performAlbumArtSearch(cleanTitle: string): Promise<AlbumArtResponse> {
+    try {
+      // Rate limit requests
+      const currentRequests = Array.from(this.requestQueue.values()).filter(time => Date.now() - time < 1000).length;
+      if (currentRequests >= this.maxConcurrentRequests) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      
+      this.requestQueue.set(cleanTitle, Date.now());
+
+      // Try iTunes first (most reliable)
+      const itunesResult = await this.searchiTunes(cleanTitle);
+      if (itunesResult.imageUrl) {
+        return itunesResult;
       }
 
-      // Fallback to a default music-themed image
-      const defaultImage = this.getDefaultAlbumArt();
-      return { imageUrl: defaultImage };
+      // Fallback to default
+      return { imageUrl: this.getDefaultAlbumArt() };
     } catch (error) {
       console.error('Error fetching album art:', error);
       return { imageUrl: this.getDefaultAlbumArt(), error: 'Failed to fetch album art' };
+    } finally {
+      // Clean up old requests
+      setTimeout(() => this.requestQueue.delete(cleanTitle), 2000);
     }
   }
 
@@ -86,11 +90,15 @@ export class AlbumArtService {
     try {
       const url = `https://itunes.apple.com/search?term=${encodeURIComponent(title)}&media=music&limit=1`;
       const response = await fetch(url);
+      
+      if (!response.ok) {
+        return { imageUrl: null };
+      }
+      
       const data = await response.json();
       
       if (data.results && data.results.length > 0) {
         const track = data.results[0];
-        // Get high resolution artwork
         const artworkUrl = track.artworkUrl100?.replace('100x100', '600x600');
         return { imageUrl: artworkUrl };
       }

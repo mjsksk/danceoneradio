@@ -25,8 +25,14 @@ interface AppleMusicSearchResponse {
 
 export class AppleMusicService {
   private static baseUrl = 'https://upbwlnpycrbhxahjztrf.supabase.co/functions/v1/apple-music-search';
+  private static cache = new Map<string, Promise<string | null>>();
+  private static connectionTested = false;
 
   static async testConnection(): Promise<boolean> {
+    if (this.connectionTested) {
+      return true;
+    }
+    
     try {
       console.log('🔧 Testing Apple Music API connection...');
       const testResponse = await fetch(`${this.baseUrl}?q=test`, {
@@ -36,18 +42,8 @@ export class AppleMusicService {
         }
       });
       
-      console.log('🔧 Test response status:', testResponse.status);
-      console.log('🔧 Test response headers:', Object.fromEntries(testResponse.headers.entries()));
-      
-      if (!testResponse.ok) {
-        const errorText = await testResponse.text();
-        console.error('🔧 Test response error:', errorText);
-        return false;
-      }
-      
-      const testData = await testResponse.json();
-      console.log('🔧 Test response data:', testData);
-      return true;
+      this.connectionTested = testResponse.ok;
+      return this.connectionTested;
     } catch (error) {
       console.error('🔧 Apple Music API connection test failed:', error);
       return false;
@@ -57,19 +53,39 @@ export class AppleMusicService {
   static async searchTrack(artist: string, title: string): Promise<string | null> {
     try {
       const query = `${artist} ${title}`.trim();
-      console.log('🎵 Searching Apple Music for:', query);
-      console.log('🎵 Using API endpoint:', this.baseUrl);
+      const cacheKey = query.toLowerCase();
+      
+      // Return cached promise if available
+      if (this.cache.has(cacheKey)) {
+        return await this.cache.get(cacheKey)!;
+      }
+      
+      // Create and cache the promise
+      const searchPromise = this.performSearch(query);
+      this.cache.set(cacheKey, searchPromise);
+      
+      return await searchPromise;
+    } catch (error) {
+      console.error('🎵 Error searching Apple Music:', error);
+      return null;
+    }
+  }
 
-      // Test connection first if this is the first call
-      const isConnected = await this.testConnection();
-      if (!isConnected) {
-        console.error('🎵 Apple Music API connection failed, skipping search');
-        return null;
+  private static async performSearch(query: string): Promise<string | null> {
+    try {
+      console.log('🎵 Searching Apple Music for:', query);
+
+      // Only test connection once
+      if (!this.connectionTested) {
+        const isConnected = await this.testConnection();
+        if (!isConnected) {
+          console.error('🎵 Apple Music API connection failed, skipping search');
+          return null;
+        }
       }
 
       const fullUrl = `${this.baseUrl}?q=${encodeURIComponent(query)}`;
-      console.log('🎵 Making request to:', fullUrl);
-
+      
       const response = await fetch(fullUrl, {
         method: 'GET',
         headers: {
@@ -77,44 +93,26 @@ export class AppleMusicService {
         }
       });
       
-      console.log('🎵 Response status:', response.status);
-      console.log('🎵 Response headers:', Object.fromEntries(response.headers.entries()));
-      
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('🎵 Apple Music search failed:', {
-          status: response.status,
-          statusText: response.statusText,
-          error: errorText
-        });
+        console.error('🎵 Apple Music search failed:', response.status);
         return null;
       }
 
       const data: AppleMusicSearchResponse = await response.json();
-      console.log('🎵 Apple Music API response:', data);
       
       if (data.results.songs?.data && data.results.songs.data.length > 0) {
         const track = data.results.songs.data[0];
-        console.log('🎵 Found track:', track.attributes.name, 'by', track.attributes.artistName);
-        
         const previewUrl = track.attributes.previews?.[0]?.url;
         
         if (previewUrl) {
-          console.log('🎵 Found Apple Music preview URL:', previewUrl);
+          console.log('🎵 Found Apple Music preview URL for:', query);
           return previewUrl;
-        } else {
-          console.log('🎵 Track found but no preview available');
         }
       }
 
-      console.log('🎵 No Apple Music results found for:', query);
       return null;
     } catch (error) {
-      console.error('🎵 Error searching Apple Music:', {
-        error: error.message,
-        stack: error.stack,
-        query: `${artist} ${title}`
-      });
+      console.error('🎵 Error in performSearch:', error);
       return null;
     }
   }

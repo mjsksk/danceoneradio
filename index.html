@@ -7,6 +7,25 @@
     <title>dance one radio</title>
     <meta name="description" content="Lovable Generated Project" />
     <meta name="author" content="Lovable" />
+    <!-- Critical CSS and font optimization -->
+    <style>
+      /* Inline critical font fallbacks to prevent layout shift */
+      @font-face {
+        font-family: 'Audiowide-fallback';
+        src: local('Arial Black'), local('Impact');
+        font-display: swap;
+      }
+      @font-face {
+        font-family: 'Electrolize-fallback';
+        src: local('Arial'), local('Helvetica');
+        font-display: swap;
+      }
+      
+      /* Use fallback fonts initially */
+      .font-audiowide-loading { font-family: 'Audiowide-fallback', monospace; }
+      .font-electrolize-loading { font-family: 'Electrolize-fallback', sans-serif; }
+    </style>
+    
     <!-- Preconnect to Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,16 +39,38 @@
     <link rel="dns-prefetch" href="//s9.myradiostream.com">
     <link rel="dns-prefetch" href="//api.allorigins.win">
     <link rel="dns-prefetch" href="//images.unsplash.com">
+    <link rel="dns-prefetch" href="//itunes.apple.com">
     
-    <!-- Inline font loading script to prevent render blocking -->
+    <!-- Optimized font loading script -->
     <script>
-      // Load fonts asynchronously after page load
-      window.addEventListener('load', function() {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = 'https://fonts.googleapis.com/css2?family=Audiowide:wght@400&family=Electrolize:wght@400&display=swap';
-        document.head.appendChild(link);
-      });
+      // Load fonts asynchronously with fallback handling
+      (function() {
+        var fontLoadTimeout = setTimeout(function() {
+          console.log('Font loading timeout, using fallbacks');
+        }, 3000);
+        
+        function loadFonts() {
+          var link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = 'https://fonts.googleapis.com/css2?family=Audiowide:wght@400&family=Electrolize:wght@400&display=swap';
+          link.onload = function() {
+            clearTimeout(fontLoadTimeout);
+            document.documentElement.classList.add('fonts-loaded');
+          };
+          link.onerror = function() {
+            clearTimeout(fontLoadTimeout);
+            console.log('Font loading failed, using system fonts');
+          };
+          document.head.appendChild(link);
+        }
+        
+        // Load fonts when DOM is ready
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', loadFonts);
+        } else {
+          loadFonts();
+        }
+      })();
       
       // Register service worker for browser-level caching
       if ('serviceWorker' in navigator) {
