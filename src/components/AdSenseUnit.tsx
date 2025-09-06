@@ -52,11 +52,6 @@ const AdSenseUnit = () => {
           data-ad-format="auto"
           data-full-width-responsive="true"
         />
-        
-        <div className="mt-4 bg-muted/10 border border-dashed border-muted-foreground/20 rounded-lg p-8 text-center">
-          <p className="text-muted-foreground">Advertisement Placeholder</p>
-          <p className="text-xs text-muted-foreground/70 mt-2">Check console for AdSense logs</p>
-        </div>
       </div>
     </section>
   );
