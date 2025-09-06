@@ -6,7 +6,7 @@ const DJSection = () => {
     name: "DJ Pulse",
     role: "Resident DJ & Founder",
     genre: "Progressive House",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=focalpoint&fp-x=0.5&fp-y=0.3",
     bio: "Pioneer of progressive house with over 10 years in the scene",
     socials: {
       instagram: "@djpulse",
@@ -18,7 +18,7 @@ const DJSection = () => {
     name: "DJ Neon",
     role: "Cyber Specialist",
     genre: "Cyberpunk / Synthwave",
-    image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop&crop=focalpoint&fp-x=0.5&fp-y=0.3",
     bio: "Bringing futuristic sounds from the digital underground",
     socials: {
       instagram: "@djneon",
