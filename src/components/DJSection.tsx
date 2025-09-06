@@ -18,7 +18,7 @@ const DJSection = () => {
     name: "DJ Neon",
     role: "Cyber Specialist",
     genre: "Cyberpunk / Synthwave",
-    image: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=400&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
     bio: "Bringing futuristic sounds from the digital underground",
     socials: {
       instagram: "@djneon",
