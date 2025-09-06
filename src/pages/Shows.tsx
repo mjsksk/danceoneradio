@@ -158,8 +158,21 @@ const Shows = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
-      <Navigation />
+    <div className="min-h-screen bg-background overflow-x-hidden relative">
+      {/* Background Image */}
+      <div 
+        className="fixed inset-0 z-0 opacity-20"
+        style={{
+          backgroundImage: 'url(/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      />
+      
+      {/* Content overlay */}
+      <div className="relative z-10">
+        <Navigation />
       
       <main className="pt-16">
         {/* Hero Section */}
@@ -325,6 +338,7 @@ const Shows = () => {
       </main>
 
       <Footer />
+      </div>
     </div>
   );
 };
