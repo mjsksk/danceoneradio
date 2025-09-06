@@ -386,15 +386,14 @@ const TracksSection = () => {
                         {track.artist}
                       </p>
                       <div className="flex flex-wrap items-center gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground font-['Rajdhani']">
-                        <span className="truncate max-w-20 sm:max-w-none">{track.genre}</span>
+                        <span className="truncate max-w-16 sm:max-w-none">{track.genre}</span>
                         <span className="hidden sm:inline">•</span>
-                        <div className="flex items-center">
+                        <div className="flex items-center shrink-0">
                           <Clock className="w-3 h-3 mr-1" />
                           {track.duration}
                         </div>
                         <span className="hidden sm:inline">•</span>
                         <span className="hidden sm:inline">{new Date(track.playedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                        <span className="sm:hidden text-xs">{new Date(track.playedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
                     </div>
 
@@ -460,8 +459,8 @@ const TracksSection = () => {
                  </div>
 
                  {/* Stats & Actions */}
-                 <div className="flex items-center justify-between">
-                   <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
+                 <div className="flex items-center justify-between gap-2">
+                   <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                      <div className="flex items-center gap-1">
                        <Heart className="w-3 h-3 sm:w-4 sm:h-4" />
                        <span>{track.likes}</span>
@@ -470,6 +469,9 @@ const TracksSection = () => {
                        <Download className="w-3 h-3 sm:w-4 sm:h-4" />
                        <span>{track.downloads}</span>
                      </div>
+                     <span className="text-xs whitespace-nowrap">
+                       {new Date(track.playedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                     </span>
                    </div>
                    
                    <Button
