@@ -53,11 +53,13 @@ const AdSenseUnit = () => {
       <div 
         className="w-full max-w-4xl"
         style={{ 
-          contain: 'layout style',
+          contain: 'layout style paint',
+          contentVisibility: 'auto',
           minHeight: '280px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          willChange: 'auto'
         }}
       >
         <ins 
@@ -67,7 +69,11 @@ const AdSenseUnit = () => {
             display: 'block',
             width: '100%',
             height: '280px',
-            backgroundColor: 'transparent'
+            backgroundColor: 'transparent',
+            contain: 'layout style',
+            transform: 'translateZ(0)',
+            backfaceVisibility: 'hidden',
+            perspective: '1000px'
           }}
           data-ad-client="ca-pub-4230589452649530"
           data-ad-slot="6777392184"
