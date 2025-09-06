@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 declare global {
   interface Window {
@@ -7,45 +7,67 @@ declare global {
 }
 
 const AdSenseUnit = () => {
+  const adRef = useRef<HTMLModElement>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
   useEffect(() => {
-    console.log('🔥 AdSense component mounted! Time:', new Date().toISOString());
-    
-    // Check if AdSense script is loaded
-    const scripts = document.querySelectorAll('script[src*="adsbygoogle"]');
-    console.log('📜 AdSense scripts found:', scripts.length);
-    
-    // Check if adsbygoogle is available
-    console.log('🌐 window.adsbygoogle exists:', !!window.adsbygoogle);
-    console.log('🌐 window.adsbygoogle length:', window.adsbygoogle?.length || 0);
-    
-    // Initialize adsbygoogle array
-    window.adsbygoogle = window.adsbygoogle || [];
-    console.log('🔧 AdSense array initialized, length:', window.adsbygoogle.length);
-    
-    // Wait a bit then push the ad
-    const timer = setTimeout(() => {
-      try {
-        console.log('🚀 Pushing ad to AdSense queue...');
-        (window.adsbygoogle).push({});
-        console.log('✅ AdSense ad pushed to queue successfully');
-        console.log('📊 AdSense queue length after push:', window.adsbygoogle.length);
-      } catch (error) {
-        console.error('❌ AdSense push error:', error);
+    // Use Intersection Observer to load ad only when visible
+    if (!adRef.current) return;
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Initialize adsbygoogle array
+            window.adsbygoogle = window.adsbygoogle || [];
+            
+            // Use requestAnimationFrame to avoid forced reflows
+            requestAnimationFrame(() => {
+              try {
+                (window.adsbygoogle).push({});
+              } catch (error) {
+                console.error('AdSense error:', error);
+              }
+            });
+            
+            // Disconnect observer after loading
+            observerRef.current?.disconnect();
+          }
+        });
+      },
+      { 
+        rootMargin: '100px',
+        threshold: 0.1 
       }
-    }, 1000);
-    
-    return () => clearTimeout(timer);
+    );
+
+    observerRef.current.observe(adRef.current);
+
+    return () => {
+      observerRef.current?.disconnect();
+    };
   }, []);
 
   return (
     <section className="my-8 flex justify-center">
-      <div className="w-full max-w-4xl">
+      <div 
+        className="w-full max-w-4xl"
+        style={{ 
+          contain: 'layout style',
+          minHeight: '280px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
         <ins 
+          ref={adRef}
           className="adsbygoogle"
           style={{ 
             display: 'block',
             width: '100%',
-            height: '280px'
+            height: '280px',
+            backgroundColor: 'transparent'
           }}
           data-ad-client="ca-pub-4230589452649530"
           data-ad-slot="6777392184"
