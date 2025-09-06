@@ -29,6 +29,12 @@ const Shows = () => {
         const response = await fetch('https://api.allorigins.win/get?url=https://www.danceoneradio.com/feed/podcast/');
         const data = await response.json();
         
+        // Check if we received HTML instead of XML (indicates wrong URL)
+        if (data.contents && data.contents.includes('<!DOCTYPE html>')) {
+          console.error('Received HTML instead of RSS feed - podcast feed URL may be incorrect');
+          throw new Error('Invalid podcast feed URL');
+        }
+        
         // Check if the response contains base64 encoded data
         let xmlContent = data.contents;
         if (typeof data.contents === 'string' && data.contents.startsWith('data:application/rss+xml')) {
@@ -39,6 +45,13 @@ const Shows = () => {
         
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
+        
+        // Check if parsing was successful
+        const parserError = xmlDoc.querySelector('parsererror');
+        if (parserError) {
+          throw new Error('Failed to parse RSS feed');
+        }
+        
         const items = xmlDoc.querySelectorAll('item');
         
         const episodeList: Episode[] = Array.from(items).map(item => {
