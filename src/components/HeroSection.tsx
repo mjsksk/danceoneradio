@@ -45,26 +45,15 @@ const HeroSection = () => {
       {/* Hero Content */}
       <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
         <div className="mb-8 animate-fade-in">
-          <div className="flex justify-center mb-6">
-            <picture>
-              <source 
-                srcSet="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png?w=640&f=webp 640w,
-                        /lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png?w=800&f=webp 800w,
-                        /lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png?w=1024&f=webp 1024w"
-                sizes="(max-width: 768px) 384px, 640px"
-                type="image/webp"
-              />
-              <img 
-                src="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png" 
-                srcSet="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png?w=640 640w,
-                        /lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png?w=800 800w,
-                        /lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png?w=1024 1024w"
-                sizes="(max-width: 768px) 384px, 640px"
-                alt="Dance One Radio" 
-                className="h-96 md:h-[40rem] w-auto object-contain animate-neon-flicker"
-                loading="eager"
-              />
-            </picture>
+          <div className="flex justify-center mb-6 hero-logo">
+            <img 
+              src="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png" 
+              alt="Dance One Radio" 
+              className="h-96 md:h-[40rem] w-auto object-contain animate-neon-flicker"
+              loading="eager"
+              width="640"
+              height="640"
+            />
           </div>
         </div>
 
