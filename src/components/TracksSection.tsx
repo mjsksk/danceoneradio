@@ -30,14 +30,26 @@ const TracksSection = () => {
   const [loadingPreviews, setLoadingPreviews] = useState<{[key: number]: boolean}>({});
   const [previewErrors, setPreviewErrors] = useState<{[key: number]: string}>({});
   const [audioRef, setAudioRef] = useState<HTMLAudioElement | null>(null);
+  const [likedTracks, setLikedTracks] = useState<Set<number>>(new Set());
 
-  // Initialize audio element
+  // Initialize audio element and load liked tracks
   useEffect(() => {
     const audio = new Audio();
     audio.addEventListener('ended', () => {
       setPlayingTrack(null);
     });
     setAudioRef(audio);
+    
+    // Load liked tracks from localStorage
+    const savedLikes = localStorage.getItem('likedTracks');
+    if (savedLikes) {
+      try {
+        const likedTrackIds = JSON.parse(savedLikes);
+        setLikedTracks(new Set(likedTrackIds));
+      } catch (error) {
+        console.error('Failed to load liked tracks:', error);
+      }
+    }
     
     return () => {
       audio.pause();
@@ -317,6 +329,23 @@ const TracksSection = () => {
     console.log('🎵 Social sharing popup opened');
   };
 
+  const handleLike = (track: Track) => {
+    const newLikedTracks = new Set(likedTracks);
+    
+    if (likedTracks.has(track.id)) {
+      newLikedTracks.delete(track.id);
+      console.log(`🎵 Unliked track: ${track.title} by ${track.artist}`);
+    } else {
+      newLikedTracks.add(track.id);
+      console.log(`🎵 Liked track: ${track.title} by ${track.artist}`);
+    }
+    
+    setLikedTracks(newLikedTracks);
+    
+    // Save to localStorage
+    localStorage.setItem('likedTracks', JSON.stringify(Array.from(newLikedTracks)));
+  };
+
   return (
     <section id="tracks" className="py-20 relative">
       <div className="container mx-auto px-4">
@@ -459,13 +488,19 @@ const TracksSection = () => {
                 {/* Stats & Actions */}
                 <div className="flex items-center space-x-4">
                   <div className="flex flex-col space-y-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-muted-foreground hover:text-red-400 hover:bg-red-400/20"
-                    >
-                      <Heart className="w-4 h-4" />
-                    </Button>
+                     <Button
+                       variant="ghost"
+                       size="icon"
+                       className={`transition-colors ${
+                         likedTracks.has(track.id)
+                           ? 'text-red-400 hover:text-red-500 bg-red-400/20'
+                           : 'text-muted-foreground hover:text-red-400 hover:bg-red-400/20'
+                       }`}
+                       onClick={() => handleLike(track)}
+                       title={likedTracks.has(track.id) ? 'Remove from favorites' : 'Add to favorites'}
+                     >
+                       <Heart className={`w-4 h-4 ${likedTracks.has(track.id) ? 'fill-current' : ''}`} />
+                     </Button>
                      <Button
                        variant="ghost"
                        size="icon"
