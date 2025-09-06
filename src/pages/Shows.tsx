@@ -4,7 +4,6 @@ import { Card } from '@/components/ui/card';
 import { Play, Pause, ExternalLink, Calendar, Clock } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
-import optimizedBg from '@/assets/shows-bg-optimized.jpg';
 
 interface Episode {
   title: string;
@@ -22,6 +21,7 @@ const Shows = () => {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
+  const [bgLoaded, setBgLoaded] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -171,17 +171,28 @@ const Shows = () => {
     }
   };
 
+  // Preload background image for better performance
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => setBgLoaded(true);
+    img.src = '/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png';
+  }, []);
+
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
-      {/* Optimized Background Image */}
+      {/* Optimized Background Image with lazy loading */}
       <div 
-        className="fixed inset-0 z-0 opacity-20"
+        className={`fixed inset-0 z-0 opacity-20 transition-opacity duration-500 ${
+          bgLoaded ? 'opacity-20' : 'opacity-0'
+        }`}
         style={{
-          backgroundImage: `url(${optimizedBg})`,
+          backgroundImage: 'url(/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          willChange: 'transform'
+          willChange: 'transform',
+          transform: 'translateZ(0)', // Force GPU acceleration
+          backfaceVisibility: 'hidden'
         }}
       />
       
