@@ -74,7 +74,7 @@ const Contact = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 pt-24">
         <div className="max-w-2xl mx-auto">
           <h1 className="text-4xl font-bold text-center mb-8 text-foreground">Contact Us</h1>
           
