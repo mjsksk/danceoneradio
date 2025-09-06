@@ -69,6 +69,21 @@ const Shows = () => {
     fetchEpisodes();
   }, []);
 
+  // Scroll to episode if hash is present
+  useEffect(() => {
+    if (episodes.length > 0) {
+      const hash = window.location.hash;
+      if (hash && hash.startsWith('#episode-')) {
+        const episodeElement = document.querySelector(hash);
+        if (episodeElement) {
+          setTimeout(() => {
+            episodeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 100);
+        }
+      }
+    }
+  }, [episodes]);
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -112,6 +127,34 @@ const Shows = () => {
       setCurrentlyPlaying(null);
       audioRef.current = null;
     });
+  };
+
+  const handleShareEpisode = async (episode: Episode, episodeIndex: number) => {
+    const episodeUrl = `${window.location.origin}/shows#episode-${episodes.length - episodeIndex}`;
+    const shareData = {
+      title: `${episode.title} - Future Dance Anthems with Mario`,
+      text: `Listen to "${episode.title}" from Future Dance Anthems with Mario podcast. ${episode.description.substring(0, 100)}...`,
+      url: episodeUrl
+    };
+
+    try {
+      if (navigator.share && navigator.canShare?.(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.writeText(`${shareData.title}\n\n${shareData.text}\n\n${shareData.url}`);
+        // You could add a toast notification here if you have one
+        alert('Episode link copied to clipboard!');
+      }
+    } catch (error) {
+      // Final fallback: just copy the URL
+      try {
+        await navigator.clipboard.writeText(episodeUrl);
+        alert('Episode link copied to clipboard!');
+      } catch (clipboardError) {
+        console.error('Failed to share or copy:', error, clipboardError);
+      }
+    }
   };
 
   return (
@@ -208,7 +251,7 @@ const Shows = () => {
 
                         {/* Episode Content */}
                         <div className="flex-1 space-y-4">
-                          <div>
+                          <div id={`episode-${episodes.length - index}`}>
                             <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold mb-3 text-primary group-hover:text-neon transition-colors">
                               {episode.title}
                             </h3>
@@ -266,12 +309,7 @@ const Shows = () => {
                             variant="ghost" 
                             size="sm"
                             className="w-full text-xs text-muted-foreground hover:text-primary"
-                            onClick={() => {
-                              navigator.share?.({
-                                title: episode.title,
-                                url: window.location.href
-                              }) || navigator.clipboard.writeText(window.location.href);
-                            }}
+                            onClick={() => handleShareEpisode(episode, index)}
                           >
                             Share Episode
                           </Button>
