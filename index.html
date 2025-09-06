@@ -30,10 +30,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
-    <!-- Preload critical assets -->
+    <!-- Critical resource preloading with high priority -->
+    <link rel="preload" href="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png" as="image" type="image/png" fetchpriority="high">
     <link rel="preload" href="/assets/dance-one-logo-DP6h_tTr.png" as="image" type="image/png">
     <link rel="preload" href="/assets/hero-bg-B-ZqE77g.jpg" as="image" type="image/jpeg">
-    <link rel="preload" href="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png" as="image" type="image/png">
     
     <!-- DNS prefetch for external resources -->
     <link rel="dns-prefetch" href="//s9.myradiostream.com">
@@ -41,10 +41,11 @@
     <link rel="dns-prefetch" href="//images.unsplash.com">
     <link rel="dns-prefetch" href="//itunes.apple.com">
     
-    <!-- Optimized font loading script -->
+    <!-- Optimized font loading script with LCP optimization -->
     <script>
-      // Load fonts asynchronously with fallback handling
+      // Inline critical performance optimizations
       (function() {
+        // Font loading with performance optimization
         var fontLoadTimeout = setTimeout(function() {
           console.log('Font loading timeout, using fallbacks');
         }, 3000);
@@ -53,8 +54,10 @@
           var link = document.createElement('link');
           link.rel = 'stylesheet';
           link.href = 'https://fonts.googleapis.com/css2?family=Audiowide:wght@400&family=Electrolize:wght@400&display=swap';
+          link.media = 'print';
           link.onload = function() {
             clearTimeout(fontLoadTimeout);
+            this.media = 'all';
             document.documentElement.classList.add('fonts-loaded');
           };
           link.onerror = function() {

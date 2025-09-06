@@ -51,8 +51,10 @@ const HeroSection = () => {
               alt="Dance One Radio" 
               className="h-96 md:h-[40rem] w-auto object-contain animate-neon-flicker"
               loading="eager"
+              fetchPriority="high"
               width="640"
               height="640"
+              decoding="sync"
             />
           </div>
         </div>

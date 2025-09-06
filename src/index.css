@@ -244,11 +244,19 @@
     object-fit: cover;
   }
 
-  /* Hero image optimization */
+  /* Hero image optimization for LCP */
   .hero-logo img {
     max-width: min(640px, 90vw);
     height: auto;
     object-fit: contain;
+    content-visibility: auto;
+    contain: layout style paint;
+  }
+
+  /* LCP optimization */
+  .animate-neon-flicker {
+    will-change: filter;
+    transform: translateZ(0);
   }
 
   /* Lazy loading optimization */
