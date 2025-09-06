@@ -243,11 +243,11 @@ const Shows = () => {
                   <div className="text-3xl font-['Orbitron'] font-bold text-neon mb-2">
                     {totalEpisodes}
                   </div>
-                  <div className="text-muted-foreground">Total Episodes</div>
+                  <div className="text-muted-foreground">Latest Episodes</div>
                 </Card>
                 <Card className="card-cyber p-6 text-center">
                   <div className="text-3xl font-['Orbitron'] font-bold text-neon-purple mb-2">
-                    Weekly
+                    Bi-Weekly
                   </div>
                   <div className="text-muted-foreground">Release Schedule</div>
                 </Card>
