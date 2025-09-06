@@ -27,8 +27,16 @@ const Shows = () => {
         const response = await fetch('https://api.allorigins.win/get?url=https://www.danceoneradio.com/feed/podcast/');
         const data = await response.json();
         
+        // Check if the response contains base64 encoded data
+        let xmlContent = data.contents;
+        if (typeof data.contents === 'string' && data.contents.startsWith('data:application/rss+xml')) {
+          // Extract base64 content and decode it
+          const base64Content = data.contents.split(',')[1];
+          xmlContent = atob(base64Content);
+        }
+        
         const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(data.contents, 'text/xml');
+        const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
         const items = xmlDoc.querySelectorAll('item');
         
         const episodeList: Episode[] = Array.from(items).map(item => {
