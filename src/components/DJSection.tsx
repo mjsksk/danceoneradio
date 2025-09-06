@@ -67,9 +67,21 @@ const DJSection = () => {
               {/* DJ Photo */}
               <div className="relative mb-6">
                 <div className="w-32 h-32 mx-auto rounded-full overflow-hidden border-2 border-primary/50 group-hover:border-primary transition-all duration-300">
-                  <img src={dj.image} alt={dj.name} className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-300" style={{
-                objectPosition: 'center top'
-              }} />
+                  <img 
+                    src={dj.image.includes('unsplash') ? dj.image.replace('w=400&h=400', 'w=128&h=128') : dj.image} 
+                    srcSet={dj.image.includes('unsplash') ? 
+                      `${dj.image.replace('w=400&h=400', 'w=128&h=128')} 128w,
+                       ${dj.image.replace('w=400&h=400', 'w=256&h=256')} 256w` : 
+                      undefined
+                    }
+                    sizes="128px"
+                    alt={dj.name} 
+                    className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-300" 
+                    style={{
+                      objectPosition: 'center top'
+                    }}
+                    loading="lazy"
+                  />
                 </div>
                 <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-primary rounded-full flex items-center justify-center animate-glow-pulse">
                   <Music className="w-3 h-3 text-primary-foreground" />

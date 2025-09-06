@@ -394,15 +394,20 @@ const TracksSection = () => {
                          }}
                        />
                      ) : (
-                       <img 
-                         src={stationLogo} 
-                         alt="Dance One Radio Logo" 
-                         className="w-full h-full object-contain"
-                         onError={() => {
-                           setLogoError(prev => ({...prev, [track.id]: true}));
-                           console.log('Station logo failed to load for track:', track.title);
-                         }}
-                       />
+                        <img 
+                          src={stationLogo} 
+                          alt="Dance One Radio Logo" 
+                          className="w-full h-full object-contain"
+                          loading="lazy"
+                          style={{
+                            maxWidth: '64px',
+                            maxHeight: '64px'
+                          }}
+                          onError={() => {
+                            setLogoError(prev => ({...prev, [track.id]: true}));
+                            console.log('Station logo failed to load for track:', track.title);
+                          }}
+                        />
                      )}
                    </div>
 

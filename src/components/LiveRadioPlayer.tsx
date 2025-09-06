@@ -511,7 +511,7 @@ const LiveRadioPlayer = ({
         <div className="flex items-center justify-center mb-6">
         <div className="relative">
           <div className="w-40 h-40 bg-gradient-to-r from-primary to-accent rounded-lg flex items-center justify-center pulse-cyber overflow-hidden">
-            {albumArt ? <img src={albumArt} alt="Current Track Album Art" className="w-full h-full object-cover rounded-lg" onError={() => setAlbumArt(null)} /> : <img src={stationLogo} alt="Dance One Radio Logo" className="w-24 h-24 object-contain filter brightness-0 invert" onError={e => {
+            {albumArt ? <img src={albumArt} alt="Current Track Album Art" className="w-full h-full object-cover rounded-lg" onError={() => setAlbumArt(null)} /> : <img src={stationLogo} alt="Dance One Radio Logo" className="w-24 h-24 object-contain filter brightness-0 invert" loading="lazy" onError={e => {
               // If station logo fails to load, fallback to Radio icon
               e.currentTarget.style.display = 'none';
               const radioIcon = e.currentTarget.nextElementSibling as HTMLElement;
