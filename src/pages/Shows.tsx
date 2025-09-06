@@ -27,7 +27,7 @@ const Shows = () => {
   useEffect(() => {
     const fetchEpisodes = async () => {
       try {
-        const response = await fetch('https://api.allorigins.win/get?url=https://www.danceoneradio.com/feed/podcast/');
+        const response = await fetch('https://api.allorigins.win/get?url=https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml');
         const data = await response.json();
         
         // Check if we received HTML instead of XML (indicates wrong URL)
