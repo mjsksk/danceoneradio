@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Play, ExternalLink, Calendar, Clock } from 'lucide-react';
+import { Play, Pause, ExternalLink, Calendar, Clock } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 
@@ -20,6 +20,8 @@ interface Episode {
 const Shows = () => {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const fetchEpisodes = async () => {
@@ -72,6 +74,43 @@ const Shows = () => {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
+    });
+  };
+
+  const handlePlayPause = (episodeUrl: string, episodeGuid: string) => {
+    // If same episode is playing, toggle play/pause
+    if (currentlyPlaying === episodeGuid && audioRef.current) {
+      if (audioRef.current.paused) {
+        audioRef.current.play();
+      } else {
+        audioRef.current.pause();
+      }
+      return;
+    }
+
+    // Stop current audio if playing
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+
+    // Start new episode
+    const audio = new Audio(episodeUrl);
+    audioRef.current = audio;
+    setCurrentlyPlaying(episodeGuid);
+    
+    audio.play().catch(console.error);
+    
+    // Handle when audio ends
+    audio.addEventListener('ended', () => {
+      setCurrentlyPlaying(null);
+      audioRef.current = null;
+    });
+
+    // Handle errors
+    audio.addEventListener('error', () => {
+      setCurrentlyPlaying(null);
+      audioRef.current = null;
     });
   };
 
@@ -203,13 +242,14 @@ const Shows = () => {
                           {episode.enclosure.url && (
                             <Button 
                               className="w-full flex items-center gap-2 hover:scale-105 transition-all duration-200 bg-gradient-to-r from-neon to-neon-purple text-background hover:shadow-lg hover:shadow-neon/25"
-                              onClick={() => {
-                                const audio = new Audio(episode.enclosure.url);
-                                audio.play();
-                              }}
+                              onClick={() => handlePlayPause(episode.enclosure.url, episode.guid)}
                             >
-                              <Play className="w-4 h-4" />
-                              Play Episode
+                              {currentlyPlaying === episode.guid && audioRef.current && !audioRef.current.paused ? (
+                                <Pause className="w-4 h-4" />
+                              ) : (
+                                <Play className="w-4 h-4" />
+                              )}
+                              {currentlyPlaying === episode.guid && audioRef.current && !audioRef.current.paused ? 'Pause' : 'Play'} Episode
                             </Button>
                           )}
                           
