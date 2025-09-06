@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Play, Pause, ExternalLink, Calendar, Clock } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import optimizedBg from '@/assets/shows-bg-optimized.jpg';
 
 interface Episode {
   title: string;
@@ -172,14 +173,15 @@ const Shows = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
-      {/* Background Image */}
+      {/* Optimized Background Image */}
       <div 
         className="fixed inset-0 z-0 opacity-20"
         style={{
-          backgroundImage: 'url(/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png)',
+          backgroundImage: `url(${optimizedBg})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'top center',
-          backgroundRepeat: 'no-repeat'
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          willChange: 'transform'
         }}
       />
       
