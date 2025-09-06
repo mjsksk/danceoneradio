@@ -320,8 +320,8 @@ const TracksSection = () => {
   return (
     <section id="tracks" className="py-20 relative">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-8 sm:mb-16 animate-fade-in">
-          <h2 className="text-2xl sm:text-4xl md:text-6xl font-['Orbitron'] font-bold mb-4 sm:mb-6">
+        <div className="text-center mb-16 animate-fade-in">
+          <h2 className="text-4xl md:text-6xl font-['Orbitron'] font-bold mb-6">
             <span className="text-neon">LATEST PLAYED</span>{" "}
             <span className="text-neon-purple">TRACKS</span>
           </h2>
@@ -335,153 +335,147 @@ const TracksSection = () => {
           </Button>
         </div>
 
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-6">
           {loading ? (
             <div className="text-center py-8">
               <div className="text-muted-foreground">Loading recent tracks...</div>
             </div>
           ) : (
             tracks.filter(track => !track.title.includes("Dance One Radio") && !track.artist.includes("Dance One Radio")).map((track, index) => (
-             <div
-               key={track.id}
-               className="card-cyber p-4 sm:p-6 animate-fade-in"
-               style={{ animationDelay: `${index * 0.1}s` }}
-             >
-               <div className="flex flex-col gap-3 sm:gap-4">
-                 {/* Track Header: Album Art + Info + Play Button */}
-                 <div className="flex items-center gap-3 sm:gap-4">
-                    {/* Album Art */}
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden bg-secondary/20 flex-shrink-0 flex items-center justify-center">
-                      {logoError[track.id] ? (
-                        <Radio className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
-                      ) : albumArt[track.id] ? (
-                        <img 
-                          src={albumArt[track.id]} 
-                          alt={`${track.artist} - ${track.title} Album Art`}
-                          className="w-full h-full object-cover"
-                          onError={() => {
-                            setLogoError(prev => ({...prev, [track.id]: true}));
-                            console.log('Album art failed to load for track:', track.title);
-                          }}
-                        />
-                      ) : (
-                        <img 
-                          src={stationLogo} 
-                          alt="Dance One Radio Logo" 
-                          className="w-full h-full object-contain"
-                          onError={() => {
-                            setLogoError(prev => ({...prev, [track.id]: true}));
-                            console.log('Station logo failed to load for track:', track.title);
-                          }}
-                        />
-                      )}
-                    </div>
+            <div
+              key={track.id}
+              className="card-cyber p-6 animate-fade-in"
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
+                {/* Album Art & Play Button & Track Info */}
+                <div className="flex items-center space-x-4 flex-1">
+                   {/* Album Art */}
+                   <div className="w-16 h-16 rounded-lg overflow-hidden bg-secondary/20 flex-shrink-0 flex items-center justify-center">
+                     {logoError[track.id] ? (
+                       <Radio className="w-8 h-8 text-primary" />
+                     ) : albumArt[track.id] ? (
+                       <img 
+                         src={albumArt[track.id]} 
+                         alt={`${track.artist} - ${track.title} Album Art`}
+                         className="w-full h-full object-cover"
+                         onError={() => {
+                           setLogoError(prev => ({...prev, [track.id]: true}));
+                           console.log('Album art failed to load for track:', track.title);
+                         }}
+                       />
+                     ) : (
+                       <img 
+                         src={stationLogo} 
+                         alt="Dance One Radio Logo" 
+                         className="w-full h-full object-contain"
+                         onError={() => {
+                           setLogoError(prev => ({...prev, [track.id]: true}));
+                           console.log('Station logo failed to load for track:', track.title);
+                         }}
+                       />
+                     )}
+                   </div>
 
-                    {/* Track Info */}
-                    <div className="flex-1 min-w-0 cursor-pointer" onClick={() => handleTrackClick(track)}>
-                       <h3 className="text-base sm:text-lg font-['Orbitron'] font-bold text-primary mb-1 hover:text-neon transition-colors truncate">
-                         {track.title}
-                       </h3>
-                      <p className="text-sm sm:text-base text-accent font-['Rajdhani'] font-medium mb-1 hover:text-neon-purple transition-colors truncate">
-                        {track.artist}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground font-['Rajdhani']">
-                        <span className="truncate max-w-20 sm:max-w-none">{track.genre}</span>
-                        <span className="hidden sm:inline">•</span>
-                        <div className="flex items-center">
-                          <Clock className="w-3 h-3 mr-1" />
-                          {track.duration}
-                        </div>
-                        <span className="hidden sm:inline">•</span>
-                        <span className="hidden sm:inline">{new Date(track.playedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                        <span className="sm:hidden text-xs">{new Date(track.playedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                  <Button
+                    onClick={() => handlePlayPause(track.id)}
+                    className={`w-16 h-16 rounded-full relative ${
+                      playingTrack === track.id
+                        ? 'bg-primary text-primary-foreground animate-glow-pulse'
+                        : previewUrls[track.id]
+                        ? 'bg-green-600 hover:bg-green-700 text-white'
+                        : 'bg-secondary hover:bg-secondary/80'
+                    }`}
+                    disabled={!previewUrls[track.id] && playingTrack !== track.id}
+                    title={
+                      loadingPreviews[track.id] 
+                        ? 'Loading preview...' 
+                        : previewUrls[track.id] 
+                        ? 'Play 30-second preview' 
+                        : previewErrors[track.id] 
+                        ? `Preview not available: ${previewErrors[track.id]}`
+                        : 'No preview available'
+                    }
+                  >
+                    {loadingPreviews[track.id] ? (
+                      <div className="w-6 h-6 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    ) : playingTrack === track.id ? (
+                      <Pause className="w-6 h-6" />
+                    ) : (
+                      <Play className="w-6 h-6 ml-1" />
+                    )}
+                    
+                    {previewUrls[track.id] && !loadingPreviews[track.id] && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background">
+                        <div className="w-full h-full bg-green-400 rounded-full animate-ping"></div>
                       </div>
-                    </div>
+                    )}
+                    
+                    {previewErrors[track.id] && !loadingPreviews[track.id] && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-background text-xs flex items-center justify-center">
+                        ✕
+                      </div>
+                    )}
+                  </Button>
 
-                    {/* Play Button */}
-                    <Button
-                      onClick={() => handlePlayPause(track.id)}
-                      className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full relative flex-shrink-0 ${
-                        playingTrack === track.id
-                          ? 'bg-primary text-primary-foreground animate-glow-pulse'
-                          : previewUrls[track.id]
-                          ? 'bg-green-600 hover:bg-green-700 text-white'
-                          : 'bg-secondary hover:bg-secondary/80'
-                      }`}
-                      disabled={!previewUrls[track.id] && playingTrack !== track.id}
-                      title={
-                        loadingPreviews[track.id] 
-                          ? 'Loading preview...' 
-                          : previewUrls[track.id] 
-                          ? 'Play 30-second preview' 
-                          : previewErrors[track.id] 
-                          ? `Preview not available: ${previewErrors[track.id]}`
-                          : 'No preview available'
-                      }
-                    >
-                      {loadingPreviews[track.id] ? (
-                        <div className="w-4 h-4 sm:w-6 sm:h-6 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                      ) : playingTrack === track.id ? (
-                        <Pause className="w-4 h-4 sm:w-6 sm:h-6" />
-                      ) : (
-                        <Play className="w-4 h-4 sm:w-6 sm:h-6 ml-0.5" />
-                      )}
-                      
-                      {previewUrls[track.id] && !loadingPreviews[track.id] && (
-                        <div className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-green-500 rounded-full border-2 border-background">
-                          <div className="w-full h-full bg-green-400 rounded-full animate-ping"></div>
-                        </div>
-                      )}
-                      
-                      {previewErrors[track.id] && !loadingPreviews[track.id] && (
-                        <div className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-red-500 rounded-full border-2 border-background text-xs flex items-center justify-center">
-                          ✕
-                        </div>
-                      )}
-                    </Button>
-                </div>
-
-                 {/* Waveform Visualization - Hidden on very small screens */}
-                 <div className="hidden sm:flex items-center justify-center space-x-1 flex-1 h-12 sm:h-16">
-                   {track.waveform.map((height, i) => (
-                     <div
-                       key={i}
-                       className={`w-1.5 sm:w-2 rounded-full transition-all duration-300 ${
-                         playingTrack === track.id
-                           ? 'bg-primary wave-animation'
-                           : 'bg-muted hover:bg-primary/50'
-                       }`}
-                       style={{
-                         height: `${height * 1.5}px`,
-                         animationDelay: playingTrack === track.id ? `${i * 0.1}s` : '0s'
-                       }}
-                     />
-                   ))}
-                 </div>
-
-                 {/* Stats & Actions */}
-                 <div className="flex items-center justify-between">
-                   <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
-                     <div className="flex items-center gap-1">
-                       <Heart className="w-3 h-3 sm:w-4 sm:h-4" />
-                       <span>{track.likes}</span>
-                     </div>
-                     <div className="flex items-center gap-1">
-                       <Download className="w-3 h-3 sm:w-4 sm:h-4" />
-                       <span>{track.downloads}</span>
+                   <div className="flex-1 cursor-pointer" onClick={() => handleTrackClick(track)}>
+                     <h3 className="text-xl font-['Orbitron'] font-bold text-primary mb-1 hover:text-neon transition-colors">
+                       {track.title}
+                     </h3>
+                     <p className="text-lg text-accent font-['Rajdhani'] font-medium mb-1 hover:text-neon-purple transition-colors">
+                       {track.artist}
+                     </p>
+                     <div className="flex items-center space-x-4 text-sm text-muted-foreground font-['Rajdhani']">
+                       <span>{track.genre}</span>
+                       <span>•</span>
+                       <div className="flex items-center">
+                         <Clock className="w-3 h-3 mr-1" />
+                         {track.duration}
+                       </div>
+                       <span>•</span>
+                       <span>{new Date(track.playedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                      </div>
                    </div>
-                   
-                   <Button
-                     variant="ghost"
-                     size="sm"
-                     className="text-muted-foreground hover:text-primary hover:bg-primary/20 h-8 px-2 sm:px-3"
-                     onClick={() => handleShare(track)}
-                   >
-                     <Share2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                     <span className="hidden sm:inline ml-2">Share</span>
-                   </Button>
-                 </div>
+                </div>
+
+                {/* Waveform Visualization */}
+                <div className="flex items-center justify-center space-x-1 flex-1">
+                  {track.waveform.map((height, i) => (
+                    <div
+                      key={i}
+                      className={`w-2 rounded-full transition-all duration-300 ${
+                        playingTrack === track.id
+                          ? 'bg-primary wave-animation'
+                          : 'bg-muted hover:bg-primary/50'
+                      }`}
+                      style={{
+                        height: `${height * 2}px`,
+                        animationDelay: playingTrack === track.id ? `${i * 0.1}s` : '0s'
+                      }}
+                    />
+                  ))}
+                </div>
+
+                {/* Stats & Actions */}
+                <div className="flex items-center space-x-4">
+                  <div className="flex flex-col space-y-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-muted-foreground hover:text-red-400 hover:bg-red-400/20"
+                    >
+                      <Heart className="w-4 h-4" />
+                    </Button>
+                     <Button
+                       variant="ghost"
+                       size="icon"
+                       className="text-muted-foreground hover:text-primary hover:bg-primary/20"
+                       onClick={() => handleShare(track)}
+                     >
+                       <Share2 className="w-4 h-4" />
+                     </Button>
+                  </div>
+                </div>
               </div>
             </div>
             ))
