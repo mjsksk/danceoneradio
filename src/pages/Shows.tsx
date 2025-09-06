@@ -165,7 +165,7 @@ const Shows = () => {
         style={{
           backgroundImage: 'url(/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png)',
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: 'top center',
           backgroundRepeat: 'no-repeat'
         }}
       />
