@@ -83,7 +83,16 @@ const Shows = () => {
       }
     };
 
+    // Initial fetch
     fetchEpisodes();
+
+    // Set up hourly refresh
+    const refreshInterval = setInterval(() => {
+      fetchEpisodes();
+    }, 3600000); // 1 hour = 3600000ms
+
+    // Cleanup interval on unmount
+    return () => clearInterval(refreshInterval);
   }, []);
 
   // Scroll to episode if hash is present
