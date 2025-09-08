@@ -25,64 +25,66 @@ const Shows = () => {
   const [bgLoaded, setBgLoaded] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  useEffect(() => {
-    const fetchEpisodes = async () => {
-      try {
-        const response = await fetch('https://api.allorigins.win/get?url=https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml');
-        const data = await response.json();
-        
-        // Check if we received HTML instead of XML (indicates wrong URL)
-        if (data.contents && data.contents.includes('<!DOCTYPE html>')) {
-          console.error('Received HTML instead of RSS feed - podcast feed URL may be incorrect');
-          throw new Error('Invalid podcast feed URL');
-        }
-        
-        // Check if the response contains base64 encoded data
-        let xmlContent = data.contents;
-        if (typeof data.contents === 'string' && data.contents.startsWith('data:application/rss+xml')) {
-          // Extract base64 content and decode it
-          const base64Content = data.contents.split(',')[1];
-          xmlContent = atob(base64Content);
-        }
-        
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
-        
-        // Check if parsing was successful
-        const parserError = xmlDoc.querySelector('parsererror');
-        if (parserError) {
-          throw new Error('Failed to parse RSS feed');
-        }
-        
-        const items = xmlDoc.querySelectorAll('item');
-        console.log(`Found ${items.length} episodes in RSS feed`);
-        
-        const episodeList: Episode[] = Array.from(items).map(item => {
-          const description = item.querySelector('description')?.textContent || '';
-          const cleanDescription = description.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ').trim();
-          
-          return {
-            title: item.querySelector('title')?.textContent || '',
-            description: cleanDescription,
-            pubDate: item.querySelector('pubDate')?.textContent || '',
-            enclosure: {
-              url: item.querySelector('enclosure')?.getAttribute('url') || '',
-              type: item.querySelector('enclosure')?.getAttribute('type') || ''
-            },
-            duration: item.querySelector('itunes\\:duration, duration')?.textContent || '',
-            guid: item.querySelector('guid')?.textContent || ''
-          };
-        });
-        
-        setEpisodes(episodeList.slice(0, 10));
-        setTotalEpisodes(episodeList.length);
-      } catch (error) {
-        console.error('Error fetching episodes:', error);
-      } finally {
-        setLoading(false);
+  const fetchEpisodes = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('https://api.allorigins.win/get?url=https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml');
+      const data = await response.json();
+      
+      // Check if we received HTML instead of XML (indicates wrong URL)
+      if (data.contents && data.contents.includes('<!DOCTYPE html>')) {
+        console.error('Received HTML instead of RSS feed - podcast feed URL may be incorrect');
+        throw new Error('Invalid podcast feed URL');
       }
-    };
+      
+      // Check if the response contains base64 encoded data
+      let xmlContent = data.contents;
+      if (typeof data.contents === 'string' && data.contents.startsWith('data:application/rss+xml')) {
+        // Extract base64 content and decode it
+        const base64Content = data.contents.split(',')[1];
+        xmlContent = atob(base64Content);
+      }
+      
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
+      
+      // Check if parsing was successful
+      const parserError = xmlDoc.querySelector('parsererror');
+      if (parserError) {
+        throw new Error('Failed to parse RSS feed');
+      }
+      
+      const items = xmlDoc.querySelectorAll('item');
+      console.log(`🔄 RSS Update: Found ${items.length} episodes in feed`);
+      
+      const episodeList: Episode[] = Array.from(items).map(item => {
+        const description = item.querySelector('description')?.textContent || '';
+        const cleanDescription = description.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ').trim();
+        
+        return {
+          title: item.querySelector('title')?.textContent || '',
+          description: cleanDescription,
+          pubDate: item.querySelector('pubDate')?.textContent || '',
+          enclosure: {
+            url: item.querySelector('enclosure')?.getAttribute('url') || '',
+            type: item.querySelector('enclosure')?.getAttribute('type') || ''
+          },
+          duration: item.querySelector('itunes\\:duration, duration')?.textContent || '',
+          guid: item.querySelector('guid')?.textContent || ''
+        };
+      });
+      
+      setEpisodes(episodeList.slice(0, 10));
+      setTotalEpisodes(episodeList.length);
+      console.log(`✅ RSS Update Complete: Updated with ${episodeList.length} total episodes`);
+    } catch (error) {
+      console.error('❌ RSS Update Failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     // Initial fetch
     fetchEpisodes();
 
