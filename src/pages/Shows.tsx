@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Play, Pause, ExternalLink, Calendar, Clock } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import { Link } from 'react-router-dom';
 
 interface Episode {
   title: string;
@@ -329,9 +330,17 @@ const Shows = () => {
                         {/* Episode Content */}
                         <div className="flex-1 space-y-4">
                           <div id={`episode-${totalEpisodes - index}`}>
-                            <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold mb-3 text-primary group-hover:text-neon transition-colors">
-                              {episode.title}
-                            </h3>
+                            {episode.title === "Anthems of the week 389" ? (
+                              <Link to="/episode/389">
+                                <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold mb-3 text-primary group-hover:text-neon transition-colors cursor-pointer hover:underline">
+                                  {episode.title}
+                                </h3>
+                              </Link>
+                            ) : (
+                              <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold mb-3 text-primary group-hover:text-neon transition-colors">
+                                {episode.title}
+                              </h3>
+                            )}
                             
                             <div className="flex flex-wrap items-center gap-6 mb-4 text-sm text-muted-foreground">
                               <div className="flex items-center gap-2">

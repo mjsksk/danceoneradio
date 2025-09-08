@@ -11,6 +11,7 @@ import Love from "./pages/Love";
 import Dmca from "./pages/Dmca";
 import Contact from "./pages/Contact";
 import PlayerPage from "./pages/PlayerPage";
+import Episode389 from "./pages/Episode389";
 
 import NotFound from "./pages/NotFound";
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/dmca" element={<Dmca />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/player" element={<PlayerPage />} />
+          <Route path="/episode/389" element={<Episode389 />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
