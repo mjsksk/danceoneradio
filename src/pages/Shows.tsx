@@ -28,8 +28,15 @@ const Shows = () => {
   const fetchEpisodes = async () => {
     setLoading(true);
     try {
+      console.log('🔄 Fetching RSS feed...');
       const response = await fetch('https://api.allorigins.win/get?url=https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
+      console.log('📥 RSS Response received:', { hasContents: !!data.contents, contentLength: data.contents?.length });
       
       // Check if we received HTML instead of XML (indicates wrong URL)
       if (data.contents && data.contents.includes('<!DOCTYPE html>')) {
@@ -45,23 +52,34 @@ const Shows = () => {
         xmlContent = atob(base64Content);
       }
       
+      console.log('📄 XML Content preview:', xmlContent?.substring(0, 200) + '...');
+      
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
       
       // Check if parsing was successful
       const parserError = xmlDoc.querySelector('parsererror');
       if (parserError) {
+        console.error('XML parsing error:', parserError.textContent);
         throw new Error('Failed to parse RSS feed');
       }
       
       const items = xmlDoc.querySelectorAll('item');
-      console.log(`🔄 RSS Update: Found ${items.length} episodes in feed`);
+      console.log(`🎵 Found ${items.length} episodes in RSS feed`);
       
-      const episodeList: Episode[] = Array.from(items).map(item => {
+      // Log first item details for debugging
+      if (items.length > 0) {
+        const firstItem = items[0];
+        const title = firstItem.querySelector('title')?.textContent;
+        const pubDate = firstItem.querySelector('pubDate')?.textContent;
+        console.log('📊 Latest episode:', { title, pubDate });
+      }
+      
+      const episodeList: Episode[] = Array.from(items).map((item, index) => {
         const description = item.querySelector('description')?.textContent || '';
         const cleanDescription = description.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ').trim();
         
-        return {
+        const episode = {
           title: item.querySelector('title')?.textContent || '',
           description: cleanDescription,
           pubDate: item.querySelector('pubDate')?.textContent || '',
@@ -70,13 +88,19 @@ const Shows = () => {
             type: item.querySelector('enclosure')?.getAttribute('type') || ''
           },
           duration: item.querySelector('itunes\\:duration, duration')?.textContent || '',
-          guid: item.querySelector('guid')?.textContent || ''
+          guid: item.querySelector('guid')?.textContent || `episode-${index}`
         };
+        
+        if (index < 3) {
+          console.log(`Episode ${index + 1}:`, { title: episode.title, pubDate: episode.pubDate });
+        }
+        
+        return episode;
       });
       
       setEpisodes(episodeList.slice(0, 10));
       setTotalEpisodes(episodeList.length);
-      console.log(`✅ RSS Update Complete: Updated with ${episodeList.length} total episodes`);
+      console.log(`✅ RSS Update Complete: Updated with ${episodeList.length} total episodes, showing latest 10`);
     } catch (error) {
       console.error('❌ RSS Update Failed:', error);
     } finally {
