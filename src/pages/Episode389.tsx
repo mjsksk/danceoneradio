@@ -3,7 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import SocialShare from '@/components/SocialShare';
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 interface Track {
   position: number;
@@ -13,6 +15,15 @@ interface Track {
 }
 
 const Episode389 = () => {
+  const [bgLoaded, setBgLoaded] = useState(false);
+
+  // Preload background image for better performance
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => setBgLoaded(true);
+    img.src = '/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png';
+  }, []);
+
   const tracks: Track[] = [
     { position: 1, title: "Medellin", artist: "K Motionz & Capo Lee" },
     { position: 2, title: "Sweet Nothing 2025", artist: "Calvin Harris & D.O.D" },
@@ -71,8 +82,26 @@ const Episode389 = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
+    <div className="min-h-screen bg-background overflow-x-hidden relative">
+      {/* Optimized Background Image with lazy loading */}
+      <div 
+        className={`fixed inset-0 z-0 opacity-20 transition-opacity duration-500 ${
+          bgLoaded ? 'opacity-20' : 'opacity-0'
+        }`}
+        style={{
+          backgroundImage: 'url(/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'top center',
+          backgroundRepeat: 'no-repeat',
+          willChange: 'transform',
+          transform: 'translateZ(0)', // Force GPU acceleration
+          backfaceVisibility: 'hidden'
+        }}
+      />
+      
+      {/* Content overlay */}
+      <div className="relative z-10">
+        <Navigation />
       
       <main className="pt-16">
         {/* Hero Section */}
@@ -123,6 +152,14 @@ const Episode389 = () => {
                     <Play className="w-5 h-5 mr-2" />
                     Play Episode
                   </Button>
+                  
+                  <div className="mt-4">
+                    <SocialShare 
+                      url={window.location.href}
+                      title="Anthems of the week 389 - Future Dance Anthems with Mario"
+                      description="Episode 389 featuring 54 tracks of the latest electronic dance music, including exclusive unreleased tracks."
+                    />
+                  </div>
                 </div>
               </Card>
             </div>
@@ -210,6 +247,7 @@ const Episode389 = () => {
       </main>
 
       <Footer />
+      </div>
     </div>
   );
 };

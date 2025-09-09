@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Volume2 } from 'lucide-react';
+import SocialShare from '@/components/SocialShare';
 
 import heroImage from '@/assets/hero-bg.jpg';
 import LiveRadioPlayer from './LiveRadioPlayer';
@@ -62,6 +63,16 @@ const HeroSection = () => {
         {/* Live Player */}
         <div className="mb-8 animate-slide-up">
           <LiveRadioPlayer streamUrls={["http://s9.myradiostream.com:14296/;", "http://s9.myradiostream.com:14296/stream", "http://s9.myradiostream.com:14296", "https://live-radio-stream.online/dance-one-radio.mp3"]} streamTitle={streamTitle} />
+          
+          {/* Social Share */}
+          <div className="mt-6 flex justify-center">
+            <SocialShare 
+              url={window.location.origin}
+              title="Dance One Radio - The Future of Electronic Music"
+              description="Live DJ sets featuring Progressive House, Trance, Techno, and Deep House music 24/7"
+              className="bg-background/10 backdrop-blur-sm border-primary/30 hover:border-primary hover:bg-primary/10"
+            />
+          </div>
         </div>
 
         {/* Scroll Indicator */}

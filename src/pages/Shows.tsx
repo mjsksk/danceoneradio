@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Play, Pause, ExternalLink, Calendar, Clock } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import SocialShare from '@/components/SocialShare';
 import { Link } from 'react-router-dom';
 
 interface Episode {
@@ -265,6 +266,13 @@ const Shows = () => {
                   <ExternalLink className="w-5 h-5 mr-2" />
                   Apple Podcasts
                 </Button>
+                
+                <SocialShare 
+                  url={`${window.location.origin}/shows`}
+                  title="Future Dance Anthems with Mario - Shows"
+                  description="Weekly episodes featuring the latest in electronic dance music"
+                  className="text-lg px-8 py-4 hover:scale-105 transition-transform"
+                />
               </div>
             </div>
           </div>
