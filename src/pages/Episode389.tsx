@@ -148,10 +148,17 @@ const Episode389 = () => {
                     describes his style as "Big Room Sexy house", but because of his love for electronic m...
                   </p>
                   
-                  <Button size="lg" className="text-lg px-8 py-4 hover:scale-105 transition-transform bg-gradient-to-r from-neon to-neon-purple text-background hover:shadow-lg hover:shadow-neon/25">
-                    <Play className="w-5 h-5 mr-2" />
-                    Play Episode
-                  </Button>
+                  <div className="w-full max-w-2xl mx-auto">
+                    <iframe 
+                      src="https://player.blubrry.com/biggest_tunes_with_mario_135/latest/#mode-Dark&border-1a89f9&progress-118cf7" 
+                      title="Blubrry Podcast Player" 
+                      scrolling="no" 
+                      width="100%" 
+                      height="165px" 
+                      frameBorder="0"
+                      className="rounded-lg shadow-lg"
+                    />
+                  </div>
                   
                   <div className="mt-4">
                     <SocialShare 
