@@ -9,15 +9,18 @@ declare global {
 const AdSenseUnit = () => {
   const adRef = useRef<HTMLModElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const adLoadedRef = useRef<boolean>(false);
 
   useEffect(() => {
     // Use Intersection Observer to load ad only when visible
-    if (!adRef.current) return;
+    if (!adRef.current || adLoadedRef.current) return;
 
     observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
+          if (entry.isIntersecting && !adLoadedRef.current) {
+            adLoadedRef.current = true;
+            
             // Initialize adsbygoogle array
             window.adsbygoogle = window.adsbygoogle || [];
             
