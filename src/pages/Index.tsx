@@ -5,6 +5,7 @@ import DJSection from '@/components/DJSection';
 import TracksSection from '@/components/TracksSection';
 import AdSenseUnit from '@/components/AdSenseUnit';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
 import { useTrackHistoryUpdater } from '@/hooks/useTrackHistoryUpdater';
 
 const Index = () => {
@@ -13,6 +14,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
+      <SEO />
       <Navigation />
       <main>
         <HeroSection />

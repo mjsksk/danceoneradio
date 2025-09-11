@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -73,6 +74,10 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title="Contact Us | Dance One Radio"
+        description="Get in touch with Dance One Radio. Submit your demo tracks or reach out with questions about our electronic dance music platform."
+      />
       <Navigation />
       <main className="container mx-auto px-4 py-8 pt-24">
         <div className="max-w-2xl mx-auto">

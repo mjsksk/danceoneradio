@@ -1,5 +1,6 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -25,6 +26,10 @@ const Downloads = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title="Download Desktop App | Dance One Radio"
+        description="Download the official Dance One Radio Windows desktop app with enhanced features, global hotkeys, system tray integration, and superior audio quality."
+      />
       <Navigation />
       
       <main className="pt-16">

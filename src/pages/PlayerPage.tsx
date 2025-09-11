@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import LiveRadioPlayer from '@/components/LiveRadioPlayer';
+import SEO from '@/components/SEO';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import stationLogo from '@/assets/dance-one-logo.png';
 
@@ -47,6 +48,10 @@ const PlayerPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/10 flex flex-col">
+      <SEO 
+        title="Live Player | Dance One Radio"
+        description="Listen to Dance One Radio's live electronic dance music stream with our optimized popup player interface."
+      />
       {/* Main Player Content */}
       <main className="flex-1 p-4 flex flex-col justify-center">
         <div className="max-w-md mx-auto w-full">

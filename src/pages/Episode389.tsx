@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SocialShare from '@/components/SocialShare';
+import SEO from '@/components/SEO';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
@@ -83,6 +84,12 @@ const Episode389 = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
+      <SEO 
+        title="Anthems of the week 389 - Future Dance Anthems with Mario | Dance One Radio"
+        description="Episode 389 featuring 54 tracks of the latest electronic dance music, including exclusive unreleased tracks from top artists."
+        image="/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png"
+        url={window.location.href}
+      />
       {/* Optimized Background Image with lazy loading */}
       <div 
         className={`fixed inset-0 z-0 opacity-20 transition-opacity duration-500 ${

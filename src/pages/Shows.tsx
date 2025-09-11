@@ -5,6 +5,7 @@ import { Play, Pause, ExternalLink, Calendar, Clock } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SocialShare from '@/components/SocialShare';
+import SEO from '@/components/SEO';
 import { Link } from 'react-router-dom';
 
 interface Episode {
@@ -220,6 +221,12 @@ const Shows = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
+      <SEO 
+        title="Future Dance Anthems with Mario - Shows | Dance One Radio"
+        description="Weekly episodes featuring the latest in electronic dance music. Dance anthems that consistently rule the dance and electronic scene."
+        image="/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png"
+        url={`${window.location.origin}/shows`}
+      />
       {/* Optimized Background Image with lazy loading */}
       <div 
         className={`fixed inset-0 z-0 opacity-20 transition-opacity duration-500 ${
