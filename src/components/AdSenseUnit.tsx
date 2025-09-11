@@ -10,15 +10,31 @@ const AdSenseUnit = () => {
   const adRef = useRef<HTMLModElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const adLoadedRef = useRef<boolean>(false);
+  const adInitializedRef = useRef<boolean>(false);
 
   useEffect(() => {
-    // Use Intersection Observer to load ad only when visible
-    if (!adRef.current || adLoadedRef.current) return;
+    // Prevent multiple initializations
+    if (!adRef.current || adLoadedRef.current || adInitializedRef.current) return;
+
+    // Check if ad is already loaded by checking for existing content
+    if (adRef.current.innerHTML.trim() !== '') {
+      adLoadedRef.current = true;
+      return;
+    }
+
+    adInitializedRef.current = true;
 
     observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && !adLoadedRef.current) {
+          if (entry.isIntersecting && !adLoadedRef.current && adRef.current) {
+            // Double-check that the ad hasn't been loaded yet
+            if (adRef.current.innerHTML.trim() !== '') {
+              adLoadedRef.current = true;
+              observerRef.current?.disconnect();
+              return;
+            }
+
             adLoadedRef.current = true;
             
             // Initialize adsbygoogle array
@@ -27,9 +43,15 @@ const AdSenseUnit = () => {
             // Use requestAnimationFrame to avoid forced reflows
             requestAnimationFrame(() => {
               try {
-                (window.adsbygoogle).push({});
+                // Only push if the element still exists and hasn't been processed
+                if (adRef.current && !adRef.current.hasAttribute('data-ad-status')) {
+                  (window.adsbygoogle).push({});
+                  adRef.current.setAttribute('data-ad-status', 'loaded');
+                }
               } catch (error) {
                 console.error('AdSense error:', error);
+                // Reset state on error to allow retry
+                adLoadedRef.current = false;
               }
             });
             
@@ -48,6 +70,7 @@ const AdSenseUnit = () => {
 
     return () => {
       observerRef.current?.disconnect();
+      adInitializedRef.current = false;
     };
   }, []);
 
