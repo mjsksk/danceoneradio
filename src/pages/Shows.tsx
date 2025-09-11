@@ -338,13 +338,15 @@ const Shows = () => {
                         {/* Episode Content */}
                         <div className="flex-1 space-y-4">
                           <div id={`episode-${totalEpisodes - index}`}>
-                            {episode.title.toLowerCase().includes("389") || episode.title.toLowerCase().includes("anthems of the week 389") ? (
+                            {(episode.title.toLowerCase().includes("389") || 
+                              episode.title.toLowerCase().includes("anthems of the week 389") ||
+                              episode.title.toLowerCase().includes("anthems") && episode.title.includes("389")) ? (
                               <Link 
                                 to="/episode/389"
-                                key={`episode-link-${episode.guid}-${totalEpisodes - index}`}
-                                className="block"
+                                className="block group/link"
+                                key={`link-${index}-${episode.guid || 'no-guid'}`}
                               >
-                                <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold mb-3 text-primary group-hover:text-neon transition-colors cursor-pointer hover:underline">
+                                <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold mb-3 text-primary group-hover/link:text-neon transition-colors cursor-pointer hover:underline">
                                   {episode.title}
                                 </h3>
                               </Link>
