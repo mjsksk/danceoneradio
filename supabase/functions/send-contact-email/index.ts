@@ -15,6 +15,42 @@ interface ContactEmailRequest {
   message: string;
 }
 
+// Helper function to sanitize HTML content
+const sanitizeHtml = (input: string): string => {
+  return input
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;');
+};
+
+// Input validation function
+const validateInput = (data: ContactEmailRequest): { isValid: boolean; errors: string[] } => {
+  const errors: string[] = [];
+  
+  if (!data.name || data.name.trim().length === 0) {
+    errors.push('Name is required');
+  }
+  if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+    errors.push('Valid email is required');
+  }
+  if (!data.subject || data.subject.trim().length === 0) {
+    errors.push('Subject is required');
+  }
+  if (!data.message || data.message.trim().length === 0) {
+    errors.push('Message is required');
+  }
+  
+  // Check for suspicious patterns
+  if (data.message.includes('<script') || data.message.includes('javascript:')) {
+    errors.push('Message contains invalid content');
+  }
+  
+  return { isValid: errors.length === 0, errors };
+};
+
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -22,7 +58,25 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { name, email, subject, message }: ContactEmailRequest = await req.json();
+    const requestData: ContactEmailRequest = await req.json();
+    
+    // Validate input
+    const validation = validateInput(requestData);
+    if (!validation.isValid) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid input', details: validation.errors }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+    
+    // Sanitize all inputs
+    const name = sanitizeHtml(requestData.name.trim());
+    const email = requestData.email.trim(); // Email doesn't need HTML escaping but validate format
+    const subject = sanitizeHtml(requestData.subject.trim());
+    const message = sanitizeHtml(requestData.message.trim()).replace(/\n/g, '<br>');
 
     console.log(`Processing contact email from ${name} (${email})`);
 
@@ -39,7 +93,7 @@ const handler = async (req: Request): Promise<Response> => {
           <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3>Your message:</h3>
             <p><strong>Subject:</strong> ${subject}</p>
-            <p><strong>Message:</strong><br>${message.replace(/\n/g, '<br>')}</p>
+            <p><strong>Message:</strong><br>${message}</p>
           </div>
           
           <p>Best regards,<br>The Dance One Radio Team</p>
@@ -65,7 +119,7 @@ const handler = async (req: Request): Promise<Response> => {
             <p><strong>From:</strong> ${name}</p>
             <p><strong>Email:</strong> ${email}</p>
             <p><strong>Subject:</strong> ${subject}</p>
-            <p><strong>Message:</strong><br>${message.replace(/\n/g, '<br>')}</p>
+            <p><strong>Message:</strong><br>${message}</p>
           </div>
           
           <p style="margin-top: 20px;">

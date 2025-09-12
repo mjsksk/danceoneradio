@@ -293,22 +293,48 @@ const TracksSection = () => {
       min-width: 300px;
     `;
     
-    popup.innerHTML = `
-      <h3 style="margin: 0 0 15px 0; color: hsl(var(--foreground)); font-family: 'Orbitron', sans-serif;">Share Track</h3>
-      <p style="margin: 0 0 15px 0; color: hsl(var(--muted-foreground)); font-size: 14px;">${track.title} by ${track.artist}</p>
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        ${platforms.map(platform => `
-          <button onclick="window.open('${platform.url}', '_blank', 'width=600,height=400'); document.body.removeChild(this.closest('div').parentElement)" 
-                  style="padding: 10px 15px; background: ${platform.color}; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
-            Share on ${platform.name}
-          </button>
-        `).join('')}
-        <button onclick="document.body.removeChild(this.parentElement)" 
-                style="padding: 10px 15px; background: hsl(var(--secondary)); color: hsl(var(--secondary-foreground)); border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">
-          Cancel
-        </button>
-      </div>
-    `;
+    // Helper function to safely escape HTML
+    const escapeHtml = (text: string) => {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    };
+    
+    // Create elements safely using DOM methods instead of innerHTML
+    const title = document.createElement('h3');
+    title.style.cssText = 'margin: 0 0 15px 0; color: hsl(var(--foreground)); font-family: "Orbitron", sans-serif;';
+    title.textContent = 'Share Track';
+    
+    const trackInfo = document.createElement('p');
+    trackInfo.style.cssText = 'margin: 0 0 15px 0; color: hsl(var(--muted-foreground)); font-size: 14px;';
+    trackInfo.textContent = `${track.title} by ${track.artist}`;
+    
+    const buttonsContainer = document.createElement('div');
+    buttonsContainer.style.cssText = 'display: flex; flex-direction: column; gap: 10px;';
+    
+    // Create platform buttons safely
+    platforms.forEach(platform => {
+      const button = document.createElement('button');
+      button.style.cssText = `padding: 10px 15px; background: ${platform.color}; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;`;
+      button.textContent = `Share on ${platform.name}`;
+      button.onclick = () => {
+        window.open(platform.url, '_blank', 'width=600,height=400');
+        document.body.removeChild(backdrop);
+      };
+      buttonsContainer.appendChild(button);
+    });
+    
+    // Create cancel button
+    const cancelButton = document.createElement('button');
+    cancelButton.style.cssText = 'padding: 10px 15px; background: hsl(var(--secondary)); color: hsl(var(--secondary-foreground)); border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;';
+    cancelButton.textContent = 'Cancel';
+    cancelButton.onclick = () => document.body.removeChild(backdrop);
+    buttonsContainer.appendChild(cancelButton);
+    
+    // Append all elements safely
+    popup.appendChild(title);
+    popup.appendChild(trackInfo);
+    popup.appendChild(buttonsContainer);
     
     // Add backdrop
     const backdrop = document.createElement('div');

@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { SecurityHeaders } from "@/components/SecurityHeaders";
 import Index from "./pages/Index";
 import Shows from "./pages/Shows";
 import Downloads from "./pages/Downloads";
@@ -12,7 +13,6 @@ import Dmca from "./pages/Dmca";
 import Contact from "./pages/Contact";
 import PlayerPage from "./pages/PlayerPage";
 import Episode389 from "./pages/Episode389";
-
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +20,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <SecurityHeaders />
       <Toaster />
       <Sonner />
       <BrowserRouter>
