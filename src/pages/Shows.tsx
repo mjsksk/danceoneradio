@@ -28,11 +28,26 @@ const Shows = () => {
   const [bgLoaded, setBgLoaded] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const fetchEpisodes = async () => {
+  const fetchEpisodes = async (retryCount = 0) => {
+    const maxRetries = 3;
+    let success = false;
     setLoading(true);
+    
     try {
       console.log('🔄 Fetching RSS feed...');
-      const response = await fetch('https://api.allorigins.win/get?url=https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml');
+      
+      // Add timeout for mobile connections
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+      
+      const response = await fetch('https://api.allorigins.win/get?url=https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml', {
+        signal: controller.signal,
+        headers: {
+          'Accept': 'application/json',
+        }
+      });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -104,10 +119,27 @@ const Shows = () => {
       setEpisodes(episodeList.slice(0, 10));
       setTotalEpisodes(episodeList.length);
       console.log(`✅ RSS Update Complete: Updated with ${episodeList.length} total episodes, showing latest 10`);
+      success = true;
     } catch (error) {
       console.error('❌ RSS Update Failed:', error);
+      
+      // Retry mechanism for mobile reliability
+      if (retryCount < maxRetries && (error instanceof Error && (error.name === 'AbortError' || error.message.includes('fetch')))) {
+        console.log(`🔄 Retrying RSS fetch (attempt ${retryCount + 1}/${maxRetries})...`);
+        setTimeout(() => {
+          fetchEpisodes(retryCount + 1);
+        }, Math.pow(2, retryCount) * 1000); // Exponential backoff
+        return;
+      }
+      
+      // Set empty state on final failure
+      setEpisodes([]);
+      setTotalEpisodes(0);
     } finally {
-      setLoading(false);
+      // Only set loading false when we're done with all retries or succeeded
+      if (success || retryCount >= maxRetries) {
+        setLoading(false);
+      }
     }
   };
 
