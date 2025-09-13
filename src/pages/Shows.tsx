@@ -30,11 +30,14 @@ const Shows = () => {
 
   const fetchEpisodes = async (retryCount = 0) => {
     const maxRetries = 3;
-    let success = false;
-    setLoading(true);
+    
+    // Only set loading on initial attempt
+    if (retryCount === 0) {
+      setLoading(true);
+    }
     
     try {
-      console.log('🔄 Fetching RSS feed...');
+      console.log(`🔄 Fetching RSS feed (attempt ${retryCount + 1})...`);
       
       // Add timeout for mobile connections
       const controller = new AbortController();
@@ -119,27 +122,25 @@ const Shows = () => {
       setEpisodes(episodeList.slice(0, 10));
       setTotalEpisodes(episodeList.length);
       console.log(`✅ RSS Update Complete: Updated with ${episodeList.length} total episodes, showing latest 10`);
-      success = true;
+      setLoading(false); // Success - stop loading
+      
     } catch (error) {
       console.error('❌ RSS Update Failed:', error);
       
       // Retry mechanism for mobile reliability
       if (retryCount < maxRetries && (error instanceof Error && (error.name === 'AbortError' || error.message.includes('fetch')))) {
-        console.log(`🔄 Retrying RSS fetch (attempt ${retryCount + 1}/${maxRetries})...`);
+        console.log(`🔄 Retrying RSS fetch (attempt ${retryCount + 1}/${maxRetries}) in ${Math.pow(2, retryCount)}s...`);
         setTimeout(() => {
           fetchEpisodes(retryCount + 1);
         }, Math.pow(2, retryCount) * 1000); // Exponential backoff
         return;
       }
       
-      // Set empty state on final failure
+      // Final failure - stop loading and set empty state
+      console.log('❌ All RSS fetch attempts failed');
       setEpisodes([]);
       setTotalEpisodes(0);
-    } finally {
-      // Only set loading false when we're done with all retries or succeeded
-      if (success || retryCount >= maxRetries) {
-        setLoading(false);
-      }
+      setLoading(false);
     }
   };
 
