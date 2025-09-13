@@ -20,28 +20,90 @@ interface Episode {
   guid: string;
 }
 
+interface EpisodeCache {
+  episodes: Episode[];
+  totalEpisodes: number;
+  lastFetch: number;
+  lastEpisodeGuid: string;
+  cacheVersion: string;
+}
+
 const Shows = () => {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [totalEpisodes, setTotalEpisodes] = useState<number>(0);
   const [loading, setLoading] = useState(true);
+  const [backgroundUpdating, setBackgroundUpdating] = useState(false);
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
   const [bgLoaded, setBgLoaded] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const fetchEpisodes = async (retryCount = 0) => {
+  const CACHE_KEY = 'podcast_episodes_cache';
+  const CACHE_VERSION = '1.0';
+  const CACHE_EXPIRY_HOURS = 2;
+
+  // Cache management functions
+  const saveEpisodesToCache = (episodes: Episode[], totalEpisodes: number) => {
+    const cache: EpisodeCache = {
+      episodes,
+      totalEpisodes,
+      lastFetch: Date.now(),
+      lastEpisodeGuid: episodes[0]?.guid || '',
+      cacheVersion: CACHE_VERSION
+    };
+    
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+      console.log('💾 Episodes cached successfully');
+    } catch (error) {
+      console.warn('⚠️ Failed to cache episodes:', error);
+    }
+  };
+
+  const loadEpisodesFromCache = (): EpisodeCache | null => {
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (!cached) return null;
+
+      const cache: EpisodeCache = JSON.parse(cached);
+      
+      // Check cache version
+      if (cache.cacheVersion !== CACHE_VERSION) {
+        console.log('🔄 Cache version mismatch, clearing cache');
+        localStorage.removeItem(CACHE_KEY);
+        return null;
+      }
+
+      // Check cache expiry
+      const cacheAge = Date.now() - cache.lastFetch;
+      const cacheExpired = cacheAge > (CACHE_EXPIRY_HOURS * 60 * 60 * 1000);
+      
+      console.log(`📦 Cache found: ${cache.episodes.length} episodes, age: ${Math.round(cacheAge / 60000)}min, expired: ${cacheExpired}`);
+      
+      return cache;
+    } catch (error) {
+      console.warn('⚠️ Failed to load cache:', error);
+      localStorage.removeItem(CACHE_KEY);
+      return null;
+    }
+  };
+
+  const fetchEpisodes = async (retryCount = 0, isBackgroundUpdate = false) => {
     const maxRetries = 3;
     
-    // Only set loading on initial attempt
-    if (retryCount === 0) {
+    // Set loading states
+    if (!isBackgroundUpdate && retryCount === 0) {
       setLoading(true);
+    }
+    if (isBackgroundUpdate && retryCount === 0) {
+      setBackgroundUpdating(true);
     }
     
     try {
-      console.log(`🔄 Fetching RSS feed (attempt ${retryCount + 1})...`);
+      console.log(`🔄 Fetching RSS feed (attempt ${retryCount + 1})${isBackgroundUpdate ? ' [background]' : ''}...`);
       
       // Add timeout for mobile connections
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
       
       const response = await fetch('https://api.allorigins.win/get?url=https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml', {
         signal: controller.signal,
@@ -57,50 +119,35 @@ const Shows = () => {
       }
       
       const data = await response.json();
-      console.log('📥 RSS Response received:', { hasContents: !!data.contents, contentLength: data.contents?.length });
       
-      // Check if we received HTML instead of XML (indicates wrong URL)
+      // Check if we received HTML instead of XML
       if (data.contents && data.contents.includes('<!DOCTYPE html>')) {
-        console.error('Received HTML instead of RSS feed - podcast feed URL may be incorrect');
         throw new Error('Invalid podcast feed URL');
       }
       
-      // Check if the response contains base64 encoded data
+      // Handle base64 encoded data
       let xmlContent = data.contents;
       if (typeof data.contents === 'string' && data.contents.startsWith('data:application/rss+xml')) {
-        // Extract base64 content and decode it
         const base64Content = data.contents.split(',')[1];
         xmlContent = atob(base64Content);
       }
       
-      console.log('📄 XML Content preview:', xmlContent?.substring(0, 200) + '...');
-      
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
       
-      // Check if parsing was successful
+      // Check parsing errors
       const parserError = xmlDoc.querySelector('parsererror');
       if (parserError) {
-        console.error('XML parsing error:', parserError.textContent);
         throw new Error('Failed to parse RSS feed');
       }
       
       const items = xmlDoc.querySelectorAll('item');
-      console.log(`🎵 Found ${items.length} episodes in RSS feed`);
-      
-      // Log first item details for debugging
-      if (items.length > 0) {
-        const firstItem = items[0];
-        const title = firstItem.querySelector('title')?.textContent;
-        const pubDate = firstItem.querySelector('pubDate')?.textContent;
-        console.log('📊 Latest episode:', { title, pubDate });
-      }
       
       const episodeList: Episode[] = Array.from(items).map((item, index) => {
         const description = item.querySelector('description')?.textContent || '';
         const cleanDescription = description.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ').trim();
         
-        const episode = {
+        return {
           title: item.querySelector('title')?.textContent || '',
           description: cleanDescription,
           pubDate: item.querySelector('pubDate')?.textContent || '',
@@ -111,49 +158,94 @@ const Shows = () => {
           duration: item.querySelector('itunes\\:duration, duration')?.textContent || '',
           guid: item.querySelector('guid')?.textContent || `episode-${index}`
         };
-        
-        if (index < 3) {
-          console.log(`Episode ${index + 1}:`, { title: episode.title, pubDate: episode.pubDate });
-        }
-        
-        return episode;
       });
       
-      setEpisodes(episodeList.slice(0, 10));
+      // Check if this is a background update and if there are new episodes
+      if (isBackgroundUpdate) {
+        const currentLatestGuid = episodes[0]?.guid;
+        const newLatestGuid = episodeList[0]?.guid;
+        
+        if (currentLatestGuid === newLatestGuid) {
+          console.log('✅ Background check: No new episodes found');
+          setBackgroundUpdating(false);
+          return;
+        } else {
+          console.log('🆕 New episodes detected, updating...');
+        }
+      }
+      
+      const displayEpisodes = episodeList.slice(0, 10);
+      setEpisodes(displayEpisodes);
       setTotalEpisodes(episodeList.length);
+      
+      // Save to cache
+      saveEpisodesToCache(displayEpisodes, episodeList.length);
+      
       console.log(`✅ RSS Update Complete: Updated with ${episodeList.length} total episodes, showing latest 10`);
-      setLoading(false); // Success - stop loading
+      
+      if (!isBackgroundUpdate) {
+        setLoading(false);
+      } else {
+        setBackgroundUpdating(false);
+      }
       
     } catch (error) {
-      console.error('❌ RSS Update Failed:', error);
+      console.error(`❌ RSS Update Failed${isBackgroundUpdate ? ' [background]' : ''}:`, error);
       
-      // Retry mechanism for mobile reliability
+      // Retry mechanism
       if (retryCount < maxRetries && (error instanceof Error && (error.name === 'AbortError' || error.message.includes('fetch')))) {
         console.log(`🔄 Retrying RSS fetch (attempt ${retryCount + 1}/${maxRetries}) in ${Math.pow(2, retryCount)}s...`);
         setTimeout(() => {
-          fetchEpisodes(retryCount + 1);
-        }, Math.pow(2, retryCount) * 1000); // Exponential backoff
+          fetchEpisodes(retryCount + 1, isBackgroundUpdate);
+        }, Math.pow(2, retryCount) * 1000);
         return;
       }
       
-      // Final failure - stop loading and set empty state
-      console.log('❌ All RSS fetch attempts failed');
-      setEpisodes([]);
-      setTotalEpisodes(0);
-      setLoading(false);
+      // Final failure
+      console.log(`❌ All RSS fetch attempts failed${isBackgroundUpdate ? ' [background]' : ''}`);
+      
+      if (!isBackgroundUpdate) {
+        setEpisodes([]);
+        setTotalEpisodes(0);
+        setLoading(false);
+      } else {
+        setBackgroundUpdating(false);
+      }
     }
   };
 
   useEffect(() => {
-    // Initial fetch
-    fetchEpisodes();
-
-    // Set up hourly refresh
-    const refreshInterval = setInterval(() => {
+    // Load cached episodes immediately
+    const cache = loadEpisodesFromCache();
+    
+    if (cache) {
+      setEpisodes(cache.episodes);
+      setTotalEpisodes(cache.totalEpisodes);
+      setLoading(false);
+      console.log('⚡ Loaded episodes from cache immediately');
+      
+      // Check cache age
+      const cacheAge = Date.now() - cache.lastFetch;
+      const shouldUpdate = cacheAge > (30 * 60 * 1000); // Update if cache older than 30 minutes
+      
+      if (shouldUpdate) {
+        console.log('🔄 Cache is getting stale, checking for updates in background...');
+        setTimeout(() => {
+          fetchEpisodes(0, true);
+        }, 1000); // Start background update after 1 second
+      }
+    } else {
+      // No cache, do initial fetch
+      console.log('📭 No cache found, fetching episodes...');
       fetchEpisodes();
-    }, 3600000); // 1 hour = 3600000ms
+    }
 
-    // Cleanup interval on unmount
+    // Set up background refresh every 2 hours
+    const refreshInterval = setInterval(() => {
+      console.log('⏰ Scheduled background update...');
+      fetchEpisodes(0, true);
+    }, 2 * 60 * 60 * 1000); // 2 hours
+
     return () => clearInterval(refreshInterval);
   }, []);
 
@@ -350,8 +442,16 @@ const Shows = () => {
         <section className="py-16 relative">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-['Orbitron'] font-bold mb-12 text-center">
+               <h2 className="text-3xl md:text-4xl font-['Orbitron'] font-bold mb-12 text-center">
                 <span className="text-neon-purple">LATEST EPISODES</span>
+                {backgroundUpdating && (
+                  <div className="flex items-center justify-center mt-2">
+                    <div className="animate-pulse text-sm text-muted-foreground flex items-center gap-2">
+                      <div className="w-2 h-2 bg-neon rounded-full animate-ping"></div>
+                      Checking for new episodes...
+                    </div>
+                  </div>
+                )}
               </h2>
 
               {loading ? (
