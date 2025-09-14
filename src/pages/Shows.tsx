@@ -20,129 +20,35 @@ interface Episode {
   guid: string;
 }
 
-interface EpisodeCache {
-  episodes: Episode[];
-  totalEpisodes: number;
-  lastFetch: number;
-  lastEpisodeGuid: string;
-  cacheVersion: string;
-}
-
 const Shows = () => {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [totalEpisodes, setTotalEpisodes] = useState<number>(0);
   const [loading, setLoading] = useState(true);
-  const [backgroundUpdating, setBackgroundUpdating] = useState(false);
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
   const [bgLoaded, setBgLoaded] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const CACHE_KEY = 'podcast_episodes_cache';
-  const CACHE_VERSION = '1.0';
-  const CACHE_EXPIRY_HOURS = 2;
-
-  // Cache management functions
-  const saveEpisodesToCache = (episodes: Episode[], totalEpisodes: number) => {
-    const cache: EpisodeCache = {
-      episodes,
-      totalEpisodes,
-      lastFetch: Date.now(),
-      lastEpisodeGuid: episodes[0]?.guid || '',
-      cacheVersion: CACHE_VERSION
-    };
-    
-    try {
-      localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
-      console.log('💾 Episodes cached successfully');
-    } catch (error) {
-      console.warn('⚠️ Failed to cache episodes:', error);
-    }
-  };
-
-  const loadEpisodesFromCache = (): EpisodeCache | null => {
-    try {
-      const cached = localStorage.getItem(CACHE_KEY);
-      if (!cached) return null;
-
-      const cache: EpisodeCache = JSON.parse(cached);
-      
-      // Check cache version
-      if (cache.cacheVersion !== CACHE_VERSION) {
-        console.log('🔄 Cache version mismatch, clearing cache');
-        localStorage.removeItem(CACHE_KEY);
-        return null;
-      }
-
-      // Check cache expiry
-      const cacheAge = Date.now() - cache.lastFetch;
-      const cacheExpired = cacheAge > (CACHE_EXPIRY_HOURS * 60 * 60 * 1000);
-      
-      console.log(`📦 Cache found: ${cache.episodes.length} episodes, age: ${Math.round(cacheAge / 60000)}min, expired: ${cacheExpired}`);
-      
-      return cache;
-    } catch (error) {
-      console.warn('⚠️ Failed to load cache:', error);
-      localStorage.removeItem(CACHE_KEY);
-      return null;
-    }
-  };
-
-  const fetchEpisodes = async (retryCount = 0, isBackgroundUpdate = false) => {
-    console.log(`📺 Shows: fetchEpisodes called - retry: ${retryCount}, background: ${isBackgroundUpdate}`);
+  const fetchEpisodes = async (retryCount = 0) => {
     const maxRetries = 3;
     
-    // Set loading states
-    if (!isBackgroundUpdate && retryCount === 0) {
-      setLoading(true);
-    }
-    if (isBackgroundUpdate && retryCount === 0) {
-      setBackgroundUpdating(true);
-    }
-    
     try {
-      console.log(`🔄 Fetching RSS feed (attempt ${retryCount + 1})${isBackgroundUpdate ? ' [background]' : ''}...`);
+      console.log(`🔄 Fetching RSS feed (attempt ${retryCount + 1})...`);
       
       // Add timeout for mobile connections
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000);
       
-      // Try multiple proxy services for better reliability
-      const proxyUrls = [
-        'https://api.allorigins.win/get?url=',
-        'https://corsproxy.io/?',
-        'https://api.codetabs.com/v1/proxy/?quest='
-      ];
-      
-      let response;
-      let lastError;
-      
-      for (const proxyUrl of proxyUrls) {
-        try {
-          const fullUrl = `${proxyUrl}${encodeURIComponent('https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml')}`;
-          response = await fetch(fullUrl, {
-            signal: controller.signal,
-            headers: {
-              'Accept': 'application/json',
-            }
-          });
-          
-          if (response.ok) {
-            break; // Success, exit loop
-          } else {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-        } catch (error) {
-          lastError = error;
-          console.warn(`Failed with proxy ${proxyUrl}:`, error);
-          continue; // Try next proxy
+      const response = await fetch('https://api.allorigins.win/get?url=https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml', {
+        signal: controller.signal,
+        headers: {
+          'Accept': 'application/json',
         }
-      }
-      
-      if (!response || !response.ok) {
-        throw lastError || new Error('All proxy services failed');
-      }
+      });
       
       clearTimeout(timeoutId);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       
       const data = await response.json();
       
@@ -186,94 +92,78 @@ const Shows = () => {
         };
       });
       
-      // Check if this is a background update and if there are new episodes
-      if (isBackgroundUpdate) {
-        const currentLatestGuid = episodes[0]?.guid;
-        const newLatestGuid = episodeList[0]?.guid;
-        
-        if (currentLatestGuid === newLatestGuid) {
-          console.log('✅ Background check: No new episodes found');
-          setBackgroundUpdating(false);
-          return;
-        } else {
-          console.log('🆕 New episodes detected, updating...');
-        }
-      }
-      
       const displayEpisodes = episodeList.slice(0, 10);
       setEpisodes(displayEpisodes);
       setTotalEpisodes(episodeList.length);
       
-      // Save to cache
-      saveEpisodesToCache(displayEpisodes, episodeList.length);
-      
-      console.log(`✅ RSS Update Complete: Updated with ${episodeList.length} total episodes, showing latest 10`);
-      
-      if (!isBackgroundUpdate) {
-        setLoading(false);
-      } else {
-        setBackgroundUpdating(false);
+      // Simple caching - save to localStorage
+      try {
+        const cache = {
+          episodes: displayEpisodes,
+          totalEpisodes: episodeList.length,
+          timestamp: Date.now()
+        };
+        localStorage.setItem('podcast_episodes', JSON.stringify(cache));
+        console.log('💾 Episodes cached');
+      } catch (error) {
+        console.warn('⚠️ Cache save failed:', error);
       }
       
+      console.log(`✅ RSS Update Complete: ${episodeList.length} episodes loaded`);
+      setLoading(false);
+      
     } catch (error) {
-      console.error(`❌ RSS Update Failed${isBackgroundUpdate ? ' [background]' : ''}:`, error);
+      console.error('❌ RSS fetch failed:', error);
       
       // Retry mechanism
       if (retryCount < maxRetries && (error instanceof Error && (error.name === 'AbortError' || error.message.includes('fetch')))) {
-        console.log(`🔄 Retrying RSS fetch (attempt ${retryCount + 1}/${maxRetries}) in ${Math.pow(2, retryCount)}s...`);
+        console.log(`🔄 Retrying (${retryCount + 1}/${maxRetries})...`);
         setTimeout(() => {
-          fetchEpisodes(retryCount + 1, isBackgroundUpdate);
+          fetchEpisodes(retryCount + 1);
         }, Math.pow(2, retryCount) * 1000);
         return;
       }
       
-      // Final failure
-      console.log(`❌ All RSS fetch attempts failed${isBackgroundUpdate ? ' [background]' : ''}`);
-      
-      if (!isBackgroundUpdate) {
-        setEpisodes([]);
-        setTotalEpisodes(0);
-        setLoading(false);
-      } else {
-        setBackgroundUpdating(false);
+      // Load from cache on final failure
+      try {
+        const cached = localStorage.getItem('podcast_episodes');
+        if (cached) {
+          const cache = JSON.parse(cached);
+          setEpisodes(cache.episodes || []);
+          setTotalEpisodes(cache.totalEpisodes || 0);
+          console.log('📦 Loaded episodes from cache after fetch failed');
+        }
+      } catch (cacheError) {
+        console.warn('⚠️ Cache load failed:', cacheError);
       }
+      
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    console.log('📺 Shows page: useEffect running, loading episodes...');
-    // Load cached episodes immediately
-    const cache = loadEpisodesFromCache();
-    
-    if (cache) {
-      setEpisodes(cache.episodes);
-      setTotalEpisodes(cache.totalEpisodes);
-      setLoading(false);
-      console.log('⚡ Loaded episodes from cache immediately');
-      
-      // Check cache age
-      const cacheAge = Date.now() - cache.lastFetch;
-      const shouldUpdate = cacheAge > (30 * 60 * 1000); // Update if cache older than 30 minutes
-      
-      if (shouldUpdate) {
-        console.log('🔄 Cache is getting stale, checking for updates in background...');
-        setTimeout(() => {
-          fetchEpisodes(0, true);
-        }, 1000); // Start background update after 1 second
+    // Try to load from cache first for instant display
+    try {
+      const cached = localStorage.getItem('podcast_episodes');
+      if (cached) {
+        const cache = JSON.parse(cached);
+        const age = Date.now() - cache.timestamp;
+        
+        // Use cache if less than 1 hour old
+        if (age < 60 * 60 * 1000) {
+          setEpisodes(cache.episodes || []);
+          setTotalEpisodes(cache.totalEpisodes || 0);
+          setLoading(false);
+          console.log('⚡ Loaded from cache instantly');
+          return;
+        }
       }
-    } else {
-      // No cache, do initial fetch
-      console.log('📭 No cache found, fetching episodes...');
-      fetchEpisodes();
+    } catch (error) {
+      console.warn('⚠️ Cache load failed:', error);
     }
-
-    // Set up background refresh every 2 hours
-    const refreshInterval = setInterval(() => {
-      console.log('⏰ Scheduled background update...');
-      fetchEpisodes(0, true);
-    }, 2 * 60 * 60 * 1000); // 2 hours
-
-    return () => clearInterval(refreshInterval);
+    
+    // Fetch episodes (either no cache or cache expired)
+    fetchEpisodes();
   }, []);
 
   // Scroll to episode if hash is present
@@ -471,14 +361,6 @@ const Shows = () => {
             <div className="max-w-6xl mx-auto">
                <h2 className="text-3xl md:text-4xl font-['Orbitron'] font-bold mb-12 text-center">
                 <span className="text-neon-purple">LATEST EPISODES</span>
-                {backgroundUpdating && (
-                  <div className="flex items-center justify-center mt-2">
-                    <div className="animate-pulse text-sm text-muted-foreground flex items-center gap-2">
-                      <div className="w-2 h-2 bg-neon rounded-full animate-ping"></div>
-                      Checking for new episodes...
-                    </div>
-                  </div>
-                )}
               </h2>
 
               {loading ? (
