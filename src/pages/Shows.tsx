@@ -292,7 +292,16 @@ const Shows = () => {
                 Dance anthems that consistently rule the dance and electronic scene. Featuring infectious beats, catchy hooks, and high-energy vibes perfect for both clubbing and radio airplay.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="text-lg px-8 py-4 hover:scale-105 transition-transform">
+                <Button 
+                  size="lg" 
+                  className="text-lg px-8 py-4 hover:scale-105 transition-transform"
+                  onClick={() => {
+                    if (episodes.length > 0 && episodes[0].enclosure.url) {
+                      handlePlayPause(episodes[0].enclosure.url, episodes[0].guid);
+                    }
+                  }}
+                  disabled={loading || episodes.length === 0}
+                >
                   <Play className="w-5 h-5 mr-2" />
                   Listen Now
                 </Button>
