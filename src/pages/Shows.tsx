@@ -105,12 +105,41 @@ const Shows = () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000);
       
-      const response = await fetch('https://api.allorigins.win/get?url=https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml', {
-        signal: controller.signal,
-        headers: {
-          'Accept': 'application/json',
+      // Try multiple proxy services for better reliability
+      const proxyUrls = [
+        'https://api.allorigins.win/get?url=',
+        'https://corsproxy.io/?',
+        'https://api.codetabs.com/v1/proxy/?quest='
+      ];
+      
+      let response;
+      let lastError;
+      
+      for (const proxyUrl of proxyUrls) {
+        try {
+          const fullUrl = `${proxyUrl}${encodeURIComponent('https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml')}`;
+          response = await fetch(fullUrl, {
+            signal: controller.signal,
+            headers: {
+              'Accept': 'application/json',
+            }
+          });
+          
+          if (response.ok) {
+            break; // Success, exit loop
+          } else {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+        } catch (error) {
+          lastError = error;
+          console.warn(`Failed with proxy ${proxyUrl}:`, error);
+          continue; // Try next proxy
         }
-      });
+      }
+      
+      if (!response || !response.ok) {
+        throw lastError || new Error('All proxy services failed');
+      }
       
       clearTimeout(timeoutId);
       
