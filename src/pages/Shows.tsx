@@ -88,6 +88,7 @@ const Shows = () => {
   };
 
   const fetchEpisodes = async (retryCount = 0, isBackgroundUpdate = false) => {
+    console.log(`📺 Shows: fetchEpisodes called - retry: ${retryCount}, background: ${isBackgroundUpdate}`);
     const maxRetries = 3;
     
     // Set loading states
@@ -244,6 +245,7 @@ const Shows = () => {
   };
 
   useEffect(() => {
+    console.log('📺 Shows page: useEffect running, loading episodes...');
     // Load cached episodes immediately
     const cache = loadEpisodesFromCache();
     
