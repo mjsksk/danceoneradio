@@ -4,7 +4,7 @@ const DJSection = () => {
   const djs = [{
     id: 1,
     name: "DJ Pulse",
-    role: "Resident DJ & Founder",
+    role: "Resident DJ",
     genre: "Progressive House",
     image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop&crop=face",
     bio: "Pioneer of progressive house with over 10 years in the scene",
@@ -12,7 +12,7 @@ const DJSection = () => {
       instagram: "@djpulse",
       twitter: "@djpulse_music"
     },
-    nextShow: "Friday 5PM PST"
+    nextShow: "Saturday 5PM PST"
   }, {
     id: 2,
     name: "DJ Neon",
