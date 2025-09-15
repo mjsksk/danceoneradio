@@ -301,9 +301,12 @@ const Shows = () => {
                 </Button>
                 
                 <SocialShare 
-                  url={`${window.location.origin}/shows`}
-                  title="Future Dance Anthems with Mario - Shows"
-                  description="Weekly episodes featuring the latest in electronic dance music"
+                  url={episodes.length > 0 ? `${window.location.origin}/shows#episode-${totalEpisodes}` : `${window.location.origin}/shows`}
+                  title={episodes.length > 0 ? `${episodes[0].title} - Future Dance Anthems with Mario` : "Future Dance Anthems with Mario - Shows"}
+                  description={episodes.length > 0 ? 
+                    `Listen to the latest episode: "${episodes[0].title}". ${episodes[0].description.substring(0, 120)}...` :
+                    "Weekly episodes featuring the latest in electronic dance music"
+                  }
                   className="text-lg px-8 py-4 hover:scale-105 transition-transform"
                 />
               </div>
