@@ -33,80 +33,27 @@ const Shows = () => {
     let success = false;
     setLoading(true);
     
-    // List of CORS proxies to try
-    const corsProxies = [
-      'https://corsproxy.io/?',
-      'https://api.codetabs.com/v1/proxy?quest=',
-      'https://cors-anywhere.herokuapp.com/',
-      'https://api.allorigins.win/get?url='
-    ];
-    
     const rssUrl = 'https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml';
     
     try {
-      console.log('🔄 Fetching RSS feed...');
+      console.log('🔄 Fetching RSS feed via Supabase Edge Function...');
       
-      // Try different CORS proxies
-      let response;
-      let proxyUsed = '';
+      const { supabase } = await import('@/integrations/supabase/client');
       
-      for (const proxy of corsProxies) {
-        try {
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 10000);
-          
-          const proxyUrl = proxy === 'https://cors-anywhere.herokuapp.com/' 
-            ? `${proxy}${rssUrl}`
-            : `${proxy}${encodeURIComponent(rssUrl)}`;
-            
-          console.log(`🔄 Trying proxy: ${proxy}`);
-          
-          response = await fetch(proxyUrl, {
-            signal: controller.signal,
-            headers: {
-              'Accept': proxy.includes('allorigins') ? 'application/json' : 'application/rss+xml, application/xml, text/xml',
-            }
-          });
-          
-          clearTimeout(timeoutId);
-          
-          if (response.ok) {
-            proxyUsed = proxy;
-            console.log(`✅ Success with proxy: ${proxy}`);
-            break;
-          }
-        } catch (proxyError) {
-          console.log(`❌ Proxy ${proxy} failed:`, proxyError.message);
-          continue;
-        }
+      const { data, error } = await supabase.functions.invoke('rss-feed-fetch', {
+        body: { url: rssUrl }
+      });
+
+      if (error) {
+        throw new Error(`Supabase function error: ${error.message}`);
       }
-      
-      if (!response || !response.ok) {
-        throw new Error(`All CORS proxies failed`);
+
+      if (!data || !data.content) {
+        throw new Error('No RSS content received');
       }
-      
-      // Parse response based on proxy type
-      let xmlContent;
-      if (proxyUsed.includes('allorigins')) {
-        const data = await response.json();
-        console.log('📥 RSS Response received:', { hasContents: !!data.contents, contentLength: data.contents?.length });
-        
-        // Check if we received HTML instead of XML (indicates wrong URL)
-        if (data.contents && data.contents.includes('<!DOCTYPE html>')) {
-          console.error('Received HTML instead of RSS feed - podcast feed URL may be incorrect');
-          throw new Error('Invalid podcast feed URL');
-        }
-        
-        // Check if the response contains base64 encoded data
-        xmlContent = data.contents;
-        if (typeof data.contents === 'string' && data.contents.startsWith('data:application/rss+xml')) {
-          // Extract base64 content and decode it
-          const base64Content = data.contents.split(',')[1];
-          xmlContent = atob(base64Content);
-        }
-      } else {
-        xmlContent = await response.text();
-      }
+
+      const xmlContent = data.content;
+      console.log('📄 XML Content preview:', xmlContent.substring(0, 200) + '...');
       
       console.log('📄 XML Content preview:', xmlContent?.substring(0, 200) + '...');
       
