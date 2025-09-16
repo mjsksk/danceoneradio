@@ -78,7 +78,13 @@ const handler = async (req: Request): Promise<Response> => {
     const subject = sanitizeHtml(requestData.subject.trim());
     const message = sanitizeHtml(requestData.message.trim()).replace(/\n/g, '<br>');
 
-    console.log(`Processing contact email from ${name} (${email})`);
+    console.log('Processing contact form submission', {
+      timestamp: new Date().toISOString(),
+      name: name.slice(0, 3) + '***',
+      email: email.slice(0, 3) + '***' + email.slice(-10),
+      userAgent: req.headers.get('user-agent')?.slice(0, 100),
+      origin: req.headers.get('origin')
+    });
 
     // Send confirmation email to the user
     const confirmationEmail = await resend.emails.send({

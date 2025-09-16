@@ -18,7 +18,8 @@ export const SecurityHeaders = () => {
       "manifest-src 'self'",
       "base-uri 'self'",
       "form-action 'self'",
-      "frame-ancestors 'none'"
+      "frame-ancestors 'none'",
+      "upgrade-insecure-requests"
     ].join('; ');
     
     // Only add if not already present
@@ -30,7 +31,10 @@ export const SecurityHeaders = () => {
     const securityMetas = [
       { httpEquiv: 'X-Content-Type-Options', content: 'nosniff' },
       { httpEquiv: 'X-Frame-Options', content: 'DENY' },
-      { httpEquiv: 'Referrer-Policy', content: 'strict-origin-when-cross-origin' }
+      { httpEquiv: 'Referrer-Policy', content: 'strict-origin-when-cross-origin' },
+      { httpEquiv: 'Strict-Transport-Security', content: 'max-age=31536000; includeSubDomains; preload' },
+      { httpEquiv: 'X-Permitted-Cross-Domain-Policies', content: 'none' },
+      { httpEquiv: 'Permissions-Policy', content: 'geolocation=(), microphone=(), camera=()' }
     ];
 
     securityMetas.forEach(meta => {

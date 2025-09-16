@@ -134,7 +134,12 @@ const handler = async (req: Request): Promise<Response> => {
       // Don't fail the subscription if email fails
     }
 
-    console.log(`✅ New newsletter subscription: ${email}`);
+    console.log('New newsletter subscription', {
+      timestamp: new Date().toISOString(),
+      email: email.slice(0, 3) + '***' + email.slice(-10),
+      userAgent: req.headers.get('user-agent')?.slice(0, 100),
+      origin: req.headers.get('origin')
+    });
 
     return new Response(
       JSON.stringify({ 

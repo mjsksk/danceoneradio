@@ -1,27 +1,34 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { validateEmail, sanitizeEmail } from '@/utils/emailValidator';
+import { newsletterLimiter } from '@/utils/rateLimiter';
 
 export const useNewsletter = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const subscribe = async (email: string) => {
-    if (!email) {
+    // Rate limiting check
+    const clientId = 'newsletter_' + (navigator.userAgent + navigator.language).slice(0, 50);
+    if (!newsletterLimiter.isAllowed(clientId)) {
+      const remainingTime = Math.ceil(newsletterLimiter.getRemainingTime(clientId) / 1000);
       toast({
-        title: "Email Required",
-        description: "Please enter your email address.",
+        title: "Too Many Requests",
+        description: `Please wait ${remainingTime} seconds before trying again.`,
         variant: "destructive",
       });
       return;
     }
 
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    // Enhanced email validation
+    const sanitizedEmail = sanitizeEmail(email);
+    const validation = validateEmail(sanitizedEmail);
+    
+    if (!validation.isValid) {
       toast({
         title: "Invalid Email",
-        description: "Please enter a valid email address.",
+        description: validation.error || "Please enter a valid email address.",
         variant: "destructive",
       });
       return;
@@ -31,7 +38,7 @@ export const useNewsletter = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('newsletter-subscribe', {
-        body: { email }
+        body: { email: sanitizedEmail }
       });
 
       if (error) {
