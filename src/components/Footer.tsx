@@ -123,9 +123,6 @@ const Footer = () => {
             <a href="/privacy" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani'] text-sm">
               Privacy Policy
             </a>
-            <a href="/love" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani'] text-sm">
-              Love
-            </a>
             <a href="/dmca" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani'] text-sm">
               DMCA
             </a>
