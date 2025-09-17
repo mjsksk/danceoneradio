@@ -17,6 +17,9 @@ interface Track {
 
 const Episode389 = () => {
   const [bgLoaded, setBgLoaded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   // Preload background image for better performance
   useEffect(() => {
@@ -24,6 +27,28 @@ const Episode389 = () => {
     img.onload = () => setBgLoaded(true);
     img.src = '/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png';
   }, []);
+
+  const handlePlayPause = async () => {
+    if (!audioRef.current) return;
+    
+    try {
+      setIsLoading(true);
+      
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      }
+    } catch (error) {
+      console.error('Error playing audio:', error);
+      // Fallback to Blubrry link
+      window.open('https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml', '_blank');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const tracks: Track[] = [
     { position: 1, title: "Medellin", artist: "K Motionz & Capo Lee" },
@@ -156,13 +181,34 @@ const Episode389 = () => {
                   </p>
                   
                   <div className="w-full max-w-2xl mx-auto">
+                    <audio 
+                      ref={audioRef}
+                      preload="metadata"
+                      onEnded={() => setIsPlaying(false)}
+                      onPause={() => setIsPlaying(false)}
+                      onPlay={() => setIsPlaying(true)}
+                    >
+                      <source src="https://media.blubrry.com/biggest_tunes_with_mario_135/content.blubrry.com/biggest_tunes_with_mario_135/ep389-anthems-of-the-week.mp3" type="audio/mpeg" />
+                      Your browser does not support the audio element.
+                    </audio>
+                    
                     <div className="card-cyber p-6 bg-gradient-to-br from-background/80 to-background/60 backdrop-blur-sm">
                       <div className="flex items-center gap-4 mb-4">
                         <Button 
                           className="w-12 h-12 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full flex items-center justify-center hover:from-neon/30 hover:to-neon-purple/30 transition-all duration-200 p-0"
-                          onClick={() => window.open('https://blubrry.com/biggest_tunes_with_mario_135/', '_blank')}
+                          onClick={handlePlayPause}
+                          disabled={isLoading}
                         >
-                          <Play className="w-6 h-6 text-neon" />
+                          {isLoading ? (
+                            <div className="w-4 h-4 border-2 border-neon border-t-transparent rounded-full animate-spin" />
+                          ) : isPlaying ? (
+                            <div className="w-6 h-6 flex items-center justify-center">
+                              <div className="w-2 h-4 bg-neon rounded-sm mr-1"></div>
+                              <div className="w-2 h-4 bg-neon rounded-sm"></div>
+                            </div>
+                          ) : (
+                            <Play className="w-6 h-6 text-neon" />
+                          )}
                         </Button>
                         <div className="flex-1">
                           <h3 className="font-semibold text-primary">Future Dance Anthems with Mario</h3>
