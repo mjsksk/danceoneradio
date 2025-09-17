@@ -158,9 +158,12 @@ const Episode389 = () => {
                   <div className="w-full max-w-2xl mx-auto">
                     <div className="card-cyber p-6 bg-gradient-to-br from-background/80 to-background/60 backdrop-blur-sm">
                       <div className="flex items-center gap-4 mb-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full flex items-center justify-center">
+                        <Button 
+                          className="w-12 h-12 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full flex items-center justify-center hover:from-neon/30 hover:to-neon-purple/30 transition-all duration-200 p-0"
+                          onClick={() => window.open('https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml', '_blank')}
+                        >
                           <Play className="w-6 h-6 text-neon" />
-                        </div>
+                        </Button>
                         <div className="flex-1">
                           <h3 className="font-semibold text-primary">Future Dance Anthems with Mario</h3>
                           <p className="text-sm text-muted-foreground">Episode 389 - Anthems of the week</p>
