@@ -156,15 +156,60 @@ const Episode389 = () => {
                   </p>
                   
                   <div className="w-full max-w-2xl mx-auto">
-                    <iframe 
-                      src="https://player.blubrry.com/biggest_tunes_with_mario_135/latest/#mode-Dark&border-1a89f9&progress-118cf7" 
-                      title="Blubrry Podcast Player" 
-                      scrolling="no" 
-                      width="100%" 
-                      height="165px" 
-                      frameBorder="0"
-                      className="rounded-lg shadow-lg"
-                    />
+                    <div className="card-cyber p-6 bg-gradient-to-br from-background/80 to-background/60 backdrop-blur-sm">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="w-12 h-12 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full flex items-center justify-center">
+                          <Play className="w-6 h-6 text-neon" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-primary">Future Dance Anthems with Mario</h3>
+                          <p className="text-sm text-muted-foreground">Episode 389 - Anthems of the week</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-muted-foreground">Duration</p>
+                          <p className="text-sm font-medium text-neon-purple">2:08:51</p>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-background/50 rounded-lg p-4 border border-neon/20">
+                        <div className="text-center mb-4">
+                          <p className="text-muted-foreground mb-2">
+                            This episode is available on our podcast platforms
+                          </p>
+                          <div className="flex justify-center gap-4">
+                            <Button 
+                              asChild 
+                              className="bg-gradient-to-r from-neon/20 to-neon-purple/20 border-neon/30 hover:from-neon/30 hover:to-neon-purple/30"
+                            >
+                              <a 
+                                href="https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2"
+                              >
+                                <Play className="w-4 h-4" />
+                                Listen on Blubrry
+                              </a>
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              asChild
+                            >
+                              <Link to="/player" className="flex items-center gap-2">
+                                <Music className="w-4 h-4" />
+                                Live Radio
+                              </Link>
+                            </Button>
+                          </div>
+                        </div>
+                        
+                        <div className="text-center">
+                          <p className="text-xs text-muted-foreground">
+                            Subscribe to get notified when new episodes are available
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   
                   <div className="mt-4">
