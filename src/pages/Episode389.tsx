@@ -48,8 +48,7 @@ const Episode389 = () => {
       }
     } catch (error) {
       console.error('Error playing audio:', error);
-      // Fallback to Blubrry link
-      window.open('https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml', '_blank');
+      // Don't automatically redirect on error - let user click the Blubrry button if needed
     } finally {
       setIsLoading(false);
     }
