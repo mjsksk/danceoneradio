@@ -21,6 +21,11 @@ const Episode389 = () => {
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Preload background image for better performance
   useEffect(() => {
     const img = new Image();
