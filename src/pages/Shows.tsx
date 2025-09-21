@@ -81,9 +81,10 @@ const Shows = () => {
       
       // Helper function to extract episode number from title
       const extractEpisodeNumber = (title: string): number => {
-        // Look for patterns like "389", "Episode 389", "Anthems 389", etc.
+        // Look for patterns like "Future Dance Anthems with Mario 380", "Episode 389", etc.
         const patterns = [
-          /(?:episode|anthems|show)?\s*#?(\d+)/i,
+          /Future Dance Anthems with Mario\s+(\d+)/i,
+          /(?:episode|anthems|show)\s*#?(\d+)/i,
           /(\d+)(?:\s*-|\s*:|$)/,
           /\b(\d{1,4})\b/
         ];
@@ -132,21 +133,29 @@ const Shows = () => {
 
       // Sort episodes by episode number (highest to lowest)
       const sortedEpisodes = episodeList.sort((a, b) => {
-        // If both have episode numbers, sort by number
+        // If both have episode numbers, sort by number (highest first)
         if (a.episodeNumber && b.episodeNumber) {
           return b.episodeNumber - a.episodeNumber;
         }
         // If only one has episode number, prioritize it
         if (a.episodeNumber && !b.episodeNumber) return -1;
         if (!a.episodeNumber && b.episodeNumber) return 1;
-        // If neither has episode number, maintain original order
+        // If neither has episode number, maintain original RSS order
         return 0;
       });
+
+      // Find the highest episode number for proper numbering
+      const maxEpisodeNumber = Math.max(...sortedEpisodes.map(ep => ep.episodeNumber || 0));
       
       setEpisodes(sortedEpisodes.slice(0, 10));
       setTotalEpisodes(sortedEpisodes.length);
-      console.log(`✅ RSS Update Complete: Updated with ${sortedEpisodes.length} total episodes, showing latest 10`, 
-        sortedEpisodes.slice(0, 3).map(ep => ({ title: ep.title, number: ep.episodeNumber })));
+      console.log(`✅ RSS Update Complete: Updated with ${sortedEpisodes.length} total episodes, showing latest 10`);
+      console.log(`📊 Latest episode number: ${maxEpisodeNumber}`);
+      console.log(`🎵 Episode numbers found:`, sortedEpisodes.slice(0, 5).map(ep => ({ 
+        title: ep.title, 
+        number: ep.episodeNumber,
+        pubDate: ep.pubDate 
+      })));
       success = true;
     } catch (error) {
       console.error('❌ RSS Update Failed:', error);
