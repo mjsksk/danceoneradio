@@ -34,10 +34,11 @@ const Shows = () => {
     let success = false;
     setLoading(true);
     
-    const rssUrl = 'https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml';
+    // Add cache busting to get fresh RSS data
+    const rssUrl = `https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml?t=${Date.now()}`;
     
     try {
-      console.log('🔄 Fetching RSS feed via Supabase Edge Function...');
+      console.log('🔄 Fetching RSS feed via Supabase Edge Function with cache bust...', new Date().toISOString());
       
       const { supabase } = await import('@/integrations/supabase/client');
       
@@ -71,13 +72,13 @@ const Shows = () => {
       const items = xmlDoc.querySelectorAll('item');
       console.log(`🎵 Found ${items.length} episodes in RSS feed`);
       
-      // Log first item details for debugging
-      if (items.length > 0) {
-        const firstItem = items[0];
-        const title = firstItem.querySelector('title')?.textContent;
-        const pubDate = firstItem.querySelector('pubDate')?.textContent;
-        console.log('📊 Latest episode:', { title, pubDate });
-      }
+      // Log ALL episode titles for debugging
+      console.log('📋 All episodes found in RSS feed:');
+      Array.from(items).forEach((item, index) => {
+        const title = item.querySelector('title')?.textContent;
+        const pubDate = item.querySelector('pubDate')?.textContent;
+        console.log(`  ${index + 1}. "${title}" - ${pubDate}`);
+      });
       
       // Helper function to extract episode number from title
       const extractEpisodeNumber = (title: string): number => {
