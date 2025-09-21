@@ -2,6 +2,7 @@ import { useLocation, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Home, Music, Download, Heart, Mail, Radio, Headphones } from "lucide-react";
+import SEO from "@/components/SEO";
 import danceOneLogo from "@/assets/dance-one-logo.png";
 
 const NotFound = () => {
@@ -30,6 +31,11 @@ const NotFound = () => {
   ];
 
   useEffect(() => {
+    // Set proper HTTP status code for SEO
+    if (typeof window !== 'undefined' && window.history) {
+      document.title = '404 - Page Not Found | Dance One Radio';
+    }
+    
     console.error(
       "404 Error: User attempted to access non-existent route:",
       location.pathname
@@ -75,7 +81,13 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+    <>
+      <SEO 
+        title="404 - Page Not Found | Dance One Radio"
+        description="The page you're looking for doesn't exist. Tune into Dance One Radio's main pages or contact our DJ for help."
+        url={`https://danceoneradio.com${location.pathname}`}
+      />
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="max-w-2xl mx-auto text-center">
         {/* Logo */}
         <div className="mb-8 flex justify-center">
@@ -146,6 +158,7 @@ const NotFound = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
