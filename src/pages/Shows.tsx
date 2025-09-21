@@ -18,6 +18,7 @@ interface Episode {
   };
   duration?: string;
   guid: string;
+  episodeNumber?: number;
 }
 
 const Shows = () => {
@@ -78,12 +79,35 @@ const Shows = () => {
         console.log('📊 Latest episode:', { title, pubDate });
       }
       
+      // Helper function to extract episode number from title
+      const extractEpisodeNumber = (title: string): number => {
+        // Look for patterns like "389", "Episode 389", "Anthems 389", etc.
+        const patterns = [
+          /(?:episode|anthems|show)?\s*#?(\d+)/i,
+          /(\d+)(?:\s*-|\s*:|$)/,
+          /\b(\d{1,4})\b/
+        ];
+        
+        for (const pattern of patterns) {
+          const match = title.match(pattern);
+          if (match && match[1]) {
+            const num = parseInt(match[1]);
+            // Only consider reasonable episode numbers (1-1000)
+            if (num >= 1 && num <= 1000) {
+              return num;
+            }
+          }
+        }
+        return 0; // Default if no episode number found
+      };
+
       const episodeList: Episode[] = Array.from(items).map((item, index) => {
         const description = item.querySelector('description')?.textContent || '';
         const cleanDescription = description.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ').trim();
+        const title = item.querySelector('title')?.textContent || '';
         
         const episode = {
-          title: item.querySelector('title')?.textContent || '',
+          title,
           description: cleanDescription,
           pubDate: item.querySelector('pubDate')?.textContent || '',
           enclosure: {
@@ -91,19 +115,38 @@ const Shows = () => {
             type: item.querySelector('enclosure')?.getAttribute('type') || ''
           },
           duration: item.querySelector('itunes\\:duration, duration')?.textContent || '',
-          guid: item.querySelector('guid')?.textContent || `episode-${index}`
+          guid: item.querySelector('guid')?.textContent || `episode-${index}`,
+          episodeNumber: extractEpisodeNumber(title)
         };
         
         if (index < 3) {
-          console.log(`Episode ${index + 1}:`, { title: episode.title, pubDate: episode.pubDate });
+          console.log(`Episode ${index + 1}:`, { 
+            title: episode.title, 
+            pubDate: episode.pubDate,
+            episodeNumber: episode.episodeNumber 
+          });
         }
         
         return episode;
       });
+
+      // Sort episodes by episode number (highest to lowest)
+      const sortedEpisodes = episodeList.sort((a, b) => {
+        // If both have episode numbers, sort by number
+        if (a.episodeNumber && b.episodeNumber) {
+          return b.episodeNumber - a.episodeNumber;
+        }
+        // If only one has episode number, prioritize it
+        if (a.episodeNumber && !b.episodeNumber) return -1;
+        if (!a.episodeNumber && b.episodeNumber) return 1;
+        // If neither has episode number, maintain original order
+        return 0;
+      });
       
-      setEpisodes(episodeList.slice(0, 10));
-      setTotalEpisodes(episodeList.length);
-      console.log(`✅ RSS Update Complete: Updated with ${episodeList.length} total episodes, showing latest 10`);
+      setEpisodes(sortedEpisodes.slice(0, 10));
+      setTotalEpisodes(sortedEpisodes.length);
+      console.log(`✅ RSS Update Complete: Updated with ${sortedEpisodes.length} total episodes, showing latest 10`, 
+        sortedEpisodes.slice(0, 3).map(ep => ({ title: ep.title, number: ep.episodeNumber })));
       success = true;
     } catch (error) {
       console.error('❌ RSS Update Failed:', error);
@@ -202,7 +245,8 @@ const Shows = () => {
   };
 
    const handleShareEpisode = async (episode: Episode, episodeIndex: number) => {
-     const episodeUrl = `${window.location.origin}/shows#episode-${totalEpisodes - episodeIndex}`;
+     const episodeNumber = episode.episodeNumber || (totalEpisodes - episodeIndex);
+     const episodeUrl = `${window.location.origin}/shows#episode-${episodeNumber}`;
      const shareData = {
        title: `${episode.title} - Future Dance Anthems with Mario`,
        text: `Listen to "${episode.title}" from Future Dance Anthems with Mario podcast. ${episode.description.substring(0, 100)}...`,
@@ -370,13 +414,13 @@ const Shows = () => {
                         {/* Episode Number Badge */}
                         <div className="lg:w-20 flex lg:flex-col items-center lg:items-start gap-4">
                            <div className="bg-gradient-to-br from-neon to-neon-purple text-background rounded-full w-16 h-16 flex items-center justify-center font-['Orbitron'] font-bold text-lg">
-                             #{totalEpisodes - index}
+                             #{episode.episodeNumber || (totalEpisodes - index)}
                            </div>
                         </div>
 
                         {/* Episode Content */}
-                        <div className="flex-1 space-y-4">
-                          <div id={`episode-${totalEpisodes - index}`}>
+                         <div className="flex-1 space-y-4">
+                           <div id={`episode-${episode.episodeNumber || (totalEpisodes - index)}`}>
                             {(episode.title.toLowerCase().includes("389") || 
                               episode.title.toLowerCase().includes("anthems of the week 389") ||
                               episode.title.toLowerCase().includes("anthems") && episode.title.includes("389")) ? (
