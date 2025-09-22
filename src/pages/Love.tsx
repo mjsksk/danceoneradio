@@ -31,86 +31,94 @@ const Love = () => {
                  Support Dance One Radio and help us continue bringing you the best electronic music experience.
                </p>
                
-               <div className="space-y-6">
-                 {/* Premium Support Form */}
-                 <div className="card-cyber p-4 bg-background/50">
-                   <h4 className="text-lg font-semibold text-accent mb-3">Premium Support</h4>
-                   <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-                     <input type="hidden" name="cmd" value="_s-xclick" />
-                     <input type="hidden" name="hosted_button_id" value="X3SUYFT3YSG5S" />
-                     <table className="mx-auto">
-                       <tr>
-                         <td>
-                           <input type="hidden" name="on0" value="Payment Options" />
-                           <label className="text-muted-foreground mb-2 block">Payment Options</label>
-                         </td>
-                       </tr>
-                       <tr>
-                         <td>
-                           <select name="os0" className="mb-4 p-2 border border-border rounded bg-background text-foreground">
-                             <option value="Option 1">
-                               Option 1 $15.00 USD - month(s)
-                             </option>
-                             <option value="Option 2">
-                               Option 2 $20.00 USD - month(s)
-                             </option>
-                             <option value="Option 3">
-                               Option 3 $30.00 USD - month(s)
-                             </option>
-                           </select>
-                         </td>
-                       </tr>
-                     </table>
-                     <input type="hidden" name="currency_code" value="USD" />
-                     <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_subscribeCC_LG.gif" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Subscribe" className="border-0" />
-                   </form>
-                 </div>
+                <div className="space-y-6">
+                  {/* Premium Support Form */}
+                  <div className="card-cyber p-4 bg-background/50">
+                    <h4 className="text-lg font-semibold text-accent mb-3">Premium Support</h4>
+                    <form 
+                      action="https://www.paypal.com/cgi-bin/webscr" 
+                      method="post" 
+                      target="_blank"
+                      className="text-center"
+                    >
+                      <input type="hidden" name="cmd" value="_s-xclick" />
+                      <input type="hidden" name="hosted_button_id" value="X3SUYFT3YSG5S" />
+                      <div className="mb-4">
+                        <input type="hidden" name="on0" value="Payment Options" />
+                        <label className="text-muted-foreground mb-2 block">Choose Your Support Level</label>
+                        <select 
+                          name="os0" 
+                          className="w-full max-w-xs p-2 border border-border rounded bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
+                        >
+                          <option value="Option 1">$15.00 USD / month</option>
+                          <option value="Option 2">$20.00 USD / month</option>
+                          <option value="Option 3">$30.00 USD / month</option>
+                        </select>
+                      </div>
+                      <input type="hidden" name="currency_code" value="USD" />
+                      <Button 
+                        type="submit"
+                        className="btn-cyber w-full max-w-xs"
+                      >
+                        Subscribe with PayPal
+                      </Button>
+                    </form>
+                  </div>
 
-                 {/* Standard Support Form */}
-                 <div className="card-cyber p-4 bg-background/50">
-                   <h4 className="text-lg font-semibold text-accent mb-3">Standard Support</h4>
-                   <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-                     <input type="hidden" name="cmd" value="_s-xclick" />
-                     <input type="hidden" name="hosted_button_id" value="8KHUB494QFKYS" />
-                     <table className="mx-auto">
-                       <tr>
-                         <td>
-                           <input type="hidden" name="on0" value="Payment Options" />
-                           <label className="text-muted-foreground mb-2 block">Payment Options</label>
-                         </td>
-                       </tr>
-                       <tr>
-                         <td>
-                           <select name="os0" className="mb-4 p-2 border border-border rounded bg-background text-foreground">
-                             <option value="Option 1">
-                               Option 1 $1.00 USD - month(s)
-                             </option>
-                             <option value="Option 2">
-                               Option 2 $5.00 USD - month(s)
-                             </option>
-                             <option value="Option 3">
-                               Option 3 $10.00 USD - month(s)
-                             </option>
-                           </select>
-                         </td>
-                       </tr>
-                     </table>
-                     <input type="hidden" name="currency_code" value="USD" />
-                     <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_subscribe_LG.gif" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Subscribe" className="border-0" />
-                   </form>
-                 </div>
+                  {/* Standard Support Form */}
+                  <div className="card-cyber p-4 bg-background/50">
+                    <h4 className="text-lg font-semibold text-accent mb-3">Standard Support</h4>
+                    <form 
+                      action="https://www.paypal.com/cgi-bin/webscr" 
+                      method="post" 
+                      target="_blank"
+                      className="text-center"
+                    >
+                      <input type="hidden" name="cmd" value="_s-xclick" />
+                      <input type="hidden" name="hosted_button_id" value="8KHUB494QFKYS" />
+                      <div className="mb-4">
+                        <input type="hidden" name="on0" value="Payment Options" />
+                        <label className="text-muted-foreground mb-2 block">Choose Your Support Level</label>
+                        <select 
+                          name="os0" 
+                          className="w-full max-w-xs p-2 border border-border rounded bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
+                        >
+                          <option value="Option 1">$1.00 USD / month</option>
+                          <option value="Option 2">$5.00 USD / month</option>
+                          <option value="Option 3">$10.00 USD / month</option>
+                        </select>
+                      </div>
+                      <input type="hidden" name="currency_code" value="USD" />
+                      <Button 
+                        type="submit"
+                        className="btn-cyber w-full max-w-xs"
+                      >
+                        Subscribe with PayPal
+                      </Button>
+                    </form>
+                  </div>
 
-                 {/* Quick Support Form */}
-                 <div className="card-cyber p-4 bg-background/50">
-                   <h4 className="text-lg font-semibold text-accent mb-3">Quick Support</h4>
-                   <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-                     <input type="hidden" name="cmd" value="_s-xclick" />
-                     <input type="hidden" name="hosted_button_id" value="DK3YAZ6D4WGGU" />
-                     <input type="hidden" name="currency_code" value="USD" />
-                     <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_subscribe_LG.gif" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Subscribe" className="border-0" />
-                   </form>
-                 </div>
-               </div>
+                  {/* Quick Support Form */}
+                  <div className="card-cyber p-4 bg-background/50">
+                    <h4 className="text-lg font-semibold text-accent mb-3">Quick Support</h4>
+                    <form 
+                      action="https://www.paypal.com/cgi-bin/webscr" 
+                      method="post" 
+                      target="_blank"
+                      className="text-center"
+                    >
+                      <input type="hidden" name="cmd" value="_s-xclick" />
+                      <input type="hidden" name="hosted_button_id" value="DK3YAZ6D4WGGU" />
+                      <input type="hidden" name="currency_code" value="USD" />
+                      <Button 
+                        type="submit"
+                        className="btn-cyber w-full max-w-xs"
+                      >
+                        Quick Support with PayPal
+                      </Button>
+                    </form>
+                  </div>
+                </div>
                <div className="flex justify-center space-x-4 mt-6">
                  <Heart className="w-6 h-6 text-primary animate-pulse" />
                  <Music className="w-6 h-6 text-accent" />
