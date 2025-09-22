@@ -36,85 +36,93 @@ const Love = () => {
                    <div className="card-cyber p-4 bg-background/50">
                      <h4 className="text-lg font-semibold text-accent mb-3">Premium Support</h4>
                      <p className="text-muted-foreground mb-4">Monthly subscriptions for dedicated supporters</p>
-                     <div className="space-y-3">
-                       <Button asChild className="btn-cyber w-full max-w-xs">
-                         <a 
-                           href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=X3SUYFT3YSG5S&os0=Option%201" 
-                           target="_blank" 
-                           rel="noopener noreferrer"
+                     <form 
+                       action="https://www.paypal.com/cgi-bin/webscr" 
+                       method="post" 
+                       target="paypal"
+                       onSubmit={() => window.open('', 'paypal', 'scrollbars=yes,resizable=yes,toolbar=no,location=yes,directories=no,status=no,menubar=no,copyhistory=no,width=400,height=350')}
+                       className="text-center"
+                     >
+                       <input type="hidden" name="cmd" value="_s-xclick" />
+                       <input type="hidden" name="hosted_button_id" value="X3SUYFT3YSG5S" />
+                       <div className="mb-4">
+                         <input type="hidden" name="on0" value="Payment Options" />
+                         <label className="text-muted-foreground mb-2 block">Choose Your Support Level</label>
+                         <select 
+                           name="os0" 
+                           className="w-full max-w-xs p-2 border border-border rounded bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary mb-4"
                          >
-                           $15.00 USD / month
-                         </a>
+                           <option value="Option 1">$15.00 USD / month</option>
+                           <option value="Option 2">$20.00 USD / month</option>
+                           <option value="Option 3">$30.00 USD / month</option>
+                         </select>
+                       </div>
+                       <input type="hidden" name="currency_code" value="USD" />
+                       <Button 
+                         type="submit"
+                         className="btn-cyber w-full max-w-xs"
+                       >
+                         Subscribe with PayPal
                        </Button>
-                       <Button asChild className="btn-cyber w-full max-w-xs">
-                         <a 
-                           href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=X3SUYFT3YSG5S&os0=Option%202" 
-                           target="_blank" 
-                           rel="noopener noreferrer"
-                         >
-                           $20.00 USD / month
-                         </a>
-                       </Button>
-                       <Button asChild className="btn-cyber w-full max-w-xs">
-                         <a 
-                           href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=X3SUYFT3YSG5S&os0=Option%203" 
-                           target="_blank" 
-                           rel="noopener noreferrer"
-                         >
-                           $30.00 USD / month
-                         </a>
-                       </Button>
-                     </div>
+                     </form>
                    </div>
 
                    {/* Standard Support */}
                    <div className="card-cyber p-4 bg-background/50">
                      <h4 className="text-lg font-semibold text-accent mb-3">Standard Support</h4>
                      <p className="text-muted-foreground mb-4">Affordable monthly support options</p>
-                     <div className="space-y-3">
-                       <Button asChild className="btn-cyber w-full max-w-xs">
-                         <a 
-                           href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8KHUB494QFKYS&os0=Option%201" 
-                           target="_blank" 
-                           rel="noopener noreferrer"
+                     <form 
+                       action="https://www.paypal.com/cgi-bin/webscr" 
+                       method="post" 
+                       target="paypal2"
+                       onSubmit={() => window.open('', 'paypal2', 'scrollbars=yes,resizable=yes,toolbar=no,location=yes,directories=no,status=no,menubar=no,copyhistory=no,width=400,height=350')}
+                       className="text-center"
+                     >
+                       <input type="hidden" name="cmd" value="_s-xclick" />
+                       <input type="hidden" name="hosted_button_id" value="8KHUB494QFKYS" />
+                       <div className="mb-4">
+                         <input type="hidden" name="on0" value="Payment Options" />
+                         <label className="text-muted-foreground mb-2 block">Choose Your Support Level</label>
+                         <select 
+                           name="os0" 
+                           className="w-full max-w-xs p-2 border border-border rounded bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary mb-4"
                          >
-                           $1.00 USD / month
-                         </a>
+                           <option value="Option 1">$1.00 USD / month</option>
+                           <option value="Option 2">$5.00 USD / month</option>
+                           <option value="Option 3">$10.00 USD / month</option>
+                         </select>
+                       </div>
+                       <input type="hidden" name="currency_code" value="USD" />
+                       <Button 
+                         type="submit"
+                         className="btn-cyber w-full max-w-xs"
+                       >
+                         Subscribe with PayPal
                        </Button>
-                       <Button asChild className="btn-cyber w-full max-w-xs">
-                         <a 
-                           href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8KHUB494QFKYS&os0=Option%202" 
-                           target="_blank" 
-                           rel="noopener noreferrer"
-                         >
-                           $5.00 USD / month
-                         </a>
-                       </Button>
-                       <Button asChild className="btn-cyber w-full max-w-xs">
-                         <a 
-                           href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8KHUB494QFKYS&os0=Option%203" 
-                           target="_blank" 
-                           rel="noopener noreferrer"
-                         >
-                           $10.00 USD / month
-                         </a>
-                       </Button>
-                     </div>
+                     </form>
                    </div>
 
                    {/* Quick Support */}
                    <div className="card-cyber p-4 bg-background/50">
                      <h4 className="text-lg font-semibold text-accent mb-3">Quick Support</h4>
                      <p className="text-muted-foreground mb-4">One-time donation to show your appreciation</p>
-                     <Button asChild className="btn-cyber w-full max-w-xs">
-                       <a 
-                         href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DK3YAZ6D4WGGU" 
-                         target="_blank" 
-                         rel="noopener noreferrer"
+                     <form 
+                       action="https://www.paypal.com/cgi-bin/webscr" 
+                       method="post" 
+                       target="paypal3"
+                       onSubmit={() => window.open('', 'paypal3', 'scrollbars=yes,resizable=yes,toolbar=no,location=yes,directories=no,status=no,menubar=no,copyhistory=no,width=400,height=350')}
+                       className="text-center"
+                     >
+                       <input type="hidden" name="cmd" value="_s-xclick" />
+                       <input type="hidden" name="hosted_button_id" value="DK3YAZ6D4WGGU" />
+                       <input type="hidden" name="currency_code" value="USD" />
+                       <Button 
+                         type="submit"
+                         className="btn-cyber w-full max-w-xs"
                        >
                          Quick Support with PayPal
-                       </a>
-                     </Button>
+                       </Button>
+                     </form>
                    </div>
                  </div>
                <div className="flex justify-center space-x-4 mt-6">
