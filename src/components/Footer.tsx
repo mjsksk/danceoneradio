@@ -11,9 +11,13 @@ const Footer = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('📝 Newsletter form submitted with email:', email);
     const success = await subscribe(email);
     if (success) {
+      console.log('✅ Newsletter subscription successful, clearing form');
       setEmail(''); // Clear the form on success
+    } else {
+      console.log('❌ Newsletter subscription failed');
     }
   };
 

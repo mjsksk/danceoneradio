@@ -9,6 +9,8 @@ export const useNewsletter = () => {
   const { toast } = useToast();
 
   const subscribe = async (email: string) => {
+    console.log('🔄 Newsletter subscription started for:', email);
+    
     // Rate limiting check
     const clientId = 'newsletter_' + (navigator.userAgent + navigator.language).slice(0, 50);
     if (!newsletterLimiter.isAllowed(clientId)) {
@@ -37,9 +39,11 @@ export const useNewsletter = () => {
     setIsSubmitting(true);
 
     try {
+      console.log('📧 Calling newsletter-subscribe function with email:', sanitizedEmail);
       const { data, error } = await supabase.functions.invoke('newsletter-subscribe', {
         body: { email: sanitizedEmail }
       });
+      console.log('📧 Newsletter subscription response:', { data, error });
 
       if (error) {
         console.error('Newsletter subscription error:', error);
