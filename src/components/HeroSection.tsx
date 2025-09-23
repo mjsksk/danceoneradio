@@ -8,6 +8,17 @@ import LiveRadioPlayer from './LiveRadioPlayer';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 const HeroSection = () => {
   const [streamTitle, setStreamTitle] = useState('🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵');
+  
+  // Array of background videos - randomly selected on each page visit
+  const backgroundVideos = [
+    "https://upbwlnpycrbhxahjztrf.supabase.co/storage/v1/object/public/videos/Laser-Beam.mp4",
+    "/Sequence_01.mp4"
+  ];
+  
+  // Select random video on component mount
+  const [selectedVideo] = useState(() => 
+    backgroundVideos[Math.floor(Math.random() * backgroundVideos.length)]
+  );
   useEffect(() => {
     const fetchStreamMetadata = async () => {
       try {
@@ -29,7 +40,7 @@ const HeroSection = () => {
   return <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Video with Overlay */}
       <video className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline poster={heroImage}>
-        <source src="https://upbwlnpycrbhxahjztrf.supabase.co/storage/v1/object/public/videos/Laser-Beam.mp4" type="video/mp4" />
+        <source src={selectedVideo} type="video/mp4" />
       </video>
       <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]"></div>
 
