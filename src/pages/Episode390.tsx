@@ -137,11 +137,11 @@ const Episode390 = () => {
                 <div className="flex flex-wrap items-center justify-center gap-6 text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-neon" />
-                    <span>September 21, 2025</span>
+                    <span>September 22, 2025</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="w-5 h-5 text-neon-purple" />
-                    <span>2:17:45</span>
+                    <span>1:18:00</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Music className="w-5 h-5 text-primary" />
@@ -166,7 +166,7 @@ const Episode390 = () => {
                       onPause={() => setIsPlaying(false)}
                       onPlay={() => setIsPlaying(true)}
                     >
-                      <source src="https://media.blubrry.com/biggest_tunes_with_mario_135/content.blubrry.com/biggest_tunes_with_mario_135/ep390-anthems-of-the-week.mp3" type="audio/mpeg" />
+                      <source src="https://media.blubrry.com/biggest_tunes_with_mario_135/content.blubrry.com/biggest_tunes_with_mario_135/Biggest-Tunes-with-Mario-390-streamed.mp3" type="audio/mpeg" />
                       Your browser does not support the audio element.
                     </audio>
                     
@@ -194,7 +194,7 @@ const Episode390 = () => {
                         </div>
                         <div className="text-right">
                           <p className="text-xs text-muted-foreground">Duration</p>
-                          <p className="text-sm font-medium text-neon-purple">2:17:45</p>
+                          <p className="text-sm font-medium text-neon-purple">1:18:00</p>
                         </div>
                       </div>
                       
@@ -314,7 +314,7 @@ const Episode390 = () => {
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-primary font-['Orbitron']">
-                        2:17:45
+                        1:18:00
                       </div>
                       <div className="text-sm text-muted-foreground">Duration</div>
                     </div>
