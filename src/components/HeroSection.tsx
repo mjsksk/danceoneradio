@@ -15,10 +15,9 @@ const HeroSection = () => {
     "/Sequence_01.mp4"
   ];
   
-  // Select random video on component mount
-  const [selectedVideo] = useState(() => 
-    backgroundVideos[Math.floor(Math.random() * backgroundVideos.length)]
-  );
+  // Select random video on each page visit (not cached in state)
+  const selectedVideo = backgroundVideos[Math.floor(Math.random() * backgroundVideos.length)];
+  const [videoKey, setVideoKey] = useState(0);
   useEffect(() => {
     const fetchStreamMetadata = async () => {
       try {
@@ -37,9 +36,22 @@ const HeroSection = () => {
     const interval = setInterval(fetchStreamMetadata, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // Force video refresh on component mount to ensure new video selection
+  useEffect(() => {
+    setVideoKey(prev => prev + 1);
+  }, []);
   return <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Video with Overlay */}
-      <video className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline poster={heroImage}>
+      <video 
+        key={`video-${videoKey}-${selectedVideo}`}
+        className="absolute inset-0 w-full h-full object-cover" 
+        autoPlay 
+        muted 
+        loop 
+        playsInline 
+        poster={heroImage}
+      >
         <source src={selectedVideo} type="video/mp4" />
       </video>
       <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]"></div>
