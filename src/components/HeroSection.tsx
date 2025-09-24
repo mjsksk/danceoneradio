@@ -50,7 +50,7 @@ const HeroSection = () => {
         muted 
         loop 
         playsInline 
-        poster={heroImage}
+        poster="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png"
       >
         <source src={selectedVideo} type="video/mp4" />
       </video>
