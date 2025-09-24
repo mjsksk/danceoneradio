@@ -45,25 +45,9 @@ const Gallery = () => {
         <div className="relative bg-background">
           <ContainerStagger className="relative z-[9999] -mb-12 place-self-center px-6 pt-24 text-center">
             <ContainerAnimated>
-              <h1 className="font-['Orbitron'] text-4xl font-bold text-cyber-blue md:text-6xl">
-                Love{" "}
-                <span className="bg-gradient-neon bg-clip-text text-transparent">
-                  Parade
-                </span>
+              <h1 className="font-['Orbitron'] text-5xl font-bold text-white md:text-7xl drop-shadow-lg">
+                Love Parade 2005
               </h1>
-            </ContainerAnimated>
-            <ContainerAnimated>
-              <h2 className="font-['Orbitron'] text-3xl font-light text-foreground md:text-4xl mt-2">
-                2005
-              </h2>
-            </ContainerAnimated>
-
-            <ContainerAnimated className="my-6">
-              <p className="leading-relaxed tracking-wide text-muted-foreground max-w-2xl mx-auto">
-                Relive the magic of one of electronic music's most iconic celebrations.
-                <br /> 
-                Experience the energy, creativity, and pure joy that defined Love Parade 2005.
-              </p>
             </ContainerAnimated>
           </ContainerStagger>
 
