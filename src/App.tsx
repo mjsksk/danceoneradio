@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SecurityHeaders } from "@/components/SecurityHeaders";
 import Index from "./pages/Index";
 import Shows from "./pages/Shows";
+import Gallery from "./pages/Gallery";
 import Downloads from "./pages/Downloads";
 import Privacy from "./pages/Privacy";
 import Love from "./pages/Love";
@@ -28,6 +29,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/shows" element={<Shows />} />
+          <Route path="/gallery" element={<Gallery />} />
           <Route path="/downloads" element={<Downloads />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/love" element={<Love />} />
