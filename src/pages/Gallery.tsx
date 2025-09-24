@@ -12,34 +12,32 @@ import {
 import { Button } from "@/components/ui/button";
 import { Radio, Heart, Star } from "lucide-react";
 
-// Sample images - replace with your actual radio station photos
+// Love Parade 2005 images
 const IMAGES_1 = [
-  "/lovable-uploads/054c29a7-1e20-4801-8426-fd378cd3d2bb.png",
-  "/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png",
-  "/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png",
-  "/lovable-uploads/72d04e54-23af-4f4a-bf39-efcc6c6b2150.png",
+  "/lovable-uploads/456045ea-1b09-4d4a-a5b5-92feb3d9b232.png",
+  "/lovable-uploads/904ad015-6a99-4f89-9045-773a74fef249.png",
+  "/lovable-uploads/adebbaa6-a671-4552-92df-75fa9ee22e59.png",
+  "/lovable-uploads/e85e609a-ca18-49ba-a3d2-64056b100d75.png",
 ];
 
 const IMAGES_2 = [
-  "/lovable-uploads/ba6a92fa-e132-4643-8d4c-abc0bab124f1.png",
-  "/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png",
-  "/lovable-uploads/f807b27f-9eaf-4d20-b3f5-4bad24538a4e.png",
-  "/lovable-uploads/054c29a7-1e20-4801-8426-fd378cd3d2bb.png",
+  "/lovable-uploads/cb44467f-22aa-4065-b0c2-21e90051c6e0.png",
+  "/lovable-uploads/27372fc3-4a92-4713-b992-5044632d553c.png",
+  "/lovable-uploads/3d724d81-1a61-4f83-b45f-08d6bab09744.png",
 ];
 
 const IMAGES_3 = [
-  "/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png",
-  "/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png",
-  "/lovable-uploads/72d04e54-23af-4f4a-bf39-efcc6c6b2150.png",
-  "/lovable-uploads/ba6a92fa-e132-4643-8d4c-abc0bab124f1.png",
+  "/lovable-uploads/085cba21-1654-4f82-98d4-fe637a0e7f50.png",
+  "/lovable-uploads/5c460280-de6c-4efd-9358-f28dd8dcb52c.png",
+  "/lovable-uploads/a13d8147-86d7-4e56-b349-ab8264e6ac07.png",
 ];
 
 const Gallery = () => {
   return (
     <>
       <SEO 
-        title="Gallery - Dance One Radio"
-        description="Explore our vibrant gallery showcasing the best moments from Dance One Radio. From live DJ sets to behind-the-scenes moments, discover our journey in electronic music."
+        title="Love Parade 2005 - Dance One Radio Gallery"
+        description="Relive the magic of Love Parade 2005 through our exclusive photo gallery. Experience the energy, creativity, and pure joy of electronic music culture at its peak."
       />
       <div className="min-h-screen bg-background">
         <Navigation />
@@ -48,35 +46,24 @@ const Gallery = () => {
           <ContainerStagger className="relative z-[9999] -mb-12 place-self-center px-6 pt-24 text-center">
             <ContainerAnimated>
               <h1 className="font-['Orbitron'] text-4xl font-bold text-cyber-blue md:text-6xl">
-                Our{" "}
+                Love{" "}
                 <span className="bg-gradient-neon bg-clip-text text-transparent">
-                  Journey
+                  Parade
                 </span>
               </h1>
             </ContainerAnimated>
             <ContainerAnimated>
               <h2 className="font-['Orbitron'] text-3xl font-light text-foreground md:text-4xl mt-2">
-                in Electronic Music
+                2005
               </h2>
             </ContainerAnimated>
 
             <ContainerAnimated className="my-6">
               <p className="leading-relaxed tracking-wide text-muted-foreground max-w-2xl mx-auto">
-                From intimate studio sessions to explosive live performances,
+                Relive the magic of one of electronic music's most iconic celebrations.
                 <br /> 
-                witness the passion behind Dance One Radio's sound.
+                Experience the energy, creativity, and pure joy that defined Love Parade 2005.
               </p>
-            </ContainerAnimated>
-
-            <ContainerAnimated>
-              <Button className="btn-cyber gap-2 mr-4">
-                <Radio className="size-4" />
-                Listen Live
-              </Button>
-              <Button variant="ghost" className="text-cyber-blue hover:text-electric-purple">
-                <Heart className="size-4 mr-2" />
-                Support Us
-              </Button>
             </ContainerAnimated>
           </ContainerStagger>
 
@@ -99,7 +86,7 @@ const Gallery = () => {
                       <img
                         className="aspect-video block h-auto max-h-full w-full rounded-lg object-cover shadow-lg card-cyber transition-all duration-300 group-hover:shadow-glow-cyber"
                         src={imageUrl}
-                        alt={`Dance One Radio gallery moment ${index + 1}`}
+                        alt={`Love Parade 2005 moment ${index + 1}`}
                         loading="lazy"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-end p-4">
@@ -117,7 +104,7 @@ const Gallery = () => {
                       <img
                         className="aspect-video block h-auto max-h-full w-full rounded-lg object-cover shadow-lg card-cyber transition-all duration-300 group-hover:shadow-glow-purple"
                         src={imageUrl}
-                        alt={`Dance One Radio behind the scenes ${index + 1}`}
+                        alt={`Love Parade 2005 celebration ${index + 1}`}
                         loading="lazy"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-end p-4">
@@ -135,7 +122,7 @@ const Gallery = () => {
                       <img
                         className="aspect-video block h-auto max-h-full w-full rounded-lg object-cover shadow-lg card-cyber transition-all duration-300 group-hover:shadow-glow-neon"
                         src={imageUrl}
-                        alt={`Dance One Radio community moment ${index + 1}`}
+                        alt={`Love Parade 2005 festival ${index + 1}`}
                         loading="lazy"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-end p-4">
