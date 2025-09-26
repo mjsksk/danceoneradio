@@ -71,17 +71,22 @@ const Gallery = () => {
             }}
           />
 
-          <ContainerScroll className="relative h-[350vh]">
-            <ContainerSticky className="h-svh">
-              <GalleryContainer className="p-4">
-                <GalleryCol yRange={["-10%", "2%"]} className="-mt-2">
+          <ContainerScroll className="relative h-[500vh]">
+            <ContainerSticky className="h-screen">
+              <GalleryContainer className="p-6">
+                <GalleryCol yRange={["-5%", "10%"]} className="space-y-4">
                   {IMAGES_1.map((imageUrl, index) => (
                     <div key={index} className="relative group">
                       <img
-                        className="aspect-video block h-auto max-h-full w-full rounded-lg object-cover shadow-lg card-cyber transition-all duration-300 group-hover:shadow-glow-cyber"
+                        className="block h-auto w-full rounded-lg object-contain shadow-lg card-cyber transition-all duration-500 ease-out group-hover:shadow-glow-cyber will-change-transform"
                         src={imageUrl}
                         alt={`Love Parade 2005 moment ${index + 1}`}
                         loading="lazy"
+                        style={{ 
+                          maxHeight: '400px',
+                          transform: 'translateZ(0)', // Hardware acceleration
+                          backfaceVisibility: 'hidden'
+                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-end p-4">
                         <div className="flex items-center gap-2 text-cyber-blue">
@@ -92,14 +97,19 @@ const Gallery = () => {
                     </div>
                   ))}
                 </GalleryCol>
-                <GalleryCol className="mt-[-50%]" yRange={["15%", "5%"]}>
+                <GalleryCol yRange={["5%", "-5%"]} className="space-y-4 mt-8">
                   {IMAGES_2.map((imageUrl, index) => (
                     <div key={index} className="relative group">
                       <img
-                        className="aspect-video block h-auto max-h-full w-full rounded-lg object-cover shadow-lg card-cyber transition-all duration-300 group-hover:shadow-glow-purple"
+                        className="block h-auto w-full rounded-lg object-contain shadow-lg card-cyber transition-all duration-500 ease-out group-hover:shadow-glow-purple will-change-transform"
                         src={imageUrl}
                         alt={`Love Parade 2005 celebration ${index + 1}`}
                         loading="lazy"
+                        style={{ 
+                          maxHeight: '400px',
+                          transform: 'translateZ(0)', // Hardware acceleration
+                          backfaceVisibility: 'hidden'
+                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-end p-4">
                         <div className="flex items-center gap-2 text-electric-purple">
@@ -110,14 +120,19 @@ const Gallery = () => {
                     </div>
                   ))}
                 </GalleryCol>
-                <GalleryCol yRange={["-10%", "2%"]} className="-mt-2">
+                <GalleryCol yRange={["-5%", "10%"]} className="space-y-4">
                   {IMAGES_3.map((imageUrl, index) => (
                     <div key={index} className="relative group">
                       <img
-                        className="aspect-video block h-auto max-h-full w-full rounded-lg object-cover shadow-lg card-cyber transition-all duration-300 group-hover:shadow-glow-neon"
+                        className="block h-auto w-full rounded-lg object-contain shadow-lg card-cyber transition-all duration-500 ease-out group-hover:shadow-glow-neon will-change-transform"
                         src={imageUrl}
                         alt={`Love Parade 2005 festival ${index + 1}`}
                         loading="lazy"
+                        style={{ 
+                          maxHeight: '400px',
+                          transform: 'translateZ(0)', // Hardware acceleration
+                          backfaceVisibility: 'hidden'
+                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-end p-4">
                         <div className="flex items-center gap-2 text-neon-green">
