@@ -19,7 +19,22 @@ const HeroSection = () => {
   const selectedVideo = backgroundVideos[Math.floor(Math.random() * backgroundVideos.length)];
   const [videoKey, setVideoKey] = useState(0);
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    let isVisible = !document.hidden;
+
+    const handleVisibilityChange = () => {
+      isVisible = !document.hidden;
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     const fetchStreamMetadata = async () => {
+      // Skip if tab is not visible
+      if (!isVisible) {
+        console.log('🎵 HeroSection: Skipping metadata fetch - tab not visible');
+        return;
+      }
+
       try {
         const metadata = await RadioStreamService.getStreamMetadata();
         const formattedTitle = RadioStreamService.formatTitle(metadata);
@@ -29,12 +44,26 @@ const HeroSection = () => {
       }
     };
 
-    // Fetch immediately
-    fetchStreamMetadata();
+    const scheduleNext = () => {
+      // Update every 10 seconds instead of 1 second - 90% reduction
+      timeoutId = setTimeout(() => {
+        fetchStreamMetadata().then(scheduleNext);
+      }, 10000);
+    };
 
-    // Update every 1 second for real-time updates
-    const interval = setInterval(fetchStreamMetadata, 1000);
-    return () => clearInterval(interval);
+    // Fetch immediately if visible
+    if (isVisible) {
+      fetchStreamMetadata().then(scheduleNext);
+    } else {
+      scheduleNext();
+    }
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, []);
 
   // Force video refresh on component mount to ensure new video selection

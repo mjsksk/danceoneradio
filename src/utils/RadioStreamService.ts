@@ -26,6 +26,14 @@ export class RadioStreamService {
     const startTime = Date.now();
     console.log('🔍 RadioStreamService: Starting metadata fetch at', new Date().toISOString());
     
+    // Check cache first
+    const { cacheService } = await import('@/utils/CacheService');
+    const cached = cacheService.getStreamMetadata();
+    if (cached && !cacheService.isStreamMetadataStale(10000)) {
+      console.log('✅ Using cached metadata:', cached);
+      return cached;
+    }
+    
     try {
       // Try our Supabase Edge Function first (bypasses CORS)
       console.log('🔍 Trying Supabase Edge Function...');
@@ -43,6 +51,9 @@ export class RadioStreamService {
           data.title = `🎵 ${data.title} 🎵`;
         }
         
+        // Cache the result for 10 seconds
+        cacheService.setStreamMetadata(data, 10000);
+        
         const elapsed = Date.now() - startTime;
         console.log(`✅ Got real metadata in ${elapsed}ms:`, data);
         return data;
@@ -54,10 +65,15 @@ export class RadioStreamService {
       console.log('🔄 Edge Function failed, using fallback');
       const fallback = this.generateLiveTitle();
       console.log('🔄 Fallback metadata:', fallback);
+      
+      // Cache fallback for shorter time
+      cacheService.setStreamMetadata(fallback, 5000);
       return fallback;
     } catch (error) {
       console.error('💥 Error fetching stream metadata:', error);
-      return this.generateLiveTitle();
+      const fallback = this.generateLiveTitle();
+      cacheService.setStreamMetadata(fallback, 5000);
+      return fallback;
     }
   }
 

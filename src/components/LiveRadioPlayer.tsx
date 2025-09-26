@@ -369,7 +369,26 @@ const LiveRadioPlayer = ({
 
   // Real-time stream metadata fetching - independent of parent
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    let isVisible = !document.hidden;
+    let wasHidden = false;
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden && isVisible === false) {
+        wasHidden = true; // Tab became visible again
+      }
+      isVisible = !document.hidden;
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     const fetchStreamMetadata = async () => {
+      // Skip if tab is not visible (unless it was hidden and now visible)
+      if (!isVisible && !wasHidden) {
+        console.log('🎵 LivePlayer: Skipping metadata fetch - tab not visible');
+        return;
+      }
+
       try {
         console.log('🎵 LivePlayer: Fetching stream metadata...');
         const metadata = await RadioStreamService.getStreamMetadata();
@@ -390,25 +409,37 @@ const LiveRadioPlayer = ({
         } else {
           console.log('🎵 LivePlayer: No change in metadata, keeping current title');
         }
+
+        if (wasHidden) {
+          wasHidden = false; // Clear the flag
+        }
       } catch (error) {
         console.error('🎵 LivePlayer: Error fetching stream metadata:', error);
         setIsStreamLive(false);
       }
     };
 
+    const scheduleNext = () => {
+      // Update every 10 seconds instead of 2 seconds - 80% reduction
+      timeoutId = setTimeout(() => {
+        fetchStreamMetadata().then(scheduleNext);
+      }, 10000);
+    };
+
     // Initial fetch
     console.log('🎵 LivePlayer: Setting up metadata fetching...');
-    fetchStreamMetadata();
-    
-    // Update every 2 seconds for real-time updates
-    const interval = setInterval(() => {
-      console.log('🎵 LivePlayer: Interval tick - fetching metadata...');
-      fetchStreamMetadata();
-    }, 2000);
+    if (isVisible) {
+      fetchStreamMetadata().then(scheduleNext);
+    } else {
+      scheduleNext();
+    }
     
     return () => {
       console.log('🎵 LivePlayer: Cleaning up metadata interval');
-      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
     };
   }, [currentStreamTitle]);
 
