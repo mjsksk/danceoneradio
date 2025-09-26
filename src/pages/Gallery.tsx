@@ -18,18 +18,28 @@ const IMAGES_1 = [
   "/lovable-uploads/904ad015-6a99-4f89-9045-773a74fef249.png",
   "/lovable-uploads/adebbaa6-a671-4552-92df-75fa9ee22e59.png",
   "/lovable-uploads/e85e609a-ca18-49ba-a3d2-64056b100d75.png",
+  "/lovable-uploads/DSCN2420.JPG",
+  "/lovable-uploads/DSCN2423.JPG",
+  "/lovable-uploads/DSCN2426.JPG",
 ];
 
 const IMAGES_2 = [
   "/lovable-uploads/cb44467f-22aa-4065-b0c2-21e90051c6e0.png",
   "/lovable-uploads/27372fc3-4a92-4713-b992-5044632d553c.png",
   "/lovable-uploads/3d724d81-1a61-4f83-b45f-08d6bab09744.png",
+  "/lovable-uploads/DSCN2421.JPG",
+  "/lovable-uploads/DSCN2424.JPG",
+  "/lovable-uploads/DSCN2427.JPG",
+  "/lovable-uploads/DSCN2429.JPG",
 ];
 
 const IMAGES_3 = [
   "/lovable-uploads/085cba21-1654-4f82-98d4-fe637a0e7f50.png",
   "/lovable-uploads/5c460280-de6c-4efd-9358-f28dd8dcb52c.png",
   "/lovable-uploads/a13d8147-86d7-4e56-b349-ab8264e6ac07.png",
+  "/lovable-uploads/DSCN2422.JPG",
+  "/lovable-uploads/DSCN2425.JPG",
+  "/lovable-uploads/DSCN2431.JPG",
 ];
 
 const Gallery = () => {
