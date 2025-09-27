@@ -15,16 +15,16 @@ const DJSection = () => {
     nextShow: "Saturday 5PM PST"
   }, {
     id: 2,
-    name: "DJ Neon",
-    role: "Cyber Specialist",
-    genre: "Cyberpunk / Synthwave",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
-    bio: "Bringing futuristic sounds from the digital underground",
+    name: "Ivan Samel",
+    role: "Sound Technologist",
+    genre: "EQ Wave Magician, Creator of the the best sounding experience",
+    image: "",
+    bio: "",
     socials: {
       instagram: "@djneon",
       twitter: "@neon_beats"
     },
-    nextShow: "Saturday 9PM PST"
+    nextShow: ""
   }, {
     id: 3,
     name: "DJ Cosmos",
@@ -65,21 +65,23 @@ const DJSection = () => {
           animationDelay: `${index * 0.1}s`
         }}>
               {/* DJ Photo */}
-              <div className="relative mb-6">
-                <div className="dj-photo mx-auto rounded-full overflow-hidden border-2 border-primary/50 group-hover:border-primary transition-all duration-300">
-                  <img 
-                    src={dj.image.includes('unsplash') ? dj.image.replace('w=400&h=400', 'w=128&h=128') : dj.image} 
-                    alt={dj.name} 
-                    className="group-hover:scale-110 transition-transform duration-300" 
-                    loading="lazy"
-                    width="128"
-                    height="128"
-                  />
+              {dj.image && (
+                <div className="relative mb-6">
+                  <div className="dj-photo mx-auto rounded-full overflow-hidden border-2 border-primary/50 group-hover:border-primary transition-all duration-300">
+                    <img 
+                      src={dj.image.includes('unsplash') ? dj.image.replace('w=400&h=400', 'w=128&h=128') : dj.image} 
+                      alt={dj.name} 
+                      className="group-hover:scale-110 transition-transform duration-300" 
+                      loading="lazy"
+                      width="128"
+                      height="128"
+                    />
+                  </div>
+                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-primary rounded-full flex items-center justify-center animate-glow-pulse">
+                    <Music className="w-3 h-3 text-primary-foreground" />
+                  </div>
                 </div>
-                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-primary rounded-full flex items-center justify-center animate-glow-pulse">
-                  <Music className="w-3 h-3 text-primary-foreground" />
-                </div>
-              </div>
+              )}
 
               {/* DJ Info */}
               <div className="mb-6">
@@ -98,15 +100,17 @@ const DJSection = () => {
               </div>
 
               {/* Next Show */}
-              <div className="mb-6 p-3 bg-secondary/50 rounded-lg border border-primary/20">
-                <div className="flex items-center justify-center text-xs text-muted-foreground mb-1">
-                  <Calendar className="w-3 h-3 mr-1" />
-                  NEXT SHOW
+              {dj.nextShow && (
+                <div className="mb-6 p-3 bg-secondary/50 rounded-lg border border-primary/20">
+                  <div className="flex items-center justify-center text-xs text-muted-foreground mb-1">
+                    <Calendar className="w-3 h-3 mr-1" />
+                    NEXT SHOW
+                  </div>
+                  <p className="text-sm font-['Rajdhani'] font-semibold text-primary">
+                    {dj.nextShow}
+                  </p>
                 </div>
-                <p className="text-sm font-['Rajdhani'] font-semibold text-primary">
-                  {dj.nextShow}
-                </p>
-              </div>
+              )}
 
               {/* Social Links */}
               <div className="flex items-center justify-center space-x-4 mb-6">
