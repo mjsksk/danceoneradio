@@ -29,11 +29,11 @@ const Gallery = () => {
           mixBlendMode: "screen"
         }} />
 
-          <ContainerScroll className="relative h-[400vh]">
-            <ContainerSticky className="h-svh">
-              <GalleryContainer className="p-4">
-                <GalleryCol yRange={["-10%", "2%"]} className="-mt-2">
-                  {IMAGES_1.map((imageUrl, index) => <div key={index} className="relative group">
+          <ContainerScroll className="relative h-[500vh]">
+            <ContainerSticky className="h-screen overflow-hidden">
+              <GalleryContainer className="p-4 h-full">
+                <GalleryCol yRange={["-20%", "10%"]} className="-mt-2">
+                  {IMAGES_1.map((imageUrl, index) => <div key={index} className="relative group mb-4">
                       <img className="aspect-video block h-auto max-h-full w-full rounded-lg object-cover shadow-lg card-cyber transition-all duration-300 group-hover:shadow-glow-cyber" src={imageUrl} alt={`Love Parade 2005 moment ${index + 1}`} loading="lazy" />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-end p-4">
                         <div className="flex items-center gap-2 text-cyber-blue">
@@ -43,8 +43,8 @@ const Gallery = () => {
                       </div>
                     </div>)}
                 </GalleryCol>
-                <GalleryCol className="mt-[-50%]" yRange={["15%", "5%"]}>
-                  {IMAGES_2.map((imageUrl, index) => <div key={index} className="relative group">
+                <GalleryCol className="mt-[-40%]" yRange={["20%", "-5%"]}>
+                  {IMAGES_2.map((imageUrl, index) => <div key={index} className="relative group mb-4">
                       <img className="aspect-video block h-auto max-h-full w-full rounded-lg object-cover shadow-lg card-cyber transition-all duration-300 group-hover:shadow-glow-purple" src={imageUrl} alt={`Love Parade 2005 celebration ${index + 1}`} loading="lazy" />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-end p-4">
                         <div className="flex items-center gap-2 text-electric-purple">
@@ -54,8 +54,8 @@ const Gallery = () => {
                       </div>
                     </div>)}
                 </GalleryCol>
-                <GalleryCol yRange={["-30%", "30%"]} className="-mt-2">
-                  {IMAGES_3.map((imageUrl, index) => <div key={index} className="relative group">
+                <GalleryCol yRange={["-50%", "50%"]} className="-mt-2">
+                  {IMAGES_3.map((imageUrl, index) => <div key={index} className="relative group mb-4">
                       <img className="aspect-video block h-auto max-h-full w-full rounded-lg object-cover shadow-lg card-cyber transition-all duration-300 group-hover:shadow-glow-neon" src={imageUrl} alt={`Love Parade 2005 festival ${index + 1}`} loading="lazy" />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-end p-4">
                         <div className="flex items-center gap-2 text-neon-green">
