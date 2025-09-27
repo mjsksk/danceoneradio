@@ -17,14 +17,15 @@ const DJSection = () => {
     id: 2,
     name: "Ivan Samel",
     role: "Sound Technologist",
-    genre: "EQ Wave Magician, Creator of the the best sounding experience",
+    genre: "EQ Wave Magician",
+    subtitle: "Creator of the best sounding experience",
     image: "",
     bio: "",
     socials: {
       instagram: "",
       twitter: ""
     },
-    nextShow: ""
+    nextShow: "SOUNDING 24/7"
   }, {
     id: 3,
     name: "DJ Cosmos",
@@ -54,8 +55,8 @@ const DJSection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16 animate-fade-in">
           <h2 className="text-4xl md:text-6xl font-['Orbitron'] font-bold mb-6">
-            <span className="text-neon">FEATURED</span>{" "}
-            <span className="text-neon-purple">DJs</span>
+            <span className="text-neon">D1R</span>{" "}
+            <span className="text-neon-purple">TEAM</span>
           </h2>
           
         </div>
@@ -66,15 +67,17 @@ const DJSection = () => {
         }}>
               {/* DJ Photo */}
               <div className="relative mb-6">
-                <div className="dj-photo mx-auto rounded-full overflow-hidden border-2 border-primary/50 group-hover:border-primary transition-all duration-300">
-                  <img 
-                    src={dj.image.includes('unsplash') ? dj.image.replace('w=400&h=400', 'w=128&h=128') : dj.image} 
-                    alt={dj.name} 
-                    className="group-hover:scale-110 transition-transform duration-300" 
-                    loading="lazy"
-                    width="128"
-                    height="128"
-                  />
+                <div className="dj-photo mx-auto rounded-full overflow-hidden border-2 border-primary/50 group-hover:border-primary transition-all duration-300 w-32 h-32 flex items-center justify-center bg-background">
+                  {dj.image ? (
+                    <img 
+                      src={dj.image.includes('unsplash') ? dj.image.replace('w=400&h=400', 'w=128&h=128') : dj.image} 
+                      alt={dj.name} 
+                      className="group-hover:scale-110 transition-transform duration-300" 
+                      loading="lazy"
+                      width="128"
+                      height="128"
+                    />
+                  ) : null}
                 </div>
                 <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-primary rounded-full flex items-center justify-center animate-glow-pulse">
                   <Music className="w-3 h-3 text-primary-foreground" />
@@ -89,9 +92,14 @@ const DJSection = () => {
                 <p className="text-accent font-['Rajdhani'] font-medium mb-2">
                   {dj.role}
                 </p>
-                <p className="text-sm text-muted-foreground font-['Rajdhani'] mb-3">
+                <p className="text-sm text-muted-foreground font-['Rajdhani'] mb-1">
                   {dj.genre}
                 </p>
+                {dj.subtitle && (
+                  <p className="text-sm text-muted-foreground font-['Rajdhani'] mb-3">
+                    {dj.subtitle}
+                  </p>
+                )}
                 <p className="text-xs text-muted-foreground font-['Rajdhani'] leading-relaxed">
                   {dj.bio}
                 </p>
@@ -101,11 +109,13 @@ const DJSection = () => {
               <div className="mb-6 p-3 bg-secondary/50 rounded-lg border border-primary/20">
                 <div className="flex items-center justify-center text-xs text-muted-foreground mb-1">
                   <Calendar className="w-3 h-3 mr-1" />
-                  NEXT SHOW
+                  {dj.nextShow === "SOUNDING 24/7" ? "SOUNDING 24/7" : "NEXT SHOW"}
                 </div>
-                <p className="text-sm font-['Rajdhani'] font-semibold text-primary">
-                  {dj.nextShow}
-                </p>
+                {dj.nextShow && dj.nextShow !== "SOUNDING 24/7" && (
+                  <p className="text-sm font-['Rajdhani'] font-semibold text-primary">
+                    {dj.nextShow}
+                  </p>
+                )}
               </div>
 
               {/* Social Links */}
