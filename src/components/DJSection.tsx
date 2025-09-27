@@ -15,16 +15,16 @@ const DJSection = () => {
     nextShow: "Saturday 5PM PST"
   }, {
     id: 2,
-    name: "DJ Neon",
-    role: "Cyber Specialist",
-    genre: "Cyberpunk / Synthwave",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
-    bio: "Bringing futuristic sounds from the digital underground",
+    name: "Ivan Samel",
+    role: "Sound Technologist",
+    genre: "EQ Wave Magician, Creator of the the best sounding experience",
+    image: "",
+    bio: "",
     socials: {
-      instagram: "@djneon",
-      twitter: "@neon_beats"
+      instagram: "",
+      twitter: ""
     },
-    nextShow: "Saturday 9PM PST"
+    nextShow: ""
   }, {
     id: 3,
     name: "DJ Cosmos",
