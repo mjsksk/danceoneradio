@@ -49,7 +49,7 @@ const DJSection = () => {
       instagram: "@mario",
       twitter: "@mario_dance"
     },
-    nextShow: "Weekly Episodes"
+    nextShow: "Friday 5PM PST"
   }];
   return <section id="djs" className="py-20 relative">
       <div className="container mx-auto px-4">
