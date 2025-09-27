@@ -29,7 +29,7 @@ const Gallery = () => {
           mixBlendMode: "screen"
         }} />
 
-          <ContainerScroll className="relative h-[350vh]">
+          <ContainerScroll className="relative h-[400vh]">
             <ContainerSticky className="h-svh">
               <GalleryContainer className="p-4">
                 <GalleryCol yRange={["-10%", "2%"]} className="-mt-2">
@@ -54,7 +54,7 @@ const Gallery = () => {
                       </div>
                     </div>)}
                 </GalleryCol>
-                <GalleryCol yRange={["-10%", "2%"]} className="-mt-2">
+                <GalleryCol yRange={["-30%", "30%"]} className="-mt-2">
                   {IMAGES_3.map((imageUrl, index) => <div key={index} className="relative group">
                       <img className="aspect-video block h-auto max-h-full w-full rounded-lg object-cover shadow-lg card-cyber transition-all duration-300 group-hover:shadow-glow-neon" src={imageUrl} alt={`Love Parade 2005 festival ${index + 1}`} loading="lazy" />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-end p-4">
