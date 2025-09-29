@@ -1,102 +1,154 @@
+import { useState } from "react";
 import SEO from "@/components/SEO";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { ContainerAnimated, ContainerScroll, ContainerStagger, ContainerSticky, GalleryCol, GalleryContainer } from "@/components/ui/animated-gallery";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Radio, Heart, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
-// Love Parade 2005 images
-const IMAGES_1 = [
-  "/lovable-uploads/456045ea-1b09-4d4a-a5b5-92feb3d9b232.png", 
-  "/lovable-uploads/904ad015-6a99-4f89-9045-773a74fef249.png", 
-  "/lovable-uploads/adebbaa6-a671-4552-92df-75fa9ee22e59.png", 
+// All Love Parade 2005 images
+const ALL_IMAGES = [
+  "/lovable-uploads/456045ea-1b09-4d4a-a5b5-92feb3d9b232.png",
+  "/lovable-uploads/904ad015-6a99-4f89-9045-773a74fef249.png",
+  "/lovable-uploads/adebbaa6-a671-4552-92df-75fa9ee22e59.png",
   "/lovable-uploads/e85e609a-ca18-49ba-a3d2-64056b100d75.png",
-  "/lovable-uploads/DSCN2432.JPG",
-  "/lovable-uploads/DSCN2436.JPG",
-  "/lovable-uploads/DSCN2438.JPG"
-];
-
-const IMAGES_2 = [
-  "/lovable-uploads/cb44467f-22aa-4065-b0c2-21e90051c6e0.png", 
-  "/lovable-uploads/27372fc3-4a92-4713-b992-5044632d553c.png", 
+  "/lovable-uploads/cb44467f-22aa-4065-b0c2-21e90051c6e0.png",
+  "/lovable-uploads/27372fc3-4a92-4713-b992-5044632d553c.png",
   "/lovable-uploads/3d724d81-1a61-4f83-b45f-08d6bab09744.png",
-  "/lovable-uploads/DSCN2435.JPG",
-  "/lovable-uploads/DSCN2437.JPG",
-  "/lovable-uploads/DSCN2441.JPG"
-];
-
-const IMAGES_3 = [
-  "/lovable-uploads/085cba21-1654-4f82-98d4-fe637a0e7f50.png", 
-  "/lovable-uploads/5c460280-de6c-4efd-9358-f28dd8dcb52c.png", 
+  "/lovable-uploads/085cba21-1654-4f82-98d4-fe637a0e7f50.png",
+  "/lovable-uploads/5c460280-de6c-4efd-9358-f28dd8dcb52c.png",
   "/lovable-uploads/a13d8147-86d7-4e56-b349-ab8264e6ac07.png",
+  "/lovable-uploads/DSCN2432.JPG",
   "/lovable-uploads/DSCN2434.JPG",
+  "/lovable-uploads/DSCN2435.JPG",
+  "/lovable-uploads/DSCN2436.JPG",
+  "/lovable-uploads/DSCN2437.JPG",
+  "/lovable-uploads/DSCN2438.JPG",
   "/lovable-uploads/DSCN2439.JPG",
   "/lovable-uploads/DSCN2440.JPG",
-  "/lovable-uploads/DSCN2442.JPG"
+  "/lovable-uploads/DSCN2441.JPG",
+  "/lovable-uploads/DSCN2442.JPG",
 ];
+
 const Gallery = () => {
-  return <>
-      <SEO title="Love Parade 2005 - Dance One Radio Gallery" description="Relive the magic of Love Parade 2005 through our exclusive photo gallery. Experience the energy, creativity, and pure joy of electronic music culture at its peak." />
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+
+  const handlePrevious = () => {
+    if (selectedImageIndex !== null) {
+      setSelectedImageIndex((selectedImageIndex - 1 + ALL_IMAGES.length) % ALL_IMAGES.length);
+    }
+  };
+
+  const handleNext = () => {
+    if (selectedImageIndex !== null) {
+      setSelectedImageIndex((selectedImageIndex + 1) % ALL_IMAGES.length);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowLeft") handlePrevious();
+    if (e.key === "ArrowRight") handleNext();
+    if (e.key === "Escape") setSelectedImageIndex(null);
+  };
+
+  return (
+    <>
+      <SEO
+        title="Love Parade 2005 - Dance One Radio Gallery"
+        description="Relive the magic of Love Parade 2005 through our exclusive photo gallery. Experience the energy, creativity, and pure joy of electronic music culture at its peak."
+      />
       <div className="min-h-screen bg-background">
         <Navigation />
-        
-        <div className="relative bg-background">
-          <ContainerStagger className="relative z-[9999] -mb-12 place-self-center px-6 pt-24 text-center">
-            <ContainerAnimated>
-              <h1 className="font-['Orbitron'] text-5xl font-bold text-white md:text-7xl drop-shadow-lg">Love Parade 2005 San Francisco</h1>
-            </ContainerAnimated>
-          </ContainerStagger>
 
-          {/* Cyber glow effect */}
-          <div className="pointer-events-none absolute z-10 h-[70vh] w-full opacity-30" style={{
-          background: "var(--gradient-cyber)",
-          filter: "blur(100px)",
-          mixBlendMode: "screen"
-        }} />
+        <div className="container mx-auto px-4 py-24">
+          <div className="text-center mb-12">
+            <h1 className="font-['Orbitron'] text-4xl md:text-6xl font-bold text-foreground mb-4">
+              Love Parade 2005 San Francisco
+            </h1>
+            <p className="text-muted-foreground text-lg">
+              {ALL_IMAGES.length} photos from the festival
+            </p>
+          </div>
 
-          <ContainerScroll className="relative h-[500vh]">
-            <ContainerSticky className="h-screen overflow-hidden">
-              <GalleryContainer className="p-4 h-full">
-                <GalleryCol yRange={["-20%", "10%"]} className="-mt-2">
-                  {IMAGES_1.map((imageUrl, index) => <div key={index} className="relative group mb-4">
-                      <img className="aspect-video block h-auto max-h-full w-full rounded-lg object-cover shadow-lg card-cyber transition-all duration-300 group-hover:shadow-glow-cyber" src={imageUrl} alt={`Love Parade 2005 moment ${index + 1}`} loading="lazy" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-end p-4">
-                        <div className="flex items-center gap-2 text-cyber-blue">
-                          <Star className="size-4" />
-                          <span className="text-sm font-medium">Featured Moment</span>
-                        </div>
-                      </div>
-                    </div>)}
-                </GalleryCol>
-                <GalleryCol className="mt-[-40%]" yRange={["20%", "-5%"]}>
-                  {IMAGES_2.map((imageUrl, index) => <div key={index} className="relative group mb-4">
-                      <img className="aspect-video block h-auto max-h-full w-full rounded-lg object-cover shadow-lg card-cyber transition-all duration-300 group-hover:shadow-glow-purple" src={imageUrl} alt={`Love Parade 2005 celebration ${index + 1}`} loading="lazy" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-end p-4">
-                        <div className="flex items-center gap-2 text-electric-purple">
-                          <Radio className="size-4" />
-                          <span className="text-sm font-medium">Behind the Scenes</span>
-                        </div>
-                      </div>
-                    </div>)}
-                </GalleryCol>
-                <GalleryCol yRange={["-50%", "50%"]} className="-mt-2">
-                  {IMAGES_3.map((imageUrl, index) => <div key={index} className="relative group mb-4">
-                      <img className="aspect-video block h-auto max-h-full w-full rounded-lg object-cover shadow-lg card-cyber transition-all duration-300 group-hover:shadow-glow-neon" src={imageUrl} alt={`Love Parade 2005 festival ${index + 1}`} loading="lazy" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-end p-4">
-                        <div className="flex items-center gap-2 text-neon-green">
-                          <Heart className="size-4" />
-                          <span className="text-sm font-medium">Community Love</span>
-                        </div>
-                      </div>
-                    </div>)}
-                </GalleryCol>
-              </GalleryContainer>
-            </ContainerSticky>
-          </ContainerScroll>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {ALL_IMAGES.map((image, index) => (
+              <div
+                key={index}
+                className="relative group cursor-pointer overflow-hidden rounded-lg card-cyber hover:shadow-glow-cyber transition-all duration-300"
+                onClick={() => setSelectedImageIndex(index)}
+              >
+                <img
+                  src={image}
+                  alt={`Love Parade 2005 - Photo ${index + 1}`}
+                  className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <span className="text-foreground font-semibold text-lg">View Photo</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-        
+
         <Footer />
       </div>
-    </>;
+
+      {/* Lightbox Dialog */}
+      <Dialog open={selectedImageIndex !== null} onOpenChange={() => setSelectedImageIndex(null)}>
+        <DialogContent
+          className="max-w-[95vw] max-h-[95vh] p-0 bg-background/95 backdrop-blur-sm border-0"
+          onKeyDown={handleKeyDown}
+        >
+          <div className="relative w-full h-full flex items-center justify-center">
+            {selectedImageIndex !== null && (
+              <>
+                <img
+                  src={ALL_IMAGES[selectedImageIndex]}
+                  alt={`Love Parade 2005 - Photo ${selectedImageIndex + 1}`}
+                  className="max-w-full max-h-[90vh] object-contain"
+                />
+
+                {/* Navigation Buttons */}
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background"
+                  onClick={handlePrevious}
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background"
+                  onClick={handleNext}
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </Button>
+
+                {/* Close Button */}
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="absolute top-4 right-4 bg-background/80 hover:bg-background"
+                  onClick={() => setSelectedImageIndex(null)}
+                >
+                  <X className="h-6 w-6" />
+                </Button>
+
+                {/* Image Counter */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/80 px-4 py-2 rounded-full text-sm">
+                  {selectedImageIndex + 1} / {ALL_IMAGES.length}
+                </div>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 };
+
 export default Gallery;
