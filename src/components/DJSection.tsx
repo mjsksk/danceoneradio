@@ -16,10 +16,10 @@ const DJSection = () => {
   }, {
     id: 2,
     name: "Ivan Samel",
-    role: "Sound Technologist",
+    role: "Sound Engineer",
     genre: "EQ Wave Magician",
     subtitle: "Creator of the best sounding experience",
-    image: "",
+    image: "/lovable-uploads/ivan-samel.jpg",
     bio: "",
     socials: {
       instagram: "",
