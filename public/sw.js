@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dance-one-radio-v3-' + Date.now();
+const CACHE_NAME = 'dance-one-radio-v2';
 const STATIC_ASSETS = [
   '/assets/dance-one-logo-DP6h_tTr.png',
   '/assets/hero-bg-B-ZqE77g.jpg',
@@ -9,19 +9,12 @@ const STATIC_ASSETS = [
   '/lovable-uploads/f807b27f-9eaf-4d20-b3f5-4bad24538a4e.png'
 ];
 
-// Aggressive cache invalidation - clear ALL caches on install
-const clearAllCaches = async () => {
-  const cacheNames = await caches.keys();
-  await Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)));
-};
-
-// Install event - aggressive cache clearing and new asset caching
+// Install event - cache static assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    clearAllCaches()
-      .then(() => caches.open(CACHE_NAME))
+    caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('Caching static assets with new cache');
+        console.log('Caching static assets');
         return cache.addAll(STATIC_ASSETS);
       })
       .catch((error) => {
@@ -61,36 +54,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // NEVER cache HTML documents - always fetch fresh with cache busting
+  // Always fetch fresh HTML documents (SPA routes)
   if (event.request.destination === 'document' || 
-      event.request.headers.get('accept')?.includes('text/html') ||
-      event.request.url.includes('.html') ||
-      event.request.url.endsWith('/')) {
-    
-    // Add cache-busting headers and timestamp
-    const url = new URL(event.request.url);
-    url.searchParams.set('_t', Date.now().toString());
-    
-    const headers = new Headers({
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0'
-    });
-    
+      event.request.headers.get('accept')?.includes('text/html')) {
     event.respondWith(
-      fetch(url.toString(), {
-        method: event.request.method,
-        headers: headers,
-        credentials: event.request.credentials,
-        cache: 'no-store'
-      }).catch(() => {
-        // Only fallback for true offline scenarios, not cache issues
-        return new Response(`
-          <!DOCTYPE html>
-          <html><head><title>Offline</title></head>
-          <body><h1>You are offline</h1><p>Please check your connection.</p></body>
-          </html>
-        `, { headers: { 'Content-Type': 'text/html' } });
+      fetch(event.request).catch(() => {
+        // Fallback to cached index.html for SPA routing
+        return caches.match('/index.html') || caches.match('/');
       })
     );
     return;
