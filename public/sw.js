@@ -1,6 +1,5 @@
-const CACHE_NAME = 'dance-one-radio-v1';
+const CACHE_NAME = 'dance-one-radio-v2';
 const STATIC_ASSETS = [
-  '/',
   '/assets/dance-one-logo-DP6h_tTr.png',
   '/assets/hero-bg-B-ZqE77g.jpg',
   '/assets/app-store-badge-new-CVyK0T4N.svg',
@@ -52,6 +51,18 @@ self.addEventListener('fetch', (event) => {
       event.request.url.includes('api.allorigins.win') ||
       event.request.url.includes('supabase.co/storage') ||
       event.request.url.includes('pagead2.googlesyndication.com')) {
+    return;
+  }
+
+  // Always fetch fresh HTML documents (SPA routes)
+  if (event.request.destination === 'document' || 
+      event.request.headers.get('accept')?.includes('text/html')) {
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        // Fallback to cached index.html for SPA routing
+        return caches.match('/index.html') || caches.match('/');
+      })
+    );
     return;
   }
 
