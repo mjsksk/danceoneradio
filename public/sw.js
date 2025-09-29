@@ -21,7 +21,8 @@ self.addEventListener('install', (event) => {
         console.log('Cache install failed:', error);
       })
   );
-  self.skipWaiting();
+  // Don't force immediate activation - wait for page reload
+  // self.skipWaiting();
 });
 
 // Activate event - clean up old caches
@@ -38,7 +39,8 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
-  self.clients.claim();
+  // Don't force immediate control - wait for natural page reload
+  // self.clients.claim();
 });
 
 // Fetch event - serve from cache with fallback to network
