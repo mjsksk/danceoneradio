@@ -78,6 +78,16 @@ const ALL_IMAGES = [
   "/lovable-uploads/DSCN2487.JPG",
   "/lovable-uploads/DSCN2490.JPG",
   "/lovable-uploads/DSCN2491.JPG",
+  "/lovable-uploads/DSCN2492.JPG",
+  "/lovable-uploads/DSCN2493.JPG",
+  "/lovable-uploads/DSCN2496.JPG",
+  "/lovable-uploads/DSCN2498.JPG",
+  "/lovable-uploads/DSCN2499.JPG",
+  "/lovable-uploads/DSCN2502.JPG",
+  "/lovable-uploads/DSCN2505.JPG",
+  "/lovable-uploads/DSCN2506.JPG",
+  "/lovable-uploads/DSCN2507.JPG",
+  "/lovable-uploads/DSCN2508.JPG",
 ];
 
 const Gallery = () => {
