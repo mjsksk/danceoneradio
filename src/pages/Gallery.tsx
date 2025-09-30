@@ -34,11 +34,11 @@ const Gallery = () => {
                   <CardDescription>San Francisco</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="relative overflow-hidden rounded-lg mb-4">
+                  <div className="relative overflow-hidden rounded-lg mb-4 bg-muted">
                     <img
                       src={loveParade2005}
                       alt="Love Parade 2005 San Francisco"
-                      className="w-full h-64 object-cover transition-transform duration-300 hover:scale-110"
+                      className="w-full h-64 object-contain transition-transform duration-300 hover:scale-110"
                     />
                   </div>
                   <p className="text-muted-foreground">
@@ -55,11 +55,11 @@ const Gallery = () => {
                   <CardDescription>San Francisco</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="relative overflow-hidden rounded-lg mb-4">
+                  <div className="relative overflow-hidden rounded-lg mb-4 bg-muted">
                     <img
                       src={loveParade2006}
                       alt="Love Parade 2006 San Francisco"
-                      className="w-full h-64 object-cover transition-transform duration-300 hover:scale-110"
+                      className="w-full h-64 object-contain transition-transform duration-300 hover:scale-110"
                     />
                   </div>
                   <p className="text-muted-foreground">
