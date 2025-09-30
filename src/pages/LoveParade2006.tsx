@@ -13,11 +13,18 @@ interface ImageData {
   explicit?: boolean;
 }
 
-// Love Parade 2006 images (placeholder - add actual 2006 images here)
+// Love Parade 2006 images
 const ALL_IMAGES: ImageData[] = [
-  { url: "/lovable-uploads/904ad015-6a99-4f89-9045-773a74fef249.png" },
-  { url: "/lovable-uploads/adebbaa6-a671-4552-92df-75fa9ee22e59.png" },
-  { url: "/lovable-uploads/e85e609a-ca18-49ba-a3d2-64056b100d75.png" },
+  { url: "/lovable-uploads/Loveparade_2006_1.JPG" },
+  { url: "/lovable-uploads/Loveparade_2006_3.JPG" },
+  { url: "/lovable-uploads/Loveparade_2006_4.JPG" },
+  { url: "/lovable-uploads/Loveparade_2006_6.JPG" },
+  { url: "/lovable-uploads/Loveparade_2006_7.JPG" },
+  { url: "/lovable-uploads/Loveparade_2006_10.JPG" },
+  { url: "/lovable-uploads/Loveparade_2006_11.JPG" },
+  { url: "/lovable-uploads/Loveparade_2006_16.JPG" },
+  { url: "/lovable-uploads/Loveparade_2006_19.JPG" },
+  { url: "/lovable-uploads/Loveparade_2006_20.JPG" },
 ];
 
 const LoveParade2006 = () => {
