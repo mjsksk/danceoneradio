@@ -9,8 +9,8 @@ const DJSection = () => {
     image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop&crop=face",
     bio: "Pioneer of progressive house with over 10 years in the scene",
     socials: {
-      instagram: "@djpulse",
-      twitter: "@djpulse_music"
+      instagram: "danceoneradio",
+      twitter: "danceoneradio"
     },
     nextShow: "Saturday 5PM PST"
   }, {
@@ -22,8 +22,8 @@ const DJSection = () => {
     image: "/lovable-uploads/ivan-samel.jpg",
     bio: "",
     socials: {
-      instagram: "",
-      twitter: ""
+      instagram: "danceoneradio",
+      twitter: "danceoneradio"
     },
     nextShow: "SOUNDING 24/7"
   }, {
@@ -34,8 +34,8 @@ const DJSection = () => {
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
     bio: "Journey through cosmic soundscapes and deep grooves",
     socials: {
-      instagram: "@djcosmos",
-      twitter: "@cosmos_deep"
+      instagram: "danceoneradio",
+      twitter: "danceoneradio"
     },
     nextShow: "Sunday 7PM PST"
   }, {
@@ -46,8 +46,8 @@ const DJSection = () => {
     image: "/lovable-uploads/f807b27f-9eaf-4d20-b3f5-4bad24538a4e.png",
     bio: "Host of Future Dance Anthems, bringing you the latest electronic music",
     socials: {
-      instagram: "@mario",
-      twitter: "@mario_dance"
+      instagram: "danceoneradio",
+      twitter: "danceoneradio"
     },
     nextShow: "Friday 5PM PST"
   }];
@@ -120,13 +120,27 @@ const DJSection = () => {
 
               {/* Social Links */}
               <div className="flex items-center justify-center space-x-4 mb-6">
-                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary hover:bg-primary/20">
-                  <Instagram className="w-4 h-4" />
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-muted-foreground hover:text-primary hover:bg-primary/20"
+                  asChild
+                >
+                  <a href={`https://www.instagram.com/${dj.socials.instagram}`} target="_blank" rel="noopener noreferrer">
+                    <Instagram className="w-4 h-4" />
+                  </a>
                 </Button>
-                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary hover:bg-primary/20">
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/>
-                  </svg>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-muted-foreground hover:text-primary hover:bg-primary/20"
+                  asChild
+                >
+                  <a href={`https://x.com/${dj.socials.twitter}`} target="_blank" rel="noopener noreferrer">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/>
+                    </svg>
+                  </a>
                 </Button>
               </div>
 
