@@ -3,6 +3,8 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import loveParade2005 from "@/assets/love-parade-2005.jpg";
+import loveParade2006 from "@/assets/love-parade-2006.png";
 
 const Gallery = () => {
   return (
@@ -34,7 +36,7 @@ const Gallery = () => {
                 <CardContent>
                   <div className="relative overflow-hidden rounded-lg mb-4">
                     <img
-                      src="/lovable-uploads/456045ea-1b09-4d4a-a5b5-92feb3d9b232.png"
+                      src={loveParade2005}
                       alt="Love Parade 2005 San Francisco"
                       className="w-full h-64 object-cover transition-transform duration-300 hover:scale-110"
                     />
@@ -55,7 +57,7 @@ const Gallery = () => {
                 <CardContent>
                   <div className="relative overflow-hidden rounded-lg mb-4">
                     <img
-                      src="/lovable-uploads/904ad015-6a99-4f89-9045-773a74fef249.png"
+                      src={loveParade2006}
                       alt="Love Parade 2006 San Francisco"
                       className="w-full h-64 object-cover transition-transform duration-300 hover:scale-110"
                     />
