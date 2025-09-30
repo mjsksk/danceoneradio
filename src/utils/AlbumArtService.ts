@@ -88,19 +88,21 @@ export class AlbumArtService {
 
   private static async searchiTunes(title: string): Promise<AlbumArtResponse> {
     try {
-      const url = `https://itunes.apple.com/search?term=${encodeURIComponent(title)}&media=music&limit=1`;
-      const response = await fetch(url);
+      // Use Supabase edge function to avoid CORS issues
+      const { supabase } = await import('@/integrations/supabase/client');
       
-      if (!response.ok) {
+      const { data, error } = await supabase.functions.invoke('album-art-search', {
+        body: { query: title }
+      });
+      
+      if (error) {
+        console.log('Album art search error:', error);
         return { imageUrl: null };
       }
       
-      const data = await response.json();
-      
-      if (data.results && data.results.length > 0) {
-        const track = data.results[0];
-        const artworkUrl = track.artworkUrl100?.replace('100x100', '600x600');
-        return { imageUrl: artworkUrl };
+      if (data?.imageUrl) {
+        console.log('✅ Found album art for:', title);
+        return { imageUrl: data.imageUrl };
       }
     } catch (error) {
       console.log('iTunes search failed:', error);
