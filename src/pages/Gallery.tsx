@@ -124,10 +124,9 @@ const ALL_IMAGES: ImageData[] = [
   { url: "/lovable-uploads/DSCN2547.JPG" },
   { url: "/lovable-uploads/DSCN2549.JPG" },
   { url: "/lovable-uploads/DSCN2552.JPG" },
-  { url: "/lovable-uploads/DSCN2553.JPG" },
+  { url: "/lovable-uploads/DSCN2553.JPG", explicit: true },
   { url: "/lovable-uploads/DSCN2555.JPG" },
   { url: "/lovable-uploads/DSCN2558.JPG" },
-  { url: "/lovable-uploads/explicit-image-15.png", explicit: true },
 ];
 
 const Gallery = () => {
