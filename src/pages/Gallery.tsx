@@ -121,7 +121,7 @@ const ALL_IMAGES: ImageData[] = [
   { url: "/lovable-uploads/DSCN2543.JPG" },
   { url: "/lovable-uploads/DSCN2544.JPG" },
   { url: "/lovable-uploads/DSCN2545.JPG" },
-  { url: "/lovable-uploads/DSCN2547.JPG" },
+  { url: "/lovable-uploads/DSCN2547.JPG", explicit: true },
   { url: "/lovable-uploads/DSCN2549.JPG", explicit: true },
   { url: "/lovable-uploads/DSCN2552.JPG" },
   { url: "/lovable-uploads/DSCN2553.JPG" },
