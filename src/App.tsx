@@ -7,6 +7,8 @@ import { SecurityHeaders } from "@/components/SecurityHeaders";
 import Index from "./pages/Index";
 import Shows from "./pages/Shows";
 import Gallery from "./pages/Gallery";
+import LoveParade2005 from "./pages/LoveParade2005";
+import LoveParade2006 from "./pages/LoveParade2006";
 import Downloads from "./pages/Downloads";
 import Privacy from "./pages/Privacy";
 import Love from "./pages/Love";
@@ -30,6 +32,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/shows" element={<Shows />} />
           <Route path="/gallery" element={<Gallery />} />
+          <Route path="/gallery/love-parade-2005" element={<LoveParade2005 />} />
+          <Route path="/gallery/love-parade-2006" element={<LoveParade2006 />} />
           <Route path="/downloads" element={<Downloads />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/love" element={<Love />} />
