@@ -45,6 +45,16 @@ const ALL_IMAGES: ImageData[] = [
   { url: "/lovable-uploads/LoveparadeSF_2006_16.JPG", explicit: true },
   { url: "/lovable-uploads/LoveparadeSF_2006_17.JPG", explicit: true },
   { url: "/lovable-uploads/LoveparadeSF_2006_18.JPG", explicit: true },
+  { url: "/lovable-uploads/LoveparadeSF_2006_20.JPG" },
+  { url: "/lovable-uploads/LoveparadeSF_2006_21.JPG" },
+  { url: "/lovable-uploads/LoveparadeSF_2006_25.JPG" },
+  { url: "/lovable-uploads/LoveparadeSF_2006_27.JPG" },
+  { url: "/lovable-uploads/LoveparadeSF_2006_31.JPG" },
+  { url: "/lovable-uploads/LoveparadeSF_2006_33.JPG" },
+  { url: "/lovable-uploads/LoveparadeSF_2006_34.JPG" },
+  { url: "/lovable-uploads/LoveparadeSF_2006_36.JPG" },
+  { url: "/lovable-uploads/LoveparadeSF_2006_37.JPG" },
+  { url: "/lovable-uploads/LoveparadeSF_2006_40.JPG" },
 ];
 
 const LoveParade2006 = () => {
