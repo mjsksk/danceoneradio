@@ -75,8 +75,9 @@ const Contact = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO 
-        title="Contact Us | Dance One Radio"
-        description="Get in touch with Dance One Radio. Submit your demo tracks or reach out with questions about our electronic dance music platform."
+        title="Contact Dance One Radio - Get in Touch"
+        description="Contact Dance One Radio for inquiries, partnerships, DJ bookings, or to submit your music. We would love to hear from you."
+        keywords="contact dance one radio, DJ booking, music submission, radio contact, demo submission"
       />
       <Navigation />
       <main className="container mx-auto px-4 py-8 pt-24">

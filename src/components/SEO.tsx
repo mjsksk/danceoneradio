@@ -5,13 +5,17 @@ interface SEOProps {
   description?: string;
   image?: string;
   url?: string;
+  type?: string;
+  keywords?: string;
 }
 
 const SEO = ({ 
-  title = "Dance One Radio - The Castle of Dance",
-  description = "Live stream of the newest dance and electronic music",
-  image = "/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png", // Station logo as default
-  url = window.location.href
+  title = "Dance One Radio - The Castle of Dance | Live Electronic & Dance Music Stream",
+  description = "Listen to Dance One Radio - Live streaming the newest dance, electronic, trance, house, and EDM music 24/7. Your ultimate castle of dance music with DJ mixes, podcasts, and exclusive shows.",
+  image = "/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png",
+  url = window.location.href,
+  type = "website",
+  keywords = "dance music radio, electronic music stream, EDM radio, trance radio, house music, live DJ mixes, dance music podcast, online radio station"
 }: SEOProps) => {
   useEffect(() => {
     // Update document title
@@ -38,48 +42,74 @@ const SEO = ({
       }
     };
 
-    // Update meta tags with specific selectors
+    // Full image URL
+    const fullImageUrl = image.startsWith('http') ? image : window.location.origin + image;
+
+    // Update essential meta tags
     updateMetaTag('meta[name="description"]', description);
+    updateMetaTag('meta[name="keywords"]', keywords);
+    
+    // Open Graph meta tags
     updateMetaTag('meta[property="og:title"]', title);
     updateMetaTag('meta[property="og:description"]', description);
-    updateMetaTag('meta[property="og:image"]', window.location.origin + image);
+    updateMetaTag('meta[property="og:image"]', fullImageUrl);
     updateMetaTag('meta[property="og:url"]', url);
+    updateMetaTag('meta[property="og:type"]', type);
+    updateMetaTag('meta[property="og:site_name"]', "Dance One Radio");
+    
+    // Twitter Card meta tags
+    updateMetaTag('meta[name="twitter:card"]', "summary_large_image");
     updateMetaTag('meta[name="twitter:title"]', title);
-    updateMetaTag('meta[name="twitter:image"]', window.location.origin + image);
+    updateMetaTag('meta[name="twitter:description"]', description);
+    updateMetaTag('meta[name="twitter:image"]', fullImageUrl);
+    updateMetaTag('meta[name="twitter:site"]', "@DanceOneRadio");
     
-    // Debug: Log current meta tags (remove in production)
-    console.log('SEO Meta Tags Updated:', {
-      title,
-      description,
-      image: window.location.origin + image,
-      url
-    });
+    // SEO robots meta tags
+    updateMetaTag('meta[name="robots"]', "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1");
     
-    // Force refresh social media tags
-    if (typeof window !== 'undefined') {
-      // Remove any cached social media metadata
-      const existingCanonical = document.querySelector('link[rel="canonical"]');
-      if (!existingCanonical) {
-        const canonical = document.createElement('link');
-        canonical.rel = 'canonical';
-        canonical.href = url;
-        document.head.appendChild(canonical);
-      } else {
-        existingCanonical.setAttribute('href', url);
-      }
+    // Update or create canonical link
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
     }
+    canonical.setAttribute('href', url);
+
+    // Add structured data if not exists
+    const addStructuredData = () => {
+      const existingScript = document.querySelector('script[type="application/ld+json"][data-dynamic]');
+      if (existingScript) {
+        existingScript.remove();
+      }
+
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.setAttribute('data-dynamic', 'true');
+      script.textContent = JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": title,
+        "description": description,
+        "url": url,
+        "image": fullImageUrl,
+        "publisher": {
+          "@type": "RadioStation",
+          "name": "Dance One Radio",
+          "url": "https://danceoneradio.com",
+          "logo": window.location.origin + "/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
+        }
+      });
+      document.head.appendChild(script);
+    };
+
+    addStructuredData();
 
     return () => {
       // Reset to defaults when component unmounts
-      document.title = "Dance One Radio - The Castle of Dance";
-      updateMetaTag('meta[name="description"]', "Live stream of the newest dance and electronic music");
-      updateMetaTag('meta[property="og:title"]', "Dance One Radio - The Castle of Dance");
-      updateMetaTag('meta[property="og:description"]', "Live stream of the newest dance and electronic music");
-      updateMetaTag('meta[property="og:image"]', window.location.origin + "/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png");
-      updateMetaTag('meta[name="twitter:title"]', "Dance One Radio - The Castle of Dance");
-      updateMetaTag('meta[name="twitter:image"]', window.location.origin + "/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png");
+      document.title = "Dance One Radio - The Castle of Dance | Live Electronic & Dance Music Stream";
     };
-  }, [title, description, image, url]);
+  }, [title, description, image, url, type, keywords]);
 
   return null; // This component doesn't render anything
 };

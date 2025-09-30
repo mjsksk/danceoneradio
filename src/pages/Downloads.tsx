@@ -27,8 +27,9 @@ const Downloads = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO 
-        title="Download Desktop App | Dance One Radio"
-        description="Download the official Dance One Radio Windows desktop app with enhanced features, global hotkeys, system tray integration, and superior audio quality."
+        title="Download Dance One Radio Apps - Desktop & Mobile"
+        description="Download Dance One Radio desktop apps for Windows, Mac, and Linux. Listen to live electronic dance music streams on your favorite device."
+        keywords="dance one radio app, radio desktop app, music streaming app, electronic music app, Windows radio app"
       />
       <Navigation />
       
