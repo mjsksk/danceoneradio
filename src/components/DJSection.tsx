@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
-import { Instagram, X, Music, Calendar } from 'lucide-react';
+import { Instagram, Music, Calendar } from 'lucide-react';
+import xIcon from '@/assets/x-icon.svg';
 const DJSection = () => {
   const djs = [{
     id: 1,
@@ -124,7 +125,7 @@ const DJSection = () => {
                   <Instagram className="w-4 h-4" />
                 </Button>
                 <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary hover:bg-primary/20">
-                  <X className="w-4 h-4" />
+                  <img src={xIcon} alt="X" className="w-4 h-4" />
                 </Button>
               </div>
 

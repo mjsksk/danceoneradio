@@ -1,4 +1,5 @@
-import { Share2, Facebook, X, MessageCircle, Copy } from 'lucide-react';
+import { Share2, Facebook, MessageCircle, Copy } from 'lucide-react';
+import xIcon from '@/assets/x-icon.svg';
 import { Button } from '@/components/ui/button';
 import { 
   DropdownMenu, 
@@ -104,7 +105,7 @@ const SocialShare = ({
           Facebook
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleTwitterShare} className="cursor-pointer">
-          <X className="w-4 h-4 mr-2" />
+          <img src={xIcon} alt="X" className="w-4 h-4 mr-2" />
           X (Twitter)
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleWhatsAppShare} className="cursor-pointer">
