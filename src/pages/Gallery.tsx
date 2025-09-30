@@ -4,7 +4,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, X, Eye } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
 // Image metadata with explicit content marking
 interface ImageData {
@@ -132,7 +132,6 @@ const ALL_IMAGES: ImageData[] = [
 
 const Gallery = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
-  const [unblurredImages, setUnblurredImages] = useState<Set<number>>(new Set());
 
   const handlePrevious = () => {
     if (selectedImageIndex !== null) {
@@ -150,14 +149,6 @@ const Gallery = () => {
     if (e.key === "ArrowLeft") handlePrevious();
     if (e.key === "ArrowRight") handleNext();
     if (e.key === "Escape") setSelectedImageIndex(null);
-  };
-
-  const handleUnblur = (index: number) => {
-    setUnblurredImages(prev => new Set(prev).add(index));
-  };
-
-  const isBlurred = (index: number) => {
-    return ALL_IMAGES[index].explicit && !unblurredImages.has(index);
   };
 
   return (
@@ -184,40 +175,21 @@ const Gallery = () => {
               <div
                 key={index}
                 className="relative group cursor-pointer overflow-hidden rounded-lg card-cyber hover:shadow-glow-cyber transition-all duration-300"
-                onClick={() => {
-                  if (!isBlurred(index)) {
-                    setSelectedImageIndex(index);
-                  }
-                }}
+                onClick={() => setSelectedImageIndex(index)}
               >
                 <img
                   src={image.url}
                   alt={`Love Parade 2005 - Photo ${index + 1}`}
                   className={`w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110 ${
-                    isBlurred(index) ? 'blur-2xl' : ''
+                    image.explicit ? 'blur-xl' : ''
                   }`}
                   loading="lazy"
                 />
-                {isBlurred(index) ? (
-                  <div className="absolute inset-0 bg-background/60 flex flex-col items-center justify-center">
-                    <Eye className="h-8 w-8 text-foreground mb-2" />
-                    <span className="text-foreground font-semibold text-sm mb-3">Explicit Content</span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleUnblur(index);
-                      }}
-                    >
-                      Show Image
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <span className="text-foreground font-semibold text-lg">View Photo</span>
-                  </div>
-                )}
+                <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <span className="text-foreground font-semibold text-lg">
+                    {image.explicit ? 'View Photo (18+)' : 'View Photo'}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
