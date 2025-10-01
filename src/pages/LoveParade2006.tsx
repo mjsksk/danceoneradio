@@ -233,16 +233,6 @@ const LoveParade2006 = () => {
                   <ChevronRight className="h-6 w-6" />
                 </Button>
 
-                {/* Close Button */}
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="absolute top-4 right-4 bg-background/80 hover:bg-background"
-                  onClick={() => setSelectedImageIndex(null)}
-                >
-                  <X className="h-6 w-6" />
-                </Button>
-
                 {/* Image Counter */}
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/80 px-4 py-2 rounded-full text-sm">
                   {selectedImageIndex + 1} / {ALL_IMAGES.length}
