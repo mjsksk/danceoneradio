@@ -49,7 +49,7 @@ const ALL_IMAGES: ImageData[] = [
   { url: "/lovable-uploads/LoveparadeSF_2006_21.JPG" },
   { url: "/lovable-uploads/LoveparadeSF_2006_25.JPG" },
   { url: "/lovable-uploads/LoveparadeSF_2006_27.JPG" },
-  { url: "/lovable-uploads/LoveparadeSF_2006_33.JPG" },
+  
   { url: "/lovable-uploads/LoveparadeSF_2006_34.JPG" },
   { url: "/lovable-uploads/LoveparadeSF_2006_36.JPG" },
   { url: "/lovable-uploads/LoveparadeSF_2006_37.JPG" },
@@ -99,6 +99,16 @@ const ALL_IMAGES: ImageData[] = [
   { url: "/lovable-uploads/LoveparadeSF_2006_134.JPG", explicit: true },
   { url: "/lovable-uploads/LoveparadeSF_2006_135.JPG" },
   { url: "/lovable-uploads/LoveparadeSF_2006_136.JPG" },
+  { url: "/lovable-uploads/LoveparadeSF_2006_144.JPG" },
+  { url: "/lovable-uploads/LoveparadeSF_2006_145.JPG" },
+  { url: "/lovable-uploads/LoveparadeSF_2006_147.JPG", explicit: true },
+  { url: "/lovable-uploads/LoveparadeSF_2006_148.JPG" },
+  { url: "/lovable-uploads/LoveparadeSF_2006_149.JPG" },
+  { url: "/lovable-uploads/LoveparadeSF_2006_151.JPG" },
+  { url: "/lovable-uploads/LoveparadeSF_2006_152.JPG", explicit: true },
+  { url: "/lovable-uploads/LoveparadeSF_2006_156.JPG" },
+  { url: "/lovable-uploads/LoveparadeSF_2006_160.JPG" },
+  { url: "/lovable-uploads/LoveparadeSF_2006_161.JPG" },
 ];
 
 const LoveParade2006 = () => {
