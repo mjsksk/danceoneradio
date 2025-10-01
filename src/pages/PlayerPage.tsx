@@ -47,14 +47,14 @@ const PlayerPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/10 flex flex-col">
+    <div className="h-screen w-screen overflow-hidden bg-gradient-to-br from-background via-background to-primary/10 flex flex-col">
       <SEO 
         title="Live Player | Dance One Radio"
         description="Listen to Dance One Radio's live electronic dance music stream with our optimized popup player interface."
       />
       {/* Main Player Content */}
-      <main className="flex-1 p-4 flex flex-col justify-center">
-        <div className="max-w-md mx-auto w-full">
+      <main className="flex-1 p-3 flex flex-col justify-center overflow-hidden">
+        <div className="w-full">
           <LiveRadioPlayer 
             streamUrls={[
               "http://s9.myradiostream.com:14296/;", 
@@ -69,7 +69,7 @@ const PlayerPage = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-card/80 backdrop-blur-sm border-t border-border/50 p-3 text-center">
+      <footer className="bg-card/80 backdrop-blur-sm border-t border-border/50 p-2 text-center shrink-0">
         <p className="text-xs text-muted-foreground">
           Visit <a href="https://danceoneradio.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">danceoneradio.com</a>
         </p>
