@@ -32,11 +32,15 @@ const PodcastPreview = () => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 12000); // 12 second timeout for preview
         
-        const response = await fetch('https://api.allorigins.win/get?url=https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml', {
+        const response = await fetch('https://upbwlnpycrbhxahjztrf.supabase.co/functions/v1/rss-feed-fetch', {
+          method: 'POST',
           signal: controller.signal,
           headers: {
-            'Accept': 'application/json',
-          }
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            url: 'https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml'
+          })
         });
         
         clearTimeout(timeoutId);
@@ -48,7 +52,7 @@ const PodcastPreview = () => {
         const data = await response.json();
         
         const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(data.contents, 'text/xml');
+        const xmlDoc = parser.parseFromString(data.content, 'text/xml');
         const items = xmlDoc.querySelectorAll('item');
         
         const episodeList: Episode[] = Array.from(items).map(item => {
