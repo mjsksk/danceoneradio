@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Volume2 } from 'lucide-react';
 import SocialShare from '@/components/SocialShare';
@@ -6,8 +6,25 @@ import SocialShare from '@/components/SocialShare';
 import heroImage from '@/assets/hero-bg.jpg';
 import LiveRadioPlayer from './LiveRadioPlayer';
 import { RadioStreamService } from '@/utils/RadioStreamService';
+
+// Performance detection utilities
+const getConnectionSpeed = () => {
+  const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+  if (!connection) return 'unknown';
+  return connection.effectiveType || 'unknown';
+};
+
+const prefersReducedMotion = () => {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+};
+
+const getHardwareConcurrency = () => {
+  return navigator.hardwareConcurrency || 4;
+};
+
 const HeroSection = () => {
   const [streamTitle, setStreamTitle] = useState('🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵');
+  const videoRef = useRef<HTMLVideoElement>(null);
   
   // Array of background videos - randomly selected on each page visit
   const backgroundVideos = [
@@ -15,9 +32,23 @@ const HeroSection = () => {
     "/Sequence_01.mp4"
   ];
   
-  // Select random video on each page visit (not cached in state)
+  // Performance-based configuration
+  const connectionSpeed = getConnectionSpeed();
+  const reducedMotion = prefersReducedMotion();
+  const cpuCores = getHardwareConcurrency();
+  
+  // Determine if we should show video or static image
+  const shouldShowVideo = !reducedMotion && 
+                          connectionSpeed !== 'slow-2g' && 
+                          connectionSpeed !== '2g';
+  
+  // Adjust particle count based on CPU cores
+  const particleCount = cpuCores >= 8 ? 20 : cpuCores >= 4 ? 10 : 5;
+  
+  // Select random video on each page visit
   const selectedVideo = backgroundVideos[Math.floor(Math.random() * backgroundVideos.length)];
   const [videoKey, setVideoKey] = useState(0);
+  const [videoError, setVideoError] = useState(false);
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     let isVisible = !document.hidden;
@@ -70,30 +101,73 @@ const HeroSection = () => {
   useEffect(() => {
     setVideoKey(prev => prev + 1);
   }, []);
-  return <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Video with Overlay */}
-      <video 
-        key={`video-${videoKey}-${selectedVideo}`}
-        className="absolute inset-0 w-full h-full object-cover" 
-        autoPlay 
-        muted 
-        loop 
-        playsInline 
-        poster="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png"
-      >
-        <source src={selectedVideo} type="video/mp4" />
-      </video>
-      <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]"></div>
 
-      {/* Animated Particles */}
-      <div className="absolute inset-0">
-        {[...Array(20)].map((_, i) => <div key={i} className="absolute w-2 h-2 bg-primary/30 rounded-full animate-float" style={{
-        left: `${Math.random() * 100}%`,
-        top: `${Math.random() * 100}%`,
-        animationDelay: `${Math.random() * 6}s`,
-        animationDuration: `${4 + Math.random() * 4}s`
-      }} />)}
-      </div>
+  // Lazy video loading - play when in viewport
+  useEffect(() => {
+    if (!videoRef.current || !shouldShowVideo) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            videoRef.current?.play().catch(() => {
+              console.log('Video autoplay failed, user interaction required');
+            });
+          } else {
+            videoRef.current?.pause();
+          }
+        });
+      },
+      { threshold: 0.25 }
+    );
+
+    observer.observe(videoRef.current);
+    return () => observer.disconnect();
+  }, [shouldShowVideo]);
+
+  // Video error handler
+  const handleVideoError = () => {
+    console.log('Video failed to load, falling back to poster image');
+    setVideoError(true);
+  };
+  return <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Background Video with Overlay or Static Poster */}
+      {shouldShowVideo && !videoError ? (
+        <video 
+          ref={videoRef}
+          key={`video-${videoKey}-${selectedVideo}`}
+          className="absolute inset-0 w-full h-full object-cover" 
+          muted 
+          loop 
+          playsInline 
+          preload="metadata"
+          poster="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png"
+          onError={handleVideoError}
+        >
+          <source src={selectedVideo} type="video/mp4" />
+        </video>
+      ) : (
+        <img 
+          src="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png"
+          alt="Dance One Radio"
+          className="absolute inset-0 w-full h-full object-cover"
+          loading="eager"
+          fetchPriority="high"
+        />
+      )}
+      <div className="absolute inset-0 bg-background/70"></div>
+
+      {/* Animated Particles - Reduced count on slower devices */}
+      {!reducedMotion && (
+        <div className="absolute inset-0">
+          {[...Array(particleCount)].map((_, i) => <div key={i} className="absolute w-2 h-2 bg-primary/30 rounded-full animate-float" style={{
+          left: `${Math.random() * 100}%`,
+          top: `${Math.random() * 100}%`,
+          animationDelay: `${Math.random() * 6}s`,
+          animationDuration: `${4 + Math.random() * 4}s`
+        }} />)}
+        </div>
+      )}
 
       {/* Hero Content */}
       <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
