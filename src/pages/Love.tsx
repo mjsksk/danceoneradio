@@ -1,6 +1,7 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import AdSenseUnit from '@/components/AdSenseUnit';
 import { Button } from '@/components/ui/button';
 import { Heart, Music, Radio, Users } from 'lucide-react';
 
@@ -139,7 +140,9 @@ const Love = () => {
                </div>
              </div>
              
-             <div className="space-y-12 font-['Rajdhani'] text-lg">
+              <AdSenseUnit />
+              
+              <div className="space-y-12 font-['Rajdhani'] text-lg">
               <section className="text-center">
                 <Music className="w-16 h-16 text-accent mx-auto mb-6" />
                 <h2 className="text-3xl font-semibold text-accent mb-6">The Music</h2>

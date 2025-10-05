@@ -5,6 +5,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SocialShare from '@/components/SocialShare';
 import SEO from '@/components/SEO';
+import AdSenseUnit from '@/components/AdSenseUnit';
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 
@@ -277,6 +278,8 @@ const Episode389 = () => {
             </div>
           </div>
         </section>
+
+        <AdSenseUnit />
 
         {/* Track Listing */}
         <section className="py-12">

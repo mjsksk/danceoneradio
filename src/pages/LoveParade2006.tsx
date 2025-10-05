@@ -2,6 +2,7 @@ import { useState } from "react";
 import SEO from "@/components/SEO";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import AdSenseUnit from "@/components/AdSenseUnit";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
@@ -189,6 +190,8 @@ const LoveParade2006 = () => {
               {ALL_IMAGES.length} photos from the festival
             </p>
           </div>
+
+          <AdSenseUnit />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {ALL_IMAGES.map((image, index) => (

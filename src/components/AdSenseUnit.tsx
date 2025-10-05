@@ -81,7 +81,6 @@ const AdSenseUnit = () => {
         style={{ 
           contain: 'layout style paint',
           contentVisibility: 'auto',
-          minHeight: '280px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -94,7 +93,7 @@ const AdSenseUnit = () => {
           style={{ 
             display: 'block',
             width: '100%',
-            height: '280px',
+            minHeight: '280px',
             backgroundColor: 'transparent',
             contain: 'layout style',
             transform: 'translateZ(0)',

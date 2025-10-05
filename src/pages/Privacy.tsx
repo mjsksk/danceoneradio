@@ -1,9 +1,15 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
+import AdSenseUnit from '@/components/AdSenseUnit';
 
 const Privacy = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <SEO 
+        title="Privacy Policy - Dance One Radio"
+        description="Learn about how Dance One Radio protects and uses your personal information. Read our privacy policy for details on data collection and security."
+      />
       <Navigation />
       
       <main className="pt-20 pb-16">
@@ -12,6 +18,8 @@ const Privacy = () => {
             <h1 className="text-4xl font-['Orbitron'] font-bold text-primary mb-8 text-center">
               Privacy Policy
             </h1>
+            
+            <AdSenseUnit />
             
             <div className="space-y-8 font-['Rajdhani'] text-lg">
               <section>

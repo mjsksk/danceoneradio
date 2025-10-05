@@ -1,6 +1,7 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import AdSenseUnit from '@/components/AdSenseUnit';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -90,6 +91,8 @@ const Downloads = () => {
             </div>
           </div>
         </section>
+
+        <AdSenseUnit />
 
         {/* Features Section */}
         <section className="py-20">
