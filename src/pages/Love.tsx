@@ -1,6 +1,7 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import AdSenseUnit from '@/components/AdSenseUnit';
 import { Button } from '@/components/ui/button';
 import { Heart, Music, Radio, Users } from 'lucide-react';
 
@@ -180,6 +181,8 @@ const Love = () => {
           </div>
         </div>
       </main>
+
+      <AdSenseUnit />
 
       <Footer />
     </div>;

@@ -1,5 +1,6 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import AdSenseUnit from '@/components/AdSenseUnit';
 
 const Privacy = () => {
   return (
@@ -67,6 +68,8 @@ const Privacy = () => {
           </div>
         </div>
       </main>
+
+      <AdSenseUnit />
 
       <Footer />
     </div>

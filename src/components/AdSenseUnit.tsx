@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 declare global {
   interface Window {
@@ -11,6 +11,7 @@ const AdSenseUnit = () => {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const adLoadedRef = useRef<boolean>(false);
   const adInitializedRef = useRef<boolean>(false);
+  const [hasAdContent, setHasAdContent] = useState<boolean>(false);
 
   useEffect(() => {
     // Prevent multiple initializations
@@ -47,6 +48,13 @@ const AdSenseUnit = () => {
                 if (adRef.current && !adRef.current.hasAttribute('data-ad-status')) {
                   (window.adsbygoogle).push({});
                   adRef.current.setAttribute('data-ad-status', 'loaded');
+                  
+                  // Check if ad content loaded after a short delay
+                  setTimeout(() => {
+                    if (adRef.current && adRef.current.innerHTML.trim() !== '') {
+                      setHasAdContent(true);
+                    }
+                  }, 1500);
                 }
               } catch (error) {
                 console.error('AdSense error:', error);
@@ -74,6 +82,11 @@ const AdSenseUnit = () => {
     };
   }, []);
 
+  // Don't render the container if no ad content after initialization
+  if (adLoadedRef.current && !hasAdContent) {
+    return null;
+  }
+
   return (
     <section className="my-8 flex justify-center">
       <div 
@@ -81,11 +94,12 @@ const AdSenseUnit = () => {
         style={{ 
           contain: 'layout style paint',
           contentVisibility: 'auto',
-          minHeight: '280px',
+          minHeight: hasAdContent ? '280px' : '0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          willChange: 'auto'
+          willChange: 'auto',
+          transition: 'min-height 0.3s ease'
         }}
       >
         <ins 

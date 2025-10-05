@@ -2,6 +2,7 @@ import { useState } from "react";
 import SEO from "@/components/SEO";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import AdSenseUnit from "@/components/AdSenseUnit";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
@@ -200,6 +201,8 @@ const LoveParade2005 = () => {
             ))}
           </div>
         </div>
+
+        <AdSenseUnit />
 
         <Footer />
       </div>

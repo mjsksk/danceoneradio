@@ -1,6 +1,7 @@
 import SEO from "@/components/SEO";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import AdSenseUnit from "@/components/AdSenseUnit";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import loveParade2005 from "@/assets/love-parade-2005.jpg";
@@ -72,6 +73,8 @@ const Gallery = () => {
             </Link>
           </div>
         </div>
+
+        <AdSenseUnit />
 
         <Footer />
       </div>

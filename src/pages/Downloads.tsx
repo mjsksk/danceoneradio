@@ -1,5 +1,6 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import AdSenseUnit from '@/components/AdSenseUnit';
 import SEO from '@/components/SEO';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -290,6 +291,8 @@ const Downloads = () => {
           </div>
         </section>
       </main>
+
+      <AdSenseUnit />
 
       <Footer />
     </div>
