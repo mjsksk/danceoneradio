@@ -37,6 +37,11 @@
   to = "/index.html"
   status = 200
   force = false
+  conditions = {Role = ["anonymous"]}
+
+# Enable Netlify's prerendering for better SEO
+[[plugins]]
+  package = "@netlify/plugin-sitemap"
   
 # Enable prerendering for better SEO
 [build.processing]
