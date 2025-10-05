@@ -24,7 +24,6 @@ const getHardwareConcurrency = () => {
 
 const HeroSection = () => {
   const [streamTitle, setStreamTitle] = useState('🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵');
-  const videoRef = useRef<HTMLVideoElement>(null);
   
   // Array of background videos - randomly selected on each page visit
   const backgroundVideos = [
@@ -32,32 +31,23 @@ const HeroSection = () => {
     "/Sequence_01.mp4"
   ];
   
-  // Performance-based configuration (initialized safely)
-  const [shouldShowVideo, setShouldShowVideo] = useState(true);
-  const [particleCount, setParticleCount] = useState(10);
+  // Performance-based configuration
+  const connectionSpeed = getConnectionSpeed();
+  const reducedMotion = prefersReducedMotion();
+  const cpuCores = getHardwareConcurrency();
+  
+  // Determine if we should show video or static image
+  const shouldShowVideo = !reducedMotion && 
+                          connectionSpeed !== 'slow-2g' && 
+                          connectionSpeed !== '2g';
+  
+  // Adjust particle count based on CPU cores
+  const particleCount = cpuCores >= 8 ? 20 : cpuCores >= 4 ? 10 : 5;
   
   // Select random video on each page visit
   const selectedVideo = backgroundVideos[Math.floor(Math.random() * backgroundVideos.length)];
   const [videoKey, setVideoKey] = useState(0);
   const [videoError, setVideoError] = useState(false);
-
-  // Initialize performance settings after mount
-  useEffect(() => {
-    const connectionSpeed = getConnectionSpeed();
-    const reducedMotion = prefersReducedMotion();
-    const cpuCores = getHardwareConcurrency();
-    
-    // Determine if we should show video or static image
-    const showVideo = !reducedMotion && 
-                      connectionSpeed !== 'slow-2g' && 
-                      connectionSpeed !== '2g';
-    
-    // Adjust particle count based on CPU cores
-    const particles = cpuCores >= 8 ? 20 : cpuCores >= 4 ? 10 : 5;
-    
-    setShouldShowVideo(showVideo);
-    setParticleCount(particles);
-  }, []);
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     let isVisible = !document.hidden;
@@ -111,29 +101,6 @@ const HeroSection = () => {
     setVideoKey(prev => prev + 1);
   }, []);
 
-  // Lazy video loading - play when in viewport
-  useEffect(() => {
-    if (!videoRef.current || !shouldShowVideo) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            videoRef.current?.play().catch(() => {
-              console.log('Video autoplay failed, user interaction required');
-            });
-          } else {
-            videoRef.current?.pause();
-          }
-        });
-      },
-      { threshold: 0.25 }
-    );
-
-    observer.observe(videoRef.current);
-    return () => observer.disconnect();
-  }, [shouldShowVideo]);
-
   // Video error handler
   const handleVideoError = () => {
     console.log('Video failed to load, falling back to poster image');
@@ -143,9 +110,9 @@ const HeroSection = () => {
       {/* Background Video with Overlay or Static Poster */}
       {shouldShowVideo && !videoError ? (
         <video 
-          ref={videoRef}
           key={`video-${videoKey}-${selectedVideo}`}
           className="absolute inset-0 w-full h-full object-cover" 
+          autoPlay
           muted 
           loop 
           playsInline 
@@ -167,14 +134,16 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-background/70"></div>
 
       {/* Animated Particles - Reduced count on slower devices */}
-      <div className="absolute inset-0">
-        {[...Array(particleCount)].map((_, i) => <div key={i} className="absolute w-2 h-2 bg-primary/30 rounded-full animate-float" style={{
-        left: `${Math.random() * 100}%`,
-        top: `${Math.random() * 100}%`,
-        animationDelay: `${Math.random() * 6}s`,
-        animationDuration: `${4 + Math.random() * 4}s`
-      }} />)}
-      </div>
+      {!reducedMotion && (
+        <div className="absolute inset-0">
+          {[...Array(particleCount)].map((_, i) => <div key={i} className="absolute w-2 h-2 bg-primary/30 rounded-full animate-float" style={{
+          left: `${Math.random() * 100}%`,
+          top: `${Math.random() * 100}%`,
+          animationDelay: `${Math.random() * 6}s`,
+          animationDuration: `${4 + Math.random() * 4}s`
+        }} />)}
+        </div>
+      )}
 
       {/* Hero Content */}
       <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
