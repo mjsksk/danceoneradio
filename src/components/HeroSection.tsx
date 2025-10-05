@@ -32,23 +32,32 @@ const HeroSection = () => {
     "/Sequence_01.mp4"
   ];
   
-  // Performance-based configuration
-  const connectionSpeed = getConnectionSpeed();
-  const reducedMotion = prefersReducedMotion();
-  const cpuCores = getHardwareConcurrency();
-  
-  // Determine if we should show video or static image
-  const shouldShowVideo = !reducedMotion && 
-                          connectionSpeed !== 'slow-2g' && 
-                          connectionSpeed !== '2g';
-  
-  // Adjust particle count based on CPU cores
-  const particleCount = cpuCores >= 8 ? 20 : cpuCores >= 4 ? 10 : 5;
+  // Performance-based configuration (initialized safely)
+  const [shouldShowVideo, setShouldShowVideo] = useState(true);
+  const [particleCount, setParticleCount] = useState(10);
   
   // Select random video on each page visit
   const selectedVideo = backgroundVideos[Math.floor(Math.random() * backgroundVideos.length)];
   const [videoKey, setVideoKey] = useState(0);
   const [videoError, setVideoError] = useState(false);
+
+  // Initialize performance settings after mount
+  useEffect(() => {
+    const connectionSpeed = getConnectionSpeed();
+    const reducedMotion = prefersReducedMotion();
+    const cpuCores = getHardwareConcurrency();
+    
+    // Determine if we should show video or static image
+    const showVideo = !reducedMotion && 
+                      connectionSpeed !== 'slow-2g' && 
+                      connectionSpeed !== '2g';
+    
+    // Adjust particle count based on CPU cores
+    const particles = cpuCores >= 8 ? 20 : cpuCores >= 4 ? 10 : 5;
+    
+    setShouldShowVideo(showVideo);
+    setParticleCount(particles);
+  }, []);
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     let isVisible = !document.hidden;
@@ -158,16 +167,14 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-background/70"></div>
 
       {/* Animated Particles - Reduced count on slower devices */}
-      {!reducedMotion && (
-        <div className="absolute inset-0">
-          {[...Array(particleCount)].map((_, i) => <div key={i} className="absolute w-2 h-2 bg-primary/30 rounded-full animate-float" style={{
-          left: `${Math.random() * 100}%`,
-          top: `${Math.random() * 100}%`,
-          animationDelay: `${Math.random() * 6}s`,
-          animationDuration: `${4 + Math.random() * 4}s`
-        }} />)}
-        </div>
-      )}
+      <div className="absolute inset-0">
+        {[...Array(particleCount)].map((_, i) => <div key={i} className="absolute w-2 h-2 bg-primary/30 rounded-full animate-float" style={{
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 6}s`,
+        animationDuration: `${4 + Math.random() * 4}s`
+      }} />)}
+      </div>
 
       {/* Hero Content */}
       <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
