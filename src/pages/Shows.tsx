@@ -6,7 +6,6 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SocialShare from '@/components/SocialShare';
 import SEO from '@/components/SEO';
-import AdSenseUnit from '@/components/AdSenseUnit';
 import { Link } from 'react-router-dom';
 
 interface Episode {
@@ -529,9 +528,6 @@ const Shows = () => {
             </div>
           </div>
         </section>
-
-        {/* Ad Unit */}
-        <AdSenseUnit />
       </main>
 
       <Footer />

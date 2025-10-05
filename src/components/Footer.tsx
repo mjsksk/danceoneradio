@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Instagram, Facebook, Youtube } from 'lucide-react';
-import appStoreBadge from '@/assets/app-store-badge.svg';
-import googlePlayBadge from '@/assets/google-play-badge.png';
+import appStoreBadge from '@/assets/app-store-badge-new.svg';
+import googlePlayBadge from '@/assets/google-play-badge-new.svg';
 import { useNewsletter } from '@/hooks/useNewsletter';
 const Footer = () => {
   const [email, setEmail] = useState('');

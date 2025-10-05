@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
-import AdSenseUnit from '@/components/AdSenseUnit';
 import SEO from '@/components/SEO';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -167,7 +166,6 @@ const Contact = () => {
           </div>
         </div>
       </main>
-      <AdSenseUnit />
       <Footer />
     </div>
   );

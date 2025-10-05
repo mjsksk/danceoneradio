@@ -1,6 +1,5 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
-import AdSenseUnit from '@/components/AdSenseUnit';
 const Dmca = () => {
   return <div className="min-h-screen bg-background">
       <Navigation />
@@ -41,7 +40,6 @@ const Dmca = () => {
           </div>
         </div>
       </main>
-      <AdSenseUnit />
       <Footer />
     </div>;
 };

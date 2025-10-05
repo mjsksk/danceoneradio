@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
-import AdSenseUnit from '@/components/AdSenseUnit';
 import SocialShare from '@/components/SocialShare';
 import SEO from '@/components/SEO';
 import { Link } from 'react-router-dom';
@@ -332,8 +331,6 @@ const Episode390 = () => {
           </div>
         </section>
       </main>
-      
-      <AdSenseUnit />
       
       <Footer />
       </div>
