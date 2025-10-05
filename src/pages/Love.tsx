@@ -44,13 +44,12 @@ const Love = () => {
                    <div className="card-cyber p-4 bg-background/50">
                      <h4 className="text-lg font-semibold text-accent mb-3">Premium Support</h4>
                      <p className="text-muted-foreground mb-4">Monthly subscriptions for dedicated supporters</p>
-                     <form 
-                       action="https://www.paypal.com/cgi-bin/webscr" 
-                       method="post" 
-                       target="paypal"
-                       onSubmit={() => window.open('', 'paypal', 'scrollbars=yes,resizable=yes,toolbar=no,location=yes,directories=no,status=no,menubar=no,copyhistory=no,width=400,height=350')}
-                       className="text-center"
-                     >
+                      <form 
+                        action="https://www.paypal.com/cgi-bin/webscr" 
+                        method="post" 
+                        target="_blank"
+                        className="text-center"
+                      >
                        <input type="hidden" name="cmd" value="_s-xclick" />
                        <input type="hidden" name="hosted_button_id" value="X3SUYFT3YSG5S" />
                        <div className="mb-4">
@@ -79,13 +78,12 @@ const Love = () => {
                    <div className="card-cyber p-4 bg-background/50">
                      <h4 className="text-lg font-semibold text-accent mb-3">Standard Support</h4>
                      <p className="text-muted-foreground mb-4">Affordable monthly support options</p>
-                     <form 
-                       action="https://www.paypal.com/cgi-bin/webscr" 
-                       method="post" 
-                       target="paypal2"
-                       onSubmit={() => window.open('', 'paypal2', 'scrollbars=yes,resizable=yes,toolbar=no,location=yes,directories=no,status=no,menubar=no,copyhistory=no,width=400,height=350')}
-                       className="text-center"
-                     >
+                      <form 
+                        action="https://www.paypal.com/cgi-bin/webscr" 
+                        method="post" 
+                        target="_blank"
+                        className="text-center"
+                      >
                        <input type="hidden" name="cmd" value="_s-xclick" />
                        <input type="hidden" name="hosted_button_id" value="8KHUB494QFKYS" />
                        <div className="mb-4">
@@ -114,13 +112,12 @@ const Love = () => {
                    <div className="card-cyber p-4 bg-background/50">
                      <h4 className="text-lg font-semibold text-accent mb-3">Quick Support</h4>
                      <p className="text-muted-foreground mb-4">One-time donation to show your appreciation</p>
-                     <form 
-                       action="https://www.paypal.com/cgi-bin/webscr" 
-                       method="post" 
-                       target="paypal3"
-                       onSubmit={() => window.open('', 'paypal3', 'scrollbars=yes,resizable=yes,toolbar=no,location=yes,directories=no,status=no,menubar=no,copyhistory=no,width=400,height=350')}
-                       className="text-center"
-                     >
+                      <form 
+                        action="https://www.paypal.com/cgi-bin/webscr" 
+                        method="post" 
+                        target="_blank"
+                        className="text-center"
+                      >
                        <input type="hidden" name="cmd" value="_s-xclick" />
                        <input type="hidden" name="hosted_button_id" value="DK3YAZ6D4WGGU" />
                        <input type="hidden" name="currency_code" value="USD" />
