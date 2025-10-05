@@ -19,25 +19,24 @@ interface Episode {
 const PodcastPreview = () => {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
 
   useEffect(() => {
-    const fetchEpisodes = async () => {
+    const fetchEpisodes = async (retryCount = 0) => {
+      const maxRetries = 3;
+      let success = false;
+      
       try {
         console.log('🔄 PodcastPreview: Fetching RSS feed...');
         
+        // Add timeout for mobile connections
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        const timeoutId = setTimeout(() => controller.abort(), 12000); // 12 second timeout for preview
         
-        const response = await fetch('https://upbwlnpycrbhxahjztrf.supabase.co/functions/v1/rss-feed-fetch', {
-          method: 'POST',
+        const response = await fetch('https://api.allorigins.win/get?url=https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml', {
           signal: controller.signal,
           headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            url: 'https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml'
-          })
+            'Accept': 'application/json',
+          }
         });
         
         clearTimeout(timeoutId);
@@ -49,7 +48,7 @@ const PodcastPreview = () => {
         const data = await response.json();
         
         const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(data.content, 'text/xml');
+        const xmlDoc = parser.parseFromString(data.contents, 'text/xml');
         const items = xmlDoc.querySelectorAll('item');
         
         const episodeList: Episode[] = Array.from(items).map(item => {
@@ -69,13 +68,28 @@ const PodcastPreview = () => {
           };
         });
         
-        setEpisodes(episodeList.slice(0, 3));
-        console.log('✅ PodcastPreview: Loaded', episodeList.length, 'episodes');
-      } catch (err) {
-        console.error('❌ PodcastPreview RSS Update Failed:', err);
-        setError(true);
+        setEpisodes(episodeList.slice(0, 3)); // Only show 3 episodes in preview
+        console.log('✅ PodcastPreview: RSS Update Complete:', episodeList.length, 'episodes');
+        success = true;
+      } catch (error) {
+        console.error('❌ PodcastPreview RSS Update Failed:', error);
+        
+        // Retry mechanism for mobile reliability
+        if (retryCount < maxRetries && (error instanceof Error && (error.name === 'AbortError' || error.message.includes('fetch')))) {
+          console.log(`🔄 PodcastPreview: Retrying RSS fetch (attempt ${retryCount + 1}/${maxRetries})...`);
+          setTimeout(() => {
+            fetchEpisodes(retryCount + 1);
+          }, Math.pow(2, retryCount) * 1000); // Exponential backoff
+          return;
+        }
+        
+        // Set empty state on final failure
+        setEpisodes([]);
       } finally {
-        setLoading(false);
+        // Only set loading false when we're done with all retries or succeeded
+        if (success || retryCount >= maxRetries) {
+          setLoading(false);
+        }
       }
     };
 
@@ -94,34 +108,6 @@ const PodcastPreview = () => {
       <div className="card-cyber p-8 bg-transparent text-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
         <p className="text-muted-foreground">Loading episodes...</p>
-      </div>
-    );
-  }
-
-  if (error || episodes.length === 0) {
-    return (
-      <div className="card-cyber p-6 bg-transparent">
-        <div className="mb-6">
-          <h3 className="text-2xl font-['Orbitron'] font-bold mb-2">
-            <span className="text-neon">RECENT</span>{" "}
-            <span className="text-neon-purple">EPISODES</span>
-          </h3>
-          <p className="text-muted-foreground">Latest from Future Dance Anthems with Mario</p>
-        </div>
-        
-        <div className="text-center py-8">
-          <p className="text-muted-foreground mb-6">
-            {error ? 'Unable to load episodes at the moment' : 'No episodes available'}
-          </p>
-          <Button 
-            variant="outline" 
-            className="hover:scale-105 transition-transform border-primary/30 hover:border-primary"
-            onClick={() => window.open('https://podcasts.apple.com/podcast/future-dance-anthems-with-mario/id1439656478', '_blank')}
-          >
-            <ExternalLink className="w-4 h-4 mr-2" />
-            View on Apple Podcasts
-          </Button>
-        </div>
       </div>
     );
   }

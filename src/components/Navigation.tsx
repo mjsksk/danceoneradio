@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Radio, Volume2 } from 'lucide-react';
 
@@ -25,14 +24,14 @@ const Navigation = () => {
           {/* Desktop Navigation - Centered */}
           <div className="hidden md:flex items-center space-x-8 flex-1 justify-center">
             {navItems.map((item) => (
-              <Link
+              <a
                 key={item.name}
-                to={item.href}
+                href={item.href}
                 className="text-muted-foreground hover:text-primary transition-colors duration-300 font-medium text-sm tracking-tight"
                 style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
               >
                 {item.name}
-              </Link>
+              </a>
             ))}
           </div>
 
@@ -55,15 +54,15 @@ const Navigation = () => {
           <div className="md:hidden py-4 border-t border-primary/20 animate-slide-up">
             <div className="flex flex-col space-y-4">
               {navItems.map((item) => (
-                <Link
+                <a
                   key={item.name}
-                  to={item.href}
+                  href={item.href}
                   className="text-muted-foreground hover:text-primary transition-colors duration-300 font-medium text-sm tracking-tight py-2"
                   style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.name}
-                </Link>
+                </a>
               ))}
             </div>
           </div>
