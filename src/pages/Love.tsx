@@ -18,28 +18,51 @@ declare global {
 
 const Love = () => {
   useEffect(() => {
+    // Check if button container exists
+    const checkAndRender = () => {
+      const container = document.getElementById('donate-button');
+      console.log('Button container found:', container);
+      
+      if (container && window.PayPal && window.PayPal.Donation) {
+        console.log('Rendering PayPal button...');
+        try {
+          window.PayPal.Donation.Button({
+            env: 'production',
+            hosted_button_id: 'NBJRR3JBYUUKE',
+            image: {
+              src: 'https://pics.paypal.com/00/s/Yjk2NjRhM2UtNWM4MC00N2QxLWI2MGItZmFlN2E1MTY5Yzli/file.PNG',
+              alt: 'Donate with PayPal button',
+              title: 'PayPal - The safer, easier way to pay online!',
+            }
+          }).render('#donate-button');
+          console.log('PayPal button rendered successfully');
+        } catch (error) {
+          console.error('Error rendering PayPal button:', error);
+        }
+      } else {
+        console.log('PayPal SDK not ready yet or container not found');
+      }
+    };
+
     // Load PayPal Donation SDK
     const script = document.createElement('script');
     script.src = 'https://www.paypalobjects.com/donate/sdk/donate-sdk.js';
     script.charset = 'UTF-8';
     script.async = true;
     script.onload = () => {
-      if (window.PayPal && window.PayPal.Donation) {
-        window.PayPal.Donation.Button({
-          env: 'production',
-          hosted_button_id: 'NBJRR3JBYUUKE',
-          image: {
-            src: 'https://pics.paypal.com/00/s/Yjk2NjRhM2UtNWM4MC00N2QxLWI2MGItZmFlN2E1MTY5Yzli/file.PNG',
-            alt: 'Donate with PayPal button',
-            title: 'PayPal - The safer, easier way to pay online!',
-          }
-        }).render('#donate-button');
-      }
+      console.log('PayPal SDK loaded');
+      // Wait a bit for DOM to be ready
+      setTimeout(checkAndRender, 100);
+    };
+    script.onerror = (error) => {
+      console.error('Failed to load PayPal SDK:', error);
     };
     document.body.appendChild(script);
 
     return () => {
-      document.body.removeChild(script);
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
     };
   }, []);
 
@@ -152,7 +175,7 @@ const Love = () => {
                      <h4 className="text-lg font-semibold text-accent mb-3">Quick Support</h4>
                      <p className="text-muted-foreground mb-4">One-time donation to show your appreciation</p>
                      <div className="text-center">
-                       <div id="donate-button-container">
+                       <div id="donate-button-container" className="min-h-[60px] flex items-center justify-center">
                          <div id="donate-button"></div>
                        </div>
                      </div>
