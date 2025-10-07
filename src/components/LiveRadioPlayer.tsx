@@ -66,7 +66,7 @@ const LiveRadioPlayer = ({
       analyser.fftSize = 256; // This gives us 128 frequency bins for 64 bars
       analyser.smoothingTimeConstant = 0.8; // Add smoothing for realistic behavior
       const bufferLength = analyser.frequencyBinCount;
-      const dataArray = new Uint8Array(bufferLength);
+      const dataArray = new Uint8Array(new ArrayBuffer(bufferLength));
       source.connect(analyser);
       analyser.connect(audioContext.destination);
       audioContextRef.current = audioContext;
@@ -89,7 +89,7 @@ const LiveRadioPlayer = ({
     if (!analyserRef.current || !dataArrayRef.current) return;
     const updateFrequencyData = () => {
       if (!analyserRef.current || !dataArrayRef.current || !isPlaying) return;
-      analyserRef.current.getByteFrequencyData(dataArrayRef.current);
+      analyserRef.current.getByteFrequencyData(dataArrayRef.current as Uint8Array<ArrayBuffer>);
 
       // Check if we're getting real data (sum should be > 0 if audio is playing)
       const dataSum = Array.from(dataArrayRef.current).reduce((sum, val) => sum + val, 0);
