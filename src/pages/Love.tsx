@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
@@ -6,65 +5,7 @@ import AdSenseUnit from '@/components/AdSenseUnit';
 import { Button } from '@/components/ui/button';
 import { Heart, Music, Radio, Users } from 'lucide-react';
 
-declare global {
-  interface Window {
-    PayPal?: {
-      Donation: {
-        Button: (config: any) => { render: (selector: string) => void };
-      };
-    };
-  }
-}
-
 const Love = () => {
-  useEffect(() => {
-    // Check if button container exists
-    const checkAndRender = () => {
-      const container = document.getElementById('donate-button');
-      console.log('Button container found:', container);
-      
-      if (container && window.PayPal && window.PayPal.Donation) {
-        console.log('Rendering PayPal button...');
-        try {
-          window.PayPal.Donation.Button({
-            env: 'production',
-            hosted_button_id: 'NBJRR3JBYUUKE',
-            image: {
-              src: 'https://pics.paypal.com/00/s/Yjk2NjRhM2UtNWM4MC00N2QxLWI2MGItZmFlN2E1MTY5Yzli/file.PNG',
-              alt: 'Donate with PayPal button',
-              title: 'PayPal - The safer, easier way to pay online!',
-            }
-          }).render('#donate-button');
-          console.log('PayPal button rendered successfully');
-        } catch (error) {
-          console.error('Error rendering PayPal button:', error);
-        }
-      } else {
-        console.log('PayPal SDK not ready yet or container not found');
-      }
-    };
-
-    // Load PayPal Donation SDK
-    const script = document.createElement('script');
-    script.src = 'https://www.paypalobjects.com/donate/sdk/donate-sdk.js';
-    script.charset = 'UTF-8';
-    script.async = true;
-    script.onload = () => {
-      console.log('PayPal SDK loaded');
-      // Wait a bit for DOM to be ready
-      setTimeout(checkAndRender, 100);
-    };
-    script.onerror = (error) => {
-      console.error('Failed to load PayPal SDK:', error);
-    };
-    document.body.appendChild(script);
-
-    return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
-  }, []);
 
   return <div className="min-h-screen bg-background text-foreground">
       <SEO 
@@ -170,16 +111,25 @@ const Love = () => {
                      </form>
                    </div>
 
-                   {/* Quick Support */}
-                   <div className="card-cyber p-4 bg-background/50">
-                     <h4 className="text-lg font-semibold text-accent mb-3">Quick Support</h4>
-                     <p className="text-muted-foreground mb-4">One-time donation to show your appreciation</p>
-                     <div className="text-center">
-                       <div id="donate-button-container" className="min-h-[60px] flex items-center justify-center">
-                         <div id="donate-button"></div>
-                       </div>
-                     </div>
-                   </div>
+                    {/* Quick Support */}
+                    <div className="card-cyber p-4 bg-background/50">
+                      <h4 className="text-lg font-semibold text-accent mb-3">Quick Support</h4>
+                      <p className="text-muted-foreground mb-4">One-time donation to show your appreciation</p>
+                      <form 
+                        action="https://www.paypal.com/donate" 
+                        method="post" 
+                        target="_blank"
+                        className="text-center"
+                      >
+                        <input type="hidden" name="hosted_button_id" value="NBJRR3JBYUUKE" />
+                        <Button 
+                          type="submit"
+                          className="btn-cyber w-full max-w-xs"
+                        >
+                          Donate with PayPal
+                        </Button>
+                      </form>
+                    </div>
                  </div>
                <div className="flex justify-center space-x-4 mt-6">
                  <Heart className="w-6 h-6 text-primary animate-pulse" />
