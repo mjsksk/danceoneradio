@@ -24,13 +24,13 @@ const Love = () => {
               <h1 className="text-4xl font-['Orbitron'] font-bold text-primary mb-4">
                 Love
               </h1>
-              <p className="text-xl text-muted-foreground font-['Rajdhani']">Dance One is operating its streams commercial-free. We can do that with your help, our listeners. All donations go directly into helping the station operate on a non-commercial basis. Your money will help cover expenses related to hardware, software, streamlining, development, and music licensing. 
+              <p className="text-xl text-muted-foreground font-['Rajdhani']">Dance One is operating its streams commercial-free. We can do that with your help, our listeners. All donations go directly into helping the station operate on a non-commercial basis. Your money will help cover expenses related to hardware, software, streamlining, development, and music licensing. 
 
 
- If you appreciate all the hard work that goes into making this station one of the best dance radio stations on earth, please consider a donation using one of the PayPal options below. 
+ If you appreciate all the hard work that goes into making this station one of the best dance radio stations on earth, please consider a donation. 
 
 
- You can make the change, and we really appreciate it.</p>
+ You can make the change, and we really appreciate it.</p>
              </div>
              
              {/* Share the Love Section - Moved under Love heading */}
@@ -40,97 +40,20 @@ const Love = () => {
                  Support Dance One Radio and help us continue bringing you the best electronic music experience.
                </p>
                
-                 <div className="space-y-6">
-                   {/* Premium Support */}
-                   <div className="card-cyber p-4 bg-background/50">
-                     <h4 className="text-lg font-semibold text-accent mb-3">Premium Support</h4>
-                     <p className="text-muted-foreground mb-4">Monthly subscriptions for dedicated supporters</p>
-                     <form 
-                       action="https://www.paypal.com/cgi-bin/webscr" 
-                       method="post" 
-                       target="paypal"
-                       onSubmit={() => window.open('', 'paypal', 'scrollbars=yes,resizable=yes,toolbar=no,location=yes,directories=no,status=no,menubar=no,copyhistory=no,width=400,height=350')}
-                       className="text-center"
-                     >
-                       <input type="hidden" name="cmd" value="_s-xclick" />
-                       <input type="hidden" name="hosted_button_id" value="X3SUYFT3YSG5S" />
-                       <div className="mb-4">
-                         <input type="hidden" name="on0" value="Payment Options" />
-                         <label className="text-muted-foreground mb-2 block">Choose Your Support Level</label>
-                         <select 
-                           name="os0" 
-                           className="w-full max-w-xs p-2 border border-border rounded bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary mb-4"
-                         >
-                           <option value="Option 1">$15.00 USD / month</option>
-                           <option value="Option 2">$20.00 USD / month</option>
-                           <option value="Option 3">$30.00 USD / month</option>
-                         </select>
-                       </div>
-                       <input type="hidden" name="currency_code" value="USD" />
-                       <Button 
-                         type="submit"
-                         className="btn-cyber w-full max-w-xs"
-                       >
-                         Subscribe with PayPal
-                       </Button>
-                     </form>
-                   </div>
-
-                   {/* Standard Support */}
-                   <div className="card-cyber p-4 bg-background/50">
-                     <h4 className="text-lg font-semibold text-accent mb-3">Standard Support</h4>
-                     <p className="text-muted-foreground mb-4">Affordable monthly support options</p>
-                     <form 
-                       action="https://www.paypal.com/cgi-bin/webscr" 
-                       method="post" 
-                       target="paypal2"
-                       onSubmit={() => window.open('', 'paypal2', 'scrollbars=yes,resizable=yes,toolbar=no,location=yes,directories=no,status=no,menubar=no,copyhistory=no,width=400,height=350')}
-                       className="text-center"
-                     >
-                       <input type="hidden" name="cmd" value="_s-xclick" />
-                       <input type="hidden" name="hosted_button_id" value="8KHUB494QFKYS" />
-                       <div className="mb-4">
-                         <input type="hidden" name="on0" value="Payment Options" />
-                         <label className="text-muted-foreground mb-2 block">Choose Your Support Level</label>
-                         <select 
-                           name="os0" 
-                           className="w-full max-w-xs p-2 border border-border rounded bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-primary mb-4"
-                         >
-                           <option value="Option 1">$1.00 USD / month</option>
-                           <option value="Option 2">$5.00 USD / month</option>
-                           <option value="Option 3">$10.00 USD / month</option>
-                         </select>
-                       </div>
-                       <input type="hidden" name="currency_code" value="USD" />
-                       <Button 
-                         type="submit"
-                         className="btn-cyber w-full max-w-xs"
-                       >
-                         Subscribe with PayPal
-                       </Button>
-                     </form>
-                   </div>
-
-                    {/* Quick Support */}
-                    <div className="card-cyber p-4 bg-background/50">
-                      <h4 className="text-lg font-semibold text-accent mb-3">Quick Support</h4>
-                      <p className="text-muted-foreground mb-4">One-time donation to show your appreciation</p>
-                      <form 
-                        action="https://www.paypal.com/donate" 
-                        method="post" 
-                        target="_blank"
-                        className="text-center"
-                      >
-                        <input type="hidden" name="hosted_button_id" value="NBJRR3JBYUUKE" />
-                        <Button 
-                          type="submit"
-                          className="btn-cyber w-full max-w-xs"
-                        >
-                          Donate with PayPal
-                        </Button>
-                      </form>
-                    </div>
-                 </div>
+                <div className="text-center">
+                  <Button 
+                    asChild
+                    className="btn-cyber text-lg px-8 py-6"
+                  >
+                    <a 
+                      href="https://www.paypal.com/ncp/payment/LYHFTSSTD6MJG" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                    >
+                      Support Dance One Radio
+                    </a>
+                  </Button>
+                </div>
                <div className="flex justify-center space-x-4 mt-6">
                  <Heart className="w-6 h-6 text-primary animate-pulse" />
                  <Music className="w-6 h-6 text-accent" />
