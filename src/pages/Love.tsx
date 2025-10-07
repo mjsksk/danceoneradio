@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
@@ -5,7 +6,43 @@ import AdSenseUnit from '@/components/AdSenseUnit';
 import { Button } from '@/components/ui/button';
 import { Heart, Music, Radio, Users } from 'lucide-react';
 
+declare global {
+  interface Window {
+    PayPal?: {
+      Donation: {
+        Button: (config: any) => { render: (selector: string) => void };
+      };
+    };
+  }
+}
+
 const Love = () => {
+  useEffect(() => {
+    // Load PayPal Donation SDK
+    const script = document.createElement('script');
+    script.src = 'https://www.paypalobjects.com/donate/sdk/donate-sdk.js';
+    script.charset = 'UTF-8';
+    script.async = true;
+    script.onload = () => {
+      if (window.PayPal && window.PayPal.Donation) {
+        window.PayPal.Donation.Button({
+          env: 'production',
+          hosted_button_id: 'NBJRR3JBYUUKE',
+          image: {
+            src: 'https://pics.paypal.com/00/s/Yjk2NjRhM2UtNWM4MC00N2QxLWI2MGItZmFlN2E1MTY5Yzli/file.PNG',
+            alt: 'Donate with PayPal button',
+            title: 'PayPal - The safer, easier way to pay online!',
+          }
+        }).render('#donate-button');
+      }
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
   return <div className="min-h-screen bg-background text-foreground">
       <SEO 
         title="About Love Parade - Dance One Radio"
@@ -114,23 +151,11 @@ const Love = () => {
                    <div className="card-cyber p-4 bg-background/50">
                      <h4 className="text-lg font-semibold text-accent mb-3">Quick Support</h4>
                      <p className="text-muted-foreground mb-4">One-time donation to show your appreciation</p>
-                     <form 
-                       action="https://www.paypal.com/cgi-bin/webscr" 
-                       method="post" 
-                       target="paypal3"
-                       onSubmit={() => window.open('', 'paypal3', 'scrollbars=yes,resizable=yes,toolbar=no,location=yes,directories=no,status=no,menubar=no,copyhistory=no,width=400,height=350')}
-                       className="text-center"
-                     >
-                       <input type="hidden" name="cmd" value="_s-xclick" />
-                       <input type="hidden" name="hosted_button_id" value="DK3YAZ6D4WGGU" />
-                       <input type="hidden" name="currency_code" value="USD" />
-                       <Button 
-                         type="submit"
-                         className="btn-cyber w-full max-w-xs"
-                       >
-                         Quick Support with PayPal
-                       </Button>
-                     </form>
+                     <div className="text-center">
+                       <div id="donate-button-container">
+                         <div id="donate-button"></div>
+                       </div>
+                     </div>
                    </div>
                  </div>
                <div className="flex justify-center space-x-4 mt-6">
