@@ -462,6 +462,12 @@ const TracksSection = () => {
                       <Play className="w-6 h-6 ml-1" />
                     )}
                     
+                    {previewUrls[track.id] && !loadingPreviews[track.id] && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background">
+                        <div className="w-full h-full bg-green-400 rounded-full animate-ping"></div>
+                      </div>
+                    )}
+                    
                     {previewErrors[track.id] && !loadingPreviews[track.id] && (
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-background text-xs flex items-center justify-center">
                         ✕
