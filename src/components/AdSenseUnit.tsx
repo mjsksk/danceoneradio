@@ -17,7 +17,16 @@ const AdSenseUnit = () => {
   useEffect(() => {
     // Listen for consent changes
     const handleConsentChange = () => {
-      setHasAdConsent(hasConsent('advertising'));
+      const newConsent = hasConsent('advertising');
+      console.log('🍪 AdSense: Consent changed, advertising consent:', newConsent);
+      setHasAdConsent(newConsent);
+      
+      // Reset ad state when consent is granted to allow reinitialization
+      if (newConsent && !adLoadedRef.current) {
+        console.log('🍪 AdSense: Resetting ad state for reinitialization');
+        adLoadedRef.current = false;
+        adInitializedRef.current = false;
+      }
     };
 
     window.addEventListener('consentChanged', handleConsentChange);
@@ -28,62 +37,102 @@ const AdSenseUnit = () => {
 
   useEffect(() => {
     // Don't load ads if no consent
-    if (!hasAdConsent) return;
+    if (!hasAdConsent) {
+      console.log('🍪 AdSense: No advertising consent, skipping ad load');
+      return;
+    }
 
     // Prevent multiple initializations
-    if (!adRef.current || adLoadedRef.current || adInitializedRef.current) return;
+    if (!adRef.current || adLoadedRef.current || adInitializedRef.current) {
+      console.log('🍪 AdSense: Skipping (already loaded or initialized)', {
+        hasRef: !!adRef.current,
+        loaded: adLoadedRef.current,
+        initialized: adInitializedRef.current
+      });
+      return;
+    }
 
     // Check if ad is already loaded by checking for existing content
     if (adRef.current.innerHTML.trim() !== '') {
+      console.log('🍪 AdSense: Ad already has content, marking as loaded');
       adLoadedRef.current = true;
       return;
     }
 
+    console.log('🍪 AdSense: Starting ad initialization');
     adInitializedRef.current = true;
 
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && !adLoadedRef.current && adRef.current) {
-            // Double-check that the ad hasn't been loaded yet
-            if (adRef.current.innerHTML.trim() !== '') {
-              adLoadedRef.current = true;
-              observerRef.current?.disconnect();
-              return;
-            }
-
-            adLoadedRef.current = true;
-            
-            // Initialize adsbygoogle array
-            window.adsbygoogle = window.adsbygoogle || [];
-            
-            // Use requestAnimationFrame to avoid forced reflows
-            requestAnimationFrame(() => {
-              try {
-                // Only push if the element still exists and hasn't been processed
-                if (adRef.current && !adRef.current.hasAttribute('data-ad-status')) {
-                  (window.adsbygoogle).push({});
-                  adRef.current.setAttribute('data-ad-status', 'loaded');
-                }
-              } catch (error) {
-                console.error('AdSense error:', error);
-                // Reset state on error to allow retry
-                adLoadedRef.current = false;
-              }
-            });
-            
-            // Disconnect observer after loading
-            observerRef.current?.disconnect();
+    // Wait for AdSense script to be loaded before initializing
+    const waitForAdSenseScript = () => {
+      return new Promise<void>((resolve) => {
+        const checkScript = () => {
+          if (window.adsbygoogle || document.querySelector('script[src*="adsbygoogle.js"]')) {
+            console.log('🍪 AdSense: Script is loaded');
+            resolve();
+          } else {
+            console.log('🍪 AdSense: Waiting for script...');
+            setTimeout(checkScript, 100);
           }
-        });
-      },
-      { 
-        rootMargin: '100px',
-        threshold: 0.1 
-      }
-    );
+        };
+        checkScript();
+      });
+    };
 
-    observerRef.current.observe(adRef.current);
+    waitForAdSenseScript().then(() => {
+      console.log('🍪 AdSense: Setting up IntersectionObserver');
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && !adLoadedRef.current && adRef.current) {
+              console.log('🍪 AdSense: Ad is visible, attempting to load');
+              
+              // Double-check that the ad hasn't been loaded yet
+              if (adRef.current.innerHTML.trim() !== '') {
+                console.log('🍪 AdSense: Ad already has content, skipping');
+                adLoadedRef.current = true;
+                observerRef.current?.disconnect();
+                return;
+              }
+
+              adLoadedRef.current = true;
+              
+              // Initialize adsbygoogle array
+              window.adsbygoogle = window.adsbygoogle || [];
+              
+              // Use requestAnimationFrame to avoid forced reflows
+              requestAnimationFrame(() => {
+                try {
+                  // Only push if the element still exists and hasn't been processed
+                  if (adRef.current && !adRef.current.hasAttribute('data-ad-status')) {
+                    console.log('🍪 AdSense: Pushing ad to adsbygoogle queue');
+                    (window.adsbygoogle).push({});
+                    adRef.current.setAttribute('data-ad-status', 'loaded');
+                    console.log('✅ AdSense: Ad successfully initialized');
+                  }
+                } catch (error) {
+                  console.error('❌ AdSense error:', error);
+                  // Reset state on error to allow retry
+                  adLoadedRef.current = false;
+                  adInitializedRef.current = false;
+                }
+              });
+              
+              // Disconnect observer after loading
+              observerRef.current?.disconnect();
+            }
+          });
+        },
+        { 
+          rootMargin: '100px',
+          threshold: 0.1 
+        }
+      );
+
+      if (adRef.current) {
+        observerRef.current.observe(adRef.current);
+        console.log('🍪 AdSense: Observer attached to ad element');
+      }
+    });
 
     return () => {
       observerRef.current?.disconnect();
