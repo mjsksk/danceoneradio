@@ -70,53 +70,50 @@ export const CookieConsent = ({ forceShow = false, onClose }: CookieConsentProps
 
   return (
     <>
-      {/* Cookie Banner */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-background via-background/98 to-background/95 backdrop-blur-xl border-t-2 border-primary/40 shadow-[0_-10px_40px_rgba(0,0,0,0.3)]">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-            <div className="flex-1">
-              <h3 className="text-2xl font-['Orbitron'] font-bold text-primary mb-3 flex items-center gap-2">
-                🍪 We Value Your Privacy
+      {/* Cookie Banner - Full screen overlay */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-md animate-fade-in">
+        <div className="w-full max-w-2xl mx-4 bg-card/95 backdrop-blur-lg border-2 border-primary/40 rounded-lg shadow-2xl shadow-primary/20 animate-scale-in">
+          <div className="p-8">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-['Orbitron'] font-bold text-primary mb-3">
+                🍪 Cookie Consent
               </h3>
-              <p className="text-base text-foreground/90 font-['Rajdhani'] leading-relaxed mb-2">
-                We use cookies to enhance your experience, analyze site traffic, and serve personalized content.
+              <p className="text-base text-foreground/90 font-['Rajdhani'] leading-relaxed">
+                We use cookies to enhance your experience, analyze site traffic, and serve personalized content. 
+                Accepting cookies helps keep Dance One Radio free and supports our community.
               </p>
-              <p className="text-sm text-primary/80 font-['Rajdhani'] font-semibold">
-                ✨ Accepting cookies helps keep Dance One Radio free and supports our community!
-              </p>
-              <a href="/privacy" className="text-xs text-muted-foreground hover:text-primary underline mt-2 inline-block font-['Rajdhani']">
+              <a href="/privacy" className="text-sm text-primary hover:underline mt-2 inline-block font-['Rajdhani']">
                 Learn more in our Privacy Policy →
               </a>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto lg:min-w-[400px]">
+            <div className="flex flex-col sm:flex-row gap-3">
               <Button
                 onClick={handleAcceptAll}
                 size="lg"
-                className="btn-cyber whitespace-nowrap text-lg font-bold shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all hover:scale-105"
+                className="btn-cyber flex-1 text-lg font-bold"
               >
-                ✓ Accept All Cookies
+                ✓ Accept All
               </Button>
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleRejectNonEssential}
-                  variant="outline"
-                  className="border-primary/30 text-primary hover:bg-primary/10 whitespace-nowrap flex-1"
-                >
-                  Reject
-                </Button>
-                <Button
-                  onClick={handleCustomize}
-                  variant="outline"
-                  className="border-primary/30 text-primary hover:bg-primary/10 whitespace-nowrap flex-1"
-                >
-                  Customize
-                </Button>
-              </div>
+              <Button
+                onClick={handleRejectNonEssential}
+                variant="outline"
+                className="border-primary/30 text-primary hover:bg-primary/10 flex-1"
+              >
+                Reject Non-Essential
+              </Button>
+              <Button
+                onClick={handleCustomize}
+                variant="outline"
+                className="border-primary/30 text-primary hover:bg-primary/10 flex-1"
+              >
+                Customize
+              </Button>
             </div>
           </div>
         </div>
       </div>
+
 
       {/* Customization Modal */}
       <Dialog open={showCustomize} onOpenChange={handleCloseCustomize}>
