@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { hasConsent } from '@/utils/consentManager';
 
 declare global {
   interface Window {
@@ -7,12 +8,28 @@ declare global {
 }
 
 const AdSenseUnit = () => {
+  const [hasAdConsent, setHasAdConsent] = useState(hasConsent('advertising'));
   const adRef = useRef<HTMLModElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const adLoadedRef = useRef<boolean>(false);
   const adInitializedRef = useRef<boolean>(false);
 
   useEffect(() => {
+    // Listen for consent changes
+    const handleConsentChange = () => {
+      setHasAdConsent(hasConsent('advertising'));
+    };
+
+    window.addEventListener('consentChanged', handleConsentChange);
+    return () => {
+      window.removeEventListener('consentChanged', handleConsentChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Don't load ads if no consent
+    if (!hasAdConsent) return;
+
     // Prevent multiple initializations
     if (!adRef.current || adLoadedRef.current || adInitializedRef.current) return;
 
@@ -72,7 +89,20 @@ const AdSenseUnit = () => {
       observerRef.current?.disconnect();
       adInitializedRef.current = false;
     };
-  }, []);
+  }, [hasAdConsent]);
+
+  // If no advertising consent, show a message
+  if (!hasAdConsent) {
+    return (
+      <section className="my-8 flex justify-center">
+        <div className="w-full max-w-4xl p-8 text-center bg-card/50 border border-primary/20 rounded-lg">
+          <p className="text-muted-foreground font-['Rajdhani']">
+            Ads are disabled. You can enable them in Cookie Settings to support our free service.
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="my-8 flex justify-center">

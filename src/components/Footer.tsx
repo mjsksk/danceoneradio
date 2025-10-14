@@ -4,6 +4,7 @@ import { Instagram, Facebook, Youtube } from 'lucide-react';
 import appStoreBadge from '@/assets/app-store-badge-new.svg';
 import googlePlayBadge from '@/assets/google-play-badge-new.svg';
 import { useNewsletter } from '@/hooks/useNewsletter';
+import { CookieSettingsButton } from '@/components/CookieConsent';
 const Footer = () => {
   const [email, setEmail] = useState('');
   const { subscribe, isSubmitting } = useNewsletter();
@@ -117,13 +118,14 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-primary/20 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between">
           <p className="text-muted-foreground font-['Rajdhani'] text-sm">© Dance One Radio. All rights reserved.</p>
-          <div className="flex space-x-6 mt-4 md:mt-0">
+          <div className="flex flex-wrap space-x-6 mt-4 md:mt-0">
             <a href="/privacy" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani'] text-sm">
               Privacy Policy
             </a>
             <a href="/dmca" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani'] text-sm">
               DMCA
             </a>
+            <CookieSettingsButton />
           </div>
         </div>
       </div>
