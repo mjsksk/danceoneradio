@@ -5,8 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SecurityHeaders } from "@/components/SecurityHeaders";
 import { CookieConsent } from "@/components/CookieConsent";
-import { useEffect } from "react";
-import { initializeConsentScripts } from "@/utils/consentManager";
 import Index from "./pages/Index";
 import Shows from "./pages/Shows";
 import Gallery from "./pages/Gallery";
@@ -25,20 +23,14 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => {
-  useEffect(() => {
-    // Initialize consent-based scripts on app mount
-    initializeConsentScripts();
-  }, []);
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <SecurityHeaders />
-        <Toaster />
-        <Sonner />
-        <CookieConsent />
-        <BrowserRouter>
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <SecurityHeaders />
+      <Toaster />
+      <Sonner />
+      <CookieConsent />
+      <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/shows" element={<Shows />} />
@@ -61,7 +53,6 @@ const App = () => {
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
-  );
-};
+);
 
 export default App;
