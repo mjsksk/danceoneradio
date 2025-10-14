@@ -71,43 +71,48 @@ export const CookieConsent = ({ forceShow = false, onClose }: CookieConsentProps
   return (
     <>
       {/* Cookie Banner */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-lg border-t border-primary/20 shadow-2xl">
-        <div className="container mx-auto px-4 py-6">
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-background via-background/98 to-background/95 backdrop-blur-xl border-t-2 border-primary/40 shadow-[0_-10px_40px_rgba(0,0,0,0.3)]">
+        <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
             <div className="flex-1">
-              <h3 className="text-lg font-['Orbitron'] font-bold text-primary mb-2">
+              <h3 className="text-2xl font-['Orbitron'] font-bold text-primary mb-3 flex items-center gap-2">
                 🍪 We Value Your Privacy
               </h3>
-              <p className="text-sm text-muted-foreground font-['Rajdhani'] leading-relaxed">
-                We use cookies to enhance your experience, analyze site traffic, and serve personalized content. 
-                You can choose to accept all cookies, reject non-essential ones, or customize your preferences.{' '}
-                <a href="/privacy" className="text-primary hover:underline">
-                  Learn more in our Privacy Policy
-                </a>
+              <p className="text-base text-foreground/90 font-['Rajdhani'] leading-relaxed mb-2">
+                We use cookies to enhance your experience, analyze site traffic, and serve personalized content.
               </p>
+              <p className="text-sm text-primary/80 font-['Rajdhani'] font-semibold">
+                ✨ Accepting cookies helps keep Dance One Radio free and supports our community!
+              </p>
+              <a href="/privacy" className="text-xs text-muted-foreground hover:text-primary underline mt-2 inline-block font-['Rajdhani']">
+                Learn more in our Privacy Policy →
+              </a>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto lg:min-w-[400px]">
               <Button
                 onClick={handleAcceptAll}
-                className="btn-cyber whitespace-nowrap"
+                size="lg"
+                className="btn-cyber whitespace-nowrap text-lg font-bold shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all hover:scale-105"
               >
-                Accept All
+                ✓ Accept All Cookies
               </Button>
-              <Button
-                onClick={handleRejectNonEssential}
-                variant="outline"
-                className="border-primary/30 text-primary hover:bg-primary/10 whitespace-nowrap"
-              >
-                Reject Non-Essential
-              </Button>
-              <Button
-                onClick={handleCustomize}
-                variant="ghost"
-                className="text-muted-foreground hover:text-primary hover:bg-primary/10 whitespace-nowrap"
-              >
-                Customize
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleRejectNonEssential}
+                  variant="outline"
+                  className="border-primary/30 text-primary hover:bg-primary/10 whitespace-nowrap flex-1"
+                >
+                  Reject
+                </Button>
+                <Button
+                  onClick={handleCustomize}
+                  variant="outline"
+                  className="border-primary/30 text-primary hover:bg-primary/10 whitespace-nowrap flex-1"
+                >
+                  Customize
+                </Button>
+              </div>
             </div>
           </div>
         </div>
