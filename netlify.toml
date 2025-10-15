@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "npm run build && npx tsx scripts/generate-prerender.ts"
   publish = "dist"
 
 # Prerendering configuration

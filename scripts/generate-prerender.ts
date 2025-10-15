@@ -13,7 +13,7 @@ const routes = [
     path: '/shows',
     title: 'DJ Shows & Podcasts - Dance One Radio',
     description: 'Listen to exclusive DJ mixes, podcasts, and radio shows from Dance One Radio. New episodes weekly featuring the best electronic and dance music.',
-    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+    image: '/lovable-uploads/mario-show.jpg'
   },
   {
     path: '/downloads',
@@ -59,15 +59,21 @@ const routes = [
   },
   {
     path: '/episode/389',
-    title: 'Episode 389 - Dance One Radio Podcast',
-    description: 'Listen to Episode 389 of Dance One Radio podcast featuring the latest electronic and dance music tracks.',
-    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+    title: 'Anthems of the week 389 - Future Dance Anthems with Mario | Dance One Radio',
+    description: 'Episode 389 featuring 54 tracks of the latest electronic dance music, including exclusive unreleased tracks from top artists.',
+    image: '/lovable-uploads/mario-show.jpg'
   },
   {
     path: '/episode/390',
-    title: 'Episode 390 - Dance One Radio Podcast',
-    description: 'Listen to Episode 390 of Dance One Radio podcast featuring the latest electronic and dance music tracks.',
-    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+    title: 'Anthems of the week 390 - Future Dance Anthems with Mario | Dance One Radio',
+    description: 'Episode 390 featuring 28 tracks of the latest electronic dance music, including exclusive unreleased tracks from top artists.',
+    image: '/lovable-uploads/mario-show.jpg'
+  },
+  {
+    path: '/episode/391',
+    title: 'Anthems of the week 391 - Future Dance Anthems with Mario | Dance One Radio',
+    description: 'Episode 391 featuring 26 tracks of the latest electronic dance music, including tracks from Above & Beyond, Prospa, KETTAMA, and more.',
+    image: '/lovable-uploads/mario-show.jpg'
   },
   {
     path: '/privacy',
