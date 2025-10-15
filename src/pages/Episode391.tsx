@@ -89,7 +89,7 @@ const Episode391 = () => {
       <SEO 
         title="Anthems of the week 391 - Future Dance Anthems with Mario | Dance One Radio"
         description="Episode 391 featuring 26 tracks of the latest electronic dance music, including tracks from Above & Beyond, Prospa, KETTAMA, and more."
-        image="/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png"
+        image="/lovable-uploads/mario-show.jpg"
         url={window.location.href}
       />
       {/* Optimized Background Image with lazy loading */}
