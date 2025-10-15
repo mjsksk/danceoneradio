@@ -2,6 +2,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import AdSenseUnit from '@/components/AdSenseUnit';
+import SocialShare from '@/components/SocialShare';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -85,8 +86,17 @@ const Downloads = () => {
                 </Button>
               </div>
 
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-muted-foreground mb-6">
                 Version 1.0.0 • ~50 MB • Windows 10+ • Free Download
+              </div>
+              
+              <div className="flex justify-center">
+                <SocialShare 
+                  url={window.location.href}
+                  title="Download Dance One Radio Desktop App"
+                  description="Download Dance One Radio desktop apps for Windows. Experience the ultimate electronic music streaming with our feature-rich application."
+                  image={`${window.location.origin}/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png`}
+                />
               </div>
             </div>
           </div>

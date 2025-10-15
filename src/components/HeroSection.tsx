@@ -119,9 +119,10 @@ const HeroSection = () => {
           {/* Social Share */}
           <div className="mt-6 flex justify-center">
             <SocialShare 
-              url={window.location.origin}
+              url={window.location.href}
               title="Dance One Radio - The Future of Electronic Music"
               description="Live DJ sets featuring Progressive House, Trance, Techno, and Deep House music 24/7"
+              image={`${window.location.origin}/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png`}
               className="bg-background/10 backdrop-blur-sm border-primary/30 hover:border-primary hover:bg-primary/10"
             />
           </div>

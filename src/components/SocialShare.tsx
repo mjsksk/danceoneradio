@@ -9,16 +9,18 @@ import {
 import { useToast } from '@/hooks/use-toast';
 
 interface SocialShareProps {
-  url?: string;
-  title?: string;
-  description?: string;
+  url: string;
+  title: string;
+  description: string;
+  image?: string;
   className?: string;
 }
 
 const SocialShare = ({ 
-  url = window.location.href, 
-  title = "Future Dance Anthems with Mario - Dance One Radio",
-  description = "Dance anthems that consistently rule the dance and electronic scene.",
+  url, 
+  title,
+  description,
+  image,
   className = ""
 }: SocialShareProps) => {
   const { toast } = useToast();

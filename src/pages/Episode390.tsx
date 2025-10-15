@@ -245,6 +245,7 @@ const Episode390 = () => {
                       url={window.location.href}
                       title="Anthems of the week 390 - Future Dance Anthems with Mario"
                       description="Episode 390 featuring 28 tracks of the latest electronic dance music, including exclusive unreleased tracks."
+                      image={`${window.location.origin}/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png`}
                     />
                   </div>
                 </div>

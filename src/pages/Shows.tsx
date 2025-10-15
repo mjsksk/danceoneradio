@@ -357,15 +357,10 @@ const Shows = () => {
                 </Button>
                 
                 <SocialShare 
-                  url={episodes.length > 0 ? 
-                    `https://upbwlnpycrbhxahjztrf.supabase.co/functions/v1/og-meta-generator?episode=${totalEpisodes}&url=${encodeURIComponent(window.location.origin + '/shows')}` : 
-                    `${window.location.origin}/shows`
-                  }
-                  title={episodes.length > 0 ? `${episodes[0].title} - Future Dance Anthems with Mario` : "Future Dance Anthems with Mario - Shows"}
-                  description={episodes.length > 0 ? 
-                    `Listen to the latest episode: "${episodes[0].title}". ${episodes[0].description.substring(0, 120)}...` :
-                    "Weekly episodes featuring the latest in electronic dance music"
-                  }
+                  url={window.location.href}
+                  title="Future Dance Anthems with Mario - DJ Shows & Podcasts"
+                  description="Listen to exclusive DJ mixes and podcasts featuring the best electronic and dance music. New episodes weekly."
+                  image={`${window.location.origin}/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png`}
                   className="text-lg px-8 py-4 hover:scale-105 transition-transform"
                 />
               </div>

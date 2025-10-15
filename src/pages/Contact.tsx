@@ -3,6 +3,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import AdSenseUnit from '@/components/AdSenseUnit';
+import SocialShare from '@/components/SocialShare';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -83,7 +84,15 @@ const Contact = () => {
       <Navigation />
       <main className="container mx-auto px-4 py-8 pt-24">
         <div className="max-w-2xl mx-auto">
-          <h1 className="text-4xl font-bold text-center mb-8 text-foreground">Contact Us</h1>
+          <h1 className="text-4xl font-bold text-center mb-4 text-foreground">Contact Us</h1>
+          <div className="flex justify-center mb-8">
+            <SocialShare 
+              url={window.location.href}
+              title="Contact Dance One Radio"
+              description="Contact Dance One Radio for inquiries, partnerships, DJ bookings, or to submit your music. We would love to hear from you."
+              image={`${window.location.origin}/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png`}
+            />
+          </div>
           
           <AdSenseUnit />
           

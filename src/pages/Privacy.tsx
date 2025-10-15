@@ -2,6 +2,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import AdSenseUnit from '@/components/AdSenseUnit';
+import SocialShare from '@/components/SocialShare';
 
 const Privacy = () => {
   return (
@@ -15,9 +16,17 @@ const Privacy = () => {
       <main className="pt-20 pb-16">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="card-cyber p-8">
-            <h1 className="text-4xl font-['Orbitron'] font-bold text-primary mb-8 text-center">
+            <h1 className="text-4xl font-['Orbitron'] font-bold text-primary mb-4 text-center">
               Privacy Policy
             </h1>
+            <div className="flex justify-center mb-8">
+              <SocialShare 
+                url={window.location.href}
+                title="Privacy Policy - Dance One Radio"
+                description="Learn about how Dance One Radio protects and uses your personal information. Read our privacy policy for details on data collection and security."
+                image={`${window.location.origin}/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png`}
+              />
+            </div>
             
             <AdSenseUnit />
             

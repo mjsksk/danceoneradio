@@ -2,6 +2,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import AdSenseUnit from '@/components/AdSenseUnit';
+import SocialShare from '@/components/SocialShare';
 const Dmca = () => {
   return <div className="min-h-screen bg-background">
       <SEO 
@@ -11,9 +12,17 @@ const Dmca = () => {
       <Navigation />
       <main className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-primary mb-8 font-['Orbitron']">
+          <h1 className="text-4xl font-bold text-primary mb-4 font-['Orbitron']">
             Digital Millennium Copyright Act Policy
           </h1>
+          <div className="flex justify-center mb-8">
+            <SocialShare 
+              url={window.location.href}
+              title="DMCA Policy - Dance One Radio"
+              description="Digital Millennium Copyright Act policy for Dance One Radio. Learn about our copyright protection practices and procedures."
+              image={`${window.location.origin}/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png`}
+            />
+          </div>
           
           <AdSenseUnit />
           

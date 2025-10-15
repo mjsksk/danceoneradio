@@ -3,6 +3,7 @@ import SEO from "@/components/SEO";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import AdSenseUnit from "@/components/AdSenseUnit";
+import SocialShare from "@/components/SocialShare";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
@@ -172,9 +173,17 @@ const LoveParade2005 = () => {
             <h1 className="font-['Orbitron'] text-4xl md:text-6xl font-bold text-foreground mb-4">
               Love Parade 2005 San Francisco
             </h1>
-            <p className="text-muted-foreground text-lg">
+            <p className="text-muted-foreground text-lg mb-6">
               {ALL_IMAGES.length} photos from the festival
             </p>
+            <div className="flex justify-center">
+              <SocialShare 
+                url={window.location.href}
+                title="Love Parade 2005 San Francisco - Photo Gallery"
+                description={`View ${ALL_IMAGES.length} photos from Love Parade 2005 in San Francisco. Experience the energy and creativity of this iconic electronic music festival.`}
+                image={`${window.location.origin}/assets/love-parade-2005.jpg`}
+              />
+            </div>
           </div>
 
           <AdSenseUnit />

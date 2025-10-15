@@ -2,6 +2,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import AdSenseUnit from '@/components/AdSenseUnit';
+import SocialShare from '@/components/SocialShare';
 import { Button } from '@/components/ui/button';
 import { Heart, Music, Radio, Users } from 'lucide-react';
 
@@ -24,13 +25,21 @@ const Love = () => {
               <h1 className="text-4xl font-['Orbitron'] font-bold text-primary mb-4">
                 Love
               </h1>
-              <p className="text-xl text-muted-foreground font-['Rajdhani']">Dance One is operating its streams commercial-free. We can do that with your help, our listeners. All donations go directly into helping the station operate on a non-commercial basis. Your money will help cover expenses related to hardware, software, streamlining, development, and music licensing. 
+              <p className="text-xl text-muted-foreground font-['Rajdhani'] mb-6">Dance One is operating its streams commercial-free. We can do that with your help, our listeners. All donations go directly into helping the station operate on a non-commercial basis. Your money will help cover expenses related to hardware, software, streamlining, development, and music licensing. 
 
 
  If you appreciate all the hard work that goes into making this station one of the best dance radio stations on earth, please consider a donation. 
 
 
  You can make the change, and we really appreciate it.</p>
+              <div className="flex justify-center">
+                <SocialShare 
+                  url={window.location.href}
+                  title="Support Dance One Radio - Love"
+                  description="Dance One Radio operates commercial-free with your support. Help us continue bringing you the best electronic music experience."
+                  image={`${window.location.origin}/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png`}
+                />
+              </div>
              </div>
              
              {/* Share the Love Section - Moved under Love heading */}

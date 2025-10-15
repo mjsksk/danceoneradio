@@ -2,6 +2,7 @@ import SEO from "@/components/SEO";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import AdSenseUnit from "@/components/AdSenseUnit";
+import SocialShare from "@/components/SocialShare";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import loveParade2005 from "@/assets/love-parade-2005.jpg";
@@ -24,9 +25,17 @@ const Gallery = () => {
             <h1 className="font-['Orbitron'] text-4xl md:text-6xl font-bold text-foreground mb-4">
               Photo Galleries
             </h1>
-            <p className="text-muted-foreground text-lg">
+            <p className="text-muted-foreground text-lg mb-6">
               Explore our collection of Love Parade memories
             </p>
+            <div className="flex justify-center">
+              <SocialShare 
+                url={window.location.href}
+                title="Love Parade Photo Galleries - Dance One Radio"
+                description="Explore our collection of photos from Love Parade events in San Francisco. Relive the energy and creativity of electronic music culture."
+                image={`${window.location.origin}/assets/love-parade-2006.png`}
+              />
+            </div>
           </div>
 
           <AdSenseUnit />
