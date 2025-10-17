@@ -15,8 +15,16 @@ const HeroSection = () => {
     "/Sequence_01.mp4"
   ];
   
-  // Select random video on each page visit (not cached in state)
-  const selectedVideo = backgroundVideos[Math.floor(Math.random() * backgroundVideos.length)];
+  // Check if we should show Halloween video (until November 1st, 2025)
+  const now = new Date();
+  const halloweenEndDate = new Date('2025-11-01T00:00:00');
+  const isHalloweenPeriod = now < halloweenEndDate;
+  
+  // Select video: Halloween video until Nov 1st, then random selection
+  const selectedVideo = isHalloweenPeriod 
+    ? "/halloween-video.mp4"
+    : backgroundVideos[Math.floor(Math.random() * backgroundVideos.length)];
+  
   const [videoKey, setVideoKey] = useState(0);
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
