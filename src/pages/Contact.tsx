@@ -94,7 +94,7 @@ const Contact = () => {
             />
           </div>
           
-          <AdSenseUnit />
+          <AdSenseUnit key="contact-ad" />
           
           {/* Contact Form */}
           <div className="bg-card/50 backdrop-blur-sm border border-border rounded-lg p-6">

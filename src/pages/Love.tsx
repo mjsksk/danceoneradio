@@ -70,7 +70,7 @@ const Love = () => {
                </div>
              </div>
              
-              <AdSenseUnit />
+              <AdSenseUnit key="love-ad" />
               
               <div className="space-y-12 font-['Rajdhani'] text-lg">
               <section className="text-center">

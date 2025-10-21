@@ -19,7 +19,7 @@ const Index = () => {
       <main className="flex-grow">
         <HeroSection />
         <ShowsSection />
-        <AdSenseUnit />
+        <AdSenseUnit key="home-ad" />
         <DJSection />
         <TracksSection />
       </main>

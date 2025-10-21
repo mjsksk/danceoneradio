@@ -42,18 +42,19 @@ const AdSenseUnit = () => {
       return;
     }
 
+    // Reset refs on mount to allow fresh initialization
+    console.log('🍪 AdSense: Component mounted, resetting state');
+    adLoadedRef.current = false;
+    adInitializedRef.current = false;
+
     // Prevent multiple initializations
-    if (!adRef.current || adLoadedRef.current || adInitializedRef.current) {
-      console.log('🍪 AdSense: Skipping (already loaded or initialized)', {
-        hasRef: !!adRef.current,
-        loaded: adLoadedRef.current,
-        initialized: adInitializedRef.current
-      });
+    if (!adRef.current) {
+      console.log('🍪 AdSense: No ad ref available');
       return;
     }
 
     // Check if ad is already loaded by checking for existing content
-    if (adRef.current.innerHTML.trim() !== '') {
+    if (adRef.current.innerHTML.trim() !== '' && adRef.current.hasAttribute('data-ad-status')) {
       console.log('🍪 AdSense: Ad already has content, marking as loaded');
       adLoadedRef.current = true;
       return;
@@ -87,7 +88,7 @@ const AdSenseUnit = () => {
               console.log('🍪 AdSense: Ad is visible, attempting to load');
               
               // Double-check that the ad hasn't been loaded yet
-              if (adRef.current.innerHTML.trim() !== '') {
+              if (adRef.current.innerHTML.trim() !== '' && adRef.current.hasAttribute('data-ad-status')) {
                 console.log('🍪 AdSense: Ad already has content, skipping');
                 adLoadedRef.current = true;
                 observerRef.current?.disconnect();
@@ -135,7 +136,10 @@ const AdSenseUnit = () => {
     });
 
     return () => {
+      console.log('🍪 AdSense: Component unmounting, cleaning up');
       observerRef.current?.disconnect();
+      // Reset refs on unmount to allow fresh initialization on remount
+      adLoadedRef.current = false;
       adInitializedRef.current = false;
     };
   }, [hasAdConsent]);

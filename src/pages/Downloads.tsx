@@ -102,7 +102,7 @@ const Downloads = () => {
           </div>
         </section>
 
-        <AdSenseUnit />
+        <AdSenseUnit key="downloads-ad" />
 
         {/* Features Section */}
         <section className="py-20">

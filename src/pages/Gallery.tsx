@@ -38,7 +38,7 @@ const Gallery = () => {
             </div>
           </div>
 
-          <AdSenseUnit />
+          <AdSenseUnit key="gallery-ad" />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <Link to="/gallery/love-parade-2005">
