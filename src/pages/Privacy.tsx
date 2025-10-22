@@ -3,6 +3,7 @@ import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import AdSenseUnit from '@/components/AdSenseUnit';
 import SocialShare from '@/components/SocialShare';
+import { Link } from 'react-router-dom';
 
 const Privacy = () => {
   return (
@@ -80,7 +81,11 @@ const Privacy = () => {
                   <li><strong>Right to Withdraw Consent</strong>: Withdraw consent at any time (e.g., unsubscribe from newsletter)</li>
                 </ul>
                 <p className="text-muted-foreground leading-relaxed mt-4">
-                  To exercise any of these rights, please contact us at gdpr@danceoneradio.com
+                  To exercise any of these rights, please{' '}
+                  <Link to="/contact" className="text-primary hover:text-primary/80 underline">
+                    contact us
+                  </Link>
+                  .
                 </p>
               </section>
 
@@ -162,13 +167,12 @@ const Privacy = () => {
               <section>
                 <h2 className="text-2xl font-semibold text-accent mb-4">Contact Us</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  If you have any questions about this Privacy Policy or wish to exercise your GDPR rights, please contact us:
+                  If you have any questions about this Privacy Policy or wish to exercise your GDPR rights, please visit our{' '}
+                  <Link to="/contact" className="text-primary hover:text-primary/80 underline font-semibold">
+                    Contact Us page
+                  </Link>
+                  .
                 </p>
-                <ul className="list-none text-muted-foreground space-y-2">
-                  <li><strong>General Privacy Inquiries</strong>: privacy@danceoneradio.com</li>
-                  <li><strong>GDPR Requests</strong>: gdpr@danceoneradio.com</li>
-                  <li><strong>Data Protection Officer</strong>: dpo@danceoneradio.com</li>
-                </ul>
                 <p className="text-muted-foreground leading-relaxed mt-4">
                   You also have the right to lodge a complaint with your local data protection authority if you believe 
                   we have not handled your personal data in accordance with GDPR requirements.
