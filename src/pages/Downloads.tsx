@@ -15,10 +15,10 @@ const Downloads = () => {
   const handleDownload = (type: 'installer' | 'portable') => {
     setDownloadStarted(true);
     
-    // Use GitHub releases for hosting actual executable files
+    // Direct hosting from /downloads/ folder
     const downloadUrl = type === 'installer' 
-      ? 'https://github.com/danceoneradio/desktop-app/releases/download/v1.0.0/Dance-One-Radio-Setup-1.0.0.exe'
-      : 'https://github.com/danceoneradio/desktop-app/releases/download/v1.0.0/Dance-One-Radio-Portable-1.0.0.exe';
+      ? '/downloads/Dance-One-Radio-Setup-1.0.0.exe'
+      : '/downloads/Dance-One-Radio-Portable-1.0.0.exe';
     
     // Direct download
     window.open(downloadUrl, '_blank');
