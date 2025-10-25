@@ -454,11 +454,23 @@ const Shows = () => {
                                     {episode.title}
                                   </h3>
                                 </Link>
-                              ) : (episode.title.toLowerCase().includes("391") || 
+              ) : (episode.title.toLowerCase().includes("391") || 
                                 episode.title.toLowerCase().includes("anthems of the week 391") ||
                                 episode.title.toLowerCase().includes("anthems") && episode.title.includes("391")) ? (
                                 <Link 
                                   to="/episode/391"
+                                  className="block group/link"
+                                  key={`link-${index}-${episode.guid || 'no-guid'}`}
+                                >
+                                  <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold mb-3 text-primary group-hover/link:text-neon transition-colors cursor-pointer hover:underline">
+                                    {episode.title}
+                                  </h3>
+                                </Link>
+                              ) : (episode.title.toLowerCase().includes("392") || 
+                                episode.title.toLowerCase().includes("anthems of the week 392") ||
+                                episode.title.toLowerCase().includes("anthems") && episode.title.includes("392")) ? (
+                                <Link 
+                                  to="/episode/392"
                                   className="block group/link"
                                   key={`link-${index}-${episode.guid || 'no-guid'}`}
                                 >
