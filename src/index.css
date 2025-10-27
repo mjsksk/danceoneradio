@@ -6,6 +6,21 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
+/* Critical font fallbacks to prevent layout shift */
+@font-face {
+  font-family: 'Audiowide-fallback';
+  src: local('Arial Black'), local('Impact');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Electrolize-fallback';
+  src: local('Arial'), local('Helvetica');
+  font-display: swap;
+}
+
+.font-audiowide-loading { font-family: 'Audiowide-fallback', monospace; }
+.font-electrolize-loading { font-family: 'Electrolize-fallback', sans-serif; }
+
 @layer base {
   :root {
     /* Dark space theme with neon accents */
