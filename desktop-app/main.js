@@ -30,11 +30,24 @@ function createWindow() {
     ? 'http://localhost:8080' 
     : `file://${path.join(__dirname, '../dist/index.html')}`;
   
+  console.log('Loading URL:', startUrl);
+  console.log('__dirname:', __dirname);
+  
   mainWindow.loadURL(startUrl);
+
+  // Open DevTools to debug (remove after testing)
+  if (!isDev) {
+    mainWindow.webContents.openDevTools();
+  }
 
   // Show window when ready
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
+  });
+
+  // Log any load errors
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+    console.error('Failed to load:', errorCode, errorDescription);
   });
 
   // Handle window closed

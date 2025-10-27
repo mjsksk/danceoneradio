@@ -8,7 +8,7 @@ declare global {
 }
 
 interface AdSenseUnitProps {
-  slot: string;
+  slot?: string;
   format?: 'auto' | 'rectangle' | 'vertical' | 'horizontal' | 'fluid';
   layout?: 'in-article' | 'in-feed' | '';
   className?: string;
@@ -16,7 +16,7 @@ interface AdSenseUnitProps {
 }
 
 const AdSenseUnit = ({ 
-  slot, 
+  slot = '6777392184', 
   format = 'auto', 
   layout = '',
   className = '',
