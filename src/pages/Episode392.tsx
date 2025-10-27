@@ -251,7 +251,7 @@ const Episode392 = () => {
           </div>
         </section>
 
-        <AdSenseUnit key="episode392-ad" />
+        <AdSenseUnit key="episode392-ad" slot="6777392184" />
 
         {/* Track Listing */}
         <section className="py-12">

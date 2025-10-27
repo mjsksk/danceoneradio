@@ -396,7 +396,7 @@ const Shows = () => {
           </div>
         </section>
 
-        <AdSenseUnit key="shows-ad" />
+        <AdSenseUnit key="shows-ad" slot="6777392184" />
 
         {/* Episodes List */}
         <section className="py-16 relative">

@@ -186,7 +186,7 @@ const LoveParade2005 = () => {
             </div>
           </div>
 
-          <AdSenseUnit key="loveparade2005-ad" />
+          <AdSenseUnit key="loveparade2005-ad" slot="6777392184" />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {ALL_IMAGES.map((image, index) => (

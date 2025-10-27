@@ -24,7 +24,7 @@ const Dmca = () => {
             />
           </div>
           
-          <AdSenseUnit key="dmca-ad" />
+          <AdSenseUnit key="dmca-ad" slot="6777392184" />
           
           <div className="bg-card/50 border border-primary/20 rounded-lg p-8 space-y-6">
             <section>

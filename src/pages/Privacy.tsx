@@ -29,7 +29,7 @@ const Privacy = () => {
               />
             </div>
             
-            <AdSenseUnit key="privacy-ad" />
+            <AdSenseUnit key="privacy-ad" slot="6777392184" />
             
             <div className="space-y-8 font-['Rajdhani'] text-lg">
               <section>

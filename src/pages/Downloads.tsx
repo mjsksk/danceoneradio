@@ -102,7 +102,7 @@ const Downloads = () => {
           </div>
         </section>
 
-        <AdSenseUnit key="downloads-ad" />
+        <AdSenseUnit key="downloads-ad" slot="6777392184" />
 
         {/* Features Section */}
         <section className="py-20">
