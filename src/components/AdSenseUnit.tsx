@@ -7,189 +7,116 @@ declare global {
   }
 }
 
-const AdSenseUnit = () => {
+interface AdSenseUnitProps {
+  slot: string;
+  format?: 'auto' | 'rectangle' | 'vertical' | 'horizontal' | 'fluid';
+  layout?: 'in-article' | 'in-feed' | '';
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+const AdSenseUnit = ({ 
+  slot, 
+  format = 'auto', 
+  layout = '',
+  className = '',
+  style = {}
+}: AdSenseUnitProps) => {
   const [hasAdConsent, setHasAdConsent] = useState(hasConsent('advertising'));
   const adRef = useRef<HTMLModElement>(null);
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const adLoadedRef = useRef<boolean>(false);
-  const adInitializedRef = useRef<boolean>(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
+  // Listen for consent changes
   useEffect(() => {
-    // Listen for consent changes
     const handleConsentChange = () => {
-      const newConsent = hasConsent('advertising');
-      console.log('🍪 AdSense: Consent changed, advertising consent:', newConsent);
-      setHasAdConsent(newConsent);
-      
-      // Reset ad state when consent is granted to allow reinitialization
-      if (newConsent && !adLoadedRef.current) {
-        console.log('🍪 AdSense: Resetting ad state for reinitialization');
-        adLoadedRef.current = false;
-        adInitializedRef.current = false;
-      }
+      setHasAdConsent(hasConsent('advertising'));
     };
-
     window.addEventListener('consentChanged', handleConsentChange);
-    return () => {
-      window.removeEventListener('consentChanged', handleConsentChange);
-    };
+    return () => window.removeEventListener('consentChanged', handleConsentChange);
   }, []);
 
+  // Intersection Observer for lazy loading
   useEffect(() => {
-    // Don't load ads if no consent
-    if (!hasAdConsent) {
-      console.log('🍪 AdSense: No advertising consent, skipping ad load');
-      return;
-    }
+    if (!hasAdConsent || !adRef.current) return;
 
-    // Reset refs on mount to allow fresh initialization
-    console.log('🍪 AdSense: Component mounted, resetting state');
-    adLoadedRef.current = false;
-    adInitializedRef.current = false;
-
-    // Prevent multiple initializations
-    if (!adRef.current) {
-      console.log('🍪 AdSense: No ad ref available');
-      return;
-    }
-
-    // Check if ad is already loaded by checking for existing content
-    if (adRef.current.innerHTML.trim() !== '' && adRef.current.hasAttribute('data-ad-status')) {
-      console.log('🍪 AdSense: Ad already has content, marking as loaded');
-      adLoadedRef.current = true;
-      return;
-    }
-
-    console.log('🍪 AdSense: Starting ad initialization');
-    adInitializedRef.current = true;
-
-    // Wait for AdSense script to be loaded before initializing
-    const waitForAdSenseScript = () => {
-      return new Promise<void>((resolve) => {
-        const checkScript = () => {
-          if (window.adsbygoogle || document.querySelector('script[src*="adsbygoogle.js"]')) {
-            console.log('🍪 AdSense: Script is loaded');
-            resolve();
-          } else {
-            console.log('🍪 AdSense: Waiting for script...');
-            setTimeout(checkScript, 100);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !isVisible) {
+            setIsVisible(true);
           }
-        };
-        checkScript();
-      });
-    };
-
-    waitForAdSenseScript().then(() => {
-      console.log('🍪 AdSense: Setting up IntersectionObserver');
-      observerRef.current = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting && !adLoadedRef.current && adRef.current) {
-              console.log('🍪 AdSense: Ad is visible, attempting to load');
-              
-              // Double-check that the ad hasn't been loaded yet
-              if (adRef.current.innerHTML.trim() !== '' && adRef.current.hasAttribute('data-ad-status')) {
-                console.log('🍪 AdSense: Ad already has content, skipping');
-                adLoadedRef.current = true;
-                observerRef.current?.disconnect();
-                return;
-              }
-
-              adLoadedRef.current = true;
-              
-              // Initialize adsbygoogle array
-              window.adsbygoogle = window.adsbygoogle || [];
-              
-              // Use requestAnimationFrame to avoid forced reflows
-              requestAnimationFrame(() => {
-                try {
-                  // Only push if the element still exists and hasn't been processed
-                  if (adRef.current && !adRef.current.hasAttribute('data-ad-status')) {
-                    console.log('🍪 AdSense: Pushing ad to adsbygoogle queue');
-                    (window.adsbygoogle).push({});
-                    adRef.current.setAttribute('data-ad-status', 'loaded');
-                    console.log('✅ AdSense: Ad successfully initialized');
-                  }
-                } catch (error) {
-                  console.error('❌ AdSense error:', error);
-                  // Reset state on error to allow retry
-                  adLoadedRef.current = false;
-                  adInitializedRef.current = false;
-                }
-              });
-              
-              // Disconnect observer after loading
-              observerRef.current?.disconnect();
-            }
-          });
-        },
-        { 
-          rootMargin: '100px',
-          threshold: 0.1 
-        }
-      );
-
-      if (adRef.current) {
-        observerRef.current.observe(adRef.current);
-        console.log('🍪 AdSense: Observer attached to ad element');
+        });
+      },
+      { 
+        rootMargin: '200px', // Load 200px before visible
+        threshold: 0.01 
       }
-    });
+    );
 
-    return () => {
-      console.log('🍪 AdSense: Component unmounting, cleaning up');
-      observerRef.current?.disconnect();
-      // Reset refs on unmount to allow fresh initialization on remount
-      adLoadedRef.current = false;
-      adInitializedRef.current = false;
+    observer.observe(adRef.current);
+    return () => observer.disconnect();
+  }, [hasAdConsent, isVisible]);
+
+  // Load ad when visible
+  useEffect(() => {
+    if (!isVisible || isLoaded || !adRef.current) return;
+
+    const loadAd = () => {
+      try {
+        window.adsbygoogle = window.adsbygoogle || [];
+        window.adsbygoogle.push({});
+        setIsLoaded(true);
+      } catch (err) {
+        console.error('AdSense error:', err);
+      }
     };
-  }, [hasAdConsent]);
 
-  // If no advertising consent, show a message
+    // Wait for script to be available
+    if (window.adsbygoogle) {
+      loadAd();
+    } else {
+      const checkScript = setInterval(() => {
+        if (window.adsbygoogle) {
+          clearInterval(checkScript);
+          loadAd();
+        }
+      }, 100);
+      return () => clearInterval(checkScript);
+    }
+  }, [isVisible, isLoaded]);
+
   if (!hasAdConsent) {
     return (
-      <section className="my-8 flex justify-center">
-        <div className="w-full max-w-4xl p-8 text-center bg-card/50 border border-primary/20 rounded-lg">
-          <p className="text-muted-foreground font-['Rajdhani']">
-            Ads are disabled. You can enable them in Cookie Settings to support our free service.
+      <div className={`my-8 flex justify-center ${className}`}>
+        <div className="w-full max-w-4xl p-6 text-center bg-card/50 border border-primary/20 rounded-lg">
+          <p className="text-sm text-muted-foreground font-['Rajdhani']">
+            Enable ads in Cookie Settings to support us
           </p>
         </div>
-      </section>
+      </div>
     );
   }
 
   return (
-    <section className="my-8 flex justify-center">
-      <div 
-        className="w-full max-w-4xl"
-        style={{ 
-          contain: 'layout style paint',
-          contentVisibility: 'auto',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          willChange: 'auto'
-        }}
-      >
+    <div className={`my-8 flex justify-center ${className}`}>
+      <div className="w-full max-w-4xl">
         <ins 
           ref={adRef}
           className="adsbygoogle"
           style={{ 
             display: 'block',
-            width: '100%',
             minHeight: '280px',
-            backgroundColor: 'transparent',
-            contain: 'layout style',
-            transform: 'translateZ(0)',
-            backfaceVisibility: 'hidden',
-            perspective: '1000px'
+            ...style
           }}
           data-ad-client="ca-pub-4230589452649530"
-          data-ad-slot="6777392184"
-          data-ad-format="auto"
+          data-ad-slot={slot}
+          data-ad-format={format}
+          data-ad-layout={layout}
           data-full-width-responsive="true"
         />
       </div>
-    </section>
+    </div>
   );
 };
 
