@@ -28,6 +28,9 @@
       "assets/**/*",
       "dist/**/*"
     ],
+    "asarUnpack": [
+      "dist/**/*"
+    ],
     "win": {
       "target": [
         {
