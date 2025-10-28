@@ -15,10 +15,10 @@ const Downloads = () => {
   const handleDownload = (type: 'installer' | 'portable') => {
     setDownloadStarted(true);
     
-    // Direct hosting from /downloads/ folder
+    // Supabase storage URLs
     const downloadUrl = type === 'installer' 
-      ? '/downloads/Dance-One-Radio-Setup-1.0.0.exe'
-      : '/downloads/Dance-One-Radio-Portable-1.0.0.exe';
+      ? 'https://upbwlnpycrbhxahjztrf.supabase.co/storage/v1/object/public/Software/Dance%20One%20Radio-Setup-1.0.0.exe'
+      : 'https://upbwlnpycrbhxahjztrf.supabase.co/storage/v1/object/public/Software/Dance%20One%20Radio-Portable-1.0.0.exe';
     
     // Direct download
     window.open(downloadUrl, '_blank');
