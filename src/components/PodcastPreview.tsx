@@ -26,17 +26,23 @@ const PodcastPreview = () => {
       let success = false;
       
       try {
-        console.log('🔄 PodcastPreview: Fetching RSS feed...');
+        console.log('🔄 PodcastPreview: Fetching RSS feed via Supabase Edge Function...');
         
         // Add timeout for mobile connections
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 12000); // 12 second timeout for preview
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
         
-        const response = await fetch('https://api.allorigins.win/get?url=https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml', {
+        const response = await fetch('https://upbwlnpycrbhxahjztrf.supabase.co/functions/v1/rss-feed-fetch', {
+          method: 'POST',
           signal: controller.signal,
           headers: {
-            'Accept': 'application/json',
-          }
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwYndsbnB5Y3JiaHhhaGp6dHJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODQ3MzQsImV4cCI6MjA3MDM2MDczNH0.3N7hPJIiHokZvHZQSnQqZl1xu2POj4FrNyVPMQxF55U`,
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwYndsbnB5Y3JiaHhhaGp6dHJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODQ3MzQsImV4cCI6MjA3MDM2MDczNH0.3N7hPJIiHokZvHZQSnQqZl1xu2POj4FrNyVPMQxF55U'
+          },
+          body: JSON.stringify({
+            feedUrl: 'https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml'
+          })
         });
         
         clearTimeout(timeoutId);
@@ -48,7 +54,7 @@ const PodcastPreview = () => {
         const data = await response.json();
         
         const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(data.contents, 'text/xml');
+        const xmlDoc = parser.parseFromString(data.xml, 'text/xml');
         const items = xmlDoc.querySelectorAll('item');
         
         const episodeList: Episode[] = Array.from(items).map(item => {
