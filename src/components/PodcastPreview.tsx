@@ -41,7 +41,7 @@ const PodcastPreview = () => {
             'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwYndsbnB5Y3JiaHhhaGp6dHJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODQ3MzQsImV4cCI6MjA3MDM2MDczNH0.3N7hPJIiHokZvHZQSnQqZl1xu2POj4FrNyVPMQxF55U'
           },
           body: JSON.stringify({
-            feedUrl: 'https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml'
+            url: 'https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml'
           })
         });
         
@@ -54,7 +54,7 @@ const PodcastPreview = () => {
         const data = await response.json();
         
         const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(data.xml, 'text/xml');
+        const xmlDoc = parser.parseFromString(data.content, 'text/xml');
         const items = xmlDoc.querySelectorAll('item');
         
         const episodeList: Episode[] = Array.from(items).map(item => {
