@@ -14,7 +14,43 @@ try {
   process.exit(1);
 }
 
-// Step 2: Check for required assets
+// Step 2: Copy React build to desktop-app/dist
+console.log('📁 Copying React build files...');
+const sourceDist = path.join(__dirname, '..', 'dist');
+const targetDist = path.join(__dirname, 'dist');
+
+if (!fs.existsSync(sourceDist)) {
+  console.error('❌ React build not found. Please run build first.');
+  process.exit(1);
+}
+
+// Create target directory
+if (fs.existsSync(targetDist)) {
+  fs.rmSync(targetDist, { recursive: true, force: true });
+}
+fs.mkdirSync(targetDist, { recursive: true });
+
+// Copy all files from source to target
+const copyRecursive = (src, dest) => {
+  const entries = fs.readdirSync(src, { withFileTypes: true });
+  
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+    
+    if (entry.isDirectory()) {
+      fs.mkdirSync(destPath, { recursive: true });
+      copyRecursive(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
+};
+
+copyRecursive(sourceDist, targetDist);
+console.log('✅ React build files copied\n');
+
+// Step 3: Check for required assets
 console.log('🎨 Checking desktop assets...');
 const assetsDir = path.join(__dirname, 'assets');
 const requiredAssets = ['icon.png', 'icon.ico', 'tray-icon.png'];
@@ -40,7 +76,7 @@ if (missingAssets.length > 0) {
 
 console.log('✅ Assets check completed\n');
 
-// Step 3: Install desktop dependencies
+// Step 4: Install desktop dependencies
 console.log('📥 Installing desktop dependencies...');
 try {
   execSync('npm install', { cwd: __dirname, stdio: 'inherit' });
@@ -50,7 +86,7 @@ try {
   process.exit(1);
 }
 
-// Step 4: Build the desktop app
+// Step 5: Build the desktop app
 console.log('🔨 Building desktop application...');
 try {
   execSync('npm run build:win', { cwd: __dirname, stdio: 'inherit' });
@@ -65,7 +101,7 @@ console.log('📁 Output directory: desktop-app/dist/');
 console.log('🚀 Installer: Dance One Radio-Setup-1.0.0.exe');
 console.log('💼 Portable: Dance One Radio-Portable-1.0.0.exe\n');
 
-// Step 5: Generate installation instructions
+// Step 6: Generate installation instructions
 const instructions = `
 # Dance One Radio Desktop App
 
