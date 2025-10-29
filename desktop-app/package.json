@@ -18,7 +18,7 @@
   },
   "build": {
     "appId": "com.danceoneradio.desktop",
-    "productName": "Dance One Radio",
+    "productName": "DanceOneRadio",
     "directories": {
       "output": "dist"
     },
@@ -38,9 +38,7 @@
           "arch": ["x64"]
         }
       ],
-      "requestedExecutionLevel": "asInvoker",
-      "artifactName": "${productName}-Setup-${version}.${ext}",
-      "icon": null
+      "artifactName": "${productName}-Setup-${version}.${ext}"
     },
     "nsis": {
       "oneClick": false,
@@ -49,23 +47,11 @@
       "createStartMenuShortcut": true,
       "shortcutName": "Dance One Radio",
       "deleteAppDataOnUninstall": false,
-      "runAfterFinish": true,
-      "differentialPackage": false
+      "runAfterFinish": false
     },
     "portable": {
       "artifactName": "${productName}-Portable-${version}.${ext}"
-    },
-    "publish": {
-      "provider": "github",
-      "owner": "danceoneradio",
-      "repo": "desktop-app"
-    },
-    "protocols": [
-      {
-        "name": "Dance One Radio",
-        "schemes": ["danceoneradio"]
-      }
-    ]
+    }
   },
   "keywords": [
     "radio",
