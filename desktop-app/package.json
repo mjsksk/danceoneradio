@@ -1,26 +1,21 @@
 {
   "name": "dance-one-radio-desktop",
   "version": "1.0.0",
-  "description": "Dance One Radio Desktop App - Your favorite electronic music station",
+  "description": "Dance One Radio Desktop App",
   "main": "main.js",
   "author": "Dance One Radio",
   "license": "MIT",
   "homepage": "https://www.danceoneradio.com",
   "scripts": {
     "start": "electron .",
-    "dev": "NODE_ENV=development electron .",
-    "build": "electron-builder",
-    "build:win": "electron-builder --win --dir",
-    "build:all": "electron-builder --win --linux --mac",
-    "dist": "npm run build:win",
-    "pack": "electron-builder --dir",
-    "postinstall": "electron-builder install-app-deps"
+    "build:win": "electron-builder --win portable"
   },
   "build": {
-    "appId": "com.danceoneradio.desktop",
+    "appId": "com.danceoneradio.app",
     "productName": "DanceOneRadio",
     "directories": {
-      "output": "dist"
+      "output": "dist",
+      "buildResources": "assets"
     },
     "files": [
       "main.js",
@@ -28,41 +23,9 @@
       "assets/**/*",
       "dist/**/*"
     ],
-    "asarUnpack": [
-      "dist/**/*"
-    ],
-    "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": ["x64"]
-        }
-      ],
-      "artifactName": "${productName}-Setup-${version}.${ext}"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "shortcutName": "Dance One Radio",
-      "deleteAppDataOnUninstall": false,
-      "runAfterFinish": false
-    },
     "portable": {
-      "artifactName": "${productName}-Portable-${version}.${ext}"
+      "artifactName": "DanceOneRadio-Portable-${version}.exe"
     }
-  },
-  "keywords": [
-    "radio",
-    "dance",
-    "electronic",
-    "music",
-    "streaming",
-    "desktop"
-  ],
-  "dependencies": {
-    "electron-updater": "^6.1.7"
   },
   "devDependencies": {
     "electron": "^28.0.0",
