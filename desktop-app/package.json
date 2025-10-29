@@ -10,7 +10,7 @@
     "start": "electron .",
     "dev": "NODE_ENV=development electron .",
     "build": "electron-builder",
-    "build:win": "electron-builder --win",
+    "build:win": "electron-builder --win --dir",
     "build:all": "electron-builder --win --linux --mac",
     "dist": "npm run build:win",
     "pack": "electron-builder --dir",
