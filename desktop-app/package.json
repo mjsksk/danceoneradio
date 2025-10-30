@@ -14,17 +14,18 @@
     "appId": "com.danceoneradio.app",
     "productName": "DanceOneRadio",
     "directories": {
-      "output": "dist",
-      "buildResources": "assets"
+      "output": "dist"
     },
     "files": [
       "main.js",
       "preload.js",
-      "assets/**/*",
       "dist/**/*"
     ],
     "portable": {
       "artifactName": "DanceOneRadio-Portable-${version}.exe"
+    },
+    "win": {
+      "icon": null
     }
   },
   "devDependencies": {
