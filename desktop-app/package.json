@@ -19,14 +19,18 @@
     "files": [
       "main.js",
       "preload.js",
-      "dist/**/*",
-      "!assets"
+      "dist/**/*"
     ],
-    "portable": {
-      "artifactName": "DanceOneRadio-Portable-${version}.exe"
-    },
     "win": {
-      "target": "portable"
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "portable": {
+      "artifactName": "DanceOneRadio-${version}.exe"
     }
   },
   "devDependencies": {
