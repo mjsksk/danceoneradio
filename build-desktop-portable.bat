@@ -4,17 +4,22 @@ echo Building Dance One Radio Desktop App
 echo ========================================
 echo.
 
-echo Step 1: Building React web app for desktop...
-call npx vite build --config vite.config.desktop.ts --outDir desktop-app/dist
+echo Step 1: Building React web app...
+call npm run build
 if errorlevel 1 (
     echo ERROR: Web build failed!
     pause
     exit /b 1
 )
-echo Web build complete!
 echo.
 
-echo Step 2: Building Electron portable app...
+echo Step 2: Copying build to desktop-app folder...
+if exist desktop-app\dist rmdir /s /q desktop-app\dist
+xcopy /E /I /Y dist desktop-app\dist
+echo Build copied successfully!
+echo.
+
+echo Step 3: Building Electron portable app...
 cd desktop-app
 call build-simple.bat
 if errorlevel 1 (
