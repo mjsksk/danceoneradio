@@ -20,6 +20,7 @@ import Episode389 from "./pages/Episode389";
 import Episode390 from "./pages/Episode390";
 import Episode391 from "./pages/Episode391";
 import Episode392 from "./pages/Episode392";
+import DesktopPlayer from "./pages/DesktopPlayer";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,7 @@ const App = () => (
           <Route path="/episode/390" element={<Episode390 />} />
           <Route path="/episode/391" element={<Episode391 />} />
           <Route path="/episode/392" element={<Episode392 />} />
+          <Route path="/desktop" element={<DesktopPlayer />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

@@ -25,10 +25,10 @@ function createWindow() {
     show: false
   });
 
-  // Load the app
+  // Load the app - desktop simplified interface
   const startUrl = isDev 
-    ? 'http://localhost:8080' 
-    : `file://${path.join(__dirname, 'dist/index.html')}`;
+    ? 'http://localhost:8080/#/desktop' 
+    : `file://${path.join(__dirname, 'dist/index.html')}#/desktop`;
   
   console.log('Loading URL:', startUrl);
   console.log('__dirname:', __dirname);
