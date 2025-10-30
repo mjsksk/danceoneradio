@@ -27,8 +27,8 @@ function createWindow() {
 
   // Load the desktop-optimized build
   const startUrl = isDev 
-    ? 'http://localhost:8080/desktop.html' 
-    : `file://${path.join(__dirname, 'dist/desktop.html')}`;
+    ? 'http://localhost:8080/#/desktop' 
+    : `file://${path.join(__dirname, 'dist/index.html')}#/desktop`;
   
   console.log('Loading URL:', startUrl);
   console.log('__dirname:', __dirname);
