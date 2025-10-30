@@ -1,0 +1,15 @@
+{
+  "appId": "com.danceoneradio.app",
+  "productName": "DanceOneRadio",
+  "files": [
+    "main.js",
+    "preload.js",
+    "dist/**/*"
+  ],
+  "win": {
+    "target": "portable"
+  },
+  "directories": {
+    "output": "dist"
+  }
+}
