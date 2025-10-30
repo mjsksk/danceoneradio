@@ -12,13 +12,11 @@ import { useState } from 'react';
 const Downloads = () => {
   const [downloadStarted, setDownloadStarted] = useState(false);
 
-  const handleDownload = (type: 'installer' | 'portable') => {
+  const handleDownload = () => {
     setDownloadStarted(true);
     
-    // Supabase storage URLs
-    const downloadUrl = type === 'installer' 
-      ? 'https://upbwlnpycrbhxahjztrf.supabase.co/storage/v1/object/public/Software/Dance%20One%20Radio-Setup-1.0.0.exe'
-      : 'https://upbwlnpycrbhxahjztrf.supabase.co/storage/v1/object/public/Software/Dance%20One%20Radio-Portable-1.0.0.exe';
+    // Supabase storage URL for portable version
+    const downloadUrl = 'https://upbwlnpycrbhxahjztrf.supabase.co/storage/v1/object/public/Software/DanceOneRadio-1.0.0.exe';
     
     // Direct download
     window.open(downloadUrl, '_blank');
@@ -43,21 +41,21 @@ const Downloads = () => {
               <div className="mb-6">
                 <Badge variant="secondary" className="gap-2 mb-4">
                   <Monitor className="w-4 h-4" />
-                  Windows Desktop App
+                  Windows Portable App
                 </Badge>
                 <h1 className="text-4xl md:text-6xl font-bold gradient-text mb-6">
                   Download Dance One Radio
                 </h1>
                 <p className="text-xl text-muted-foreground mb-8">
-                  Experience the ultimate electronic music streaming with our feature-rich Windows desktop application
+                  Portable Windows desktop application - no installation required, just download and run!
                 </p>
               </div>
               
-              {/* Download Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+              {/* Download Button */}
+              <div className="flex justify-center mb-12">
                 <Button 
                   size="lg"
-                  onClick={() => handleDownload('installer')}
+                  onClick={handleDownload}
                   className="gap-2 text-lg px-8 py-6"
                   disabled={downloadStarted}
                 >
@@ -69,25 +67,14 @@ const Downloads = () => {
                   ) : (
                     <>
                       <Download className="w-5 h-5" />
-                      Download Installer (Recommended)
+                      Download Portable App
                     </>
                   )}
-                </Button>
-                
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                  onClick={() => handleDownload('portable')}
-                  className="gap-2 text-lg px-8 py-6"
-                  disabled={downloadStarted}
-                >
-                  <Download className="w-5 h-5" />
-                  Portable Version
                 </Button>
               </div>
 
               <div className="text-sm text-muted-foreground mb-6">
-                Version 1.0.0 • ~50 MB • Windows 10+ • Free Download
+                Version 1.0.0 • ~50 MB • Windows 10+ (64-bit) • Free Download
               </div>
               
               <div className="flex justify-center">
@@ -267,34 +254,19 @@ const Downloads = () => {
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-8">
+              <div className="max-w-2xl mx-auto">
                 <div className="bg-card p-8 rounded-lg border">
-                  <h3 className="text-xl font-semibold mb-6">Full Installer (Recommended)</h3>
-                  <ol className="space-y-4 list-decimal list-inside">
-                    <li>Download the installer file</li>
-                    <li>Run the .exe file as administrator</li>
-                    <li>Follow the installation wizard</li>
-                    <li>Choose installation options (shortcuts, auto-start)</li>
-                    <li>Launch Dance One Radio from Start Menu or Desktop</li>
-                  </ol>
-                  <div className="mt-6 p-4 bg-primary/10 rounded-lg">
-                    <p className="text-sm">
-                      <strong>Note:</strong> The installer creates uninstaller, Start Menu shortcuts, and optionally a desktop shortcut.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="bg-card p-8 rounded-lg border">
-                  <h3 className="text-xl font-semibold mb-6">Portable Version</h3>
-                  <ol className="space-y-4 list-decimal list-inside">
-                    <li>Download the portable executable</li>
-                    <li>Save it to your preferred location</li>
-                    <li>Double-click to run (no installation required)</li>
+                  <h3 className="text-xl font-semibold mb-6">Quick Start Guide</h3>
+                  <ol className="space-y-4 list-decimal list-inside text-left">
+                    <li>Download the DanceOneRadio.exe file</li>
+                    <li>Save it to your preferred location (Desktop, Downloads, or USB drive)</li>
+                    <li>Double-click the .exe file to launch (no installation required)</li>
                     <li>Optionally pin to taskbar for quick access</li>
+                    <li>Enjoy uninterrupted electronic music streaming!</li>
                   </ol>
                   <div className="mt-6 p-4 bg-primary/10 rounded-lg">
                     <p className="text-sm">
-                      <strong>Perfect for:</strong> USB drives, temporary use, or when you don't have admin privileges.
+                      <strong>Perfect for:</strong> USB drives, portable use, or when you don't have admin privileges. No installation or registry changes required!
                     </p>
                   </div>
                 </div>
