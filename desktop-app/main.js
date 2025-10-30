@@ -13,7 +13,6 @@ function createWindow() {
     height: 800,
     minWidth: 800,
     minHeight: 600,
-    icon: path.join(__dirname, 'assets/icon.png'),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -72,8 +71,10 @@ function createWindow() {
 }
 
 function createTray() {
-  const trayIconPath = path.join(__dirname, 'assets/tray-icon.png');
-  tray = new Tray(trayIconPath);
+  // Skip tray icon for now to avoid build issues
+  // const trayIconPath = path.join(__dirname, 'assets/tray-icon.png');
+  // tray = new Tray(trayIconPath);
+  return; // Temporarily disable tray
   
   const contextMenu = Menu.buildFromTemplate([
     {
@@ -182,8 +183,7 @@ ipcMain.on('show-notification', (event, options) => {
   if (Notification.isSupported()) {
     const notification = new Notification({
       title: options.title || 'Dance One Radio',
-      body: options.body,
-      icon: path.join(__dirname, 'assets/icon.png')
+      body: options.body
     });
     
     notification.show();
