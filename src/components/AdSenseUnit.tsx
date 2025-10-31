@@ -58,17 +58,19 @@ const AdSenseUnit = ({
     return () => observer.disconnect();
   }, [hasAdConsent, isVisible]);
 
-  // Load ad when visible
+  // Load ad when visible and consent changes
   useEffect(() => {
-    if (!isVisible || isLoaded || !adRef.current) return;
+    if (!isVisible || isLoaded || !adRef.current || !hasAdConsent) return;
 
     const loadAd = () => {
       try {
+        console.log('AdSense Unit: Loading ad');
         window.adsbygoogle = window.adsbygoogle || [];
         window.adsbygoogle.push({});
         setIsLoaded(true);
+        console.log('AdSense Unit: Ad loaded successfully');
       } catch (err) {
-        console.error('AdSense error:', err);
+        console.error('AdSense Unit error:', err);
       }
     };
 
@@ -76,15 +78,26 @@ const AdSenseUnit = ({
     if (window.adsbygoogle) {
       loadAd();
     } else {
+      console.log('AdSense Unit: Waiting for script...');
       const checkScript = setInterval(() => {
         if (window.adsbygoogle) {
           clearInterval(checkScript);
           loadAd();
         }
       }, 100);
-      return () => clearInterval(checkScript);
+      
+      // Timeout after 10 seconds
+      const timeout = setTimeout(() => {
+        clearInterval(checkScript);
+        console.error('AdSense Unit: Script loading timeout');
+      }, 10000);
+      
+      return () => {
+        clearInterval(checkScript);
+        clearTimeout(timeout);
+      };
     }
-  }, [isVisible, isLoaded]);
+  }, [isVisible, isLoaded, hasAdConsent]);
 
   if (!hasAdConsent) {
     return (
