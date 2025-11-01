@@ -174,7 +174,7 @@ const Episode393 = () => {
                       onPause={() => setIsPlaying(false)}
                       onPlay={() => setIsPlaying(true)}
                     >
-                      <source src="https://media.blubrry.com/biggest_tunes_with_mario_135/content.blubrry.com/biggest_tunes_with_mario_135/fda393.mp3" type="audio/mpeg" />
+                      <source src="https://media.blubrry.com/biggest_tunes_with_mario_135/content.blubrry.com/biggest_tunes_with_mario_135/Biggest-Tunes-with-Mario-393-streamed.mp3" type="audio/mpeg" />
                       Your browser does not support the audio element.
                     </audio>
                     
