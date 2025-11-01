@@ -145,11 +145,11 @@ const Episode393 = () => {
                 <div className="flex flex-wrap items-center justify-center gap-6 text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-neon" />
-                    <span>January 31, 2025</span>
+                    <span>November 1, 2025</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="w-5 h-5 text-neon-purple" />
-                    <span>1:00:00</span>
+                    <span>1:48:57</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Music className="w-5 h-5 text-primary" />
@@ -202,7 +202,7 @@ const Episode393 = () => {
                         </div>
                         <div className="text-right">
                           <p className="text-xs text-muted-foreground">Duration</p>
-                          <p className="text-sm font-medium text-neon-purple">1:00:00</p>
+                          <p className="text-sm font-medium text-neon-purple">1:48:57</p>
                         </div>
                       </div>
                       
@@ -325,7 +325,7 @@ const Episode393 = () => {
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-primary font-['Orbitron']">
-                        1:00:00
+                        1:48:57
                       </div>
                       <div className="text-sm text-muted-foreground">Duration</div>
                     </div>
