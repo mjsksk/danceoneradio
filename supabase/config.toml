@@ -17,3 +17,15 @@ verify_jwt = false
 
 [functions.apple-music-search]
 verify_jwt = false
+
+[functions.track-history-updater]
+verify_jwt = false
+
+[functions.album-art-search]
+verify_jwt = false
+
+[functions.rss-feed-fetch]
+verify_jwt = false
+
+[functions.og-meta-generator]
+verify_jwt = false
