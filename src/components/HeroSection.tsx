@@ -12,6 +12,8 @@ const HeroSection = () => {
   // Array of background videos - randomly selected on each page visit
   const backgroundVideos = [
     "https://upbwlnpycrbhxahjztrf.supabase.co/storage/v1/object/public/videos/Laser-Beam.mp4",
+    "https://upbwlnpycrbhxahjztrf.supabase.co/storage/v1/object/public/videos/sci_fi_background.mp4",
+    "https://upbwlnpycrbhxahjztrf.supabase.co/storage/v1/object/public/videos/wave_flow.mp4",
     "/Sequence_01.mp4"
   ];
   
