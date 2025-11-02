@@ -81,8 +81,8 @@ const HeroSection = () => {
     setVideoKey(prev => prev + 1);
   }, []);
   return <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Video with Overlay */}
-      <video 
+      {/* Background Video Disabled - Using shader animation instead */}
+      {/* <video 
         key={`video-${videoKey}-${selectedVideo}`}
         className="absolute inset-0 w-full h-full object-cover" 
         autoPlay 
@@ -92,8 +92,8 @@ const HeroSection = () => {
         poster="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png"
       >
         <source src={selectedVideo} type="video/mp4" />
-      </video>
-      <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]"></div>
+      </video> */}
+      <div className="absolute inset-0 bg-background/80"></div>
 
       {/* Animated Particles */}
       <div className="absolute inset-0">
