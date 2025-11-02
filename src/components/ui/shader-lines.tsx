@@ -25,17 +25,34 @@ export function ShaderAnimation() {
   })
 
   useEffect(() => {
+    console.log('🎨 ShaderAnimation: Component mounted')
+    
+    // Check if Three.js is already loaded
+    if (window.THREE) {
+      console.log('🎨 ShaderAnimation: Three.js already loaded')
+      if (containerRef.current) {
+        initThreeJS()
+      }
+      return
+    }
+
     // Load Three.js dynamically
+    console.log('🎨 ShaderAnimation: Loading Three.js...')
     const script = document.createElement("script")
     script.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/89/three.min.js"
     script.onload = () => {
+      console.log('🎨 ShaderAnimation: Three.js loaded successfully')
       if (containerRef.current && window.THREE) {
         initThreeJS()
       }
     }
+    script.onerror = () => {
+      console.error('🎨 ShaderAnimation: Failed to load Three.js')
+    }
     document.head.appendChild(script)
 
     return () => {
+      console.log('🎨 ShaderAnimation: Cleaning up')
       // Cleanup
       if (sceneRef.current.animationId) {
         cancelAnimationFrame(sceneRef.current.animationId)
@@ -43,13 +60,21 @@ export function ShaderAnimation() {
       if (sceneRef.current.renderer) {
         sceneRef.current.renderer.dispose()
       }
-      document.head.removeChild(script)
+      // Only remove script if it exists
+      const existingScript = document.querySelector(`script[src="${script.src}"]`)
+      if (existingScript) {
+        document.head.removeChild(existingScript)
+      }
     }
   }, [])
 
   const initThreeJS = () => {
-    if (!containerRef.current || !window.THREE) return
+    if (!containerRef.current || !window.THREE) {
+      console.error('🎨 ShaderAnimation: Cannot initialize - missing container or THREE')
+      return
+    }
 
+    console.log('🎨 ShaderAnimation: Initializing Three.js scene')
     const THREE = window.THREE
     const container = containerRef.current
 
@@ -133,9 +158,18 @@ export function ShaderAnimation() {
     scene.add(mesh)
 
     // Initialize renderer
-    const renderer = new THREE.WebGLRenderer()
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true })
     renderer.setPixelRatio(window.devicePixelRatio)
+    
+    // Initial size
+    const rect = container.getBoundingClientRect()
+    renderer.setSize(rect.width || window.innerWidth, rect.height || window.innerHeight)
     container.appendChild(renderer.domElement)
+    
+    console.log('🎨 ShaderAnimation: Renderer created and added to DOM', {
+      width: rect.width || window.innerWidth,
+      height: rect.height || window.innerHeight
+    })
 
     // Store references
     sceneRef.current = {
@@ -146,15 +180,20 @@ export function ShaderAnimation() {
       animationId: null,
     }
 
+    // Set initial resolution
+    uniforms.resolution.value.x = renderer.domElement.width
+    uniforms.resolution.value.y = renderer.domElement.height
+
     // Handle resize
     const onWindowResize = () => {
       const rect = container.getBoundingClientRect()
-      renderer.setSize(rect.width, rect.height)
+      const width = rect.width || window.innerWidth
+      const height = rect.height || window.innerHeight
+      renderer.setSize(width, height)
       uniforms.resolution.value.x = renderer.domElement.width
       uniforms.resolution.value.y = renderer.domElement.height
     }
 
-    onWindowResize()
     window.addEventListener("resize", onWindowResize, false)
 
     // Animation loop
@@ -164,14 +203,19 @@ export function ShaderAnimation() {
       renderer.render(scene, camera)
     }
 
+    console.log('🎨 ShaderAnimation: Starting animation loop')
     animate()
   }
 
   return (
     <div
       ref={containerRef}
-      className="w-full h-full absolute inset-0" 
-      style={{ minHeight: '100vh', minWidth: '100vw' }}
+      className="fixed inset-0 w-screen h-screen" 
+      style={{ 
+        minHeight: '100vh', 
+        minWidth: '100vw',
+        zIndex: 0
+      }}
     />
   )
 }
