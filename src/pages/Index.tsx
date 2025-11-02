@@ -17,7 +17,7 @@ const Index = () => {
   return (
     <div className="flex flex-col min-h-screen bg-background overflow-x-hidden relative">
       {/* Shader Animation Background */}
-      <div className="fixed inset-0 z-[5] opacity-50 pointer-events-none">
+      <div className="fixed inset-0 z-0 w-screen h-screen pointer-events-none">
         <ShaderAnimation />
       </div>
       
