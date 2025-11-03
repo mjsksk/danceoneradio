@@ -46,7 +46,7 @@ const GoogleAds = ({
     return () => window.removeEventListener('consentChanged', handleConsentChange);
   }, []);
 
-  // Intersection Observer for lazy loading
+  // Intersection Observer for lazy loading with aggressive fallback
   useEffect(() => {
     if (!hasAdConsent || !adRef.current) return;
 
@@ -54,19 +54,31 @@ const GoogleAds = ({
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
+            console.log('📢 GoogleAds: Ad became visible via IntersectionObserver');
             setIsVisible(true);
             observer.disconnect();
           }
         });
       },
       { 
-        rootMargin: '400px',
-        threshold: 0.01 
+        rootMargin: '800px', // Very aggressive - load ads 800px before they come into view
+        threshold: 0 // Trigger as soon as any pixel is visible
       }
     );
 
     observer.observe(adRef.current);
-    return () => observer.disconnect();
+    
+    // Aggressive fallback: If not visible after 1 second, force visibility
+    const fallbackTimer = setTimeout(() => {
+      console.log('📢 GoogleAds: Forcing visibility via timeout fallback');
+      setIsVisible(true);
+      observer.disconnect();
+    }, 1000);
+    
+    return () => {
+      clearTimeout(fallbackTimer);
+      observer.disconnect();
+    };
   }, [hasAdConsent]);
 
   // Push ad to adsbygoogle when visible
