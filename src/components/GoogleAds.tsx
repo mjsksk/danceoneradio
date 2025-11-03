@@ -7,34 +7,48 @@ declare global {
   }
 }
 
-interface AdSenseUnitProps {
-  slot?: string;
-  format?: 'auto' | 'rectangle' | 'vertical' | 'horizontal' | 'fluid';
-  layout?: 'in-article' | 'in-feed' | '';
+interface GoogleAdsProps {
+  slot: string;
+  format?: 'auto' | 'fluid' | 'rectangle' | 'vertical' | 'horizontal';
+  layout?: string;
+  layoutKey?: string;
+  responsive?: boolean;
   className?: string;
   style?: React.CSSProperties;
 }
 
-const AdSenseUnit = ({ 
-  slot = '6777392184', 
+/**
+ * Google AdSense component with lazy loading and consent management
+ * Supports both display and video ads
+ */
+const GoogleAds = ({ 
+  slot,
   format = 'auto', 
   layout = '',
+  layoutKey = '',
+  responsive = true,
   className = '',
   style = {}
-}: AdSenseUnitProps) => {
-  const [hasAdConsent, setHasAdConsent] = useState(hasConsent('advertising'));
+}: GoogleAdsProps) => {
   const adRef = useRef<HTMLModElement>(null);
+  const [hasAdConsent, setHasAdConsent] = useState(hasConsent('advertising'));
   const [isVisible, setIsVisible] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [adPushed, setAdPushed] = useState(false);
 
   // Listen for consent changes
   useEffect(() => {
     const handleConsentChange = () => {
-      setHasAdConsent(hasConsent('advertising'));
+      const newConsent = hasConsent('advertising');
+      setHasAdConsent(newConsent);
+      if (newConsent && isVisible && !adPushed) {
+        // Reload the page to initialize ads properly after consent
+        window.location.reload();
+      }
     };
+    
     window.addEventListener('consentChanged', handleConsentChange);
     return () => window.removeEventListener('consentChanged', handleConsentChange);
-  }, []);
+  }, [isVisible, adPushed]);
 
   // Intersection Observer for lazy loading
   useEffect(() => {
@@ -43,68 +57,48 @@ const AdSenseUnit = ({
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && !isVisible) {
+          if (entry.isIntersecting) {
             setIsVisible(true);
+            observer.disconnect();
           }
         });
       },
       { 
-        rootMargin: '200px', // Load 200px before visible
+        rootMargin: '400px',
         threshold: 0.01 
       }
     );
 
     observer.observe(adRef.current);
     return () => observer.disconnect();
-  }, [hasAdConsent, isVisible]);
+  }, [hasAdConsent]);
 
-  // Load ad when visible and consent changes
+  // Push ad to adsbygoogle when visible
   useEffect(() => {
-    if (!isVisible || isLoaded || !adRef.current || !hasAdConsent) return;
+    if (!isVisible || adPushed || !hasAdConsent) return;
 
-    const loadAd = () => {
+    const pushAd = () => {
       try {
-        console.log('AdSense Unit: Loading ad');
-        window.adsbygoogle = window.adsbygoogle || [];
-        window.adsbygoogle.push({});
-        setIsLoaded(true);
-        console.log('AdSense Unit: Ad loaded successfully');
+        if (window.adsbygoogle) {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+          setAdPushed(true);
+        }
       } catch (err) {
-        console.error('AdSense Unit error:', err);
+        console.error('AdSense error:', err);
       }
     };
 
-    // Wait for script to be available
-    if (window.adsbygoogle) {
-      loadAd();
-    } else {
-      console.log('AdSense Unit: Waiting for script...');
-      const checkScript = setInterval(() => {
-        if (window.adsbygoogle) {
-          clearInterval(checkScript);
-          loadAd();
-        }
-      }, 100);
-      
-      // Timeout after 10 seconds
-      const timeout = setTimeout(() => {
-        clearInterval(checkScript);
-        console.error('AdSense Unit: Script loading timeout');
-      }, 10000);
-      
-      return () => {
-        clearInterval(checkScript);
-        clearTimeout(timeout);
-      };
-    }
-  }, [isVisible, isLoaded, hasAdConsent]);
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(pushAd, 100);
+    return () => clearTimeout(timer);
+  }, [isVisible, adPushed, hasAdConsent]);
 
   if (!hasAdConsent) {
     return (
       <div className={`my-8 flex justify-center ${className}`}>
         <div className="w-full max-w-4xl p-6 text-center bg-card/50 border border-primary/20 rounded-lg">
           <p className="text-sm text-muted-foreground font-['Rajdhani']">
-            Enable ads in Cookie Settings to support us
+            Enable advertising cookies to support Dance One Radio
           </p>
         </div>
       </div>
@@ -126,11 +120,12 @@ const AdSenseUnit = ({
           data-ad-slot={slot}
           data-ad-format={format}
           data-ad-layout={layout}
-          data-full-width-responsive="true"
+          data-ad-layout-key={layoutKey}
+          data-full-width-responsive={responsive ? 'true' : 'false'}
         />
       </div>
     </div>
   );
 };
 
-export default AdSenseUnit;
+export default GoogleAds;

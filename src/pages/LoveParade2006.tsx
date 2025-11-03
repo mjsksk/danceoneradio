@@ -2,7 +2,7 @@ import { useState } from "react";
 import SEO from "@/components/SEO";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import AdSenseUnit from "@/components/AdSenseUnit";
+import GoogleAds from "@/components/GoogleAds";
 import SocialShare from "@/components/SocialShare";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -200,7 +200,7 @@ const LoveParade2006 = () => {
             </div>
           </div>
 
-          <AdSenseUnit key="loveparade2006-ad" slot="6777392184" />
+          <GoogleAds key="loveparade2006-ad" slot="6777392184" />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {ALL_IMAGES.map((image, index) => (

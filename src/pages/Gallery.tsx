@@ -1,7 +1,7 @@
 import SEO from "@/components/SEO";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import AdSenseUnit from "@/components/AdSenseUnit";
+import GoogleAds from "@/components/GoogleAds";
 import SocialShare from "@/components/SocialShare";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,7 +38,7 @@ const Gallery = () => {
             </div>
           </div>
 
-          <AdSenseUnit key="gallery-ad" slot="6777392184" />
+          <GoogleAds key="gallery-ad" slot="6777392184" />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <Link to="/gallery/love-parade-2005">

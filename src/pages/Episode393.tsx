@@ -5,7 +5,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SocialShare from '@/components/SocialShare';
 import SEO from '@/components/SEO';
-import AdSenseUnit from '@/components/AdSenseUnit';
+import GoogleAds from '@/components/GoogleAds';
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 
@@ -261,7 +261,7 @@ const Episode393 = () => {
           </div>
         </section>
 
-        <AdSenseUnit key="episode393-ad" slot="6777392184" />
+        <GoogleAds key="episode393-ad" slot="6777392184" />
 
         {/* Track Listing */}
         <section className="py-12">

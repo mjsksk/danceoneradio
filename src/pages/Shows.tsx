@@ -6,7 +6,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SocialShare from '@/components/SocialShare';
 import SEO from '@/components/SEO';
-import AdSenseUnit from '@/components/AdSenseUnit';
+import GoogleAds from '@/components/GoogleAds';
 import { Link } from 'react-router-dom';
 
 interface Episode {
@@ -396,7 +396,7 @@ const Shows = () => {
           </div>
         </section>
 
-        <AdSenseUnit key="shows-ad" slot="6777392184" />
+        <GoogleAds key="shows-ad" slot="6777392184" />
 
         {/* Episodes List */}
         <section className="py-16 relative">

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
-import AdSenseUnit from '@/components/AdSenseUnit';
+import GoogleAds from '@/components/GoogleAds';
 import SocialShare from '@/components/SocialShare';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -94,7 +94,7 @@ const Contact = () => {
             />
           </div>
           
-          <AdSenseUnit key="contact-ad" slot="6777392184" />
+          <GoogleAds key="contact-ad" slot="6777392184" />
           
           {/* Contact Form */}
           <div className="bg-card/50 backdrop-blur-sm border border-border rounded-lg p-6">

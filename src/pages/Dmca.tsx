@@ -1,7 +1,7 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
-import AdSenseUnit from '@/components/AdSenseUnit';
+import GoogleAds from '@/components/GoogleAds';
 import SocialShare from '@/components/SocialShare';
 const Dmca = () => {
   return <div className="min-h-screen bg-background">
@@ -24,7 +24,7 @@ const Dmca = () => {
             />
           </div>
           
-          <AdSenseUnit key="dmca-ad" slot="6777392184" />
+          <GoogleAds key="dmca-ad" slot="6777392184" />
           
           <div className="bg-card/50 border border-primary/20 rounded-lg p-8 space-y-6">
             <section>

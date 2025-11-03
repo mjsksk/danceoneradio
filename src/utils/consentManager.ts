@@ -111,10 +111,8 @@ export const loadGoogleAnalytics = (): void => {
   };
 };
 
-// Load Google AdSense if consent given
+// Load Google AdSense - always load script, but ads won't display without consent
 export const loadGoogleAdSense = (): void => {
-  if (!hasConsent('advertising')) return;
-
   // Check if already loaded
   if (document.querySelector('script[src*="adsbygoogle.js"]')) return;
 
@@ -125,14 +123,13 @@ export const loadGoogleAdSense = (): void => {
   document.head.appendChild(script);
 };
 
-// Initialize consent-based scripts
+// Initialize scripts - always load AdSense script, it will respect consent internally
 export const initializeConsentScripts = (): void => {
   if (hasConsent('analytics')) {
     loadGoogleAnalytics();
   }
-  if (hasConsent('advertising')) {
-    loadGoogleAdSense();
-  }
+  // Always load AdSense script so ads can display immediately after consent
+  loadGoogleAdSense();
 };
 
 // TypeScript declarations for gtag

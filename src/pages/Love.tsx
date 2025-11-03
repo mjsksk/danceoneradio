@@ -1,7 +1,7 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
-import AdSenseUnit from '@/components/AdSenseUnit';
+import GoogleAds from '@/components/GoogleAds';
 import SocialShare from '@/components/SocialShare';
 import { Button } from '@/components/ui/button';
 import { Heart, Music, Radio, Users } from 'lucide-react';
@@ -70,7 +70,7 @@ const Love = () => {
                </div>
              </div>
              
-              <AdSenseUnit key="love-ad" slot="6777392184" />
+              <GoogleAds key="love-ad" slot="6777392184" />
               
               <div className="space-y-12 font-['Rajdhani'] text-lg">
               <section className="text-center">

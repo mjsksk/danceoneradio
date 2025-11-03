@@ -1,7 +1,7 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
-import AdSenseUnit from '@/components/AdSenseUnit';
+import GoogleAds from '@/components/GoogleAds';
 import SocialShare from '@/components/SocialShare';
 import { Link } from 'react-router-dom';
 
@@ -29,7 +29,7 @@ const Privacy = () => {
               />
             </div>
             
-            <AdSenseUnit key="privacy-ad" slot="6777392184" />
+            <GoogleAds key="privacy-ad" slot="6777392184" />
             
             <div className="space-y-8 font-['Rajdhani'] text-lg">
               <section>
