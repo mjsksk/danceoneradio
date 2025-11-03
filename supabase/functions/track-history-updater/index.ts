@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
     console.log('🔍 Fetching track history from radio stream...');
     
     // Fetch from the specific history endpoint
-    const historyUrl = 'http://s9.myradiostream.com:14296/admin.cgi?sid=1&mode=history';
+    const historyUrl = 'https://s9.myradiostream.com:14296/admin.cgi?sid=1&mode=history';
     let historyData = '';
     
     try {
@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
       
       // Fallback to current song endpoint if history fails
       try {
-        const currentResponse = await fetch('http://s9.myradiostream.com:14296/currentsong?sid=1');
+        const currentResponse = await fetch('https://s9.myradiostream.com:14296/currentsong?sid=1');
         if (currentResponse.ok) {
           const currentTrack = await currentResponse.text();
           console.log('🎵 Got current track as fallback:', currentTrack);
@@ -167,7 +167,7 @@ function parseHistoryData(data: string): Track[] {
           tracks.push({
             ...trackInfo,
             played_at: playedTime.toISOString(),
-            source_url: 'http://s9.myradiostream.com:14296/admin.cgi?sid=1&mode=history'
+            source_url: 'https://s9.myradiostream.com:14296/admin.cgi?sid=1&mode=history'
           });
         }
       });
@@ -191,7 +191,7 @@ function parseHistoryData(data: string): Track[] {
             tracks.push({
               ...trackInfo,
               played_at: playedTime.toISOString(),
-              source_url: 'http://s9.myradiostream.com:14296/admin.cgi?sid=1&mode=history'
+              source_url: 'https://s9.myradiostream.com:14296/admin.cgi?sid=1&mode=history'
             });
           }
         });
@@ -206,7 +206,7 @@ function parseHistoryData(data: string): Track[] {
         tracks.push({
           ...trackInfo,
           played_at: new Date().toISOString(),
-          source_url: 'http://s9.myradiostream.com:14296/currentsong?sid=1'
+          source_url: 'https://s9.myradiostream.com:14296/currentsong?sid=1'
         });
       }
     }
