@@ -9,7 +9,19 @@ export class AlbumArtService {
   private static maxConcurrentRequests = 3;
 
   static async getAlbumArt(songTitle: string): Promise<AlbumArtResponse> {
+    // Validate input
+    if (!songTitle || typeof songTitle !== 'string' || songTitle.trim().length === 0) {
+      console.log('⚠️ Invalid song title provided to getAlbumArt');
+      return { imageUrl: this.getDefaultAlbumArt(), error: 'Invalid song title' };
+    }
+
     const cleanTitle = this.cleanSongTitle(songTitle);
+    
+    // Double-check after cleaning
+    if (!cleanTitle || cleanTitle.length === 0) {
+      console.log('⚠️ Title became empty after cleaning:', songTitle);
+      return { imageUrl: this.getDefaultAlbumArt(), error: 'Empty title after cleaning' };
+    }
     
     // Return cached promise if available
     if (this.cache.has(cleanTitle)) {
@@ -51,14 +63,22 @@ export class AlbumArtService {
   }
 
   private static cleanSongTitle(title: string): string {
+    // Return original if title is empty or invalid
+    if (!title || typeof title !== 'string') {
+      return '';
+    }
+
     // Remove common suffixes and clean the title
-    return title
+    const cleaned = title
       .replace(/\[.*?\]/g, '') // Remove [label] info
       .replace(/\(.*?remix.*?\)/gi, '') // Remove remix info
       .replace(/\(.*?edit.*?\)/gi, '') // Remove edit info
       .replace(/feat\..*$/gi, '') // Remove featuring info
       .replace(/ft\..*$/gi, '') // Remove ft. info
       .trim();
+    
+    // If cleaning removed everything, return original title
+    return cleaned.length > 0 ? cleaned : title.trim();
   }
 
   private static async searchLastFM(title: string): Promise<AlbumArtResponse> {
@@ -88,6 +108,12 @@ export class AlbumArtService {
 
   private static async searchiTunes(title: string): Promise<AlbumArtResponse> {
     try {
+      // Validate title is not empty
+      if (!title || title.trim().length === 0) {
+        console.log('⚠️ Empty title provided to iTunes search');
+        return { imageUrl: null };
+      }
+
       // Use Supabase edge function to avoid CORS issues
       const { supabase } = await import('@/integrations/supabase/client');
       
