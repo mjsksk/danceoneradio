@@ -5,20 +5,30 @@ import { initializeConsentMode } from '@/utils/googleConsentMode'
 import { initializeConsentScripts, getConsent } from '@/utils/consentManager'
 import { updateConsentMode } from '@/utils/googleConsentMode'
 
+console.log('🚀 Application starting...');
+
 // CRITICAL: Initialize Google Consent Mode FIRST before any scripts
+console.log('🍪 Step 1: Initializing Consent Mode');
 initializeConsentMode();
 
 // Then initialize scripts (they will respect consent mode)
+console.log('📢 Step 2: Loading Google scripts');
 initializeConsentScripts();
 
 // Update consent mode if user has previously given consent
 const existingConsent = getConsent();
+console.log('🍪 Step 3: Checking existing consent', existingConsent);
+
 if (existingConsent) {
+  console.log('🍪 Found existing consent, updating consent mode');
   updateConsentMode({
     analytics: existingConsent.analytics,
     advertising: existingConsent.advertising,
     functional: existingConsent.functional,
   });
+} else {
+  console.log('🍪 No existing consent found, user will see consent banner');
 }
 
+console.log('🚀 Step 4: Rendering React app');
 createRoot(document.getElementById("root")!).render(<App />);

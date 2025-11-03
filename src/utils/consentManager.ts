@@ -113,23 +113,49 @@ export const loadGoogleAnalytics = (): void => {
 
 // Load Google AdSense - always load script, but ads won't display without consent
 export const loadGoogleAdSense = (): void => {
+  console.log('📢 AdSense: Checking if script should be loaded');
+  
   // Check if already loaded
-  if (document.querySelector('script[src*="adsbygoogle.js"]')) return;
+  if (document.querySelector('script[src*="adsbygoogle.js"]')) {
+    console.log('📢 AdSense: Script already loaded');
+    return;
+  }
 
+  console.log('📢 AdSense: Loading script...');
   const script = document.createElement('script');
   script.async = true;
   script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4230589452649530';
   script.crossOrigin = 'anonymous';
+  
+  script.onload = () => {
+    console.log('📢 AdSense: Script loaded successfully');
+    console.log('📢 AdSense: adsbygoogle available:', !!window.adsbygoogle);
+  };
+  
+  script.onerror = (error) => {
+    console.error('📢 AdSense: Script failed to load', error);
+  };
+  
   document.head.appendChild(script);
+  console.log('📢 AdSense: Script tag added to head');
 };
 
-// Initialize scripts - always load AdSense script, it will respect consent internally
+// Initialize scripts - always load AdSense script, it will respect consent mode
 export const initializeConsentScripts = (): void => {
+  console.log('🔧 Initializing consent-based scripts...');
+  
   if (hasConsent('analytics')) {
+    console.log('🔧 Loading Google Analytics (consent granted)');
     loadGoogleAnalytics();
+  } else {
+    console.log('🔧 Skipping Google Analytics (no consent)');
   }
+  
   // Always load AdSense script so ads can display immediately after consent
+  console.log('🔧 Loading Google AdSense script');
   loadGoogleAdSense();
+  
+  console.log('🔧 Script initialization complete');
 };
 
 // TypeScript declarations for gtag

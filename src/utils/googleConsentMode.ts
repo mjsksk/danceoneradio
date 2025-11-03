@@ -21,6 +21,8 @@ function gtag(...args: any[]) {
  * This must be called as early as possible in the app lifecycle
  */
 export const initializeConsentMode = (): void => {
+  console.log('🍪 Consent Mode: Initializing...');
+  
   // Initialize dataLayer
   window.dataLayer = window.dataLayer || [];
   window.gtag = gtag;
@@ -38,11 +40,15 @@ export const initializeConsentMode = (): void => {
     'wait_for_update': 500 // Wait 500ms for consent update
   });
 
+  console.log('🍪 Consent Mode: Default state set to DENIED');
+
   // Enable URL passthrough for analytics
   gtag('set', 'url_passthrough', true);
   
   // Enable ads data redaction when consent is denied
   gtag('set', 'ads_data_redaction', true);
+  
+  console.log('🍪 Consent Mode: Initialization complete');
 };
 
 /**
@@ -53,8 +59,10 @@ export const updateConsentMode = (consent: {
   advertising: boolean;
   functional: boolean;
 }): void => {
+  console.log('🍪 Consent Mode: Updating consent state', consent);
+  
   if (!window.gtag) {
-    console.warn('gtag not initialized');
+    console.warn('🍪 Consent Mode: gtag not initialized');
     return;
   }
 
@@ -69,9 +77,13 @@ export const updateConsentMode = (consent: {
 
   window.gtag('consent', 'update', consentUpdate);
   
+  console.log('🍪 Consent Mode: Updated to', consentUpdate);
+  
   // Push event for tracking consent changes
   window.dataLayer.push({
     'event': 'cookie_consent_update',
     'consent_status': consentUpdate
   });
+  
+  console.log('🍪 Consent Mode: Event pushed to dataLayer');
 };

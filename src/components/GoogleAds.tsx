@@ -71,27 +71,39 @@ const GoogleAds = ({
 
   // Push ad to adsbygoogle when visible
   useEffect(() => {
-    if (!isVisible || adPushed || !hasAdConsent) return;
+    if (!isVisible || adPushed || !hasAdConsent) {
+      console.log(`📢 GoogleAds: Skipping ad push - visible:${isVisible}, pushed:${adPushed}, consent:${hasAdConsent}`);
+      return;
+    }
 
     const pushAd = () => {
       try {
+        console.log('📢 GoogleAds: Attempting to push ad for slot:', slot);
         if (window.adsbygoogle) {
+          console.log('📢 GoogleAds: adsbygoogle available, pushing ad');
           (window.adsbygoogle = window.adsbygoogle || []).push({});
           setAdPushed(true);
+          console.log('📢 GoogleAds: Ad pushed successfully for slot:', slot);
+        } else {
+          console.error('📢 GoogleAds: window.adsbygoogle not available');
         }
       } catch (err) {
-        console.error('AdSense error:', err);
+        console.error('📢 GoogleAds error:', err);
       }
     };
 
     // Small delay to ensure DOM is ready
+    console.log('📢 GoogleAds: Scheduling ad push in 100ms');
     const timer = setTimeout(pushAd, 100);
     return () => clearTimeout(timer);
-  }, [isVisible, adPushed, hasAdConsent]);
+  }, [isVisible, adPushed, hasAdConsent, slot]);
 
   if (!hasAdConsent) {
+    console.log('📢 GoogleAds: No consent for slot:', slot);
     return null; // Don't render anything if no consent - Google Consent Mode handles this
   }
+
+  console.log('📢 GoogleAds: Rendering ad slot:', slot, 'visible:', isVisible, 'pushed:', adPushed);
 
   return (
     <div className={`my-8 flex justify-center ${className}`}>
