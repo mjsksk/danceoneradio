@@ -40,15 +40,11 @@ const GoogleAds = ({
     const handleConsentChange = () => {
       const newConsent = hasConsent('advertising');
       setHasAdConsent(newConsent);
-      if (newConsent && isVisible && !adPushed) {
-        // Reload the page to initialize ads properly after consent
-        window.location.reload();
-      }
     };
     
     window.addEventListener('consentChanged', handleConsentChange);
     return () => window.removeEventListener('consentChanged', handleConsentChange);
-  }, [isVisible, adPushed]);
+  }, []);
 
   // Intersection Observer for lazy loading
   useEffect(() => {
@@ -94,15 +90,7 @@ const GoogleAds = ({
   }, [isVisible, adPushed, hasAdConsent]);
 
   if (!hasAdConsent) {
-    return (
-      <div className={`my-8 flex justify-center ${className}`}>
-        <div className="w-full max-w-4xl p-6 text-center bg-card/50 border border-primary/20 rounded-lg">
-          <p className="text-sm text-muted-foreground font-['Rajdhani']">
-            Enable advertising cookies to support Dance One Radio
-          </p>
-        </div>
-      </div>
-    );
+    return null; // Don't render anything if no consent - Google Consent Mode handles this
   }
 
   return (

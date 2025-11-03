@@ -8,8 +8,10 @@ import {
   acceptAll,
   rejectNonEssential,
   setConsent,
+  getConsent,
   initializeConsentScripts,
 } from '@/utils/consentManager';
+import { updateConsentMode } from '@/utils/googleConsentMode';
 
 interface CookieConsentProps {
   forceShow?: boolean;
@@ -34,14 +36,29 @@ export const CookieConsent = ({ forceShow = false, onClose }: CookieConsentProps
 
   const handleAcceptAll = () => {
     acceptAll();
+    const consent = getConsent();
+    if (consent) {
+      updateConsentMode({
+        analytics: consent.analytics,
+        advertising: consent.advertising,
+        functional: consent.functional,
+      });
+    }
     initializeConsentScripts();
     setShowBanner(false);
     setShowCustomize(false);
     onClose?.();
+    // Reload to initialize ads properly
+    window.location.reload();
   };
 
   const handleRejectNonEssential = () => {
     rejectNonEssential();
+    updateConsentMode({
+      analytics: false,
+      advertising: false,
+      functional: false,
+    });
     setShowBanner(false);
     setShowCustomize(false);
     onClose?.();
@@ -53,10 +70,19 @@ export const CookieConsent = ({ forceShow = false, onClose }: CookieConsentProps
 
   const handleSavePreferences = () => {
     setConsent(preferences);
+    updateConsentMode({
+      analytics: preferences.analytics,
+      advertising: preferences.advertising,
+      functional: preferences.functional,
+    });
     initializeConsentScripts();
     setShowBanner(false);
     setShowCustomize(false);
     onClose?.();
+    // Reload if advertising was enabled to initialize ads
+    if (preferences.advertising) {
+      window.location.reload();
+    }
   };
 
   const handleCloseCustomize = () => {
