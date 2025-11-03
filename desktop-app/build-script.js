@@ -53,7 +53,7 @@ console.log('✅ React build files copied\n');
 // Step 3: Check for required assets
 console.log('🎨 Checking desktop assets...');
 const assetsDir = path.join(__dirname, 'assets');
-const requiredAssets = ['icon.png', 'icon.ico', 'tray-icon.png'];
+const requiredAssets = ['icon.png', 'tray-icon.png'];
 
 if (!fs.existsSync(assetsDir)) {
   fs.mkdirSync(assetsDir, { recursive: true });
