@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dance-one-radio-v2';
+const CACHE_NAME = 'dance-one-radio-v4';
 const STATIC_ASSETS = [
   '/assets/dance-one-logo-DP6h_tTr.png',
   '/assets/hero-bg-B-ZqE77g.jpg',
@@ -21,8 +21,8 @@ self.addEventListener('install', (event) => {
         console.log('Cache install failed:', error);
       })
   );
-  // Don't force immediate activation - wait for page reload
-  // self.skipWaiting();
+  // Force immediate activation
+  self.skipWaiting();
 });
 
 // Activate event - clean up old caches
@@ -39,8 +39,8 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
-  // Don't force immediate control - wait for natural page reload
-  // self.clients.claim();
+  // Force immediate control
+  return self.clients.claim();
 });
 
 // Fetch event - serve from cache with fallback to network
