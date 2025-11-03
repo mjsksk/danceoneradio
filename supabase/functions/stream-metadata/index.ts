@@ -15,10 +15,10 @@ serve(async (req) => {
     
     // Try multiple endpoints for stream metadata
     const endpoints = [
-      'http://s9.myradiostream.com:14296/currentsong?sid=1',
-      'http://s9.myradiostream.com:14296/7.html',
-      'http://s9.myradiostream.com:14296/stats',
-      'http://s9.myradiostream.com:14296/status-json.xsl'
+      'https://s9.myradiostream.com:14296/currentsong?sid=1',
+      'https://s9.myradiostream.com:14296/7.html',
+      'https://s9.myradiostream.com:14296/stats',
+      'https://s9.myradiostream.com:14296/status-json.xsl'
     ]
     
     for (const endpoint of endpoints) {

@@ -20,7 +20,7 @@ interface Track {
 }
 
 export class RadioStreamService {
-  private static streamUrl = 'http://s9.myradiostream.com:14296/';
+  private static streamUrl = 'https://s9.myradiostream.com:14296/';
   
   static async getStreamMetadata(): Promise<StreamMetadata | null> {
     const startTime = Date.now();
@@ -232,7 +232,7 @@ export class RadioStreamService {
       // First, trigger the track history updater and get current track immediately
       console.log('🎵 Getting current track from radio stream...');
       try {
-        const currentResponse = await fetch('http://s9.myradiostream.com:14296/currentsong?sid=1');
+        const currentResponse = await fetch('https://s9.myradiostream.com:14296/currentsong?sid=1');
         if (currentResponse.ok) {
           const currentTrack = await currentResponse.text();
           console.log('🎵 Current track from radio:', currentTrack);
@@ -247,7 +247,7 @@ export class RadioStreamService {
               played_at: new Date().toISOString(),
               duration: '3:30',
               genre: 'Electronic',
-              source_url: 'http://s9.myradiostream.com:14296/currentsong?sid=1'
+              source_url: 'https://s9.myradiostream.com:14296/currentsong?sid=1'
             };
 
             const { data: insertedTrack, error: insertError } = await supabase
