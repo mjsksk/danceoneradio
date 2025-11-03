@@ -7,12 +7,12 @@ let tray;
 let isPlaying = false;
 
 function createWindow() {
-  // Create the browser window
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    minWidth: 800,
-    minHeight: 600,
+    width: 900,
+    height: 700,
+    minWidth: 600,
+    minHeight: 500,
+    autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -20,26 +20,15 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       webSecurity: !isDev
     },
-    titleBarStyle: 'default',
     show: false
   });
 
-  // Load the desktop-optimized build
   const startUrl = isDev 
     ? 'http://localhost:8080/#/desktop' 
     : `file://${path.join(__dirname, 'dist/index.html')}#/desktop`;
   
-  console.log('Loading URL:', startUrl);
-  console.log('__dirname:', __dirname);
-  
   mainWindow.loadURL(startUrl);
 
-  // Open DevTools to debug (remove after testing)
-  if (!isDev) {
-    mainWindow.webContents.openDevTools();
-  }
-
-  // Show window when ready
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
   });

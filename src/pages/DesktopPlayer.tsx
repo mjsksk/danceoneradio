@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 import LiveRadioPlayer from '@/components/LiveRadioPlayer';
 import TracksSection from '@/components/TracksSection';
-import SEO from '@/components/SEO';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import { useTrackHistoryUpdater } from '@/hooks/useTrackHistoryUpdater';
 
 const DesktopPlayer = () => {
   const [streamTitle, setStreamTitle] = useState('🎵 Dance One Radio - Live Stream 🎵');
   
-  // Keep track history updated
   useTrackHistoryUpdater();
 
   useEffect(() => {
@@ -28,19 +26,13 @@ const DesktopPlayer = () => {
   }, []);
 
   useEffect(() => {
-    document.title = 'Dance One Radio - Desktop Player';
+    document.title = 'Dance One Radio';
   }, []);
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
-      <SEO 
-        title="Dance One Radio - Desktop Player"
-        description="Listen to Dance One Radio's live electronic dance music stream"
-      />
-      
-      {/* Player Section */}
-      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-primary/20 shadow-lg">
-        <div className="container mx-auto px-4 py-6">
+    <div className="min-h-screen bg-background">
+      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-primary/20">
+        <div className="max-w-4xl mx-auto px-4 py-4">
           <LiveRadioPlayer 
             streamUrls={[
               "http://s9.myradiostream.com:14296/;", 
@@ -54,8 +46,7 @@ const DesktopPlayer = () => {
         </div>
       </div>
 
-      {/* Tracks Section */}
-      <main className="container mx-auto px-4">
+      <main className="max-w-4xl mx-auto px-4 py-6">
         <TracksSection />
       </main>
     </div>
