@@ -1,14 +1,15 @@
 import { Button } from '@/components/ui/button';
 import { Play, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const PodcastSection = () => {
   const episodes = [
+    { id: 394, date: 'NOV 15 • 1H 33M', title: 'Future Dance Anthems with Mario 394', link: '/episode/394' },
+    { id: 393, date: 'NOV 1 • 1H 49M', title: 'Future Dance Anthems with Mario 393', link: '/episode/393' },
     { id: 387, date: 'FRI • 1H 5M', title: 'Future Dance Anthems with Mario 387' },
     { id: 386, date: 'JUL 19 • 59M', title: 'Future Dance Anthems with Mario 386' },
     { id: 385, date: 'JUL 13 • 1H 5M', title: 'Future Dance Anthems with Mario 385' },
     { id: 384, date: 'JUN 28 • 1H 3M', title: 'Future Dance Anthems with Mario 384' },
-    { id: 383, date: 'JUN 20 • 58M', title: 'Future Dance Anthems with Mario 383' },
-    { id: 382, date: 'JUN 13 • 1H 6M', title: 'Future Dance Anthems with Mario 382' },
   ];
 
   return (
@@ -41,28 +42,44 @@ const PodcastSection = () => {
             </div>
 
             <div className="space-y-3 mb-6">
-              {episodes.map((episode, index) => (
-                <div 
-                  key={episode.id}
-                  className="flex items-center justify-between p-3 rounded-md hover:bg-primary/5 transition-colors group"
-                >
-                  <div className="flex-1">
-                    <div className="text-xs text-muted-foreground font-['Rajdhani'] mb-1">
-                      {episode.date}
+              {episodes.map((episode, index) => {
+                const content = (
+                  <>
+                    <div className="flex-1">
+                      <div className="text-xs text-muted-foreground font-['Rajdhani'] mb-1">
+                        {episode.date}
+                      </div>
+                      <div className="text-sm text-foreground font-['Rajdhani'] group-hover:text-primary transition-colors">
+                        {episode.title}
+                      </div>
                     </div>
-                    <div className="text-sm text-foreground font-['Rajdhani'] group-hover:text-primary transition-colors">
-                      {episode.title}
-                    </div>
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary"
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary"
+                    >
+                      <Play className="w-4 h-4" />
+                    </Button>
+                  </>
+                );
+
+                return episode.link ? (
+                  <Link 
+                    key={episode.id}
+                    to={episode.link}
+                    className="flex items-center justify-between p-3 rounded-md hover:bg-primary/5 transition-colors group"
                   >
-                    <Play className="w-4 h-4" />
-                  </Button>
-                </div>
-              ))}
+                    {content}
+                  </Link>
+                ) : (
+                  <div 
+                    key={episode.id}
+                    className="flex items-center justify-between p-3 rounded-md hover:bg-primary/5 transition-colors group"
+                  >
+                    {content}
+                  </div>
+                );
+              })}
             </div>
 
             <div className="flex gap-3">
