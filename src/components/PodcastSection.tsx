@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 const PodcastSection = () => {
   const episodes = [
-    { id: 394, date: 'NOV 15 • 1H 33M', title: 'Future Dance Anthems with Mario 394', link: '/episode/394' },
+    { id: 394, date: 'NOV 15 • 1H 6M', title: 'Future Dance Anthems with Mario 394', link: '/episode/394' },
     { id: 393, date: 'NOV 1 • 1H 49M', title: 'Future Dance Anthems with Mario 393', link: '/episode/393' },
     { id: 387, date: 'FRI • 1H 5M', title: 'Future Dance Anthems with Mario 387' },
     { id: 386, date: 'JUL 19 • 59M', title: 'Future Dance Anthems with Mario 386' },
