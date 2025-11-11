@@ -220,15 +220,18 @@
   
   /* Scrolling text animation */
   .animate-scroll {
-    animation: scroll-text 35s ease-in-out infinite;
+    animation: scroll-text 35s linear infinite;
     will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
   }
   
   @keyframes scroll-text {
-    0% { transform: translateX(100%); }
-    15% { transform: translateX(100%); }
-    85% { transform: translateX(-100%); }
-    100% { transform: translateX(-100%); }
+    0% { transform: translateX(100%) translateZ(0); }
+    15% { transform: translateX(100%) translateZ(0); }
+    85% { transform: translateX(-100%) translateZ(0); }
+    100% { transform: translateX(-100%) translateZ(0); }
   }
 
   /* Image optimization styles */
