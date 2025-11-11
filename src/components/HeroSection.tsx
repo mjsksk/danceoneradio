@@ -6,6 +6,7 @@ import SocialShare from '@/components/SocialShare';
 import heroImage from '@/assets/hero-bg.jpg';
 import LiveRadioPlayer from './LiveRadioPlayer';
 import { RadioStreamService } from '@/utils/RadioStreamService';
+import { ShaderAnimation } from '@/components/ui/shader-lines';
 const HeroSection = () => {
   const [streamTitle, setStreamTitle] = useState('🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵');
   
@@ -81,18 +82,8 @@ const HeroSection = () => {
     setVideoKey(prev => prev + 1);
   }, []);
   return <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Video with Overlay */}
-      <video 
-        key={`video-${videoKey}-${selectedVideo}`}
-        className="absolute inset-0 w-full h-full object-cover" 
-        autoPlay 
-        muted 
-        loop 
-        playsInline 
-        poster="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png"
-      >
-        <source src={selectedVideo} type="video/mp4" />
-      </video>
+      {/* Shader Animation Background */}
+      <ShaderAnimation />
       <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]"></div>
 
       {/* Animated Particles */}
