@@ -227,17 +227,17 @@ const Episode394 = () => {
                       {/* Progress Bar */}
                       <div className="space-y-2">
                         <div 
-                          className="h-2 bg-primary/10 rounded-full cursor-pointer group/progress"
+                          className="h-2 bg-muted/30 rounded-full cursor-pointer group/progress"
                           onClick={handleSeek}
                         >
                           <div 
                             className="h-full bg-gradient-to-r from-neon to-neon-purple rounded-full transition-all duration-150 relative"
                             style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
                           >
-                            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-neon rounded-full opacity-0 group-hover/progress:opacity-100 transition-opacity" />
+                            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-neon-purple rounded-full shadow-lg shadow-neon-purple/50 opacity-0 group-hover/progress:opacity-100 transition-opacity" />
                           </div>
                         </div>
-                        <div className="flex justify-between text-xs text-muted-foreground">
+                        <div className="flex justify-between text-xs text-foreground/80">
                           <span>{formatTime(currentTime)}</span>
                           <span>{formatTime(duration)}</span>
                         </div>
