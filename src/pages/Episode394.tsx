@@ -20,6 +20,8 @@ const Episode394 = () => {
   const [bgLoaded, setBgLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   // Scroll to top when component mounts
@@ -52,6 +54,44 @@ const Episode394 = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration);
+    }
+  };
+
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!audioRef.current) return;
+    
+    const progressBar = e.currentTarget;
+    const rect = progressBar.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percentage = x / rect.width;
+    const newTime = percentage * duration;
+    
+    audioRef.current.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
+
+  const formatTime = (timeInSeconds: number) => {
+    if (isNaN(timeInSeconds)) return '0:00';
+    
+    const hours = Math.floor(timeInSeconds / 3600);
+    const minutes = Math.floor((timeInSeconds % 3600) / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
   const tracks: Track[] = [
@@ -156,6 +196,8 @@ const Episode394 = () => {
                       onEnded={() => setIsPlaying(false)}
                       onPause={() => setIsPlaying(false)}
                       onPlay={() => setIsPlaying(true)}
+                      onTimeUpdate={handleTimeUpdate}
+                      onLoadedMetadata={handleLoadedMetadata}
                     >
                       <source src="https://media.blubrry.com/biggest_tunes_with_mario_135/content.blubrry.com/biggest_tunes_with_mario_135/Biggest-Tunes-with-Mario-394-streamed.mp3" type="audio/mpeg" />
                       Your browser does not support the audio element.
@@ -179,6 +221,25 @@ const Episode394 = () => {
                         <div className="flex-1">
                           <h3 className="font-semibold text-primary">Future Dance Anthems with Mario</h3>
                           <p className="text-sm text-muted-foreground">Episode 394 - Anthems of the week</p>
+                        </div>
+                      </div>
+
+                      {/* Progress Bar */}
+                      <div className="space-y-2">
+                        <div 
+                          className="h-2 bg-primary/10 rounded-full cursor-pointer group/progress"
+                          onClick={handleSeek}
+                        >
+                          <div 
+                            className="h-full bg-gradient-to-r from-neon to-neon-purple rounded-full transition-all duration-150 relative"
+                            style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                          >
+                            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-neon rounded-full opacity-0 group-hover/progress:opacity-100 transition-opacity" />
+                          </div>
+                        </div>
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>{formatTime(currentTime)}</span>
+                          <span>{formatTime(duration)}</span>
                         </div>
                         <div className="text-right">
                           <p className="text-xs text-muted-foreground">Duration</p>
