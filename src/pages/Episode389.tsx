@@ -294,13 +294,13 @@ const Episode389 = () => {
                               className="bg-gradient-to-r from-neon/20 to-neon-purple/20 border-neon/30 hover:from-neon/30 hover:to-neon-purple/30"
                             >
                               <a 
-                                href="https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml" 
+                                href="https://podcasts.apple.com/us/podcast/future-dance-anthems-with-mario/id1439656478" 
                                 target="_blank" 
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-2"
                               >
                                 <Play className="w-4 h-4" />
-                                Listen on Blubrry
+                                Listen on Apple 🍎 Podcasts
                               </a>
                             </Button>
                             <Button 
