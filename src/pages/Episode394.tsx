@@ -1,4 +1,4 @@
-import { ArrowLeft, Calendar, Clock, Music, Play } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Music, Play, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Navigation from '@/components/Navigation';
@@ -171,10 +171,7 @@ const Episode394 = () => {
                           {isLoading ? (
                             <div className="w-4 h-4 border-2 border-neon border-t-transparent rounded-full animate-spin" />
                           ) : isPlaying ? (
-                            <div className="w-6 h-6 flex items-center justify-center">
-                              <div className="w-2 h-4 bg-neon rounded-sm mr-1"></div>
-                              <div className="w-2 h-4 bg-neon rounded-sm"></div>
-                            </div>
+                            <Pause className="w-6 h-6 text-neon" />
                           ) : (
                             <Play className="w-6 h-6 text-neon" />
                           )}
