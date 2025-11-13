@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Play, ExternalLink, Calendar, ArrowRight } from 'lucide-react';
+import { Play, Pause, ExternalLink, Calendar, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface Episode {
@@ -19,6 +19,8 @@ interface Episode {
 const PodcastPreview = () => {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState(true);
+  const [playingIndex, setPlayingIndex] = useState<number | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const fetchEpisodes = async (retryCount = 0) => {
@@ -160,14 +162,38 @@ const PodcastPreview = () => {
                 size="sm"
                 variant="ghost"
                 className="p-2 hover:bg-primary/10 hover:text-neon"
-                onClick={() => {
-                  if (episode.enclosure.url) {
-                    const audio = new Audio(episode.enclosure.url);
-                    audio.play();
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  
+                  if (playingIndex === index) {
+                    // Pause current episode
+                    audioRef.current?.pause();
+                    setPlayingIndex(null);
+                  } else {
+                    // Stop any currently playing audio
+                    if (audioRef.current) {
+                      audioRef.current.pause();
+                      audioRef.current = null;
+                    }
+                    
+                    // Play new episode
+                    if (episode.enclosure.url) {
+                      const audio = new Audio(episode.enclosure.url);
+                      audioRef.current = audio;
+                      audio.play();
+                      audio.onended = () => setPlayingIndex(null);
+                      audio.onerror = () => setPlayingIndex(null);
+                      setPlayingIndex(index);
+                    }
                   }
                 }}
               >
-                <Play className="w-4 h-4" />
+                {playingIndex === index ? (
+                  <Pause className="w-4 h-4" />
+                ) : (
+                  <Play className="w-4 h-4" />
+                )}
               </Button>
             </div>
           </Card>
