@@ -1,4 +1,4 @@
-import { ArrowLeft, Calendar, Clock, Music, Play, Pause } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Music, Play, Pause, Apple } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Navigation from '@/components/Navigation';
@@ -280,8 +280,8 @@ const Episode393 = () => {
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-2"
                               >
-                                <Play className="w-4 h-4" />
-                                Listen on Apple 🍎 Podcasts
+                                <Apple className="w-4 h-4" />
+                                Listen on Apple Podcasts
                               </a>
                             </Button>
                             <Button 
