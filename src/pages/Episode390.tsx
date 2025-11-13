@@ -1,4 +1,4 @@
-import { ArrowLeft, Calendar, Clock, Music, Play } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Music, Play, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Navigation from '@/components/Navigation';
@@ -20,6 +20,8 @@ const Episode390 = () => {
   const [bgLoaded, setBgLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   // Scroll to top when component mounts
@@ -53,6 +55,44 @@ const Episode390 = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration);
+    }
+  };
+
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!audioRef.current) return;
+    
+    const progressBar = e.currentTarget;
+    const rect = progressBar.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percentage = x / rect.width;
+    const newTime = percentage * duration;
+    
+    audioRef.current.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
+
+  const formatTime = (timeInSeconds: number) => {
+    if (isNaN(timeInSeconds)) return '0:00';
+    
+    const hours = Math.floor(timeInSeconds / 3600);
+    const minutes = Math.floor((timeInSeconds % 3600) / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
   const tracks: Track[] = [
@@ -166,6 +206,8 @@ const Episode390 = () => {
                       onEnded={() => setIsPlaying(false)}
                       onPause={() => setIsPlaying(false)}
                       onPlay={() => setIsPlaying(true)}
+                      onTimeUpdate={handleTimeUpdate}
+                      onLoadedMetadata={handleLoadedMetadata}
                     >
                       <source src="https://media.blubrry.com/biggest_tunes_with_mario_135/content.blubrry.com/biggest_tunes_with_mario_135/Biggest-Tunes-with-Mario-390-streamed.mp3" type="audio/mpeg" />
                       Your browser does not support the audio element.
@@ -181,10 +223,7 @@ const Episode390 = () => {
                           {isLoading ? (
                             <div className="w-4 h-4 border-2 border-neon border-t-transparent rounded-full animate-spin" />
                           ) : isPlaying ? (
-                            <div className="w-6 h-6 flex items-center justify-center">
-                              <div className="w-2 h-4 bg-neon rounded-sm mr-1"></div>
-                              <div className="w-2 h-4 bg-neon rounded-sm"></div>
-                            </div>
+                            <Pause className="w-6 h-6 text-neon" />
                           ) : (
                             <Play className="w-6 h-6 text-neon" />
                           )}
@@ -196,6 +235,25 @@ const Episode390 = () => {
                         <div className="text-right">
                           <p className="text-xs text-muted-foreground">Duration</p>
                           <p className="text-sm font-medium text-neon-purple">1:18:00</p>
+                        </div>
+                      </div>
+
+                      {/* Progress Bar */}
+                      <div className="space-y-2 mb-4">
+                        <div 
+                          className="h-2 bg-primary/40 border border-primary/50 rounded-full cursor-pointer group/progress hover:bg-primary/50 transition-colors"
+                          onClick={handleSeek}
+                        >
+                          <div 
+                            className="h-full bg-gradient-to-r from-neon to-neon-purple rounded-full transition-all duration-150 relative"
+                            style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                          >
+                            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-neon-purple rounded-full shadow-lg shadow-neon-purple/50 opacity-0 group-hover/progress:opacity-100 transition-opacity border-2 border-background" />
+                          </div>
+                        </div>
+                        <div className="flex justify-between text-sm text-primary font-medium">
+                          <span>{formatTime(currentTime)}</span>
+                          <span>{formatTime(duration)}</span>
                         </div>
                       </div>
                       
