@@ -1,16 +1,43 @@
 import { Button } from '@/components/ui/button';
-import { Play, ExternalLink } from 'lucide-react';
+import { Play, Pause, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useState, useRef } from 'react';
 
 const PodcastSection = () => {
   const episodes = [
-    { id: 394, date: 'NOV 15 • 1H 6M', title: 'Future Dance Anthems with Mario 394', link: '/episode/394' },
-    { id: 393, date: 'NOV 1 • 1H 49M', title: 'Future Dance Anthems with Mario 393', link: '/episode/393' },
-    { id: 387, date: 'FRI • 1H 5M', title: 'Future Dance Anthems with Mario 387' },
-    { id: 386, date: 'JUL 19 • 59M', title: 'Future Dance Anthems with Mario 386' },
-    { id: 385, date: 'JUL 13 • 1H 5M', title: 'Future Dance Anthems with Mario 385' },
-    { id: 384, date: 'JUN 28 • 1H 3M', title: 'Future Dance Anthems with Mario 384' },
+    { id: 394, date: 'NOV 15 • 1H 6M', title: 'Future Dance Anthems with Mario 394', link: '/episode/394', audioUrl: 'https://traffic.libsyn.com/secure/danceoneradio/Anthems_of_the_week_394.mp3' },
+    { id: 393, date: 'NOV 1 • 1H 49M', title: 'Future Dance Anthems with Mario 393', link: '/episode/393', audioUrl: 'https://traffic.libsyn.com/secure/danceoneradio/Anthems_of_the_week_393.mp3' },
+    { id: 387, date: 'FRI • 1H 5M', title: 'Future Dance Anthems with Mario 387', audioUrl: 'https://traffic.libsyn.com/secure/danceoneradio/Anthems_of_the_week_387.mp3' },
+    { id: 386, date: 'JUL 19 • 59M', title: 'Future Dance Anthems with Mario 386', audioUrl: 'https://traffic.libsyn.com/secure/danceoneradio/Anthems_of_the_week_386.mp3' },
+    { id: 385, date: 'JUL 13 • 1H 5M', title: 'Future Dance Anthems with Mario 385', audioUrl: 'https://traffic.libsyn.com/secure/danceoneradio/Anthems_of_the_week_385.mp3' },
+    { id: 384, date: 'JUN 28 • 1H 3M', title: 'Future Dance Anthems with Mario 384', audioUrl: 'https://traffic.libsyn.com/secure/danceoneradio/Anthems_of_the_week_384.mp3' },
   ];
+
+  const [playingId, setPlayingId] = useState<number | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const handlePlayPause = (e: React.MouseEvent, episodeId: number, audioUrl: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (playingId === episodeId) {
+      // Pause current episode
+      audioRef.current?.pause();
+      setPlayingId(null);
+    } else {
+      // Play new episode
+      if (audioRef.current) {
+        audioRef.current.src = audioUrl;
+        audioRef.current.play();
+      } else {
+        const audio = new Audio(audioUrl);
+        audioRef.current = audio;
+        audio.play();
+        audio.onended = () => setPlayingId(null);
+      }
+      setPlayingId(episodeId);
+    }
+  };
 
   return (
     <section className="py-16 relative">
@@ -57,8 +84,13 @@ const PodcastSection = () => {
                       variant="ghost" 
                       size="icon" 
                       className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary"
+                      onClick={(e) => handlePlayPause(e, episode.id, episode.audioUrl)}
                     >
-                      <Play className="w-4 h-4" />
+                      {playingId === episode.id ? (
+                        <Pause className="w-4 h-4" />
+                      ) : (
+                        <Play className="w-4 h-4" />
+                      )}
                     </Button>
                   </>
                 );
