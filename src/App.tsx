@@ -21,6 +21,7 @@ import Episode391 from "./pages/Episode391";
 import Episode392 from "./pages/Episode392";
 import Episode393 from "./pages/Episode393";
 import Episode394 from "./pages/Episode394";
+import Episode395 from "./pages/Episode395";
 import DesktopPlayer from "./pages/DesktopPlayer";
 import NotFound from "./pages/NotFound";
 
@@ -51,6 +52,7 @@ const App = () => (
           <Route path="/episode/392" element={<Episode392 />} />
           <Route path="/episode/393" element={<Episode393 />} />
           <Route path="/episode/394" element={<Episode394 />} />
+          <Route path="/episode/395" element={<Episode395 />} />
           <Route path="/desktop" element={<DesktopPlayer />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
