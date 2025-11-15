@@ -48,7 +48,6 @@ const ALL_IMAGES: ImageData[] = [
   { url: "/lovable-uploads/LoveparadeSF_2006_17.JPG", explicit: true },
   { url: "/lovable-uploads/LoveparadeSF_2006_18.JPG", explicit: true },
   { url: "/lovable-uploads/LoveparadeSF_2006_20.JPG" },
-  { url: "/lovable-uploads/LoveparadeSF_2006_21.JPG" },
   { url: "/lovable-uploads/LoveparadeSF_2006_25.JPG" },
   { url: "/lovable-uploads/LoveparadeSF_2006_27.JPG" },
   
