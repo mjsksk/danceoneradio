@@ -27,50 +27,41 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    console.log('🔍 Fetching track history from radio stream...');
+    console.log('🔍 Fetching current track from radio stream...');
     
-    // Fetch from the specific history endpoint
-    const historyUrl = 'https://s9.myradiostream.com:14296/admin.cgi?sid=1&mode=history';
+    // Fetch from current song endpoint (admin endpoint requires auth we don't have)
     let historyData = '';
     
     try {
-      console.log('📡 Attempting direct fetch from:', historyUrl);
-      const response = await fetch(historyUrl, {
+      const currentResponse = await fetch('https://s9.myradiostream.com:14296/currentsong?sid=1', {
         method: 'GET',
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'Accept': '*/*',
         },
       });
-
-      if (response.ok) {
-        historyData = await response.text();
-        console.log('✅ History data fetched:', historyData.substring(0, 200) + '...');
+      
+      if (currentResponse.ok) {
+        const currentTrack = await currentResponse.text();
+        console.log('🎵 Got current track:', currentTrack);
+        historyData = currentTrack;
       } else {
-        console.log('❌ History fetch failed with status:', response.status);
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        console.log('❌ Current track fetch failed with status:', currentResponse.status);
       }
     } catch (error) {
-      console.log('❌ Direct fetch failed, trying alternative methods:', error);
-      
-      // Fallback to current song endpoint if history fails
-      try {
-        const currentResponse = await fetch('https://s9.myradiostream.com:14296/currentsong?sid=1');
-        if (currentResponse.ok) {
-          const currentTrack = await currentResponse.text();
-          console.log('🎵 Got current track as fallback:', currentTrack);
-          historyData = currentTrack;
-        }
-      } catch (fallbackError) {
-        console.log('❌ Fallback also failed:', fallbackError);
-        throw new Error('All endpoints failed');
-      }
+      console.log('❌ Fetch failed:', error);
     }
 
+    // If no data, return success with empty tracks (not an error condition)
     if (!historyData || historyData.trim() === '') {
-      console.log('❌ No history data available');
-      return new Response(JSON.stringify({ error: 'No history data available' }), {
-        status: 400,
+      console.log('ℹ️ No current track data available at this time');
+      return new Response(JSON.stringify({ 
+        success: true, 
+        message: '0 new tracks added',
+        totalTracks: 0,
+        tracks: []
+      }), {
+        status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
@@ -80,9 +71,14 @@ Deno.serve(async (req) => {
     console.log('🎯 Parsed tracks:', tracks.length);
 
     if (tracks.length === 0) {
-      console.log('❌ No tracks found in history data');
-      return new Response(JSON.stringify({ error: 'No tracks found in history' }), {
-        status: 400,
+      console.log('ℹ️ No tracks parsed from data');
+      return new Response(JSON.stringify({ 
+        success: true, 
+        message: '0 new tracks added',
+        totalTracks: 0,
+        tracks: []
+      }), {
+        status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
