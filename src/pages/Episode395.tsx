@@ -168,7 +168,7 @@ const Episode395 = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="w-5 h-5 text-neon-purple" />
-                    <span>1:17:47</span>
+                    <span>1:00:32</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Music className="w-5 h-5 text-primary" />
@@ -239,7 +239,7 @@ const Episode395 = () => {
                         </div>
                         <div className="text-right">
                           <p className="text-xs text-muted-foreground">Duration</p>
-                          <p className="text-sm font-medium text-neon-purple">1:17:47</p>
+                          <p className="text-sm font-medium text-neon-purple">1:00:32</p>
                         </div>
                       </div>
                       
@@ -362,7 +362,7 @@ const Episode395 = () => {
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-primary font-['Orbitron']">
-                        1:17:47
+                        1:00:32
                       </div>
                       <div className="text-sm text-muted-foreground">Duration</div>
                     </div>
