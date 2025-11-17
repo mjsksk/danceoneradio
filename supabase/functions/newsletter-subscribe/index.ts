@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { Resend } from "npm:resend@2.0.0";
+import { checkRateLimit, getClientIdentifier } from "../_shared/rateLimiter.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -37,6 +38,41 @@ const handler = async (req: Request): Promise<Response> => {
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
+
+    // Server-side rate limiting - use email as identifier for newsletter
+    const clientId = getClientIdentifier(req);
+    const rateLimitResult = await checkRateLimit(
+      supabase,
+      {
+        endpoint: 'newsletter-subscribe',
+        maxRequests: 2,
+        windowMs: 300000 // 5 minutes
+      },
+      `${clientId}:${email}`, // Combine IP and email for more granular control
+      req.headers.get('user-agent') || undefined
+    );
+
+    if (!rateLimitResult.allowed) {
+      console.warn('Newsletter rate limit exceeded', { 
+        clientId, 
+        email: email.substring(0, 3) + '***',
+        timestamp: new Date().toISOString() 
+      });
+      return new Response(
+        JSON.stringify({ 
+          error: 'Too many subscription attempts. Please try again later.',
+          retryAfter: rateLimitResult.retryAfter 
+        }),
+        {
+          status: 429,
+          headers: { 
+            "Content-Type": "application/json",
+            "Retry-After": String(rateLimitResult.retryAfter || 300),
+            ...corsHeaders 
+          },
+        }
+      );
+    }
 
     // Check if email already exists
     const { data: existingSubscriber } = await supabase
