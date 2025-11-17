@@ -19,13 +19,13 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    // Rate limiting - 3 requests per minute per IP
+    // Rate limiting - 50 requests per minute per IP (to handle album art fetching for multiple tracks)
     const clientIp = req.headers.get('x-forwarded-for') || 'unknown';
     const rateLimitResult = await checkRateLimit(
       supabase,
       {
         endpoint: 'apple-music-search',
-        maxRequests: 3,
+        maxRequests: 50,
         windowMs: 60000
       },
       clientIp,
