@@ -116,33 +116,62 @@ Deno.serve(async (req) => {
     let newTracksAdded = 0;
     
     for (const track of tracks) {
-      // Check if track already exists (without checking exact played_at to avoid duplicates)
-      const { data: existingTrack } = await supabase
-        .from('radio_track_history')
-        .select('id, played_at')
-        .eq('title', track.title)
-        .eq('artist', track.artist)
-        .order('played_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      // Only add if no existing track found, or if the last occurrence was more than 30 minutes ago
-      const shouldAdd = !existingTrack || 
-        (new Date().getTime() - new Date(existingTrack.played_at).getTime()) > 30 * 60 * 1000;
-
-      if (shouldAdd) {
-        const { error: insertError } = await supabase
+      try {
+        // Check if track already exists (without checking exact played_at to avoid duplicates)
+        const { data: existingTrack, error: queryError } = await supabase
           .from('radio_track_history')
-          .insert([track]);
+          .select('id, played_at')
+          .eq('title', track.title)
+          .eq('artist', track.artist)
+          .order('played_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
 
-        if (!insertError) {
-          newTracksAdded++;
-          console.log('✅ Added new track:', track.title, 'by', track.artist);
-        } else {
-          console.log('❌ Error inserting track:', insertError);
+        if (queryError) {
+          console.log('⚠️ Query error:', queryError);
         }
-      } else {
-        console.log('⏭️ Skipping duplicate track:', track.title, 'by', track.artist);
+
+        // Only add if no existing track found, or if the last occurrence was more than 30 minutes ago
+        let shouldAdd = true;
+        
+        if (existingTrack && existingTrack.played_at) {
+          try {
+            const existingDate = new Date(existingTrack.played_at);
+            const currentTime = new Date().getTime();
+            const existingTime = existingDate.getTime();
+            
+            // Validate dates are valid numbers
+            if (isNaN(existingTime) || isNaN(currentTime)) {
+              console.log('⚠️ Invalid date detected:', { existingTrack, currentTime });
+              shouldAdd = true; // Add anyway if dates are invalid
+            } else {
+              const timeDiff = currentTime - existingTime;
+              shouldAdd = timeDiff > 30 * 60 * 1000;
+              console.log(`⏱️ Time since last play: ${Math.round(timeDiff / 1000 / 60)} minutes`);
+            }
+          } catch (dateError) {
+            console.log('⚠️ Date comparison error:', dateError);
+            shouldAdd = true; // Add anyway if comparison fails
+          }
+        }
+
+        if (shouldAdd) {
+          const { error: insertError } = await supabase
+            .from('radio_track_history')
+            .insert([track]);
+
+          if (!insertError) {
+            newTracksAdded++;
+            console.log('✅ Added new track:', track.title, 'by', track.artist);
+          } else {
+            console.log('❌ Error inserting track:', insertError);
+          }
+        } else {
+          console.log('⏭️ Skipping duplicate track:', track.title, 'by', track.artist);
+        }
+      } catch (trackError) {
+        console.error('❌ Error processing track:', trackError, track);
+        // Continue with next track instead of failing completely
       }
     }
 
@@ -186,14 +215,24 @@ function parseHistoryData(data: string): Track[] {
       lines.forEach((line, index) => {
         const trackInfo = parseTrackInfo(line.trim());
         if (trackInfo) {
-          const playedTime = new Date();
-          playedTime.setMinutes(playedTime.getMinutes() - (index * 5)); // Assume 5min intervals
-          
-          tracks.push({
-            ...trackInfo,
-            played_at: playedTime.toISOString(),
-            source_url: 'https://s9.myradiostream.com:14296/admin.cgi?sid=1&mode=history'
-          });
+          try {
+            const playedTime = new Date();
+            playedTime.setMinutes(playedTime.getMinutes() - (index * 5)); // Assume 5min intervals
+            
+            // Validate the date is valid
+            if (isNaN(playedTime.getTime())) {
+              console.error('❌ Invalid date created for track:', trackInfo);
+              return;
+            }
+            
+            tracks.push({
+              ...trackInfo,
+              played_at: playedTime.toISOString(),
+              source_url: 'https://s9.myradiostream.com:14296/admin.cgi?sid=1&mode=history'
+            });
+          } catch (error) {
+            console.error('❌ Error creating date for track:', error, trackInfo);
+          }
         }
       });
     }
@@ -210,14 +249,24 @@ function parseHistoryData(data: string): Track[] {
           const content = match.replace(/<[^>]+>/g, '').trim();
           const trackInfo = parseTrackInfo(content);
           if (trackInfo) {
-            const playedTime = new Date();
-            playedTime.setMinutes(playedTime.getMinutes() - (index * 5));
-            
-            tracks.push({
-              ...trackInfo,
-              played_at: playedTime.toISOString(),
-              source_url: 'https://s9.myradiostream.com:14296/admin.cgi?sid=1&mode=history'
-            });
+            try {
+              const playedTime = new Date();
+              playedTime.setMinutes(playedTime.getMinutes() - (index * 5));
+              
+              // Validate the date is valid
+              if (isNaN(playedTime.getTime())) {
+                console.error('❌ Invalid date created for HTML track:', trackInfo);
+                return;
+              }
+              
+              tracks.push({
+                ...trackInfo,
+                played_at: playedTime.toISOString(),
+                source_url: 'https://s9.myradiostream.com:14296/admin.cgi?sid=1&mode=history'
+              });
+            } catch (error) {
+              console.error('❌ Error creating date for HTML track:', error, trackInfo);
+            }
           }
         });
       }
@@ -228,11 +277,22 @@ function parseHistoryData(data: string): Track[] {
       console.log('🎵 Parsing as single track');
       const trackInfo = parseTrackInfo(data.trim());
       if (trackInfo) {
-        tracks.push({
-          ...trackInfo,
-          played_at: new Date().toISOString(),
-          source_url: 'https://s9.myradiostream.com:14296/currentsong?sid=1'
-        });
+        try {
+          const currentTime = new Date();
+          
+          // Validate the date is valid
+          if (isNaN(currentTime.getTime())) {
+            console.error('❌ Invalid current date created');
+          } else {
+            tracks.push({
+              ...trackInfo,
+              played_at: currentTime.toISOString(),
+              source_url: 'https://s9.myradiostream.com:14296/currentsong?sid=1'
+            });
+          }
+        } catch (error) {
+          console.error('❌ Error creating date for single track:', error, trackInfo);
+        }
       }
     }
 
