@@ -32,10 +32,13 @@ Deno.serve(async (req) => {
     const clientIp = req.headers.get('x-forwarded-for') || 'unknown';
     const rateLimitResult = await checkRateLimit(
       supabase,
+      {
+        endpoint: 'track-history-updater',
+        maxRequests: 10,
+        windowMs: 60000
+      },
       clientIp,
-      'track-history-updater',
-      10,
-      60000
+      req.headers.get('user-agent') || undefined
     );
 
     if (!rateLimitResult.allowed) {
