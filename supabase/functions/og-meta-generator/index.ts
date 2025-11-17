@@ -6,6 +6,26 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// HTML escape function to prevent XSS
+function escapeHtml(unsafe: string): string {
+  return unsafe
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// Validate URL format
+function isValidUrl(urlString: string): boolean {
+  try {
+    const url = new URL(urlString);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -13,8 +33,22 @@ serve(async (req) => {
 
   try {
     const url = new URL(req.url)
-    const episodeId = url.searchParams.get('episode')
+    const episodeId = url.searchParams.get('episode') || ''
     const showsUrl = url.searchParams.get('url') || ''
+    
+    // Validate and sanitize inputs
+    if (showsUrl && !isValidUrl(showsUrl)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid URL provided' }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+    
+    const safeUrl = escapeHtml(showsUrl)
+    const safeEpisodeId = escapeHtml(episodeId)
     
     // Default meta data
     let title = "Dance One Radio - The Castle of Dance"
@@ -48,6 +82,10 @@ serve(async (req) => {
       }
     }
 
+    // Sanitize title and description for HTML output
+    const safeTitle = escapeHtml(title)
+    const safeDescription = escapeHtml(description)
+    
     // Generate HTML with proper Open Graph meta tags
     const html = `
 <!DOCTYPE html>
@@ -55,14 +93,14 @@ serve(async (req) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${title}</title>
-    <meta name="description" content="${description}">
+    <title>${safeTitle}</title>
+    <meta name="description" content="${safeDescription}">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="${showsUrl}">
-    <meta property="og:title" content="${title}">
-    <meta property="og:description" content="${description}">
+    <meta property="og:url" content="${safeUrl}">
+    <meta property="og:title" content="${safeTitle}">
+    <meta property="og:description" content="${safeDescription}">
     <meta property="og:image" content="https://danceoneradio.com${image}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -70,9 +108,9 @@ serve(async (req) => {
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="${showsUrl}">
-    <meta name="twitter:title" content="${title}">
-    <meta name="twitter:description" content="${description}">
+    <meta name="twitter:url" content="${safeUrl}">
+    <meta name="twitter:title" content="${safeTitle}">
+    <meta name="twitter:description" content="${safeDescription}">
     <meta name="twitter:image" content="https://danceoneradio.com${image}">
     <meta name="twitter:site" content="@DanceOneRadio">
     
@@ -80,15 +118,15 @@ serve(async (req) => {
     <script>
         // Redirect after 2 seconds to allow crawlers to read meta tags
         setTimeout(() => {
-            window.location.href = '${showsUrl}';
+            window.location.href = '${safeUrl}';
         }, 2000);
     </script>
     
     <!-- Immediate redirect for non-crawler traffic -->
-    <meta http-equiv="refresh" content="0;url=${showsUrl}">
+    <meta http-equiv="refresh" content="0;url=${safeUrl}">
 </head>
 <body>
-    <p>Redirecting to <a href="${showsUrl}">${title}</a>...</p>
+    <p>Redirecting to <a href="${safeUrl}">${safeTitle}</a>...</p>
 </body>
 </html>`
 
