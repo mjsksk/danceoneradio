@@ -1,5 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { validateApiKey } from '../_shared/apiKeyAuth.ts'
+import { checkRateLimit } from '../_shared/rateLimiter.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -28,22 +28,33 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    // Validate API key for automated service
-    const apiKey = req.headers.get('x-api-key');
-    const authResult = await validateApiKey(supabase, apiKey);
-    
-    if (!authResult.valid) {
-      console.warn('Unauthorized track history update attempt');
+    // Rate limiting - 10 requests per minute per IP
+    const clientIp = req.headers.get('x-forwarded-for') || 'unknown';
+    const rateLimitResult = await checkRateLimit(
+      supabase,
+      clientIp,
+      'track-history-updater',
+      10,
+      60000
+    );
+
+    if (!rateLimitResult.allowed) {
+      console.warn(`Rate limit exceeded for IP: ${clientIp}`);
       return new Response(
-        JSON.stringify({ error: 'Unauthorized. Valid API key required.' }),
+        JSON.stringify({ 
+          error: 'Too many requests. Please try again later.',
+          retryAfter: Math.ceil(rateLimitResult.retryAfter / 1000)
+        }),
         { 
-          status: 401, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          status: 429,
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json',
+            'Retry-After': String(Math.ceil(rateLimitResult.retryAfter / 1000))
+          }
         }
       );
     }
-
-    console.log('✅ Authenticated service:', authResult.serviceName);
 
     console.log('🔍 Fetching current track from radio stream...');
     
