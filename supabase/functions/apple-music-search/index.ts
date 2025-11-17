@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { checkRateLimit } from '../_shared/rateLimiter.ts'
+import { checkRateLimit, getClientIdentifier } from '../_shared/rateLimiter.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -20,7 +20,7 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey)
 
     // Rate limiting - 50 requests per minute per IP (to handle album art fetching for multiple tracks)
-    const clientIp = req.headers.get('x-forwarded-for') || 'unknown';
+    const clientId = getClientIdentifier(req);
     const rateLimitResult = await checkRateLimit(
       supabase,
       {
@@ -28,12 +28,12 @@ serve(async (req) => {
         maxRequests: 50,
         windowMs: 60000
       },
-      clientIp,
+      clientId,
       req.headers.get('user-agent') || undefined
     );
 
     if (!rateLimitResult.allowed) {
-      console.warn(`Rate limit exceeded for IP: ${clientIp}`);
+      console.warn(`Rate limit exceeded for client: ${clientId}`);
       return new Response(
         JSON.stringify({ 
           error: 'Too many requests. Please try again later.',

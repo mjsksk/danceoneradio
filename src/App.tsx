@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CookieConsent } from "@/components/CookieConsent";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import Shows from "./pages/Shows";
 import Gallery from "./pages/Gallery";
@@ -34,30 +35,32 @@ const App = () => (
       <Sonner />
       <CookieConsent />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/shows" element={<Shows />} />
-          <Route path="/gallery" element={<Gallery />} />
-          <Route path="/gallery/love-parade-2005" element={<LoveParade2005 />} />
-          <Route path="/gallery/love-parade-2006" element={<LoveParade2006 />} />
-          <Route path="/downloads" element={<Downloads />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/love" element={<Love />} />
-          <Route path="/dmca" element={<Dmca />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/player" element={<PlayerPage />} />
-          <Route path="/episode/389" element={<Episode389 />} />
-          <Route path="/episode/390" element={<Episode390 />} />
-          <Route path="/episode/391" element={<Episode391 />} />
-          <Route path="/episode/392" element={<Episode392 />} />
-          <Route path="/episode/393" element={<Episode393 />} />
-          <Route path="/episode/394" element={<Episode394 />} />
-          <Route path="/episode/395" element={<Episode395 />} />
-          <Route path="/desktop" element={<DesktopPlayer />} />
-          
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/shows" element={<Shows />} />
+            <Route path="/gallery" element={<Gallery />} />
+            <Route path="/gallery/love-parade-2005" element={<LoveParade2005 />} />
+            <Route path="/gallery/love-parade-2006" element={<LoveParade2006 />} />
+            <Route path="/downloads" element={<Downloads />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/love" element={<Love />} />
+            <Route path="/dmca" element={<Dmca />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/player" element={<PlayerPage />} />
+            <Route path="/episode/389" element={<Episode389 />} />
+            <Route path="/episode/390" element={<Episode390 />} />
+            <Route path="/episode/391" element={<Episode391 />} />
+            <Route path="/episode/392" element={<Episode392 />} />
+            <Route path="/episode/393" element={<Episode393 />} />
+            <Route path="/episode/394" element={<Episode394 />} />
+            <Route path="/episode/395" element={<Episode395 />} />
+            <Route path="/desktop" element={<DesktopPlayer />} />
+            
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ErrorBoundary>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

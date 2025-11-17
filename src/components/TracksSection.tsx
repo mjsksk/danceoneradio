@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Download, Heart, Share2, Clock, RefreshCw, Radio } from 'lucide-react';
 import { RadioStreamService } from '@/utils/RadioStreamService';
@@ -31,6 +31,7 @@ const TracksSection = () => {
   const [previewErrors, setPreviewErrors] = useState<{[key: number]: string}>({});
   const [audioRef, setAudioRef] = useState<HTMLAudioElement | null>(null);
   const [likedTracks, setLikedTracks] = useState<Set<number>>(new Set());
+  const fetchingPreviewsRef = useRef(false);
 
   // Initialize audio element and load liked tracks
   useEffect(() => {
@@ -120,10 +121,13 @@ const TracksSection = () => {
   // Enable Apple Music preview fetching now that the API token is configured
   useEffect(() => {
     const fetchPreviews = async () => {
+      if (fetchingPreviewsRef.current || tracks.length === 0) return;
+      
+      fetchingPreviewsRef.current = true;
       console.log('🎵 Starting to fetch Apple Music previews for', tracks.length, 'tracks');
       
       for (const track of tracks) {
-        if (!previewUrls[track.id] && !loadingPreviews[track.id] && !previewErrors[track.id]) {
+        if (!previewUrls[track.id] && !previewErrors[track.id]) {
           setLoadingPreviews(prev => ({...prev, [track.id]: true}));
           
           try {
@@ -145,13 +149,15 @@ const TracksSection = () => {
           }
         }
       }
+      
+      fetchingPreviewsRef.current = false;
     };
 
     if (tracks.length > 0) {
       console.log('🎵 Tracks loaded, starting preview fetch process');
       fetchPreviews();
     }
-  }, [tracks, previewUrls, loadingPreviews, previewErrors]);
+  }, [tracks]);
 
   useEffect(() => {
     const fetchRecentTracks = async () => {
