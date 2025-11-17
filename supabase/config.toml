@@ -10,7 +10,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.newsletter-campaign]
-verify_jwt = false
+verify_jwt = true
 
 [functions.newsletter-unsubscribe]
 verify_jwt = false

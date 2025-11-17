@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      api_keys: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          key_hash: string
+          last_used_at: string | null
+          service_name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          key_hash: string
+          last_used_at?: string | null
+          service_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          key_hash?: string
+          last_used_at?: string | null
+          service_name?: string
+        }
+        Relationships: []
+      }
+      api_request_log: {
+        Row: {
+          created_at: string
+          endpoint: string
+          id: string
+          identifier: string
+          success: boolean | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          id?: string
+          identifier: string
+          success?: boolean | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          id?: string
+          identifier?: string
+          success?: boolean | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           created_at: string
@@ -139,6 +193,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_old_request_logs: { Args: never; Returns: undefined }
       validate_unsubscribe_token: {
         Args: { token_input: string }
         Returns: boolean

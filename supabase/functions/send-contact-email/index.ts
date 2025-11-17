@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { Resend } from "npm:resend@2.0.0";
+import { checkRateLimit, getClientIdentifier } from "../_shared/rateLimiter.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -58,6 +60,43 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Initialize Supabase client for rate limiting
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
+    // Server-side rate limiting
+    const clientId = getClientIdentifier(req);
+    const rateLimitResult = await checkRateLimit(
+      supabase,
+      {
+        endpoint: 'send-contact-email',
+        maxRequests: 3,
+        windowMs: 60000 // 1 minute
+      },
+      clientId,
+      req.headers.get('user-agent') || undefined
+    );
+
+    if (!rateLimitResult.allowed) {
+      console.warn('Rate limit exceeded', { clientId, timestamp: new Date().toISOString() });
+      return new Response(
+        JSON.stringify({ 
+          error: 'Rate limit exceeded. Please try again later.',
+          retryAfter: rateLimitResult.retryAfter 
+        }),
+        {
+          status: 429,
+          headers: { 
+            "Content-Type": "application/json", 
+            "Retry-After": String(rateLimitResult.retryAfter || 60),
+            ...corsHeaders 
+          },
+        }
+      );
+    }
+
     const requestData: ContactEmailRequest = await req.json();
     
     // Validate input

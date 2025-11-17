@@ -1,8 +1,9 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { validateApiKey } from '../_shared/apiKeyAuth.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-api-key',
 }
 
 interface Track {
@@ -26,6 +27,23 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseKey)
+
+    // Validate API key for automated service
+    const apiKey = req.headers.get('x-api-key');
+    const authResult = await validateApiKey(supabase, apiKey);
+    
+    if (!authResult.valid) {
+      console.warn('Unauthorized track history update attempt');
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized. Valid API key required.' }),
+        { 
+          status: 401, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    console.log('✅ Authenticated service:', authResult.serviceName);
 
     console.log('🔍 Fetching current track from radio stream...');
     
