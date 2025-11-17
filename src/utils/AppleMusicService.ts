@@ -26,28 +26,35 @@ interface AppleMusicSearchResponse {
 export class AppleMusicService {
   private static baseUrl = 'https://upbwlnpycrbhxahjztrf.supabase.co/functions/v1/apple-music-search';
   private static cache = new Map<string, Promise<string | null>>();
-  private static connectionTested = false;
+  private static connectionTestPromise: Promise<boolean> | null = null;
 
   static async testConnection(): Promise<boolean> {
-    if (this.connectionTested) {
-      return true;
+    // Return existing promise if test is in progress or completed
+    if (this.connectionTestPromise) {
+      return await this.connectionTestPromise;
     }
     
-    try {
-      console.log('🔧 Testing Apple Music API connection...');
-      const testResponse = await fetch(`${this.baseUrl}?q=test`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-      
-      this.connectionTested = testResponse.ok;
-      return this.connectionTested;
-    } catch (error) {
-      console.error('🔧 Apple Music API connection test failed:', error);
-      return false;
-    }
+    // Create and store the test promise
+    this.connectionTestPromise = (async () => {
+      try {
+        console.log('🔧 Testing Apple Music API connection...');
+        const testResponse = await fetch(`${this.baseUrl}?q=test`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        
+        const result = testResponse.ok;
+        console.log('🔧 Connection test result:', result);
+        return result;
+      } catch (error) {
+        console.error('🔧 Apple Music API connection test failed:', error);
+        return false;
+      }
+    })();
+    
+    return await this.connectionTestPromise;
   }
 
   static async searchTrack(artist: string, title: string): Promise<string | null> {
@@ -75,13 +82,11 @@ export class AppleMusicService {
     try {
       console.log('🎵 Searching Apple Music for:', query);
 
-      // Only test connection once
-      if (!this.connectionTested) {
-        const isConnected = await this.testConnection();
-        if (!isConnected) {
-          console.error('🎵 Apple Music API connection failed, skipping search');
-          return null;
-        }
+      // Test connection (will use cached promise if already tested)
+      const isConnected = await this.testConnection();
+      if (!isConnected) {
+        console.error('🎵 Apple Music API connection failed, skipping search');
+        return null;
       }
 
       const fullUrl = `${this.baseUrl}?q=${encodeURIComponent(query)}`;
