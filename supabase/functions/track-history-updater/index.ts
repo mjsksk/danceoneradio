@@ -124,7 +124,7 @@ Deno.serve(async (req) => {
         .eq('artist', track.artist)
         .order('played_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       // Only add if no existing track found, or if the last occurrence was more than 30 minutes ago
       const shouldAdd = !existingTrack || 
