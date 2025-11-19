@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CookieConsent } from "@/components/CookieConsent";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Shows from "./pages/Shows";
 import Gallery from "./pages/Gallery";
@@ -24,6 +26,9 @@ import Episode393 from "./pages/Episode393";
 import Episode394 from "./pages/Episode394";
 import Episode395 from "./pages/Episode395";
 import DesktopPlayer from "./pages/DesktopPlayer";
+import Auth from "./pages/Auth";
+import Account from "./pages/Account";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,12 +36,13 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <CookieConsent />
-      <BrowserRouter>
-        <ErrorBoundary>
-          <Routes>
+      <AuthProvider>
+        <Toaster />
+        <Sonner />
+        <CookieConsent />
+        <BrowserRouter>
+          <ErrorBoundary>
+            <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/shows" element={<Shows />} />
             <Route path="/gallery" element={<Gallery />} />
@@ -56,12 +62,16 @@ const App = () => (
             <Route path="/episode/394" element={<Episode394 />} />
             <Route path="/episode/395" element={<Episode395 />} />
             <Route path="/desktop" element={<DesktopPlayer />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
-          </Routes>
-        </ErrorBoundary>
-      </BrowserRouter>
+            </Routes>
+          </ErrorBoundary>
+        </BrowserRouter>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

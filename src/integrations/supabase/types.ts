@@ -95,6 +95,48 @@ export type Database = {
         }
         Relationships: []
       }
+      episode_listening_progress: {
+        Row: {
+          audio_url: string
+          completed: boolean | null
+          created_at: string | null
+          duration: number
+          episode_number: number
+          episode_title: string
+          id: string
+          last_listened_at: string | null
+          playback_position: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          audio_url: string
+          completed?: boolean | null
+          created_at?: string | null
+          duration?: number
+          episode_number: number
+          episode_title: string
+          id?: string
+          last_listened_at?: string | null
+          playback_position?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          audio_url?: string
+          completed?: boolean | null
+          created_at?: string | null
+          duration?: number
+          episode_number?: number
+          episode_title?: string
+          id?: string
+          last_listened_at?: string | null
+          playback_position?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       newsletter_campaigns: {
         Row: {
           content: string
@@ -152,6 +194,30 @@ export type Database = {
           subscribed_at?: string
           unsubscribe_token?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          display_name: string | null
+          email: string
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_name?: string | null
+          email: string
+          id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_name?: string | null
+          email?: string
+          id?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
