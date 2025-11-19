@@ -76,6 +76,30 @@ const routes = [
     image: '/lovable-uploads/mario-show.jpg'
   },
   {
+    path: '/episode/392',
+    title: 'Anthems of the week 392 - Future Dance Anthems with Mario | Dance One Radio',
+    description: 'Episode 392 featuring 25 tracks of the latest electronic dance music, including tracks from John Summit, KETTAMA, Hot Since 82, and more.',
+    image: '/lovable-uploads/mario-show.jpg'
+  },
+  {
+    path: '/episode/393',
+    title: 'Anthems of the week 393 - Future Dance Anthems with Mario | Dance One Radio',
+    description: 'Episode 393 featuring 35 tracks of the latest electronic dance music, including tracks from Hana, Chaney, Bruno Martini, Kaskade, and more.',
+    image: '/lovable-uploads/mario-show.jpg'
+  },
+  {
+    path: '/episode/394',
+    title: 'Anthems of the week 394 - Future Dance Anthems with Mario | Dance One Radio',
+    description: 'Episode 394 featuring 19 tracks of the latest electronic dance music, including tracks from CamelPhat, Kaz James, Nic Fanciulli, and more.',
+    image: '/lovable-uploads/mario-show.jpg'
+  },
+  {
+    path: '/episode/395',
+    title: 'Anthems of the week 395 - Future Dance Anthems with Mario | Dance One Radio',
+    description: 'Episode 395 featuring 15 tracks of the latest electronic dance music, including tracks from Durante, Faithless, Above & Beyond, and more.',
+    image: '/lovable-uploads/mario-show.jpg'
+  },
+  {
     path: '/privacy',
     title: 'Privacy Policy - Dance One Radio',
     description: 'Read the privacy policy for Dance One Radio. Learn how we collect, use, and protect your personal information.',
