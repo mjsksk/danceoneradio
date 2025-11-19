@@ -6,8 +6,11 @@ import Footer from '@/components/Footer';
 import SocialShare from '@/components/SocialShare';
 import SEO from '@/components/SEO';
 import GoogleAds from '@/components/GoogleAds';
+import { LoginPrompt } from '@/components/LoginPrompt';
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useListeningProgress } from '@/hooks/useListeningProgress';
 
 interface Track {
   position: number;
@@ -17,6 +20,13 @@ interface Track {
 }
 
 const Episode395 = () => {
+  const { user } = useAuth();
+  const episodeNumber = 395;
+  const episodeTitle = "Future Dance Anthems with Mario 395";
+  const audioUrl = "https://upbwlnpycrbhxahjztrf.supabase.co/storage/v1/object/public/Public%20images/Mario%20Show/Episode%20395.mp3?t=2025-01-19T01%3A55%3A52.726Z";
+  
+  const { progress, saveProgress } = useListeningProgress(episodeNumber, episodeTitle, audioUrl);
+  
   const [bgLoaded, setBgLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -36,6 +46,27 @@ const Episode395 = () => {
     img.src = '/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png';
   }, []);
 
+  // Restore progress on load
+  useEffect(() => {
+    if (progress && audioRef.current && !isPlaying) {
+      audioRef.current.currentTime = progress.playback_position;
+      setCurrentTime(progress.playback_position);
+    }
+  }, [progress, isPlaying]);
+
+  // Auto-save progress every 5 seconds when playing
+  useEffect(() => {
+    if (!user || !isPlaying) return;
+    
+    const interval = setInterval(() => {
+      if (audioRef.current) {
+        saveProgress(audioRef.current.currentTime, audioRef.current.duration);
+      }
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [isPlaying, user, saveProgress]);
+
   const handlePlayPause = async () => {
     if (!audioRef.current) return;
     
@@ -45,6 +76,11 @@ const Episode395 = () => {
       if (isPlaying) {
         audioRef.current.pause();
         setIsPlaying(false);
+        
+        // Save progress if user is logged in
+        if (user) {
+          await saveProgress(audioRef.current.currentTime, audioRef.current.duration);
+        }
       } else {
         await audioRef.current.play();
         setIsPlaying(true);
@@ -242,6 +278,20 @@ const Episode395 = () => {
                           <p className="text-sm font-medium text-neon-purple">1:00:32</p>
                         </div>
                       </div>
+                      
+                      {!user && (
+                        <div className="mt-6">
+                          <LoginPrompt />
+                        </div>
+                      )}
+                      
+                      {user && progress && progress.playback_position > 30 && (
+                        <div className="mt-4 p-3 bg-primary/10 border border-primary/30 rounded-lg">
+                          <p className="text-sm text-primary text-center">
+                            ✨ Saved progress: Resume from {formatTime(progress.playback_position)}
+                          </p>
+                        </div>
+                      )}
                       
                       <div className="bg-background/50 rounded-lg p-4 border border-neon/20">
                         <div className="text-center mb-4">

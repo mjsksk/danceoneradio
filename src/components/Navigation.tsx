@@ -1,12 +1,21 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Radio, Volume2 } from 'lucide-react';
+import { Menu, X, UserCircle, LogOut, Settings } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 import logo from '@/assets/dance-one-logo.png';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, profile, signOut } = useAuth();
 
   const navItems = [
     { name: 'Home', href: '/' },
@@ -34,6 +43,39 @@ const Navigation = () => {
                 {item.name}
               </Link>
             ))}
+          </div>
+
+          {/* Auth Section - Desktop */}
+          <div className="hidden md:flex items-center absolute right-4">
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="rounded-full">
+                    <UserCircle className="w-6 h-6 text-primary" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <div className="px-2 py-1.5 text-sm font-medium">
+                    {profile?.display_name || user.email}
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/account" className="cursor-pointer">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Account Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={signOut} className="cursor-pointer">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button asChild variant="default" size="sm">
+                <Link to="/auth">Login</Link>
+              </Button>
+            )}
           </div>
 
 
@@ -65,6 +107,44 @@ const Navigation = () => {
                   {item.name}
                 </Link>
               ))}
+              
+              {/* Auth Links - Mobile */}
+              <div className="pt-4 border-t border-border/50">
+                {user ? (
+                  <>
+                    <Link
+                      to="/account"
+                      className="text-muted-foreground hover:text-primary transition-colors duration-300 font-medium text-sm tracking-tight py-2 flex items-center"
+                      style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <Settings className="w-4 h-4 mr-2" />
+                      Account
+                    </Link>
+                    <button
+                      onClick={() => {
+                        signOut();
+                        setIsMenuOpen(false);
+                      }}
+                      className="text-muted-foreground hover:text-primary transition-colors duration-300 font-medium text-sm tracking-tight py-2 flex items-center w-full text-left"
+                      style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    to="/auth"
+                    className="text-primary hover:text-primary/80 transition-colors duration-300 font-medium text-sm tracking-tight py-2 flex items-center"
+                    style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <UserCircle className="w-4 h-4 mr-2" />
+                    Login
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         )}
