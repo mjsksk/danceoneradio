@@ -19,13 +19,13 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    // Rate limiting: 30 requests per minute per IP
+    // Rate limiting: 50 requests per minute per IP (increased for batch loading)
     const clientId = getClientIdentifier(req)
     const rateLimitResult = await checkRateLimit(
       supabase,
       {
         endpoint: 'album-art-search',
-        maxRequests: 30,
+        maxRequests: 50,
         windowMs: 60000
       },
       clientId,
