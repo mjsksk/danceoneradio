@@ -127,7 +127,30 @@ const Episode396 = () => {
   };
 
   const tracks: Track[] = [
-    // Tracks will be added via CSV import
+    { position: 1, title: "Silver Sun", artist: "Miguel Migs" },
+    { position: 2, title: "Too Slow (All Night)", artist: "Eliza Rose & Oppidan" },
+    { position: 3, title: "A New Day (feat. Celine Dion)", artist: "Sebastian Ingrosso" },
+    { position: 4, title: "Keep On Dreaming", artist: "Miguel Migs" },
+    { position: 5, title: "Dr Feel Right ft. The Egyptian Lover & Rome Fortune", artist: "Josh Baker" },
+    { position: 6, title: "Back Tonight", artist: "Miguel Migs" },
+    { position: 7, title: "To The Other Side", artist: "Miguel Migs" },
+    { position: 8, title: "Disco Fever", artist: "Berry Wildz x Bob Shepherd x Da Clubbmaster" },
+    { position: 9, title: "Stay A Little Longer", artist: "Joel Corry, Galantis & Izzy Bizu" },
+    { position: 10, title: "Just Be Good", artist: "RUZE & Chesster" },
+    { position: 11, title: "Chasing Time", artist: "Miguel Migs" },
+    { position: 12, title: "WHERE IS MY HUSBAND! (David Guetta & Hypaton Extended Remix)", artist: "Raye" },
+    { position: 13, title: "Back To You (Extended)", artist: "Andrew Nagy, Aaron Pfeiffer, Arteboome" },
+    { position: 14, title: "Into The Red Sky", artist: "Miguel Migs" },
+    { position: 15, title: "Ego", artist: "bbyclose" },
+    { position: 16, title: "So Far", artist: "Miguel Migs" },
+    { position: 17, title: "Against The Clock", artist: "MPH & EV" },
+    { position: 18, title: "FADED", artist: "HAYLA & Nelly Furtado" },
+    { position: 19, title: "Running With You", artist: "Miguel Migs" },
+    { position: 20, title: "Chase The Dawn", artist: "Ruth Royall ft. Ekko & Sidetrack" },
+    { position: 21, title: "Restless Nights", artist: "Miguel Migs" },
+    { position: 22, title: "Guardian Angel", artist: "Dimension, Karen Harding" },
+    { position: 23, title: "Waiting So Long (feat. CARIBOU)", artist: "Daphni" },
+    { position: 24, title: "Cantik", artist: "Mike Hotten, Karmaloft" },
   ];
 
   return (
