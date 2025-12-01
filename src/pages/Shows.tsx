@@ -23,7 +23,7 @@ interface Episode {
 }
 
 // Array of episode numbers that have dedicated pages
-const availableEpisodePages = [389, 390, 391, 392, 393, 394, 395];
+const availableEpisodePages = [389, 390, 391, 392, 393, 394, 395, 396, 397];
 
 const Shows = () => {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
