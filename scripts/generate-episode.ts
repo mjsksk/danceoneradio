@@ -71,145 +71,397 @@ function episodeExists(episodeNumber: number): boolean {
 }
 
 function generateEpisodeFile(episode: Episode): string {
-  return `import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import SEO from "@/components/SEO";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, Apple } from "lucide-react";
-import SocialShare from "@/components/SocialShare";
-import LoginPrompt from "@/components/LoginPrompt";
-import { useAuth } from "@/contexts/AuthContext";
-import { useListeningProgress } from "@/hooks/useListeningProgress";
-import GoogleAds from "@/components/GoogleAds";
+  return `import { ArrowLeft, Calendar, Clock, Music, Play, Pause, Apple } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
+import SocialShare from '@/components/SocialShare';
+import SEO from '@/components/SEO';
+import GoogleAds from '@/components/GoogleAds';
+import { LoginPrompt } from '@/components/LoginPrompt';
+import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useListeningProgress } from '@/hooks/useListeningProgress';
+
+interface Track {
+  position: number;
+  title: string;
+  artist: string;
+  isUnreleased?: boolean;
+}
 
 const Episode${episode.number} = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const episodeNumber = ${episode.number};
+  const episodeTitle = "${episode.title}";
+  const audioUrl = "${episode.audioUrl}";
   
-  const episodeData = {
-    number: ${episode.number},
-    title: "${episode.title}",
-    audioUrl: "${episode.audioUrl}",
-    duration: "${episode.duration}"
+  const { progress, saveProgress } = useListeningProgress(episodeNumber, episodeTitle, audioUrl);
+  
+  const [bgLoaded, setBgLoaded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  // Preload background image for better performance
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => setBgLoaded(true);
+    img.src = '/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png';
+  }, []);
+
+  // Restore progress on load
+  useEffect(() => {
+    if (progress && audioRef.current && !isPlaying) {
+      audioRef.current.currentTime = progress.playback_position;
+      setCurrentTime(progress.playback_position);
+    }
+  }, [progress, isPlaying]);
+
+  // Auto-save progress every 5 seconds when playing
+  useEffect(() => {
+    if (!user || !isPlaying) return;
+    
+    const interval = setInterval(() => {
+      if (audioRef.current) {
+        saveProgress(audioRef.current.currentTime, audioRef.current.duration);
+      }
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [isPlaying, user, saveProgress]);
+
+  const handlePlayPause = async () => {
+    if (!audioRef.current) return;
+    
+    try {
+      setIsLoading(true);
+      
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+        
+        // Save progress if user is logged in
+        if (user) {
+          await saveProgress(audioRef.current.currentTime, audioRef.current.duration);
+        }
+      } else {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      }
+    } catch (error) {
+      console.error('Error playing audio:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const { progress, handleTimeUpdate, handleLoadedMetadata } = useListeningProgress(
-    episodeData,
-    user
-  );
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration);
+    }
+  };
+
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!audioRef.current) return;
+    
+    const progressBar = e.currentTarget;
+    const rect = progressBar.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percentage = x / rect.width;
+    const newTime = percentage * duration;
+    
+    audioRef.current.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
+
+  const formatTime = (timeInSeconds: number) => {
+    if (isNaN(timeInSeconds)) return '0:00';
+    
+    const hours = Math.floor(timeInSeconds / 3600);
+    const minutes = Math.floor((timeInSeconds % 3600) / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    
+    if (hours > 0) {
+      return \`\${hours}:\${minutes.toString().padStart(2, '0')}:\${seconds.toString().padStart(2, '0')}\`;
+    }
+    return \`\${minutes}:\${seconds.toString().padStart(2, '0')}\`;
+  };
+
+  // TODO: Import tracks from CSV after generation
+  const tracks: Track[] = [];
 
   return (
-    <>
+    <div className="min-h-screen bg-background overflow-x-hidden relative">
       <SEO 
         title="Anthems of the week ${episode.number} - Future Dance Anthems with Mario | Dance One Radio"
         description="${episode.description}"
-        image="/lovable-uploads/mario-show.jpg"
-        url={\`https://danceoneradio.com/episode/${episode.number}\`}
-        type="music.radio_station"
-        keywords="dance music podcast, EDM podcast, electronic music, trance music, house music, episode ${episode.number}, Future Dance Anthems"
+        image="/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png"
+        url={window.location.href}
+      />
+      {/* Optimized Background Image with lazy loading */}
+      <div 
+        className={\`fixed inset-0 z-0 opacity-20 transition-opacity duration-500 \${
+          bgLoaded ? 'opacity-20' : 'opacity-0'
+        }\`}
+        style={{
+          backgroundImage: 'url(/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'top center',
+          backgroundRepeat: 'no-repeat',
+          willChange: 'transform',
+          transform: 'translateZ(0)',
+          backfaceVisibility: 'hidden'
+        }}
       />
       
-      <div className="min-h-screen bg-background relative overflow-hidden">
-        <div className="fixed inset-0 bg-gradient-to-br from-background via-background to-primary/5" />
-        
+      {/* Content overlay */}
+      <div className="relative z-10">
         <Navigation />
-        
-        <main className="container mx-auto px-4 pt-24 pb-16 relative z-10">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/shows')}
-            className="mb-6 text-foreground hover:text-primary transition-colors"
-          >
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Back to Shows
-          </Button>
-
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-card/50 backdrop-blur-sm rounded-lg p-8 border border-border/50 shadow-xl">
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  <h1 className="text-4xl font-['Orbitron'] font-bold mb-2 text-neon">
-                    Episode ${episode.number}
-                  </h1>
-                  <p className="text-muted-foreground font-['Rajdhani']">
-                    ${episode.date} • ${episode.duration}
-                  </p>
-                </div>
-                <SocialShare 
-                  url={\`https://danceoneradio.com/episode/${episode.number}\`}
-                  title="${episode.title}"
-                />
-              </div>
-
-              <div className="mb-8">
-                <audio
-                  controls
-                  className="w-full"
-                  src="${episode.audioUrl}"
-                  onTimeUpdate={handleTimeUpdate}
-                  onLoadedMetadata={handleLoadedMetadata}
-                  ref={(audio) => {
-                    if (audio && progress > 0) {
-                      audio.currentTime = progress;
-                    }
-                  }}
-                  onPause={() => {
-                    if (!user) {
-                      setShowLoginPrompt(true);
-                    }
-                  }}
-                >
-                  Your browser does not support the audio element.
-                </audio>
-                {progress > 0 && user && (
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Resume from {Math.floor(progress / 60)}:{String(Math.floor(progress % 60)).padStart(2, '0')}
-                  </p>
-                )}
-              </div>
-
-              <div className="mb-8">
-                <a 
-                  href="https://podcasts.apple.com/us/podcast/future-dance-anthems-with-mario/id1439656478"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors font-['Rajdhani']"
-                >
-                  <Apple className="w-5 h-5" />
-                  Listen on Apple Podcasts
-                </a>
-              </div>
-
-              <div className="prose prose-invert max-w-none">
-                <h2 className="text-2xl font-['Orbitron'] font-bold mb-4 text-neon-purple">
-                  Track Listing
-                </h2>
-                <div className="space-y-2 font-['Rajdhani']">
-                  {/* TODO: Add track listing here after CSV import */}
-                  <p className="text-muted-foreground italic">
-                    Track listing will be added after CSV import
-                  </p>
-                </div>
-              </div>
+      
+      <main className="pt-16">
+        {/* Hero Section */}
+        <section className="py-12 relative">
+          <div className="container mx-auto px-4">
+            {/* Back Navigation */}
+            <div className="mb-8">
+              <Link to="/shows">
+                <Button variant="ghost" className="mb-4 hover:text-primary">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Shows
+                </Button>
+              </Link>
             </div>
+            
+            <div className="max-w-4xl mx-auto">
+              <h1 className="text-3xl md:text-5xl font-['Orbitron'] font-bold mb-6 text-center">
+                <span className="text-neon">Anthems of the week</span>{" "}
+                <span className="text-neon-purple">${episode.number}</span>
+              </h1>
+              
+              <Card className="card-cyber p-6 mb-8">
+                <div className="flex flex-wrap items-center justify-center gap-6 text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-neon" />
+                    <span>${episode.date}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-neon-purple" />
+                    <span>${episode.duration}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Music className="w-5 h-5 text-primary" />
+                    <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                      EDM • House • Dance
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="mt-6 text-center">
+                  <p className="text-muted-foreground mb-4 leading-relaxed">
+                    ${episode.description.substring(0, 250)}...
+                  </p>
+                  
+                  <div className="w-full max-w-2xl mx-auto">
+                    <audio 
+                      ref={audioRef}
+                      preload="metadata"
+                      onEnded={() => setIsPlaying(false)}
+                      onPause={() => setIsPlaying(false)}
+                      onPlay={() => setIsPlaying(true)}
+                      onTimeUpdate={handleTimeUpdate}
+                      onLoadedMetadata={handleLoadedMetadata}
+                    >
+                      <source src="${episode.audioUrl}" type="audio/mpeg" />
+                      Your browser does not support the audio element.
+                    </audio>
+                    
+                    <div className="card-cyber p-6 bg-gradient-to-br from-background/80 to-background/60 backdrop-blur-sm">
+                      <div className="flex items-center gap-4 mb-4">
+                        <Button 
+                          className="w-12 h-12 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full flex items-center justify-center hover:from-neon/30 hover:to-neon-purple/30 transition-all duration-200 p-0"
+                          onClick={handlePlayPause}
+                          disabled={isLoading}
+                        >
+                          {isLoading ? (
+                            <div className="w-4 h-4 border-2 border-neon border-t-transparent rounded-full animate-spin" />
+                          ) : isPlaying ? (
+                            <Pause className="w-6 h-6 text-neon" />
+                          ) : (
+                            <Play className="w-6 h-6 text-neon" />
+                          )}
+                        </Button>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-primary">Future Dance Anthems with Mario</h3>
+                          <p className="text-sm text-muted-foreground">Episode ${episode.number} - Anthems of the week</p>
+                        </div>
+                      </div>
 
-            <div className="mt-8">
-              <GoogleAds slot="episode-bottom" format="horizontal" />
+                      {/* Progress Bar */}
+                      <div className="space-y-2">
+                        <div 
+                          className="h-2 bg-primary/40 border border-primary/50 rounded-full cursor-pointer group/progress hover:bg-primary/50 transition-colors"
+                          onClick={handleSeek}
+                        >
+                          <div 
+                            className="h-full bg-gradient-to-r from-neon to-neon-purple rounded-full transition-all duration-150 relative"
+                            style={{ width: \`\${duration > 0 ? (currentTime / duration) * 100 : 0}%\` }}
+                          >
+                            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-neon-purple rounded-full shadow-lg shadow-neon-purple/50 opacity-0 group-hover/progress:opacity-100 transition-opacity border-2 border-background" />
+                          </div>
+                        </div>
+                        <div className="flex justify-between text-sm text-primary font-medium">
+                          <span>{formatTime(currentTime)}</span>
+                          <span>{formatTime(duration)}</span>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-muted-foreground">Duration</p>
+                          <p className="text-sm font-medium text-neon-purple">${episode.duration}</p>
+                        </div>
+                      </div>
+                      
+                      {!user && (
+                        <div className="mt-6">
+                          <LoginPrompt />
+                        </div>
+                      )}
+                      
+                      {user && progress && progress.playback_position > 30 && (
+                        <div className="mt-4 p-3 bg-primary/10 border border-primary/30 rounded-lg">
+                          <p className="text-sm text-primary text-center">
+                            ✨ Saved progress: Resume from {formatTime(progress.playback_position)}
+                          </p>
+                        </div>
+                      )}
+                      
+                      <div className="bg-background/50 rounded-lg p-4 border border-neon/20">
+                        <div className="text-center mb-4">
+                          <p className="text-muted-foreground mb-2">
+                            This episode is available on our podcast platforms
+                          </p>
+                          <div className="flex justify-center gap-4">
+                            <Button 
+                              asChild 
+                              className="bg-gradient-to-r from-neon/20 to-neon-purple/20 border-neon/30 hover:from-neon/30 hover:to-neon-purple/30"
+                            >
+                              <a 
+                                href="https://podcasts.apple.com/us/podcast/future-dance-anthems-with-mario/id1439656478" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2"
+                              >
+                                <Apple className="w-4 h-4" />
+                                Listen on Apple Podcasts
+                              </a>
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              asChild
+                            >
+                              <Link to="/player" className="flex items-center gap-2">
+                                <Music className="w-4 h-4" />
+                                Live Radio
+                              </Link>
+                            </Button>
+                          </div>
+                        </div>
+                        
+                        <div className="text-center">
+                          <p className="text-xs text-muted-foreground">
+                            Subscribe to get notified when new episodes are available
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4">
+                    <SocialShare 
+                      url={window.location.href}
+                      title="Anthems of the week ${episode.number} - Future Dance Anthems with Mario"
+                      description="${episode.description.substring(0, 100)}..."
+                      image={\`\${window.location.origin}/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png\`}
+                    />
+                  </div>
+                </div>
+              </Card>
             </div>
           </div>
-        </main>
+        </section>
 
-        <LoginPrompt 
-          isOpen={showLoginPrompt}
-          onClose={() => setShowLoginPrompt(false)}
-        />
+        <GoogleAds key="episode${episode.number}-ad" slot="6777392184" />
 
-        <Footer />
+        {/* Track Listing */}
+        <section className="py-12">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-2xl md:text-3xl font-['Orbitron'] font-bold mb-8 text-center">
+                <span className="text-neon-purple">Track Listing</span>
+              </h2>
+              
+              {tracks.length === 0 ? (
+                <Card className="card-cyber p-8 text-center">
+                  <p className="text-muted-foreground">
+                    Track listing will be added soon. Use the CSV importer in the admin panel to add tracks.
+                  </p>
+                </Card>
+              ) : (
+                <div className="grid gap-3">
+                  {tracks.map((track) => (
+                    <Card key={track.position} className="card-cyber p-4 hover:scale-[1.01] transition-all duration-200 group">
+                      <div className="flex items-center gap-4">
+                        {/* Track Number */}
+                        <div className="w-12 h-12 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full flex items-center justify-center text-neon font-['Orbitron'] font-bold text-sm">
+                          {track.position}
+                        </div>
+                        
+                        {/* Track Info */}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-primary group-hover:text-neon transition-colors truncate">
+                            {track.title}
+                            {track.isUnreleased && (
+                              <span className="ml-2 px-2 py-1 bg-neon/20 text-neon text-xs rounded-full">
+                                UNRELEASED
+                              </span>
+                            )}
+                          </h3>
+                          <p className="text-sm text-muted-foreground truncate">
+                            {track.artist}
+                          </p>
+                        </div>
+                        
+                        {/* Music Icon */}
+                        <div className="w-8 h-8 flex items-center justify-center text-muted-foreground group-hover:text-neon-purple transition-colors">
+                          <Music className="w-4 h-4" />
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
       </div>
-    </>
+    </div>
   );
 };
 
@@ -245,6 +497,28 @@ function updateAppRouting(episodeNumber: number): void {
 
   fs.writeFileSync(appPath, appContent, 'utf-8');
   console.log('✓ Updated App.tsx routing');
+}
+
+function updateShowsPageAvailableEpisodes(episodeNumber: number): void {
+  const showsPath = path.join(process.cwd(), 'src', 'pages', 'Shows.tsx');
+  let showsContent = fs.readFileSync(showsPath, 'utf-8');
+
+  // Find and update the availableEpisodePages array
+  const arrayMatch = showsContent.match(/const availableEpisodePages = \[([\d,\s]+)\];/);
+  
+  if (arrayMatch) {
+    const currentNumbers = arrayMatch[1].split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+    if (!currentNumbers.includes(episodeNumber)) {
+      currentNumbers.push(episodeNumber);
+      currentNumbers.sort((a, b) => a - b);
+      const newArray = `const availableEpisodePages = [${currentNumbers.join(', ')}];`;
+      showsContent = showsContent.replace(/const availableEpisodePages = \[[\d,\s]+\];/, newArray);
+      fs.writeFileSync(showsPath, showsContent, 'utf-8');
+      console.log('✓ Updated Shows.tsx availableEpisodePages array');
+    }
+  } else {
+    console.warn('⚠️  Could not find availableEpisodePages array in Shows.tsx');
+  }
 }
 
 function updatePrerenderConfig(episode: Episode): void {
@@ -305,6 +579,10 @@ async function main() {
     // Update routing
     console.log('\n🔄 Updating routing configuration...');
     updateAppRouting(episode.number);
+
+    // Update Shows page available episodes
+    console.log('\n📝 Updating Shows.tsx available episodes...');
+    updateShowsPageAvailableEpisodes(episode.number);
 
     // Update prerender config
     console.log('\n🔧 Updating prerender configuration...');
