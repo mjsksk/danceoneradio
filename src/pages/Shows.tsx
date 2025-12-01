@@ -22,6 +22,9 @@ interface Episode {
   episodeNumber?: number;
 }
 
+// Array of episode numbers that have dedicated pages
+const availableEpisodePages = [389, 390, 391, 392, 393, 394, 395];
+
 const Shows = () => {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [totalEpisodes, setTotalEpisodes] = useState<number>(0);
@@ -430,11 +433,9 @@ const Shows = () => {
                         {/* Episode Content */}
                          <div className="flex-1 space-y-4">
                               <div id={`episode-${episode.episodeNumber || (totalEpisodes - index)}`}>
-                               {(episode.title.toLowerCase().includes("389") || 
-                                 episode.title.toLowerCase().includes("anthems of the week 389") ||
-                                 episode.title.toLowerCase().includes("anthems") && episode.title.includes("389")) ? (
+                               {episode.episodeNumber && availableEpisodePages.includes(episode.episodeNumber) ? (
                                  <Link 
-                                   to="/episode/389"
+                                   to={`/episode/${episode.episodeNumber}`}
                                    className="block group/link"
                                    key={`link-${index}-${episode.guid || 'no-guid'}`}
                                  >
@@ -442,83 +443,11 @@ const Shows = () => {
                                      {episode.title}
                                    </h3>
                                  </Link>
-                               ) : (episode.title.toLowerCase().includes("390") || 
-                                 episode.title.toLowerCase().includes("anthems of the week 390") ||
-                                 episode.title.toLowerCase().includes("anthems") && episode.title.includes("390")) ? (
-                                 <Link 
-                                   to="/episode/390"
-                                   className="block group/link"
-                                   key={`link-${index}-${episode.guid || 'no-guid'}`}
-                                 >
-                                   <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold mb-3 text-primary group-hover/link:text-neon transition-colors cursor-pointer hover:underline">
-                                     {episode.title}
-                                   </h3>
-                                 </Link>
-              ) : (episode.title.toLowerCase().includes("391") || 
-                                 episode.title.toLowerCase().includes("anthems of the week 391") ||
-                                 episode.title.toLowerCase().includes("anthems") && episode.title.includes("391")) ? (
-                                 <Link 
-                                   to="/episode/391"
-                                   className="block group/link"
-                                   key={`link-${index}-${episode.guid || 'no-guid'}`}
-                                 >
-                                   <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold mb-3 text-primary group-hover/link:text-neon transition-colors cursor-pointer hover:underline">
-                                     {episode.title}
-                                   </h3>
-                                 </Link>
-                               ) : (episode.title.toLowerCase().includes("392") || 
-                                 episode.title.toLowerCase().includes("anthems of the week 392") ||
-                                 episode.title.toLowerCase().includes("anthems") && episode.title.includes("392")) ? (
-                                 <Link 
-                                   to="/episode/392"
-                                   className="block group/link"
-                                   key={`link-${index}-${episode.guid || 'no-guid'}`}
-                                 >
-                                   <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold mb-3 text-primary group-hover/link:text-neon transition-colors cursor-pointer hover:underline">
-                                     {episode.title}
-                                   </h3>
-                                 </Link>
-                                ) : (episode.title.toLowerCase().includes("393") || 
-                                  episode.title.toLowerCase().includes("anthems of the week 393") ||
-                                  episode.title.toLowerCase().includes("anthems") && episode.title.includes("393")) ? (
-                                  <Link 
-                                    to="/episode/393"
-                                    className="block group/link"
-                                    key={`link-${index}-${episode.guid || 'no-guid'}`}
-                                  >
-                                    <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold mb-3 text-primary group-hover/link:text-neon transition-colors cursor-pointer hover:underline">
-                                      {episode.title}
-                                    </h3>
-                                  </Link>
-                                ) : (episode.title.toLowerCase().includes("394") || 
-                                  episode.title.toLowerCase().includes("anthems of the week 394") ||
-                                  episode.title.toLowerCase().includes("anthems") && episode.title.includes("394")) ? (
-                                  <Link 
-                                    to="/episode/394"
-                                    className="block group/link"
-                                    key={`link-${index}-${episode.guid || 'no-guid'}`}
-                                  >
-                                    <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold mb-3 text-primary group-hover/link:text-neon transition-colors cursor-pointer hover:underline">
-                                      {episode.title}
-                                    </h3>
-                                  </Link>
-                                ) : (episode.title.toLowerCase().includes("395") || 
-                                  episode.title.toLowerCase().includes("anthems of the week 395") ||
-                                  episode.title.toLowerCase().includes("anthems") && episode.title.includes("395")) ? (
-                                  <Link 
-                                    to="/episode/395"
-                                    className="block group/link"
-                                    key={`link-${index}-${episode.guid || 'no-guid'}`}
-                                  >
-                                    <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold mb-3 text-primary group-hover/link:text-neon transition-colors cursor-pointer hover:underline">
-                                      {episode.title}
-                                    </h3>
-                                  </Link>
-                                ) : (
-                                  <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold mb-3 text-primary group-hover:text-neon transition-colors">
-                                    {episode.title}
-                                  </h3>
-                                )}
+                               ) : (
+                                 <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold mb-3 text-primary group-hover:text-neon transition-colors">
+                                   {episode.title}
+                                 </h3>
+                               )}
                             
                             <div className="flex flex-wrap items-center gap-6 mb-4 text-sm text-muted-foreground">
                               <div className="flex items-center gap-2">
