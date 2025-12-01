@@ -29,8 +29,8 @@ const Episode397 = () => {
   const [bgLoaded, setBgLoaded] = useState(false);
 
   const episodeNumber = 397;
-  const episodeTitle = "Future Dance Anthems with Mario - Episode 397";
-  const audioUrl = "https://media.blubrry.com/future_dance_anthems/content.blubrry.com/future_dance_anthems/FDAM_Ep397.mp3";
+  const episodeTitle = "Anthems of the week 397";
+  const audioUrl = "https://media.blubrry.com/biggest_tunes_with_mario_135/mc.blubrry.com/biggest_tunes_with_mario_135/Biggest-Tunes-with-Mario-397-streamed.mp3";
 
   const { 
     progress, 
