@@ -262,7 +262,7 @@ const Episode${episode.number} = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="w-5 h-5 text-neon-purple" />
-                    <span>${episode.duration}</span>
+                    <span>{duration > 0 ? formatTime(duration) : 'Loading...'}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Music className="w-5 h-5 text-primary" />
@@ -331,7 +331,7 @@ const Episode${episode.number} = () => {
                         </div>
                         <div className="text-right">
                           <p className="text-xs text-muted-foreground">Duration</p>
-                          <p className="text-sm font-medium text-neon-purple">${episode.duration}</p>
+                          <p className="text-sm font-medium text-neon-purple">{formatTime(duration)}</p>
                         </div>
                       </div>
                       
