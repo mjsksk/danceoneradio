@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Play, Pause, Share2, ExternalLink } from 'lucide-react';
+import { Play, Pause, ArrowLeft, ExternalLink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import SEO from '@/components/SEO';
 import { LoginPrompt } from '@/components/LoginPrompt';
+import SocialShare from '@/components/SocialShare';
 import { useAuth } from '@/contexts/AuthContext';
 import { useListeningProgress } from '@/hooks/useListeningProgress';
 import applePodcastIcon from '@/assets/app-store-badge-new.svg';
@@ -131,32 +133,6 @@ const Episode396 = () => {
     // Tracks will be added via CSV import
   ];
 
-  const handleShare = async () => {
-    const shareData = {
-      title: episodeTitle,
-      text: 'Check out this episode of Future Dance Anthems with Mario!',
-      url: window.location.href,
-    };
-
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-        toast({
-          title: "Shared successfully!",
-          description: "Thanks for spreading the word!",
-        });
-      } else {
-        await navigator.clipboard.writeText(window.location.href);
-        toast({
-          title: "Link copied!",
-          description: "Share link has been copied to clipboard.",
-        });
-      }
-    } catch (error) {
-      console.error('Error sharing:', error);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <SEO 
@@ -182,6 +158,16 @@ const Episode396 = () => {
 
         <main className="container mx-auto px-4 py-8 mt-20">
           <div className="max-w-4xl mx-auto space-y-8">
+            {/* Back Navigation */}
+            <div className="animate-fade-in">
+              <Link to="/shows">
+                <Button variant="ghost" className="hover:text-primary">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Shows
+                </Button>
+              </Link>
+            </div>
+
             <div className="text-center space-y-4 animate-fade-in">
               <h1 className="text-4xl md:text-5xl font-['Orbitron'] font-bold">
                 <span className="text-neon">Episode {episodeNumber}</span>
@@ -231,14 +217,6 @@ const Episode396 = () => {
                       <Play className="w-6 h-6 ml-1" />
                     )}
                   </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    onClick={handleShare}
-                    className="w-16 h-16 rounded-full"
-                  >
-                    <Share2 className="w-6 h-6" />
-                  </Button>
                 </div>
 
                 <div className="space-y-2">
@@ -254,6 +232,15 @@ const Episode396 = () => {
                     <span>{formatTime(currentTime)}</span>
                     <span>{formatTime(duration)}</span>
                   </div>
+                </div>
+                
+                <div className="flex justify-center">
+                  <SocialShare 
+                    url={window.location.href}
+                    title={episodeTitle}
+                    description="Listen to the latest electronic dance music anthems in this episode of Future Dance Anthems with Mario."
+                    image={`${window.location.origin}/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png`}
+                  />
                 </div>
               </div>
             </Card>
