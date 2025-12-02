@@ -127,7 +127,24 @@ const Episode397 = () => {
   };
 
   const tracks: Track[] = [
-    // Tracks will be added via CSV import
+    { position: 1, title: "Flip Club", artist: "Kaz James" },
+    { position: 2, title: "Lost (Extended Mix)", artist: "Takis" },
+    { position: 3, title: "NO MATTER (Extended Mix)", artist: "Bruno Martini" },
+    { position: 4, title: "Quicksand (Don't Go) [Sultan Shepard Extended Remix]", artist: "Above & Beyond and Zoë Johnston" },
+    { position: 5, title: "One Day (Extended Mix)", artist: "Pithman" },
+    { position: 6, title: "So Real (Extended Mix)", artist: "Hot Since 82 Feat. Leon Jacques" },
+    { position: 7, title: "Love Songs (Extended Mix)", artist: "Prospa, Kosmo Kint" },
+    { position: 8, title: "Children", artist: "Dinka" },
+    { position: 9, title: "BOUNCE (Extended)", artist: "Watzgood" },
+    { position: 10, title: "Forest Woms (Original Mix)", artist: "Rich Trelo" },
+    { position: 11, title: "Call My Name (Original Mix)", artist: "Space Motion & JES" },
+    { position: 12, title: "Por Eso (Extended Mix)", artist: "Andrea Lane, Zsak" },
+    { position: 13, title: "Edge Of Desire (Grigoré & Serve Cold Extended Remix)", artist: "Jonas Blue & Malive" },
+    { position: 14, title: "Knockout (Extended Mix)", artist: "Emanuel Satie & Maga & Mâhfoud" },
+    { position: 15, title: "Rain ft. Poppy Baskcomb (Extended Mix)", artist: "Miss Monique" },
+    { position: 16, title: "Waited All Night (Solomun Remix)", artist: "Jamie xx feat. Romy & Oliver Sim" },
+    { position: 17, title: "Heartbeat", artist: "Elkana Paz, Mai Rubin" },
+    { position: 18, title: "Moth To A Flame", artist: "Jazzy" },
   ];
 
   return (
