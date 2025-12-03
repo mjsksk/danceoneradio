@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, Pause, Clock } from 'lucide-react';
+import { Play, Pause, Clock, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
@@ -134,6 +134,12 @@ const ContinueListening = () => {
            audioPlayer.isPlaying;
   };
 
+  const isEpisodeLoading = (episodeNumber: number) => {
+    return audioPlayer.source === 'episode' && 
+           audioPlayer.episodeInfo?.number === episodeNumber && 
+           audioPlayer.isLoading;
+  };
+
   const handlePlayPause = (episode: EpisodeProgress) => {
     if (isEpisodePlaying(episode.episode_number)) {
       audioPlayer.pause();
@@ -166,8 +172,9 @@ const ContinueListening = () => {
         </h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {episodes.map((episode) => {
+            {episodes.map((episode) => {
             const isPlaying = isEpisodePlaying(episode.episode_number);
+            const isLoading = isEpisodeLoading(episode.episode_number);
             const isThisEpisode = audioPlayer.source === 'episode' && audioPlayer.episodeInfo?.number === episode.episode_number;
             const currentPosition = isThisEpisode ? audioPlayer.currentTime : episode.playback_position;
             const currentDuration = isThisEpisode && audioPlayer.duration > 0 ? audioPlayer.duration : episode.duration;
@@ -197,8 +204,11 @@ const ContinueListening = () => {
                     variant="ghost"
                     className="ml-2 shrink-0 hover:bg-primary/20"
                     onClick={() => handlePlayPause(episode)}
+                    disabled={isLoading}
                   >
-                    {isPlaying ? (
+                    {isLoading ? (
+                      <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                    ) : isPlaying ? (
                       <Pause className="w-5 h-5 text-primary" />
                     ) : (
                       <Play className="w-5 h-5 text-primary" />
