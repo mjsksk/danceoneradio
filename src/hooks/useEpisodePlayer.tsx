@@ -26,16 +26,19 @@ export const useEpisodePlayer = ({ episodeNumber, episodeTitle, audioUrl }: UseE
   // Track previous playing state to detect pause
   const wasPlayingRef = useRef(false);
 
-  // Save progress periodically when playing
+  // Save progress periodically when playing (every 5 seconds)
   useEffect(() => {
     if (!user || !isPlaying || !isThisEpisode) return;
     
     const interval = setInterval(() => {
-      saveProgress(audioPlayer.currentTime, audioPlayer.duration);
+      // Access current values at save time, not from closure
+      if (audioPlayer.currentTime > 0 && audioPlayer.duration > 0) {
+        saveProgress(audioPlayer.currentTime, audioPlayer.duration);
+      }
     }, 5000);
     
     return () => clearInterval(interval);
-  }, [isPlaying, user, saveProgress, isThisEpisode, audioPlayer.currentTime, audioPlayer.duration]);
+  }, [isPlaying, user, isThisEpisode]); // Removed audioPlayer values to prevent interval reset
 
   // Save progress when pausing (detect state change)
   useEffect(() => {
