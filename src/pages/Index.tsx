@@ -2,6 +2,7 @@ import Navigation from '@/components/Navigation';
 import HeroSection from '@/components/HeroSection';
 import ShowsSection from '@/components/ShowsSection';
 import TracksSection from '@/components/TracksSection';
+import ContinueListening from '@/components/ContinueListening';
 import GoogleAds from '@/components/GoogleAds';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
@@ -17,6 +18,7 @@ const Index = () => {
       <Navigation />
       <main className="flex-grow">
         <HeroSection />
+        <ContinueListening />
         <ShowsSection />
         <GoogleAds slot="6777392184" format="auto" />
         <GoogleAds slot="6777392184" format="fluid" layout="in-article" />
