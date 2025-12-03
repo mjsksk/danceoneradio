@@ -19,7 +19,7 @@ interface GoogleAdsProps {
 
 /**
  * Google AdSense component with lazy loading and consent management
- * Supports both display and video ads
+ * Only shows space when actual ad content is detected
  */
 const GoogleAds = ({ 
   slot,
@@ -34,6 +34,7 @@ const GoogleAds = ({
   const [hasAdConsent, setHasAdConsent] = useState(hasConsent('advertising'));
   const [isVisible, setIsVisible] = useState(false);
   const [adPushed, setAdPushed] = useState(false);
+  const [hasAdContent, setHasAdContent] = useState(false);
 
   // Listen for consent changes
   useEffect(() => {
@@ -46,7 +47,7 @@ const GoogleAds = ({
     return () => window.removeEventListener('consentChanged', handleConsentChange);
   }, []);
 
-  // Intersection Observer for lazy loading with aggressive fallback
+  // Intersection Observer for lazy loading
   useEffect(() => {
     if (!hasAdConsent || !adRef.current) return;
 
@@ -54,23 +55,21 @@ const GoogleAds = ({
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            console.log('📢 GoogleAds: Ad became visible via IntersectionObserver');
             setIsVisible(true);
             observer.disconnect();
           }
         });
       },
       { 
-        rootMargin: '800px', // Very aggressive - load ads 800px before they come into view
-        threshold: 0 // Trigger as soon as any pixel is visible
+        rootMargin: '800px',
+        threshold: 0
       }
     );
 
     observer.observe(adRef.current);
     
-    // Aggressive fallback: If not visible after 1 second, force visibility
+    // Fallback: If not visible after 1 second, force visibility
     const fallbackTimer = setTimeout(() => {
-      console.log('📢 GoogleAds: Forcing visibility via timeout fallback');
       setIsVisible(true);
       observer.disconnect();
     }, 1000);
@@ -83,51 +82,100 @@ const GoogleAds = ({
 
   // Push ad to adsbygoogle when visible
   useEffect(() => {
-    if (!isVisible || adPushed || !hasAdConsent) {
-      console.log(`📢 GoogleAds: Skipping ad push - visible:${isVisible}, pushed:${adPushed}, consent:${hasAdConsent}`);
-      return;
-    }
+    if (!isVisible || adPushed || !hasAdConsent) return;
 
     const pushAd = () => {
       try {
-        console.log('📢 GoogleAds: Attempting to push ad for slot:', slot);
         if (window.adsbygoogle) {
-          console.log('📢 GoogleAds: adsbygoogle available, pushing ad');
           (window.adsbygoogle = window.adsbygoogle || []).push({});
           setAdPushed(true);
-          console.log('📢 GoogleAds: Ad pushed successfully for slot:', slot);
-        } else {
-          console.error('📢 GoogleAds: window.adsbygoogle not available');
         }
       } catch (err) {
-        console.error('📢 GoogleAds error:', err);
+        console.error('GoogleAds error:', err);
       }
     };
 
-    // Small delay to ensure DOM is ready
-    console.log('📢 GoogleAds: Scheduling ad push in 100ms');
     const timer = setTimeout(pushAd, 100);
     return () => clearTimeout(timer);
   }, [isVisible, adPushed, hasAdConsent, slot]);
 
+  // Detect actual ad content using MutationObserver and height check
+  useEffect(() => {
+    if (!adPushed || !adRef.current) return;
+
+    const checkForAdContent = () => {
+      if (!adRef.current) return false;
+      
+      // Check if the ad element has actual content (height > 0 or has children)
+      const rect = adRef.current.getBoundingClientRect();
+      const hasChildren = adRef.current.children.length > 0;
+      const hasHeight = rect.height > 10;
+      
+      return hasChildren || hasHeight;
+    };
+
+    // Check immediately
+    if (checkForAdContent()) {
+      setHasAdContent(true);
+      return;
+    }
+
+    // Use MutationObserver to detect when Google injects ad content
+    const observer = new MutationObserver(() => {
+      if (checkForAdContent()) {
+        setHasAdContent(true);
+        observer.disconnect();
+      }
+    });
+
+    observer.observe(adRef.current, {
+      childList: true,
+      subtree: true,
+      attributes: true
+    });
+
+    // Also check periodically for height changes (some ads load async)
+    const intervalId = setInterval(() => {
+      if (checkForAdContent()) {
+        setHasAdContent(true);
+        clearInterval(intervalId);
+        observer.disconnect();
+      }
+    }, 500);
+
+    // Stop checking after 5 seconds - ad won't load
+    const timeout = setTimeout(() => {
+      clearInterval(intervalId);
+      observer.disconnect();
+    }, 5000);
+
+    return () => {
+      clearInterval(intervalId);
+      clearTimeout(timeout);
+      observer.disconnect();
+    };
+  }, [adPushed]);
+
   if (!hasAdConsent) {
-    console.log('📢 GoogleAds: No consent for slot:', slot);
-    return null; // Don't render anything if no consent - Google Consent Mode handles this
+    return null;
   }
 
-  console.log('📢 GoogleAds: Rendering ad slot:', slot, 'visible:', isVisible, 'pushed:', adPushed);
-
+  // Only render visible container when actual ad content is detected
   return (
-    <div className={`flex justify-center transition-all duration-300 ${adPushed ? 'my-4' : 'my-0'} ${className}`}>
+    <div 
+      className={`flex justify-center transition-all duration-300 ${hasAdContent ? 'my-4' : 'my-0'} ${className}`}
+      style={{ 
+        height: hasAdContent ? 'auto' : '0px',
+        overflow: 'hidden'
+      }}
+    >
       <div className="w-full max-w-4xl">
         <ins 
           ref={adRef}
           className="adsbygoogle"
           style={{ 
             display: 'block',
-            minHeight: adPushed ? '90px' : '0px',
-            height: adPushed ? 'auto' : '0px',
-            overflow: 'hidden',
+            minHeight: hasAdContent ? '90px' : '0px',
             ...style
           }}
           data-ad-client="ca-pub-4230589452649530"
