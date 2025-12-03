@@ -10,6 +10,12 @@ const routes = [
     image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
   },
   {
+    path: '/about',
+    title: 'About Dance One Radio - Electronic Dance Music Station',
+    description: 'Learn about Dance One Radio\'s history, mission, and the passionate team behind your favorite electronic dance music station. Discover our story and join our global community.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  {
     path: '/shows',
     title: 'DJ Shows & Podcasts - Dance One Radio',
     description: 'Listen to exclusive DJ mixes, podcasts, and radio shows from Dance One Radio. New episodes weekly featuring the best electronic and dance music.',
