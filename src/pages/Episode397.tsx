@@ -8,9 +8,9 @@ import SEO from '@/components/SEO';
 import GoogleAds from '@/components/GoogleAds';
 import { LoginPrompt } from '@/components/LoginPrompt';
 import { Link } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useListeningProgress } from '@/hooks/useListeningProgress';
+import { useEpisodePlayer } from '@/hooks/useEpisodePlayer';
 
 interface Track {
   position: number;
@@ -26,14 +26,18 @@ const Episode397 = () => {
   const audioUrl = "https://media.blubrry.com/biggest_tunes_with_mario_135/mc.blubrry.com/biggest_tunes_with_mario_135/Biggest-Tunes-with-Mario-397-streamed.mp3?awCollectionId=673838&awEpisodeId=11864214&aw_0_azn.pgenre=Music&aw_0_1st.ri=blubrry&aw_0_azn.pcountry=US&aw_0_azn.planguage=en-us&cat_exclude=IAB1-8%2CIAB1-9%2CIAB7-41%2CIAB8-5%2CIAB8-18%2CIAB11-4%2CIAB23%2CIAB24%2CIAB25%2CIAB26&aw_0_cnt.rss=https%3A%2F%2Ffeeds.blubrry.com%2Ffeeds%2Fbiggest_tunes_with_mario_135.xml";
   const episodeDate = "November 28, 2025";
   
-  const { progress, saveProgress } = useListeningProgress(episodeNumber, episodeTitle, audioUrl);
+  const { 
+    isPlaying, 
+    isLoading, 
+    currentTime, 
+    duration, 
+    progress, 
+    handlePlayPause, 
+    handleSeek, 
+    formatTime 
+  } = useEpisodePlayer({ episodeNumber, episodeTitle, audioUrl });
   
   const [bgLoaded, setBgLoaded] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -45,85 +49,11 @@ const Episode397 = () => {
     img.src = '/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png';
   }, []);
 
-  useEffect(() => {
-    if (progress && audioRef.current && !isPlaying) {
-      audioRef.current.currentTime = progress.playback_position;
-      setCurrentTime(progress.playback_position);
-    }
-  }, [progress, isPlaying]);
-
-  useEffect(() => {
-    if (!user || !isPlaying) return;
-    
-    const interval = setInterval(() => {
-      if (audioRef.current) {
-        saveProgress(audioRef.current.currentTime, audioRef.current.duration);
-      }
-    }, 5000);
-    
-    return () => clearInterval(interval);
-  }, [isPlaying, user, saveProgress]);
-
-  const handlePlayPause = async () => {
-    if (!audioRef.current) return;
-    
-    try {
-      setIsLoading(true);
-      
-      if (isPlaying) {
-        audioRef.current.pause();
-        setIsPlaying(false);
-        
-        if (user) {
-          await saveProgress(audioRef.current.currentTime, audioRef.current.duration);
-        }
-      } else {
-        await audioRef.current.play();
-        setIsPlaying(true);
-      }
-    } catch (error) {
-      console.error('Error playing audio:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration);
-    }
-  };
-
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!audioRef.current) return;
-    
-    const progressBar = e.currentTarget;
-    const rect = progressBar.getBoundingClientRect();
+  const onSeekClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const percentage = x / rect.width;
-    const newTime = percentage * duration;
-    
-    audioRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
-  };
-
-  const formatTime = (timeInSeconds: number) => {
-    if (isNaN(timeInSeconds)) return '0:00';
-    
-    const hours = Math.floor(timeInSeconds / 3600);
-    const minutes = Math.floor((timeInSeconds % 3600) / 60);
-    const seconds = Math.floor(timeInSeconds % 60);
-    
-    if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    handleSeek(percentage * duration);
   };
 
   const tracks: Track[] = [
@@ -217,19 +147,6 @@ const Episode397 = () => {
                   </p>
                   
                   <div className="w-full max-w-2xl mx-auto">
-                    <audio 
-                      ref={audioRef}
-                      preload="metadata"
-                      onEnded={() => setIsPlaying(false)}
-                      onPause={() => setIsPlaying(false)}
-                      onPlay={() => setIsPlaying(true)}
-                      onTimeUpdate={handleTimeUpdate}
-                      onLoadedMetadata={handleLoadedMetadata}
-                    >
-                      <source src={audioUrl} type="audio/mpeg" />
-                      Your browser does not support the audio element.
-                    </audio>
-                    
                     <div className="card-cyber p-6 bg-gradient-to-br from-background/80 to-background/60 backdrop-blur-sm">
                       <div className="flex items-center gap-4 mb-4">
                         <Button 
@@ -254,7 +171,7 @@ const Episode397 = () => {
                       <div className="space-y-2">
                         <div 
                           className="h-2 bg-primary/40 border border-primary/50 rounded-full cursor-pointer group/progress hover:bg-primary/50 transition-colors"
-                          onClick={handleSeek}
+                          onClick={onSeekClick}
                         >
                           <div 
                             className="h-full bg-gradient-to-r from-neon to-neon-purple rounded-full transition-all duration-150 relative"
@@ -287,7 +204,7 @@ const Episode397 = () => {
                         </div>
                       )}
                       
-                      <div className="bg-background/50 rounded-lg p-4 border border-neon/20">
+                      <div className="bg-background/50 rounded-lg p-4 border border-neon/20 mt-4">
                         <div className="text-center mb-4">
                           <p className="text-muted-foreground mb-2">
                             This episode is available on our podcast platforms
