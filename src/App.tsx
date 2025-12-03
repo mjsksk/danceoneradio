@@ -27,6 +27,7 @@ import Episode394 from "./pages/Episode394";
 import Episode395 from "./pages/Episode395";
 import Episode396 from "./pages/Episode396";
 import Episode397 from "./pages/Episode397";
+import About from "./pages/About";
 import Admin from "./pages/Admin";
 import DesktopPlayer from "./pages/DesktopPlayer";
 import Auth from "./pages/Auth";
@@ -47,6 +48,7 @@ const App = () => (
           <ErrorBoundary>
             <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/about" element={<About />} />
             <Route path="/shows" element={<Shows />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/gallery/love-parade-2005" element={<LoveParade2005 />} />

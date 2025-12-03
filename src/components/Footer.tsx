@@ -119,6 +119,9 @@ const Footer = () => {
         <div className="border-t border-primary/20 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between">
           <p className="text-muted-foreground font-['Rajdhani'] text-sm">© Dance One Radio. All rights reserved.</p>
           <div className="flex flex-wrap space-x-6 mt-4 md:mt-0">
+            <a href="/about" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani'] text-sm">
+              About
+            </a>
             <a href="/privacy" className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani'] text-sm">
               Privacy Policy
             </a>
