@@ -4,7 +4,7 @@ import SEO from "@/components/SEO";
 import GoogleAds from "@/components/GoogleAds";
 import SocialShare from "@/components/SocialShare";
 import { Card, CardContent } from "@/components/ui/card";
-import { Radio, Music, Users, Headphones, Globe, Heart } from "lucide-react";
+import { Radio, Music, Users, Headphones, Globe, Heart, Calendar } from "lucide-react";
 
 const About = () => {
   return (
@@ -104,21 +104,136 @@ const About = () => {
         <section className="py-12 md:py-16">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <div className="flex items-center justify-center gap-4 mb-4">
-                <div className="p-3 rounded-full bg-primary/20">
-                  <Users className="h-8 w-8 text-primary" />
-                </div>
-                <h2 className="text-3xl md:text-4xl font-bold font-['Orbitron'] text-primary">
-                  Meet the Team
-                </h2>
-              </div>
+              <h2 className="text-4xl md:text-6xl font-['Orbitron'] font-bold mb-6">
+                <span className="text-neon">D1R</span>{" "}
+                <span className="text-neon-purple">TEAM</span>
+              </h2>
               <p className="text-muted-foreground font-['Rajdhani'] text-lg max-w-2xl mx-auto">
                 The passionate individuals who bring Dance One Radio to life every single day
               </p>
             </div>
             
-            <div className="grid md:grid-cols-2 gap-8">
+            {/* Team Cards Grid */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
               {/* Mario */}
+              <Card className="card-cyber border-primary/30 overflow-hidden text-center">
+                <CardContent className="p-6">
+                  <div className="relative mb-6">
+                    <div className="mx-auto rounded-full overflow-hidden border-2 border-primary/50 hover:border-primary transition-all duration-300 w-32 h-32 flex items-center justify-center bg-background">
+                      <img 
+                        src="/lovable-uploads/f807b27f-9eaf-4d20-b3f5-4bad24538a4e.png" 
+                        alt="Mario"
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-primary rounded-full flex items-center justify-center animate-glow-pulse">
+                      <Music className="w-3 h-3 text-primary-foreground" />
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-['Orbitron'] font-bold text-primary mb-2">Mario</h3>
+                  <p className="text-accent font-['Rajdhani'] font-medium mb-2">Future Dance Anthems Host</p>
+                  <p className="text-sm text-muted-foreground font-['Rajdhani'] mb-1">Electronic Dance Music</p>
+                  <div className="mb-4 p-3 bg-secondary/50 rounded-lg border border-primary/20">
+                    <div className="flex items-center justify-center text-xs text-muted-foreground mb-1">
+                      <Calendar className="w-3 h-3 mr-1" />
+                      NEXT SHOW
+                    </div>
+                    <p className="text-sm font-['Rajdhani'] font-semibold text-primary">Friday 5PM PST</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Ivan Samel */}
+              <Card className="card-cyber border-accent/30 overflow-hidden text-center">
+                <CardContent className="p-6">
+                  <div className="relative mb-6">
+                    <div className="mx-auto rounded-full overflow-hidden border-2 border-accent/50 hover:border-accent transition-all duration-300 w-32 h-32 flex items-center justify-center bg-background">
+                      <img 
+                        src="/lovable-uploads/ivan-samel.jpg" 
+                        alt="Ivan Samel"
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-accent rounded-full flex items-center justify-center animate-glow-pulse">
+                      <Music className="w-3 h-3 text-accent-foreground" />
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-['Orbitron'] font-bold text-accent mb-2">Ivan Samel</h3>
+                  <p className="text-primary font-['Rajdhani'] font-medium mb-2">Sound Engineer</p>
+                  <p className="text-sm text-muted-foreground font-['Rajdhani'] mb-1">EQ Wave Magician</p>
+                  <div className="mb-4 p-3 bg-secondary/50 rounded-lg border border-accent/20">
+                    <div className="flex items-center justify-center text-xs text-muted-foreground">
+                      <Calendar className="w-3 h-3 mr-1" />
+                      SOUNDING 24/7
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* DJ Pulse */}
+              <Card className="card-cyber border-primary/30 overflow-hidden text-center">
+                <CardContent className="p-6">
+                  <div className="relative mb-6">
+                    <div className="mx-auto rounded-full overflow-hidden border-2 border-primary/50 hover:border-primary transition-all duration-300 w-32 h-32 flex items-center justify-center bg-background">
+                      <img 
+                        src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=128&h=128&fit=crop&crop=face" 
+                        alt="DJ Pulse"
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-primary rounded-full flex items-center justify-center animate-glow-pulse">
+                      <Music className="w-3 h-3 text-primary-foreground" />
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-['Orbitron'] font-bold text-primary mb-2">DJ Pulse</h3>
+                  <p className="text-accent font-['Rajdhani'] font-medium mb-2">Resident DJ</p>
+                  <p className="text-sm text-muted-foreground font-['Rajdhani'] mb-1">Progressive House</p>
+                  <div className="mb-4 p-3 bg-secondary/50 rounded-lg border border-primary/20">
+                    <div className="flex items-center justify-center text-xs text-muted-foreground mb-1">
+                      <Calendar className="w-3 h-3 mr-1" />
+                      NEXT SHOW
+                    </div>
+                    <p className="text-sm font-['Rajdhani'] font-semibold text-primary">Saturday 5PM PST</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* DJ Cosmos */}
+              <Card className="card-cyber border-primary/30 overflow-hidden text-center">
+                <CardContent className="p-6">
+                  <div className="relative mb-6">
+                    <div className="mx-auto rounded-full overflow-hidden border-2 border-primary/50 hover:border-primary transition-all duration-300 w-32 h-32 flex items-center justify-center bg-background">
+                      <img 
+                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=128&h=128&fit=crop&crop=face" 
+                        alt="DJ Cosmos"
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-primary rounded-full flex items-center justify-center animate-glow-pulse">
+                      <Music className="w-3 h-3 text-primary-foreground" />
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-['Orbitron'] font-bold text-primary mb-2">DJ Cosmos</h3>
+                  <p className="text-accent font-['Rajdhani'] font-medium mb-2">Deep House Explorer</p>
+                  <p className="text-sm text-muted-foreground font-['Rajdhani'] mb-1">Deep House</p>
+                  <div className="mb-4 p-3 bg-secondary/50 rounded-lg border border-primary/20">
+                    <div className="flex items-center justify-center text-xs text-muted-foreground mb-1">
+                      <Calendar className="w-3 h-3 mr-1" />
+                      NEXT SHOW
+                    </div>
+                    <p className="text-sm font-['Rajdhani'] font-semibold text-primary">Sunday 7PM PST</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Detailed Bios */}
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Mario Bio */}
               <Card className="card-cyber border-primary/30 overflow-hidden">
                 <CardContent className="p-0">
                   <div className="aspect-video relative overflow-hidden">
@@ -139,7 +254,7 @@ const About = () => {
                 </CardContent>
               </Card>
 
-              {/* Ivan Samel */}
+              {/* Ivan Samel Bio */}
               <Card className="card-cyber border-accent/30 overflow-hidden">
                 <CardContent className="p-0">
                   <div className="aspect-video relative overflow-hidden">
@@ -155,6 +270,48 @@ const About = () => {
                     <p className="text-primary font-['Rajdhani'] text-lg mb-4">Sound Engineer - "EQ Wave Magician"</p>
                     <p className="text-foreground/80 font-['Rajdhani']">
                       Behind every crystal-clear broadcast and perfectly balanced mix stands Ivan Samel, our resident sound engineering wizard. Known affectionately as the "EQ Wave Magician," Ivan ensures that every track played on Dance One Radio sounds exactly as the artist intended—rich, dynamic, and immersive. His technical expertise and artistic sensibility combine to create an audio experience that rivals professional studio quality. Ivan's dedication to sonic perfection means that whether you're listening on high-end speakers or casual earbuds, you'll always experience Dance One Radio at its best.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* DJ Pulse Bio */}
+              <Card className="card-cyber border-primary/30 overflow-hidden">
+                <CardContent className="p-0">
+                  <div className="aspect-video relative overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                    <img 
+                      src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&h=450&fit=crop&crop=face" 
+                      alt="DJ Pulse - Resident DJ"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-2xl font-bold font-['Orbitron'] text-primary mb-2">DJ Pulse</h3>
+                    <p className="text-accent font-['Rajdhani'] text-lg mb-4">Resident DJ - Progressive House Specialist</p>
+                    <p className="text-foreground/80 font-['Rajdhani']">
+                      With over a decade of experience behind the decks, DJ Pulse has established himself as a pioneer of progressive house music. His signature sound blends hypnotic melodies with driving basslines, creating sets that take listeners on transformative musical journeys. From intimate club nights to festival main stages, Pulse brings an infectious energy and technical precision that keeps the dance floor moving. His Saturday shows on Dance One Radio showcase the finest progressive house tracks, from underground gems to the genre's most celebrated anthems.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* DJ Cosmos Bio */}
+              <Card className="card-cyber border-primary/30 overflow-hidden">
+                <CardContent className="p-0">
+                  <div className="aspect-video relative overflow-hidden bg-gradient-to-br from-accent/20 to-primary/20 flex items-center justify-center">
+                    <img 
+                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=450&fit=crop&crop=face" 
+                      alt="DJ Cosmos - Deep House Explorer"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-2xl font-bold font-['Orbitron'] text-primary mb-2">DJ Cosmos</h3>
+                    <p className="text-accent font-['Rajdhani'] text-lg mb-4">Deep House Explorer</p>
+                    <p className="text-foreground/80 font-['Rajdhani']">
+                      DJ Cosmos invites you to explore the deeper side of electronic music through his carefully curated sonic voyages. Drawing inspiration from jazz, soul, and ambient music, Cosmos crafts immersive soundscapes that transcend the ordinary dance floor experience. His Sunday evening shows have become a ritual for listeners seeking smooth grooves and atmospheric textures. Known for his eclectic taste and seamless mixing, Cosmos brings together classic deep house with modern productions, creating a warm and inviting atmosphere that resonates with music lovers worldwide.
                     </p>
                   </div>
                 </CardContent>
