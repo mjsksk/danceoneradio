@@ -1,8 +1,6 @@
-import { Play, Pause, X, Radio, Music, Volume2, VolumeX } from 'lucide-react';
+import { Play, Pause, X, Radio, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
-import { useState } from 'react';
 import stationLogo from '@/assets/dance-one-logo.png';
 
 const FloatingPlayer = () => {
@@ -12,7 +10,6 @@ const FloatingPlayer = () => {
     isLoading,
     currentTime,
     duration,
-    volume,
     episodeInfo,
     streamTitle,
     albumArt,
@@ -20,11 +17,8 @@ const FloatingPlayer = () => {
     pause,
     resume,
     seek,
-    setVolume,
     closePlayer,
   } = useAudioPlayer();
-
-  const [showVolume, setShowVolume] = useState(false);
 
   if (!isVisible) return null;
 
@@ -111,34 +105,6 @@ const FloatingPlayer = () => {
 
           {/* Controls */}
           <div className="flex items-center gap-2">
-            {/* Volume control */}
-            <div className="relative hidden sm:flex items-center">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-8 h-8"
-                onClick={() => setShowVolume(!showVolume)}
-              >
-                {volume === 0 ? (
-                  <VolumeX className="w-4 h-4 text-muted-foreground" />
-                ) : (
-                  <Volume2 className="w-4 h-4 text-muted-foreground" />
-                )}
-              </Button>
-              {showVolume && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-3 bg-background border border-primary/20 rounded-lg shadow-lg">
-                  <Slider
-                    orientation="vertical"
-                    value={[volume * 100]}
-                    onValueChange={([val]) => setVolume(val / 100)}
-                    max={100}
-                    step={1}
-                    className="h-20"
-                  />
-                </div>
-              )}
-            </div>
-
             {/* Play/Pause */}
             <Button
               variant="ghost"
