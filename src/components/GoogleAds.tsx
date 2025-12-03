@@ -118,7 +118,7 @@ const GoogleAds = ({
   console.log('📢 GoogleAds: Rendering ad slot:', slot, 'visible:', isVisible, 'pushed:', adPushed);
 
   return (
-    <div className={`my-4 flex justify-center ${className}`}>
+    <div className={`flex justify-center transition-all duration-300 ${adPushed ? 'my-4' : 'my-0'} ${className}`}>
       <div className="w-full max-w-4xl">
         <ins 
           ref={adRef}
@@ -126,6 +126,8 @@ const GoogleAds = ({
           style={{ 
             display: 'block',
             minHeight: adPushed ? '90px' : '0px',
+            height: adPushed ? 'auto' : '0px',
+            overflow: 'hidden',
             ...style
           }}
           data-ad-client="ca-pub-4230589452649530"

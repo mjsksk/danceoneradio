@@ -38,7 +38,7 @@ const About = () => {
           </div>
         </section>
 
-        <GoogleAds slot="1234567890" format="horizontal" className="my-8" />
+        <GoogleAds slot="1234567890" format="horizontal" />
 
         {/* Our Story Section */}
         <section className="py-12 md:py-16">
@@ -98,7 +98,7 @@ const About = () => {
           </div>
         </section>
 
-        <GoogleAds slot="0987654321" format="rectangle" className="my-8" />
+        <GoogleAds slot="0987654321" format="rectangle" />
 
         {/* Meet the Team Section */}
         <section className="py-12 md:py-16">
