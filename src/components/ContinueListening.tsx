@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, Clock } from 'lucide-react';
+import { Play, Pause, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
@@ -23,6 +23,64 @@ const ContinueListening = () => {
   const audioPlayer = useAudioPlayer();
   const [episodes, setEpisodes] = useState<EpisodeProgress[]>([]);
   const [loading, setLoading] = useState(true);
+  const saveProgressRef = useRef<((position: number, duration: number, episodeNumber: number, title: string, audioUrl: string) => void) | null>(null);
+
+  // Save progress function
+  saveProgressRef.current = async (position: number, duration: number, episodeNumber: number, title: string, audioUrl: string) => {
+    if (!user) return;
+    
+    const completed = duration > 0 && position / duration > 0.95;
+    
+    try {
+      await supabase
+        .from('episode_listening_progress')
+        .upsert({
+          user_id: user.id,
+          episode_number: episodeNumber,
+          episode_title: title,
+          audio_url: audioUrl,
+          playback_position: position,
+          duration: duration,
+          completed,
+          last_listened_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_id,episode_number',
+        });
+    } catch (error) {
+      console.error('Error saving progress:', error);
+    }
+  };
+
+  // Periodic save when playing from Continue Listening
+  useEffect(() => {
+    if (!user || !audioPlayer.isPlaying || audioPlayer.source !== 'episode' || !audioPlayer.episodeInfo) return;
+    
+    const interval = setInterval(() => {
+      const audio = audioPlayer.audioRef.current;
+      const info = audioPlayer.episodeInfo;
+      if (audio && audio.currentTime > 0 && audio.duration > 0 && info) {
+        saveProgressRef.current?.(audio.currentTime, audio.duration, info.number, info.title, info.audioUrl);
+      }
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [audioPlayer.isPlaying, audioPlayer.source, audioPlayer.episodeInfo, user, audioPlayer.audioRef]);
+
+  // Save on pause
+  useEffect(() => {
+    const audio = audioPlayer.audioRef.current;
+    if (!audio || !user) return;
+
+    const handlePause = () => {
+      const info = audioPlayer.episodeInfo;
+      if (audioPlayer.source === 'episode' && info && audio.currentTime > 0) {
+        saveProgressRef.current?.(audio.currentTime, audio.duration, info.number, info.title, info.audioUrl);
+      }
+    };
+
+    audio.addEventListener('pause', handlePause);
+    return () => audio.removeEventListener('pause', handlePause);
+  }, [audioPlayer.source, audioPlayer.episodeInfo, user, audioPlayer.audioRef]);
 
   useEffect(() => {
     if (!user) {
@@ -70,16 +128,28 @@ const ContinueListening = () => {
     return `${mins} min left`;
   };
 
-  const handleResume = (episode: EpisodeProgress) => {
-    audioPlayer.playEpisode({
-      number: episode.episode_number,
-      title: episode.episode_title,
-      audioUrl: episode.audio_url,
-    });
-    
-    setTimeout(() => {
-      audioPlayer.seek(episode.playback_position);
-    }, 500);
+  const isEpisodePlaying = (episodeNumber: number) => {
+    return audioPlayer.source === 'episode' && 
+           audioPlayer.episodeInfo?.number === episodeNumber && 
+           audioPlayer.isPlaying;
+  };
+
+  const handlePlayPause = (episode: EpisodeProgress) => {
+    if (isEpisodePlaying(episode.episode_number)) {
+      audioPlayer.pause();
+    } else if (audioPlayer.source === 'episode' && audioPlayer.episodeInfo?.number === episode.episode_number) {
+      audioPlayer.resume();
+    } else {
+      audioPlayer.playEpisode({
+        number: episode.episode_number,
+        title: episode.episode_title,
+        audioUrl: episode.audio_url,
+      });
+      
+      setTimeout(() => {
+        audioPlayer.seek(episode.playback_position);
+      }, 500);
+    }
   };
 
   // Don't show if not logged in or no episodes
@@ -97,8 +167,12 @@ const ContinueListening = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {episodes.map((episode) => {
-            const progressPercent = episode.duration > 0 
-              ? (episode.playback_position / episode.duration) * 100 
+            const isPlaying = isEpisodePlaying(episode.episode_number);
+            const isThisEpisode = audioPlayer.source === 'episode' && audioPlayer.episodeInfo?.number === episode.episode_number;
+            const currentPosition = isThisEpisode ? audioPlayer.currentTime : episode.playback_position;
+            const currentDuration = isThisEpisode && audioPlayer.duration > 0 ? audioPlayer.duration : episode.duration;
+            const progressPercent = currentDuration > 0 
+              ? (currentPosition / currentDuration) * 100 
               : 0;
             
             return (
@@ -122,17 +196,21 @@ const ContinueListening = () => {
                     size="icon"
                     variant="ghost"
                     className="ml-2 shrink-0 hover:bg-primary/20"
-                    onClick={() => handleResume(episode)}
+                    onClick={() => handlePlayPause(episode)}
                   >
-                    <Play className="w-5 h-5 text-primary" />
+                    {isPlaying ? (
+                      <Pause className="w-5 h-5 text-primary" />
+                    ) : (
+                      <Play className="w-5 h-5 text-primary" />
+                    )}
                   </Button>
                 </div>
                 
                 <Progress value={progressPercent} className="h-1.5 mb-2" />
                 
                 <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{formatTime(episode.playback_position)}</span>
-                  <span>{formatTimeLeft(episode.playback_position, episode.duration)}</span>
+                  <span>{formatTime(currentPosition)}</span>
+                  <span>{formatTimeLeft(currentPosition, currentDuration)}</span>
                 </div>
               </div>
             );
