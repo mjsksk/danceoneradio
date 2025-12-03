@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useListeningProgress } from '@/hooks/useListeningProgress';
@@ -23,27 +23,30 @@ export const useEpisodePlayer = ({ episodeNumber, episodeTitle, audioUrl }: UseE
   const currentTime = isThisEpisode ? audioPlayer.currentTime : (progress?.playback_position || 0);
   const duration = isThisEpisode ? audioPlayer.duration : (progress?.duration || 0);
 
+  // Track previous playing state to detect pause
+  const wasPlayingRef = useRef(false);
+
   // Save progress periodically when playing
   useEffect(() => {
-    if (!user || !isPlaying) return;
+    if (!user || !isPlaying || !isThisEpisode) return;
     
     const interval = setInterval(() => {
-      if (isThisEpisode) {
-        saveProgress(audioPlayer.currentTime, audioPlayer.duration);
-      }
+      saveProgress(audioPlayer.currentTime, audioPlayer.duration);
     }, 5000);
     
     return () => clearInterval(interval);
   }, [isPlaying, user, saveProgress, isThisEpisode, audioPlayer.currentTime, audioPlayer.duration]);
 
-  // Save progress when pausing
+  // Save progress when pausing (detect state change)
   useEffect(() => {
     if (!user || !isThisEpisode) return;
     
-    // When the episode stops playing, save progress
-    if (!audioPlayer.isPlaying && audioPlayer.currentTime > 0) {
+    // Detect when playback stops (was playing, now not playing)
+    if (wasPlayingRef.current && !audioPlayer.isPlaying && audioPlayer.currentTime > 0) {
       saveProgress(audioPlayer.currentTime, audioPlayer.duration);
     }
+    
+    wasPlayingRef.current = audioPlayer.isPlaying;
   }, [audioPlayer.isPlaying, isThisEpisode, user, saveProgress, audioPlayer.currentTime, audioPlayer.duration]);
 
   const handlePlayPause = () => {
