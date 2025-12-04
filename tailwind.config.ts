@@ -107,36 +107,21 @@ export default {
 					'50%': { opacity: '0.8' },
 					'75%': { opacity: '0.9' }
 				},
-			'spin-slow': {
-				'0%': { transform: 'rotate(0deg)' },
-				'100%': { transform: 'rotate(360deg)' }
+				'spin-slow': {
+					'0%': { transform: 'rotate(0deg)' },
+					'100%': { transform: 'rotate(360deg)' }
+				}
 			},
-			'gradient-shift': {
-				'0%, 100%': { transform: 'translate(0%, 0%)' },
-				'50%': { transform: 'translate(30%, 20%)' }
-			},
-			'gradient-shift-reverse': {
-				'0%, 100%': { transform: 'translate(0%, 0%)' },
-				'50%': { transform: 'translate(-30%, -20%)' }
-			},
-			'gradient-pulse': {
-				'0%, 100%': { opacity: '0.15', transform: 'scale(1)' },
-				'50%': { opacity: '0.25', transform: 'scale(1.1)' }
-			}
-		},
-		animation: {
+			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
 				'float': 'float 6s ease-in-out infinite',
 				'slide-up': 'slide-up 0.6s ease-out',
 				'fade-in': 'fade-in 0.8s ease-out',
-			'neon-flicker': 'neon-flicker 3s ease-in-out infinite',
-			'spin-slow': 'spin-slow 20s linear infinite',
-			'gradient-shift': 'gradient-shift 8s ease-in-out infinite',
-			'gradient-shift-reverse': 'gradient-shift-reverse 10s ease-in-out infinite',
-			'gradient-pulse': 'gradient-pulse 6s ease-in-out infinite'
-		}
+				'neon-flicker': 'neon-flicker 3s ease-in-out infinite',
+				'spin-slow': 'spin-slow 20s linear infinite'
+			}
 		}
 	},
 	plugins: [require("tailwindcss-animate")],

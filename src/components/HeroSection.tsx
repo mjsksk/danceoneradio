@@ -6,7 +6,7 @@ import SocialShare from '@/components/SocialShare';
 import heroImage from '@/assets/hero-bg.jpg';
 import LiveRadioPlayer from './LiveRadioPlayer';
 import { RadioStreamService } from '@/utils/RadioStreamService';
-import { AnimatedGradientBg } from '@/components/ui/animated-gradient-bg';
+import { ShaderAnimation } from '@/components/ui/shader-lines';
 const HeroSection = () => {
   const [streamTitle, setStreamTitle] = useState('🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵');
   
@@ -82,19 +82,17 @@ const HeroSection = () => {
     setVideoKey(prev => prev + 1);
   }, []);
   return <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Animated Gradient Background */}
-      <AnimatedGradientBg />
+      {/* Shader Animation Background */}
+      <ShaderAnimation />
       <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]"></div>
 
-      {/* Animated Particles - Reduced to 8 with GPU acceleration */}
+      {/* Animated Particles */}
       <div className="absolute inset-0">
-        {[...Array(8)].map((_, i) => <div key={i} className="absolute w-2 h-2 bg-primary/30 rounded-full animate-float" style={{
-        left: `${(i * 12.5) + Math.random() * 10}%`,
-        top: `${(i * 12.5) + Math.random() * 10}%`,
-        animationDelay: `${i * 0.75}s`,
-        animationDuration: `${4 + (i % 3)}s`,
-        willChange: 'transform',
-        transform: 'translateZ(0)'
+        {[...Array(20)].map((_, i) => <div key={i} className="absolute w-2 h-2 bg-primary/30 rounded-full animate-float" style={{
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 6}s`,
+        animationDuration: `${4 + Math.random() * 4}s`
       }} />)}
       </div>
 

@@ -16,57 +16,34 @@ export function ShaderAnimation() {
     renderer: any
     uniforms: any
     animationId: number | null
-    lastFrameTime: number
-    isVisible: boolean
   }>({
     camera: null,
     scene: null,
     renderer: null,
     uniforms: null,
     animationId: null,
-    lastFrameTime: 0,
-    isVisible: true,
   })
 
   useEffect(() => {
-    // Delay shader initialization to prioritize LCP
-    const initTimer = setTimeout(() => {
-      const script = document.createElement("script")
-      script.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/89/three.min.js"
-      script.onload = () => {
-        if (containerRef.current && window.THREE) {
-          initThreeJS()
-        }
+    // Load Three.js dynamically
+    const script = document.createElement("script")
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/89/three.min.js"
+    script.onload = () => {
+      if (containerRef.current && window.THREE) {
+        initThreeJS()
       }
-      document.head.appendChild(script)
-    }, 300)
-
-    // Visibility detection - pause when not visible
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          sceneRef.current.isVisible = entry.isIntersecting
-          if (entry.isIntersecting && sceneRef.current.renderer && !sceneRef.current.animationId) {
-            animate(performance.now())
-          }
-        })
-      },
-      { threshold: 0.1 }
-    )
-
-    if (containerRef.current) {
-      observer.observe(containerRef.current)
     }
+    document.head.appendChild(script)
 
     return () => {
-      clearTimeout(initTimer)
+      // Cleanup
       if (sceneRef.current.animationId) {
         cancelAnimationFrame(sceneRef.current.animationId)
       }
       if (sceneRef.current.renderer) {
         sceneRef.current.renderer.dispose()
       }
-      observer.disconnect()
+      document.head.removeChild(script)
     }
   }, [])
 
@@ -76,26 +53,33 @@ export function ShaderAnimation() {
     const THREE = window.THREE
     const container = containerRef.current
 
+    // Clear any existing content
     container.innerHTML = ""
 
+    // Initialize camera
     const camera = new THREE.Camera()
     camera.position.z = 1
 
+    // Initialize scene
     const scene = new THREE.Scene()
 
+    // Create geometry
     const geometry = new THREE.PlaneBufferGeometry(2, 2)
 
+    // Define uniforms
     const uniforms = {
       time: { type: "f", value: 1.0 },
       resolution: { type: "v2", value: new THREE.Vector2() },
     }
 
+    // Vertex shader
     const vertexShader = `
       void main() {
         gl_Position = vec4( position, 1.0 );
       }
     `
 
+    // Fragment shader
     const fragmentShader = `
       #define TWO_PI 6.2831853072
       #define PI 3.14159265359
@@ -137,30 +121,32 @@ export function ShaderAnimation() {
       }
     `
 
+    // Create material
     const material = new THREE.ShaderMaterial({
       uniforms: uniforms,
       vertexShader: vertexShader,
       fragmentShader: fragmentShader,
     })
 
+    // Create mesh and add to scene
     const mesh = new THREE.Mesh(geometry, material)
     scene.add(mesh)
 
-    // Cap pixel ratio at 1.5 for performance
+    // Initialize renderer
     const renderer = new THREE.WebGLRenderer()
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
+    renderer.setPixelRatio(window.devicePixelRatio)
     container.appendChild(renderer.domElement)
 
+    // Store references
     sceneRef.current = {
       camera,
       scene,
       renderer,
       uniforms,
       animationId: null,
-      lastFrameTime: 0,
-      isVisible: true,
     }
 
+    // Handle resize
     const onWindowResize = () => {
       const rect = container.getBoundingClientRect()
       renderer.setSize(rect.width, rect.height)
@@ -171,35 +157,20 @@ export function ShaderAnimation() {
     onWindowResize()
     window.addEventListener("resize", onWindowResize, false)
 
-    animate(performance.now())
-  }
-
-  const animate = (timestamp: number) => {
-    const { renderer, scene, camera, uniforms, isVisible, lastFrameTime } = sceneRef.current
-    
-    if (!renderer || !isVisible) {
-      sceneRef.current.animationId = null
-      return
-    }
-
-    // 30fps cap (~33ms between frames)
-    const elapsed = timestamp - lastFrameTime
-    if (elapsed < 33) {
+    // Animation loop
+    const animate = () => {
       sceneRef.current.animationId = requestAnimationFrame(animate)
-      return
+      uniforms.time.value += 0.05
+      renderer.render(scene, camera)
     }
-    
-    sceneRef.current.lastFrameTime = timestamp
-    uniforms.time.value += 0.02 // Slower time increment
-    renderer.render(scene, camera)
-    sceneRef.current.animationId = requestAnimationFrame(animate)
+
+    animate()
   }
 
   return (
     <div
       ref={containerRef}
       className="w-full h-full absolute" 
-      style={{ willChange: 'transform', contain: 'layout style paint' }}
     />
   )
 }
