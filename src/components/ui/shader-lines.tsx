@@ -182,15 +182,15 @@ export function ShaderAnimation() {
       return
     }
 
-    // 45fps cap (~22ms between frames) - balanced performance
+    // 30fps cap (~33ms between frames)
     const elapsed = timestamp - lastFrameTime
-    if (elapsed < 22) {
+    if (elapsed < 33) {
       sceneRef.current.animationId = requestAnimationFrame(animate)
       return
     }
     
     sceneRef.current.lastFrameTime = timestamp
-    uniforms.time.value += 0.04 // Faster time increment
+    uniforms.time.value += 0.02 // Slower time increment
     renderer.render(scene, camera)
     sceneRef.current.animationId = requestAnimationFrame(animate)
   }
