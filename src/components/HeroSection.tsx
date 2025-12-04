@@ -6,7 +6,7 @@ import SocialShare from '@/components/SocialShare';
 import heroImage from '@/assets/hero-bg.jpg';
 import LiveRadioPlayer from './LiveRadioPlayer';
 import { RadioStreamService } from '@/utils/RadioStreamService';
-import { ShaderAnimation } from '@/components/ui/shader-lines';
+import { AnimatedGradientBg } from '@/components/ui/animated-gradient-bg';
 const HeroSection = () => {
   const [streamTitle, setStreamTitle] = useState('🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵');
   
@@ -82,8 +82,8 @@ const HeroSection = () => {
     setVideoKey(prev => prev + 1);
   }, []);
   return <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Shader Animation Background */}
-      <ShaderAnimation />
+      {/* Animated Gradient Background */}
+      <AnimatedGradientBg />
       <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]"></div>
 
       {/* Animated Particles - Reduced to 8 with GPU acceleration */}
