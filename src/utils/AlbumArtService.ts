@@ -8,7 +8,7 @@ export class AlbumArtService {
   private static requestQueue: Array<() => Promise<void>> = [];
   private static isProcessing = false;
   private static lastRequestTime = 0;
-  private static minRequestInterval = 800; // 800ms between requests to avoid rate limits
+  private static minRequestInterval = 200; // 200ms between requests (reduced since we control concurrency)
 
   static async getAlbumArt(songTitle: string): Promise<AlbumArtResponse> {
     if (!songTitle || typeof songTitle !== 'string' || songTitle.trim().length === 0) {

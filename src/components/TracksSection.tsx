@@ -86,76 +86,107 @@ const TracksSection = () => {
     return `${cleanArtist} ${cleanTitle}`;
   };
 
-  // Fetch album art when tracks change or are added
+  // Fetch album art when tracks change - batched and parallelized
   useEffect(() => {
-    const fetchAlbumArt = async () => {
-      for (const track of tracks) {
-        // Skip if we already have album art for this track
-        if (albumArt[track.id]) continue;
+    const fetchAlbumArtBatched = async () => {
+      const tracksNeedingArt = tracks.filter(track => !albumArt[track.id]);
+      if (tracksNeedingArt.length === 0) return;
 
-        try {
-          const cleanedQuery = cleanTrackForSearch(track.artist, track.title);
-          console.log(`🎵 Fetching album art for: "${track.artist} - ${track.title}" -> cleaned: "${cleanedQuery}"`);
-          
-          const result = await AlbumArtService.getAlbumArt(cleanedQuery);
-          console.log(`🎵 Album art result for "${cleanedQuery}":`, result);
-          
-          // Only use valid album art from iTunes
-          if (result.imageUrl && !result.error) {
-            setAlbumArt(prev => ({...prev, [track.id]: result.imageUrl}));
-            console.log(`🎵 Using album art for: ${cleanedQuery}`);
-          } else {
-            console.log(`🎵 No album art found for: ${cleanedQuery}, using station logo`);
+      console.log(`🎵 Fetching album art for ${tracksNeedingArt.length} tracks in parallel`);
+      
+      // Fetch all album art in parallel with concurrency limit
+      const CONCURRENCY = 5;
+      const results: Record<number, string | null> = {};
+      
+      for (let i = 0; i < tracksNeedingArt.length; i += CONCURRENCY) {
+        const batch = tracksNeedingArt.slice(i, i + CONCURRENCY);
+        await Promise.all(batch.map(async (track) => {
+          try {
+            const cleanedQuery = cleanTrackForSearch(track.artist, track.title);
+            const result = await AlbumArtService.getAlbumArt(cleanedQuery);
+            if (result.imageUrl && !result.error) {
+              results[track.id] = result.imageUrl;
+            }
+          } catch (error) {
+            console.error(`🎵 Failed to fetch album art for ${track.artist}:`, error);
           }
-        } catch (error) {
-          console.error(`🎵 Failed to fetch album art for ${track.artist} - ${track.title}:`, error);
-        }
+        }));
+      }
+      
+      // Single state update with all results
+      if (Object.keys(results).length > 0) {
+        setAlbumArt(prev => ({ ...prev, ...results }));
+        console.log(`🎵 Updated album art for ${Object.keys(results).length} tracks`);
       }
     };
 
     if (tracks.length > 0) {
-      fetchAlbumArt();
+      fetchAlbumArtBatched();
     }
   }, [tracks]);
 
-  // Enable Apple Music preview fetching now that the API token is configured
+  // Fetch Apple Music previews - batched and parallelized
   useEffect(() => {
-    const fetchPreviews = async () => {
+    const fetchPreviewsBatched = async () => {
       if (fetchingPreviewsRef.current || tracks.length === 0) return;
       
-      fetchingPreviewsRef.current = true;
-      console.log('🎵 Starting to fetch Apple Music previews for', tracks.length, 'tracks');
+      const tracksNeedingPreviews = tracks.filter(
+        track => !previewUrls[track.id] && !previewErrors[track.id]
+      );
+      if (tracksNeedingPreviews.length === 0) return;
       
-      for (const track of tracks) {
-        if (!previewUrls[track.id] && !previewErrors[track.id]) {
-          setLoadingPreviews(prev => ({...prev, [track.id]: true}));
-          
+      fetchingPreviewsRef.current = true;
+      console.log(`🎵 Fetching Apple Music previews for ${tracksNeedingPreviews.length} tracks in parallel`);
+      
+      // Mark all as loading in single update
+      const loadingState = tracksNeedingPreviews.reduce((acc, track) => {
+        acc[track.id] = true;
+        return acc;
+      }, {} as Record<number, boolean>);
+      setLoadingPreviews(prev => ({ ...prev, ...loadingState }));
+      
+      // Fetch all previews in parallel with concurrency limit
+      const CONCURRENCY = 5;
+      const urlResults: Record<number, string> = {};
+      const errorResults: Record<number, string> = {};
+      
+      for (let i = 0; i < tracksNeedingPreviews.length; i += CONCURRENCY) {
+        const batch = tracksNeedingPreviews.slice(i, i + CONCURRENCY);
+        await Promise.all(batch.map(async (track) => {
           try {
-            console.log(`🎵 Fetching Apple Music preview for: ${track.artist} - ${track.title}`);
             const previewUrl = await AppleMusicService.getTrackPreview(track.id, track.artist, track.title);
-            
             if (previewUrl) {
-              setPreviewUrls(prev => ({...prev, [track.id]: previewUrl}));
-              console.log(`🎵 ✅ Found Apple Music preview for: ${track.artist} - ${track.title}`);
+              urlResults[track.id] = previewUrl;
             } else {
-              setPreviewErrors(prev => ({...prev, [track.id]: 'No preview available'}));
-              console.log(`🎵 ❌ No Apple Music preview found for: ${track.artist} - ${track.title}`);
+              errorResults[track.id] = 'No preview available';
             }
-          } catch (error) {
-            console.error(`🎵 ❌ Failed to fetch Apple Music preview for ${track.artist} - ${track.title}:`, error);
-            setPreviewErrors(prev => ({...prev, [track.id]: error.message || 'Failed to fetch preview'}));
-          } finally {
-            setLoadingPreviews(prev => ({...prev, [track.id]: false}));
+          } catch (error: any) {
+            errorResults[track.id] = error.message || 'Failed to fetch preview';
           }
-        }
+        }));
       }
+      
+      // Single state updates for all results
+      if (Object.keys(urlResults).length > 0) {
+        setPreviewUrls(prev => ({ ...prev, ...urlResults }));
+        console.log(`🎵 ✅ Found ${Object.keys(urlResults).length} Apple Music previews`);
+      }
+      if (Object.keys(errorResults).length > 0) {
+        setPreviewErrors(prev => ({ ...prev, ...errorResults }));
+      }
+      
+      // Clear all loading states
+      const clearedLoading = tracksNeedingPreviews.reduce((acc, track) => {
+        acc[track.id] = false;
+        return acc;
+      }, {} as Record<number, boolean>);
+      setLoadingPreviews(prev => ({ ...prev, ...clearedLoading }));
       
       fetchingPreviewsRef.current = false;
     };
 
     if (tracks.length > 0) {
-      console.log('🎵 Tracks loaded, starting preview fetch process');
-      fetchPreviews();
+      fetchPreviewsBatched();
     }
   }, [tracks]);
 
