@@ -86,13 +86,15 @@ const HeroSection = () => {
       <ShaderAnimation />
       <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]"></div>
 
-      {/* Animated Particles */}
+      {/* Animated Particles - Reduced to 8 with GPU acceleration */}
       <div className="absolute inset-0">
-        {[...Array(20)].map((_, i) => <div key={i} className="absolute w-2 h-2 bg-primary/30 rounded-full animate-float" style={{
-        left: `${Math.random() * 100}%`,
-        top: `${Math.random() * 100}%`,
-        animationDelay: `${Math.random() * 6}s`,
-        animationDuration: `${4 + Math.random() * 4}s`
+        {[...Array(8)].map((_, i) => <div key={i} className="absolute w-2 h-2 bg-primary/30 rounded-full animate-float" style={{
+        left: `${(i * 12.5) + Math.random() * 10}%`,
+        top: `${(i * 12.5) + Math.random() * 10}%`,
+        animationDelay: `${i * 0.75}s`,
+        animationDuration: `${4 + (i % 3)}s`,
+        willChange: 'transform',
+        transform: 'translateZ(0)'
       }} />)}
       </div>
 
