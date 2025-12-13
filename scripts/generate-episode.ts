@@ -11,7 +11,7 @@ interface Episode {
   description: string;
 }
 
-const RSS_FEED_URL = 'https://www.blubrry.com/feeds/futureDanceAnthems.xml';
+const RSS_FEED_URL = 'https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml';
 
 async function fetchRSSFeed(): Promise<string> {
   console.log('Fetching RSS feed...');
