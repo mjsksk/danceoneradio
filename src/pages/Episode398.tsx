@@ -56,8 +56,30 @@ const Episode398 = () => {
     handleSeek(percentage * duration);
   };
 
-  // Track listing - update via CSV import or manually
-  const tracks: Track[] = [];
+  const tracks: Track[] = [
+    { position: 1, title: "Lift Me Up", artist: "Idemi" },
+    { position: 2, title: "Temptation", artist: "Guy Burns, James Poole, Smokey Bubblin B" },
+    { position: 3, title: "Come Closer Feat. Sienna Sophia", artist: "Josh Baker" },
+    { position: 4, title: "Forever In My Room (Extended Mix)", artist: "Flight Facilities" },
+    { position: 5, title: "Yahweh (Extended Mix)", artist: "joki, Thierry Von Der Warth, Mugisho" },
+    { position: 6, title: "Positive (Extended Mix)", artist: "Jamback" },
+    { position: 7, title: "Free (You Got To Live)", artist: "Hugel" },
+    { position: 8, title: "900 miles ft. Barbara Dane (Club Mix)", artist: "Bakermat" },
+    { position: 9, title: "It's Only Real 2025", artist: "Denis Sulta" },
+    { position: 10, title: "Worth It", artist: "I. JORDAN" },
+    { position: 11, title: "Higher Grounds (Original Mix)", artist: "Frank Fonema" },
+    { position: 12, title: "Keep On (Original Mix)", artist: "Frank Fonema" },
+    { position: 13, title: "All Good", artist: "Catching Cairo & MANIA" },
+    { position: 14, title: "900 Miles ft. Barbara Dane (Extended)", artist: "Bakermat" },
+    { position: 15, title: "Do 4 Luv", artist: "Bandit & Belters Only" },
+    { position: 16, title: "Swoon (Maor Levi Remix)", artist: "The Chemical Brothers" },
+    { position: 17, title: "Edge of Desire (Franky Rizardo Remix)", artist: "Jonas Blue" },
+    { position: 18, title: "High Speed Chase", artist: "Catching Cairo" },
+    { position: 19, title: "Joyful Night (Original Mix)", artist: "Renote" },
+    { position: 20, title: "Tunnel Vision (feat. Jane) [Extended]", artist: "Belters Only" },
+    { position: 21, title: "Vibe of Love (Original Mix)", artist: "Renote" },
+    { position: 22, title: "Shout of Whispers (ANix JAy Remix)", artist: "AÍRWAVÉ (SL), SONIDDO" },
+  ];
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
