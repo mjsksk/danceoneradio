@@ -29,6 +29,7 @@ import Episode394 from "./pages/Episode394";
 import Episode395 from "./pages/Episode395";
 import Episode396 from "./pages/Episode396";
 import Episode397 from "./pages/Episode397";
+import Episode398 from "./pages/Episode398";
 import About from "./pages/About";
 import Admin from "./pages/Admin";
 import DesktopPlayer from "./pages/DesktopPlayer";
@@ -72,6 +73,7 @@ const App = () => (
                 <Route path="/episode/395" element={<Episode395 />} />
                 <Route path="/episode/396" element={<Episode396 />} />
                 <Route path="/episode/397" element={<Episode397 />} />
+                <Route path="/episode/398" element={<Episode398 />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/desktop" element={<DesktopPlayer />} />
                 <Route path="/auth" element={<Auth />} />
