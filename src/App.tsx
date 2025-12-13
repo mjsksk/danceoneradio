@@ -74,7 +74,7 @@ const App = () => (
                 <Route path="/episode/396" element={<Episode396 />} />
                 <Route path="/episode/397" element={<Episode397 />} />
                 <Route path="/episode/398" element={<Episode398 />} />
-                <Route path="/admin" element={<Admin />} />
+                <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
                 <Route path="/desktop" element={<DesktopPlayer />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
