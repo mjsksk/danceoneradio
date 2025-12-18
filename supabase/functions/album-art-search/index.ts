@@ -110,7 +110,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in album-art-search function:', error)
     return new Response(
-      JSON.stringify({ imageUrl: null, error: error.message }),
+      JSON.stringify({ imageUrl: null, error: 'Failed to search album art' }),
       { 
         status: 200, 
         headers: { 

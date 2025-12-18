@@ -140,7 +140,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in og-meta-generator:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: 'Failed to generate metadata' }),
       {
         status: 500,
         headers: {

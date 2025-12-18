@@ -193,8 +193,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('💥 Error in track history updater:', error);
     return new Response(JSON.stringify({ 
-      error: 'Failed to update track history',
-      details: error.message 
+      error: 'Failed to update track history'
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

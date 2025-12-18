@@ -87,8 +87,7 @@ serve(async (req) => {
     
     return new Response(
       JSON.stringify({ 
-        error: 'Failed to fetch stream metadata',
-        message: error.message 
+        error: 'Failed to fetch stream metadata'
       }),
       { 
         status: 500,
