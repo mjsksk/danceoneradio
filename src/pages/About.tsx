@@ -121,7 +121,7 @@ const About = () => {
                   <div className="relative mb-6">
                     <div className="mx-auto rounded-full overflow-hidden border-2 border-primary/50 hover:border-primary transition-all duration-300 w-32 h-32 flex items-center justify-center bg-background">
                       <img 
-                        src="/lovable-uploads/f807b27f-9eaf-4d20-b3f5-4bad24538a4e.png"
+                        src="/lovable-uploads/mario-new.jpg"
                         alt="Mario"
                         className="w-full h-full object-cover"
                         loading="lazy"
@@ -238,7 +238,7 @@ const About = () => {
                 <CardContent className="p-0">
                   <div className="aspect-video relative overflow-hidden">
                     <img 
-                      src="/lovable-uploads/f807b27f-9eaf-4d20-b3f5-4bad24538a4e.png" 
+                      src="/lovable-uploads/mario-new.jpg" 
                       alt="Mario - Host of Future Dance Anthems"
                       className="w-full h-full object-cover"
                     />
