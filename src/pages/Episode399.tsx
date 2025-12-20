@@ -56,7 +56,24 @@ const Episode399 = () => {
     handleSeek(percentage * duration);
   };
 
-  const tracks: Track[] = [];
+  const tracks: Track[] = [
+    { position: 1, title: "Come Closer (feat. Sienna Sophia)", artist: "Josh Baker" },
+    { position: 2, title: "Hypnotizing", artist: "Makito" },
+    { position: 3, title: "Real Love (Extended Mix)", artist: "Syn Cole & Alexander Jean" },
+    { position: 4, title: "It's Only Real 2025", artist: "Denis Sulta" },
+    { position: 5, title: "Underground (Danny P & Caleb Laurenson Remix)", artist: "Nick Curly", isUnreleased: true },
+    { position: 6, title: "Deeper (Extended Mix)", artist: "Disclosure, Leon Thomas" },
+    { position: 7, title: "Mr. Cool", artist: "Kenya Grace" },
+    { position: 8, title: "En NY", artist: "Verano" },
+    { position: 9, title: "Swoon", artist: "The Chemical Brothers" },
+    { position: 10, title: "Vois Sur Ton Chemin (Deep House Mix)", artist: "Sir Gladis" },
+    { position: 11, title: "Setting Souls", artist: "Joe Gifford" },
+    { position: 12, title: "Unshaken (Extended)", artist: "Laurent Schark & Sami & The Spirit Choir" },
+    { position: 13, title: "2011", artist: "Effy" },
+    { position: 14, title: "Deep Sweet Dream (Jope Extended Remix)", artist: "Taglo" },
+    { position: 15, title: "Lose Control (Extended Mix)", artist: "EC Twins & Emiliana" },
+    { position: 16, title: "I'm not in Love (Original Deep House Version)", artist: "Sir Gladis" },
+  ];
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
