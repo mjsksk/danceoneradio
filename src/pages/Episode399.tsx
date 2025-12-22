@@ -180,11 +180,11 @@ const Episode399 = () => {
                         </div>
                         <div className="flex justify-between text-sm text-primary font-medium">
                           <span>{formatTime(currentTime)}</span>
-                          <span>{formatTime(duration)}</span>
+                          <span>{duration > 0 ? formatTime(duration) : '1:05:00'}</span>
                         </div>
                         <div className="text-right">
                           <p className="text-xs text-muted-foreground">Duration</p>
-                          <p className="text-sm font-medium text-neon-purple">{formatTime(duration)}</p>
+                          <p className="text-sm font-medium text-neon-purple">{duration > 0 ? formatTime(duration) : '1:05:00'}</p>
                         </div>
                       </div>
                       
