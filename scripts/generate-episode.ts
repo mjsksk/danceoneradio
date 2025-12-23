@@ -348,6 +348,7 @@ const Episode${episode.number} = () => {
                     <div className="card-cyber p-6 bg-gradient-to-br from-background/80 to-background/60 backdrop-blur-sm">
                       <div className="flex items-center gap-4 mb-4">
                         <Button 
+                          variant="ghost"
                           className="w-12 h-12 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full flex items-center justify-center hover:from-neon/30 hover:to-neon-purple/30 transition-all duration-200 p-0"
                           onClick={handlePlayPause}
                           disabled={isLoading}
@@ -373,7 +374,7 @@ const Episode${episode.number} = () => {
                           onClick={handleSeek}
                         >
                           <div 
-                            className="h-full bg-gradient-to-r from-neon to-neon-purple rounded-full transition-all duration-150 relative"
+                            className="h-full bg-neon-purple rounded-full transition-all duration-150 relative"
                             style={{ width: \`\${duration > 0 ? (currentTime / duration) * 100 : 0}%\` }}
                           >
                             <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-neon-purple rounded-full shadow-lg shadow-neon-purple/50 opacity-0 group-hover/progress:opacity-100 transition-opacity border-2 border-background" />
