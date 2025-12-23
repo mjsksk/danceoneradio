@@ -82,38 +82,65 @@ const ContinueListening = () => {
     return () => audio.removeEventListener('pause', handlePause);
   }, [audioPlayer.source, audioPlayer.episodeInfo, user, audioPlayer.audioRef]);
 
-  useEffect(() => {
+  const fetchProgress = async () => {
     if (!user) {
       setEpisodes([]);
       setLoading(false);
       return;
     }
+    
+    try {
+      const { data, error } = await supabase
+        .from('episode_listening_progress')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('completed', false)
+        .order('last_listened_at', { ascending: false })
+        .limit(3);
 
-    const fetchProgress = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('episode_listening_progress')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('completed', false)
-          .order('last_listened_at', { ascending: false })
-          .limit(3);
-
-        if (error) {
-          console.error('Error fetching progress:', error);
-          return;
-        }
-
-        setEpisodes(data || []);
-      } catch (error) {
+      if (error) {
         console.error('Error fetching progress:', error);
-      } finally {
-        setLoading(false);
+        return;
       }
-    };
 
+      setEpisodes(data || []);
+    } catch (error) {
+      console.error('Error fetching progress:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initial fetch
+  useEffect(() => {
     fetchProgress();
   }, [user]);
+
+  // Refetch when audio stops playing to show updated progress
+  useEffect(() => {
+    if (!user) return;
+    
+    const audio = audioPlayer.audioRef.current;
+    if (!audio) return;
+
+    const handleEnded = () => {
+      // Refetch after a short delay to allow the save to complete
+      setTimeout(fetchProgress, 1000);
+    };
+
+    const handlePauseRefetch = () => {
+      // Refetch to update the list with latest progress
+      setTimeout(fetchProgress, 1000);
+    };
+
+    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('pause', handlePauseRefetch);
+    
+    return () => {
+      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('pause', handlePauseRefetch);
+    };
+  }, [user, audioPlayer.audioRef]);
 
   const formatTime = (seconds: number) => {
     if (isNaN(seconds)) return '0:00';
