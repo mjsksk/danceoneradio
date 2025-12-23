@@ -214,6 +214,7 @@ const Episode391 = () => {
                     <div className="card-cyber p-6 bg-gradient-to-br from-background/80 to-background/60 backdrop-blur-sm">
                       <div className="flex items-center gap-4 mb-4">
                         <Button 
+                          variant="ghost"
                           className="w-12 h-12 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full flex items-center justify-center hover:from-neon/30 hover:to-neon-purple/30 transition-all duration-200 p-0"
                           onClick={handlePlayPause}
                           disabled={isLoading}
