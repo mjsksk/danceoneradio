@@ -2,11 +2,49 @@
 
 This document explains how to use the automated episode creation system for Dance One Radio podcast episodes.
 
+---
+
+## ⚠️ CRITICAL: DO NOT MANUALLY CREATE EPISODE FILES
+
+**Never manually create episode files.** Always use the automation script:
+
+```bash
+npm run generate-episode
+```
+
+### Why Manual Creation Causes Problems:
+
+1. **Incomplete Audio URLs**: The RSS feed contains full audio URLs with tracking parameters (`awCollectionId`, `awEpisodeId`, etc.). Manually copying URLs often results in truncated URLs that break analytics and tracking.
+
+2. **Missing File Header**: Auto-generated files include a version-stamped header that helps identify when/how the file was created. Manual files lack this audit trail.
+
+3. **Inconsistent Formatting**: The generator ensures consistent code structure, imports, and SEO metadata. Manual creation leads to inconsistencies.
+
+4. **Routing/Prerender Issues**: The script automatically updates `App.tsx`, `Shows.tsx`, and prerender configuration. Manual creation often misses these updates.
+
+### Validation
+
+Run the validation script before deployment to catch issues:
+
+```bash
+npm run validate-episodes
+```
+
+This checks all episode files for:
+- Missing auto-generated header (indicates manual creation)
+- Incomplete audio URLs (missing tracking parameters)
+- Empty track listings (warning only)
+- Episode number mismatches
+
+---
+
 ## Overview
 
 The episode automation system streamlines the process of creating new episode pages by:
 - ✅ Automatically fetching episode metadata from the RSS feed
+- ✅ Validating audio URLs for completeness
 - ✅ Generating complete episode pages with full SEO configuration
+- ✅ Adding version-stamped file headers for audit trail
 - ✅ Updating routing configuration automatically
 - ✅ Updating prerender configuration for static HTML generation
 - ✅ Preserving all template features (audio player, progress tracking, authentication, social sharing, etc.)
@@ -326,6 +364,7 @@ Add these to your `package.json`:
 {
   "scripts": {
     "generate-episode": "tsx scripts/generate-episode.ts",
+    "validate-episodes": "tsx scripts/validate-episodes.ts",
     "prerender": "tsx scripts/generate-prerender.ts"
   }
 }
@@ -359,7 +398,10 @@ Potential improvements:
 - [ ] Automatic deployment trigger
 - [ ] Bulk episode import
 - [ ] Track listing API integration
-- [ ] Episode validation checks
+- [x] Episode validation checks (implemented: `npm run validate-episodes`)
+- [x] Audio URL validation (implemented in generator)
+- [x] Auto-generated file headers (implemented in generator)
 - [ ] Automated testing
 - [ ] Image upload for episode-specific artwork
 - [ ] Analytics integration
+- [ ] Pre-commit hook to warn about manual episode creation
