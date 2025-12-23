@@ -14,6 +14,7 @@ interface Episode {
   };
   duration?: string;
   guid: string;
+  episodeNumber: number;
 }
 
 const PodcastPreview = () => {
@@ -62,9 +63,14 @@ const PodcastPreview = () => {
         const episodeList: Episode[] = Array.from(items).map(item => {
           const description = item.querySelector('description')?.textContent || '';
           const cleanDescription = description.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ').trim();
+          const title = item.querySelector('title')?.textContent || '';
+          
+          // Extract episode number from title (e.g., "Anthems of the week 399" -> 399)
+          const episodeMatch = title.match(/(\d+)\s*$/);
+          const episodeNumber = episodeMatch ? parseInt(episodeMatch[1], 10) : 0;
           
           return {
-            title: item.querySelector('title')?.textContent || '',
+            title,
             description: cleanDescription,
             pubDate: item.querySelector('pubDate')?.textContent || '',
             enclosure: {
@@ -72,7 +78,8 @@ const PodcastPreview = () => {
               type: item.querySelector('enclosure')?.getAttribute('type') || ''
             },
             duration: item.querySelector('itunes\\:duration, duration')?.textContent || '',
-            guid: item.querySelector('guid')?.textContent || ''
+            guid: item.querySelector('guid')?.textContent || '',
+            episodeNumber
           };
         });
         
@@ -135,7 +142,7 @@ const PodcastPreview = () => {
           <Card key={episode.guid || index} className="bg-transparent border-primary/20 p-4 hover:bg-primary/5 transition-all duration-300 group">
             <div className="flex items-start gap-4">
               <div className="bg-gradient-to-br from-neon to-neon-purple text-background rounded-lg w-10 h-10 flex items-center justify-center font-['Orbitron'] font-bold text-sm flex-shrink-0">
-                #{3 - index}
+                #{episode.episodeNumber}
               </div>
               
               <div className="flex-1 min-w-0">
