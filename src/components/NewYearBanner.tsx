@@ -10,7 +10,7 @@ const NewYearBanner = () => {
   }
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-black py-3 px-4">
+    <div className="relative overflow-hidden bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-black py-3 px-4 z-50">
       {/* Animated sparkle background */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-0 left-1/4 w-2 h-2 bg-white rounded-full animate-ping opacity-75" style={{ animationDelay: '0s' }} />
