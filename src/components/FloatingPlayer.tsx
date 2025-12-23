@@ -1,4 +1,4 @@
-import { Play, Pause, X, Radio, Music } from 'lucide-react';
+import { Play, Pause, X, Radio, Music, RotateCcw, RotateCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import stationLogo from '@/assets/dance-one-logo.png';
@@ -109,7 +109,20 @@ const FloatingPlayer = () => {
           </div>
 
           {/* Controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            {/* Skip Back 20s (episodes only) */}
+            {source === 'episode' && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-8 h-8 text-muted-foreground hover:text-primary"
+                onClick={() => seek(Math.max(0, currentTime - 20))}
+                title="Skip back 20 seconds"
+              >
+                <RotateCcw className="w-4 h-4" />
+              </Button>
+            )}
+
             {/* Play/Pause */}
             <Button
               variant="ghost"
@@ -126,6 +139,19 @@ const FloatingPlayer = () => {
                 <Play className="w-5 h-5 text-neon" />
               )}
             </Button>
+
+            {/* Skip Forward 20s (episodes only) */}
+            {source === 'episode' && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-8 h-8 text-muted-foreground hover:text-primary"
+                onClick={() => seek(Math.min(duration, currentTime + 20))}
+                title="Skip forward 20 seconds"
+              >
+                <RotateCw className="w-4 h-4" />
+              </Button>
+            )}
 
             {/* Close */}
             <Button
