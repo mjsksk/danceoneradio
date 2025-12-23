@@ -1,8 +1,8 @@
 import { Sparkles, PartyPopper } from "lucide-react";
 
 const NewYearBanner = () => {
-  // Hide banner after January 2nd, 2025
-  const hideDate = new Date('2025-01-02T00:00:00');
+  // Hide banner after January 2nd, 2026
+  const hideDate = new Date('2026-01-02T00:00:00');
   const now = new Date();
   
   if (now >= hideDate) {
