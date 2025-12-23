@@ -88,17 +88,22 @@ const FloatingPlayer = () => {
             {/* Progress bar for episodes */}
             {source === 'episode' && (
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs text-muted-foreground w-10">{formatTime(currentTime)}</span>
+                <span className="text-xs text-muted-foreground w-12 tabular-nums">{formatTime(currentTime)}</span>
                 <div 
-                  className="flex-1 h-1 bg-primary/20 rounded-full cursor-pointer group"
+                  className="flex-1 h-1.5 bg-primary/20 rounded-full cursor-pointer group relative"
                   onClick={handleSeek}
                 >
                   <div 
-                    className="h-full bg-gradient-to-r from-neon to-neon-purple rounded-full transition-all"
+                    className="h-full bg-gradient-to-r from-neon to-neon-purple rounded-full"
                     style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
                   />
+                  {/* Playhead indicator */}
+                  <div 
+                    className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-neon rounded-full shadow-lg shadow-neon/50 opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{ left: `calc(${duration > 0 ? (currentTime / duration) * 100 : 0}% - 6px)` }}
+                  />
                 </div>
-                <span className="text-xs text-muted-foreground w-10 text-right">{formatTime(duration)}</span>
+                <span className="text-xs text-muted-foreground w-12 tabular-nums text-right">{formatTime(duration)}</span>
               </div>
             )}
           </div>
