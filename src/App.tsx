@@ -9,6 +9,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import FloatingPlayer from "@/components/FloatingPlayer";
+import NewYearBanner from "@/components/NewYearBanner";
 import Index from "./pages/Index";
 import Shows from "./pages/Shows";
 import Gallery from "./pages/Gallery";
@@ -51,6 +52,7 @@ const App = () => (
           <CookieConsent />
           <BrowserRouter>
             <ErrorBoundary>
+              <NewYearBanner />
               <div className="pb-20">
                 <Routes>
                 <Route path="/" element={<Index />} />
