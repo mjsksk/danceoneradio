@@ -188,7 +188,10 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     const handlePlay = () => setState(prev => ({ ...prev, isPlaying: true, isLoading: false }));
     const handlePause = () => setState(prev => ({ ...prev, isPlaying: false }));
     const handleTimeUpdate = () => setState(prev => ({ ...prev, currentTime: audio.currentTime }));
-    const handleLoadedMetadata = () => setState(prev => ({ ...prev, duration: audio.duration, isLoading: false }));
+    const handleLoadedMetadata = () => {
+      const nextDuration = Number.isFinite(audio.duration) ? audio.duration : 0;
+      setState(prev => ({ ...prev, duration: nextDuration, isLoading: false }));
+    };
     const handleEnded = () => setState(prev => ({ ...prev, isPlaying: false }));
     const handleError = () => {
       console.error('Audio error, trying next URL');
@@ -217,6 +220,31 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       audio.removeEventListener('error', handleError);
     };
   }, [state.source, tryNextUrl, streamUrls, currentUrlIndex]);
+
+  // Some browsers can throttle `timeupdate`; keep episode progress in sync while playing.
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (state.source !== 'episode' || !state.isPlaying) return;
+
+    const interval = window.setInterval(() => {
+      setState(prev => {
+        if (prev.source !== 'episode') return prev;
+
+        const nextTime = audio.currentTime || 0;
+        const nextDuration = Number.isFinite(audio.duration) ? audio.duration : prev.duration;
+
+        // Avoid excessive renders when the delta is tiny
+        if (Math.abs(prev.currentTime - nextTime) < 0.25 && Math.abs((prev.duration || 0) - (nextDuration || 0)) < 0.5) {
+          return prev;
+        }
+
+        return { ...prev, currentTime: nextTime, duration: nextDuration };
+      });
+    }, 500);
+
+    return () => window.clearInterval(interval);
+  }, [state.source, state.isPlaying]);
 
   return (
     <AudioPlayerContext.Provider
