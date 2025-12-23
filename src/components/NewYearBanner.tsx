@@ -10,7 +10,7 @@ const NewYearBanner = () => {
   }
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-r from-primary via-neon-purple to-primary py-3 px-4 mt-16 z-40">
+    <div className="fixed top-16 left-0 right-0 overflow-hidden bg-gradient-to-r from-primary via-neon-purple to-primary py-3 px-4 z-40">
       {/* Animated glow effect */}
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse" />
       
