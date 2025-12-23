@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Play, Pause, ExternalLink, Calendar, Clock } from 'lucide-react';
@@ -8,7 +8,9 @@ import SocialShare from '@/components/SocialShare';
 import SEO from '@/components/SEO';
 import GoogleAds from '@/components/GoogleAds';
 import { Link } from 'react-router-dom';
-
+import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 interface Episode {
   title: string;
   description: string;
@@ -29,9 +31,12 @@ const Shows = () => {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [totalEpisodes, setTotalEpisodes] = useState<number>(0);
   const [loading, setLoading] = useState(true);
-  const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
   const [bgLoaded, setBgLoaded] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  
+  // Use global audio player context
+  const { playEpisode, pause, resume, isPlaying, episodeInfo, seek, audioRef: globalAudioRef } = useAudioPlayer();
+  const { user } = useAuth();
 
   const fetchEpisodes = async (retryCount = 0) => {
     const maxRetries = 3;
@@ -221,42 +226,53 @@ const Shows = () => {
     });
   };
 
-  const handlePlayPause = (episodeUrl: string, episodeGuid: string) => {
-    // If same episode is playing, toggle play/pause
-    if (currentlyPlaying === episodeGuid && audioRef.current) {
-      if (audioRef.current.paused) {
-        audioRef.current.play();
+  // Helper to check if a specific episode is currently playing
+  const isEpisodePlaying = useCallback((episodeNumber: number) => {
+    return isPlaying && episodeInfo?.number === episodeNumber;
+  }, [isPlaying, episodeInfo]);
+
+  // Fetch saved progress and play episode from saved position
+  const handlePlayPauseWithProgress = useCallback(async (episode: Episode) => {
+    const episodeNumber = episode.episodeNumber || 0;
+    
+    // If this episode is already playing, toggle pause/resume
+    if (episodeInfo?.number === episodeNumber) {
+      if (isPlaying) {
+        pause();
       } else {
-        audioRef.current.pause();
+        resume();
       }
       return;
     }
-
-    // Stop current audio if playing
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
+    
+    // Start playing the new episode
+    playEpisode({
+      number: episodeNumber,
+      title: episode.title,
+      audioUrl: episode.enclosure.url
+    });
+    
+    // If user is logged in, fetch saved progress and seek to it
+    if (user) {
+      try {
+        const { data } = await supabase
+          .from('episode_listening_progress')
+          .select('playback_position')
+          .eq('user_id', user.id)
+          .eq('episode_number', episodeNumber)
+          .maybeSingle();
+        
+        if (data && data.playback_position > 0) {
+          // Wait a moment for audio to load, then seek
+          setTimeout(() => {
+            seek(data.playback_position);
+          }, 500);
+        }
+      } catch (error) {
+        console.error('Error fetching progress:', error);
+      }
     }
-
-    // Start new episode
-    const audio = new Audio(episodeUrl);
-    audioRef.current = audio;
-    setCurrentlyPlaying(episodeGuid);
-    
-    audio.play().catch(console.error);
-    
-    // Handle when audio ends
-    audio.addEventListener('ended', () => {
-      setCurrentlyPlaying(null);
-      audioRef.current = null;
-    });
-
-    // Handle errors
-    audio.addEventListener('error', () => {
-      setCurrentlyPlaying(null);
-      audioRef.current = null;
-    });
-  };
+  }, [user, episodeInfo, isPlaying, playEpisode, pause, resume, seek]);
 
    const handleShareEpisode = async (episode: Episode, episodeIndex: number) => {
      const episodeNumber = episode.episodeNumber || (totalEpisodes - episodeIndex);
@@ -336,14 +352,14 @@ const Shows = () => {
                 Dance anthems that consistently rule the dance and electronic scene. Featuring infectious beats, catchy hooks, and high-energy vibes perfect for both clubbing and radio airplay.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button 
-                  size="lg" 
-                  className="text-lg px-8 py-4 hover:scale-105 transition-transform"
-                  onClick={() => {
-                    if (episodes.length > 0 && episodes[0].enclosure.url) {
-                      handlePlayPause(episodes[0].enclosure.url, episodes[0].guid);
-                    }
-                  }}
+                  <Button 
+                    size="lg" 
+                    className="text-lg px-8 py-4 hover:scale-105 transition-transform"
+                    onClick={() => {
+                      if (episodes.length > 0 && episodes[0].enclosure.url) {
+                        handlePlayPauseWithProgress(episodes[0]);
+                      }
+                    }}
                   disabled={loading || episodes.length === 0}
                 >
                   <Play className="w-5 h-5 mr-2" />
@@ -478,14 +494,14 @@ const Shows = () => {
                           {episode.enclosure.url && (
                             <Button 
                               className="w-full flex items-center gap-2 hover:scale-105 transition-all duration-200 bg-gradient-to-r from-neon to-neon-purple text-background hover:shadow-lg hover:shadow-neon/25"
-                              onClick={() => handlePlayPause(episode.enclosure.url, episode.guid)}
+                              onClick={() => handlePlayPauseWithProgress(episode)}
                             >
-                              {currentlyPlaying === episode.guid && audioRef.current && !audioRef.current.paused ? (
+                              {isEpisodePlaying(episode.episodeNumber || 0) ? (
                                 <Pause className="w-4 h-4" />
                               ) : (
                                 <Play className="w-4 h-4" />
                               )}
-                              {currentlyPlaying === episode.guid && audioRef.current && !audioRef.current.paused ? 'Pause' : 'Play'} Episode
+                              {isEpisodePlaying(episode.episodeNumber || 0) ? 'Pause' : 'Play'} Episode
                             </Button>
                           )}
                           
