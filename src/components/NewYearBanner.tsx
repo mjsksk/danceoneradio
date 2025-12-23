@@ -24,7 +24,7 @@ const NewYearBanner = () => {
       
       <div className="relative flex items-center justify-center gap-3 text-center">
         <PartyPopper className="w-5 h-5 text-white flex-shrink-0 animate-bounce" />
-        <p className="font-['Inter'] font-medium text-sm md:text-base text-white tracking-normal">
+        <p className="font-['Orbitron'] font-medium text-sm md:text-base text-white tracking-wider uppercase italic">
           <span className="hidden sm:inline">🎉 </span>
           Tune in to the New Year's Eve dance party marathon. More than 12 hours of continuous mix from the best of the best of 2025. Come and celebrate with us!
           <span className="hidden sm:inline"> 🎉</span>
