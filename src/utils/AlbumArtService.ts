@@ -156,7 +156,7 @@ export class AlbumArtService {
     return { imageUrl: null };
   }
 
-  private static getDefaultAlbumArt(): string {
-    return "/src/assets/dance-one-logo.png";
+  private static getDefaultAlbumArt(): null {
+    return null;
   }
 }
