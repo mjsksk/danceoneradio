@@ -67,8 +67,30 @@ const Episode400 = () => {
     handleSeek(percentage * duration);
   };
 
-  // Track listing - import via CSV or add manually
-  const tracks: Track[] = [];
+  // Track listing for Episode 400
+  const tracks: Track[] = [
+    { position: 1, title: "Love You So Much", artist: "lllyus & Barrientos Feat. Trina Broussard" },
+    { position: 2, title: "The Way I Are (Max Dean Extended Remix)", artist: "Timbaland, Keri Hilson & D.O.E" },
+    { position: 3, title: "Sweet Love (Vocal House Mix)", artist: "Sir Gladis" },
+    { position: 4, title: "AIR (WARATAH Remix)", artist: "Eli & Fur" },
+    { position: 5, title: "AIR (Discognition Remix)", artist: "Eli & Fur" },
+    { position: 6, title: "What About My Love (Michael Gray Extended Remix)", artist: "Dave & Maurissa" },
+    { position: 7, title: "Giving Up Air (Solomun Remix)", artist: "The Temper Trap" },
+    { position: 8, title: "I HEART YOU (Saoirse Remix)", artist: "Confidence Man, Eliza Rose" },
+    { position: 9, title: "Lost (Rossi. Remix)", artist: "Frank Ocean" },
+    { position: 10, title: "I Like It Like That", artist: "Fcukers" },
+    { position: 11, title: "Smooth Operator (Deep House Version)", artist: "Sir Gladis" },
+    { position: 12, title: "Painkiller", artist: "Dave (US), Jezu (US)" },
+    { position: 13, title: "Hypoxia (Namche Bazaar Remix)", artist: "Peewee Ferris" },
+    { position: 14, title: "Hypoxia", artist: "Peewee Ferris" },
+    { position: 15, title: "Como Se Llama (Extended Mix)", artist: "Tony Romera" },
+    { position: 16, title: "Down by The Beach (Sunset Deep House Remix 2026)", artist: "ReJohn & Sir Gladis" },
+    { position: 17, title: "Release (Extended Mix)", artist: "CASSIMM Feat. Tamika Tyan" },
+    { position: 18, title: "Lonely No More", artist: "DJ Dove" },
+    { position: 19, title: "Rush (Extended Mix)", artist: "Martin Ikin & Hayley May" },
+    { position: 20, title: "Digital Loving Arms (Fred again.. Edit)", artist: "Fred again.. x Daft Punk" },
+    { position: 21, title: "We Three Kings (Tourist Extended Remix)", artist: "Ella Fitzgerald" },
+  ];
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
