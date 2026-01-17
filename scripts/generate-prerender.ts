@@ -136,6 +136,12 @@ const routes = [
     image: '/lovable-uploads/mario-show.jpg'
   },
   {
+    path: '/episode/401',
+    title: 'Anthems of the week 401 - Future Dance Anthems with Mario | Dance One Radio',
+    description: 'Episode 401 featuring the latest electronic dance music tracks and unreleased anthems.',
+    image: '/lovable-uploads/mario-show.jpg'
+  },
+  {
     path: '/privacy',
     title: 'Privacy Policy - Dance One Radio',
     description: 'Read the privacy policy for Dance One Radio. Learn how we collect, use, and protect your personal information.',
