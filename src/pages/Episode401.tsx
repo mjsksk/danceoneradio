@@ -145,7 +145,7 @@ const Episode401 = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="w-5 h-5 text-neon-purple" />
-                    <span>{duration > 0 ? formatTime(duration) : '1h 2m'}</span>
+                    <span>{duration > 0 ? formatTime(duration) : '1h 44m'}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Music className="w-5 h-5 text-primary" />
@@ -199,11 +199,11 @@ const Episode401 = () => {
                         </div>
                         <div className="flex justify-between text-sm text-primary font-medium">
                           <span>{formatTime(currentTime)}</span>
-                          <span>{duration > 0 ? formatTime(duration) : '1:02:37'}</span>
+                          <span>{duration > 0 ? formatTime(duration) : '1:43:32'}</span>
                         </div>
                         <div className="text-right">
                           <p className="text-xs text-muted-foreground">Duration</p>
-                          <p className="text-sm font-medium text-neon-purple">{duration > 0 ? formatTime(duration) : '1:02:37'}</p>
+                          <p className="text-sm font-medium text-neon-purple">{duration > 0 ? formatTime(duration) : '1:43:32'}</p>
                         </div>
                       </div>
                       
