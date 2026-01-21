@@ -28,6 +28,9 @@ const ShaderBackground = () => {
     const float scale = 5.0;
     // Cyber blue from --cyber-blue: 200 100% 50% -> RGB(0, 170, 255)
     const vec4 lineColor = vec4(0.0, 0.667, 1.0, 1.0);
+    // Glow color matching --glow-cyber (softer, more spread version)
+    const vec4 glowColor = vec4(0.0, 0.667, 1.0, 0.3);
+    const float glowWidth = 0.15;
     const float minLineWidth = 0.01;
     const float maxLineWidth = 0.2;
     const float lineSpeed = 1.0 * overallSpeed;
@@ -91,14 +94,19 @@ const ShaderBackground = () => {
         float halfWidth = mix(minLineWidth, maxLineWidth, rand * horizontalFade) / 2.0;
         float offset = random(offsetPosition + offsetTime * (1.0 + normalizedLineIndex)) * mix(minOffsetSpread, maxOffsetSpread, horizontalFade);
         float linePosition = getPlasmaY(space.x, horizontalFade, offset);
+        
+        // Add subtle glow effect (wider, softer line underneath)
+        float glow = drawSmoothLine(linePosition, halfWidth + glowWidth, space.y) * 0.4;
         float line = drawSmoothLine(linePosition, halfWidth, space.y) / 2.0 + drawCrispLine(linePosition, halfWidth * 0.15, space.y);
 
         float circleX = mod(float(l) + iTime * lineSpeed, 25.0) - 12.0;
         vec2 circlePosition = vec2(circleX, getPlasmaY(circleX, horizontalFade, offset));
         float circle = drawCircle(circlePosition, 0.01, space) * 4.0;
+        float circleGlow = drawCircle(circlePosition, 0.05, space) * 1.5;
 
         line = line + circle;
         lines += line * lineColor * rand;
+        lines += (glow + circleGlow) * glowColor * rand;
       }
 
       fragColor = mix(bgColor1, bgColor2, uv.x);
