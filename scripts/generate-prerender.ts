@@ -142,6 +142,12 @@ const routes = [
     image: '/lovable-uploads/mario-show.jpg'
   },
   {
+    path: '/episode/402',
+    title: 'Anthems of the week 402 - Future Dance Anthems with Mario | Dance One Radio',
+    description: 'Episode 402 featuring 21 tracks including Claptone, Simon Doty, Marsh, Meduza, Vintage Culture and more.',
+    image: '/lovable-uploads/mario-show.jpg'
+  },
+  {
     path: '/privacy',
     title: 'Privacy Policy - Dance One Radio',
     description: 'Read the privacy policy for Dance One Radio. Learn how we collect, use, and protect your personal information.',
