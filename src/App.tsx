@@ -8,6 +8,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { AdminRoute } from "@/components/AdminRoute";
 import FloatingPlayer from "@/components/FloatingPlayer";
 import NewYearBanner from "@/components/NewYearBanner";
 import Index from "./pages/Index";
@@ -84,7 +85,7 @@ const App = () => (
                 <Route path="/episode/400" element={<Episode400 />} />
                 <Route path="/episode/401" element={<Episode401 />} />
                 <Route path="/episode/402" element={<Episode402 />} />
-                <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+                <Route path="/admin" element={<AdminRoute requiredRole="admin"><Admin /></AdminRoute>} />
                 <Route path="/desktop" element={<DesktopPlayer />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
