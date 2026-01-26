@@ -168,6 +168,43 @@ function parseRSSItem(item: string, sourceName: string): ParsedArticle | null {
   }
 }
 
+// Fetch OG image from article page if no image in RSS
+async function fetchOgImage(url: string): Promise<string | null> {
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Dance One Radio News Bot/1.0',
+        'Accept': 'text/html'
+      },
+      signal: AbortSignal.timeout(8000)
+    })
+    
+    if (!response.ok) return null
+    
+    const html = await response.text()
+    
+    // Try og:image first (highest priority)
+    const ogMatch = html.match(/<meta[^>]*property="og:image"[^>]*content="([^"]*)"/)
+      || html.match(/<meta[^>]*content="([^"]*)"[^>]*property="og:image"/)
+    if (ogMatch?.[1]) return ogMatch[1]
+    
+    // Try twitter:image
+    const twitterMatch = html.match(/<meta[^>]*name="twitter:image"[^>]*content="([^"]*)"/)
+      || html.match(/<meta[^>]*content="([^"]*)"[^>]*name="twitter:image"/)
+    if (twitterMatch?.[1]) return twitterMatch[1]
+    
+    // Try featured image or main article image
+    const featuredMatch = html.match(/class="[^"]*(?:featured|hero|main|article)[^"]*"[^>]*>[\s\S]*?<img[^>]*src="([^"]*\.(jpg|jpeg|png|webp))"/i)
+      || html.match(/<img[^>]*class="[^"]*(?:featured|hero|main|article)[^"]*"[^>]*src="([^"]*\.(jpg|jpeg|png|webp))"/i)
+    if (featuredMatch?.[1]) return featuredMatch[1]
+    
+    return null
+  } catch (error) {
+    console.error(`Error fetching OG image from ${url}:`, error)
+    return null
+  }
+}
+
 function parseRSSFeed(xmlContent: string, sourceName: string): ParsedArticle[] {
   const articles: ParsedArticle[] = []
   
@@ -238,6 +275,20 @@ serve(async (req) => {
     }
 
     console.log(`📰 Total articles fetched: ${allArticles.length}`)
+
+    // Try to fetch OG images for articles without images (limit to avoid timeouts)
+    const articlesNeedingImages = allArticles.filter(a => !a.image_url).slice(0, 10)
+    if (articlesNeedingImages.length > 0) {
+      console.log(`🖼️ Fetching OG images for ${articlesNeedingImages.length} articles...`)
+      const imagePromises = articlesNeedingImages.map(async (article) => {
+        const ogImage = await fetchOgImage(article.source_url)
+        if (ogImage) {
+          article.image_url = ogImage
+          console.log(`✅ Found OG image for: ${article.title.substring(0, 40)}...`)
+        }
+      })
+      await Promise.allSettled(imagePromises)
+    }
 
     // Insert articles, skipping duplicates (handled by unique constraint on source_url)
     let insertedCount = 0

@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, ExternalLink, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { NewsArticle } from '@/hooks/useNewsArticles';
 import { Skeleton } from '@/components/ui/skeleton';
+import stationLogo from '@/assets/dance-one-logo.png';
 
 interface NewsFeaturedHeroProps {
   article: NewsArticle | null;
@@ -10,6 +12,8 @@ interface NewsFeaturedHeroProps {
 }
 
 export function NewsFeaturedHero({ article, isLoading }: NewsFeaturedHeroProps) {
+  const [imageError, setImageError] = useState(false);
+
   if (isLoading) {
     return (
       <div className="relative rounded-xl overflow-hidden bg-card/50 border border-border/50">
@@ -45,14 +49,21 @@ export function NewsFeaturedHero({ article, isLoading }: NewsFeaturedHeroProps) 
       className="block group relative rounded-xl overflow-hidden"
     >
       <div className="relative aspect-[21/9] md:aspect-[3/1]">
-        {article.image_url ? (
+        {article.image_url && !imageError ? (
           <img
             src={article.image_url}
             alt={article.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            onError={() => setImageError(true)}
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-primary/20 to-purple-500/20" />
+          <div className="w-full h-full bg-gradient-to-br from-primary/20 to-purple-500/20 flex items-center justify-center">
+            <img 
+              src={stationLogo} 
+              alt="Dance One Radio" 
+              className="w-32 h-32 object-contain opacity-50"
+            />
+          </div>
         )}
         
         {/* Gradient overlay */}

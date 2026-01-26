@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, ExternalLink, Tag, Music2 } from 'lucide-react';
+import { Calendar, ExternalLink, Tag } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { NewsArticle, NewsCategory } from '@/hooks/useNewsArticles';
+import stationLogo from '@/assets/dance-one-logo.png';
 
 interface NewsCardProps {
   article: NewsArticle;
@@ -26,18 +28,21 @@ const categoryLabels: Record<NewsCategory, string> = {
 };
 
 export function NewsCard({ article, featured = false }: NewsCardProps) {
+  const [imageError, setImageError] = useState(false);
+  
   const formattedDate = new Date(article.published_at).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
   });
 
-  const ImagePlaceholder = () => (
+  const FallbackImage = () => (
     <div className={`relative overflow-hidden bg-gradient-to-br from-primary/10 via-purple-500/10 to-blue-500/10 flex items-center justify-center ${featured ? 'md:w-1/2 md:min-h-[280px]' : 'aspect-video'}`}>
-      <div className="flex flex-col items-center gap-2 text-muted-foreground/50">
-        <Music2 className="w-12 h-12" />
-        <span className="text-xs font-medium">{article.source_name}</span>
-      </div>
+      <img 
+        src={stationLogo} 
+        alt="Dance One Radio" 
+        className="w-24 h-24 object-contain opacity-60"
+      />
       <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
     </div>
   );
@@ -53,25 +58,19 @@ export function NewsCard({ article, featured = false }: NewsCardProps) {
       className="block group"
     >
       <Card className={`h-full bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 ${featured ? 'md:flex md:flex-row' : ''}`}>
-        {article.image_url ? (
+        {article.image_url && !imageError ? (
           <div className={`relative overflow-hidden ${featured ? 'md:w-1/2 md:min-h-[280px]' : 'aspect-video'}`}>
             <img
               src={article.image_url}
               alt={article.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
-              onError={(e) => {
-                // Replace with placeholder on error
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                target.parentElement?.classList.add('hidden');
-                target.parentElement?.nextElementSibling?.classList.remove('hidden');
-              }}
+              onError={() => setImageError(true)}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
           </div>
         ) : (
-          <ImagePlaceholder />
+          <FallbackImage />
         )}
         
         <div className={featured ? 'md:w-1/2' : ''}>
