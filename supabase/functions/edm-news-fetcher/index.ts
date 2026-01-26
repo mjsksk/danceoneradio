@@ -290,29 +290,41 @@ serve(async (req) => {
       await Promise.allSettled(imagePromises)
     }
 
-    // Insert articles, skipping duplicates (handled by unique constraint on source_url)
+    // Insert articles, updating if source_url exists
     let insertedCount = 0
-    let skippedCount = 0
+    let updatedCount = 0
 
     for (const article of allArticles) {
-      const { error } = await supabase
+      // First check if article exists
+      const { data: existing } = await supabase
         .from('edm_news_articles')
-        .upsert({
-          ...article,
-          fetched_at: new Date().toISOString()
-        }, {
-          onConflict: 'source_url',
-          ignoreDuplicates: true
-        })
+        .select('id, image_url')
+        .eq('source_url', article.source_url)
+        .maybeSingle()
 
-      if (error) {
-        if (error.code === '23505') {
-          skippedCount++
+      if (existing) {
+        // Update only if we have a new image and the existing one is missing
+        if (article.image_url && !existing.image_url) {
+          await supabase
+            .from('edm_news_articles')
+            .update({ image_url: article.image_url })
+            .eq('id', existing.id)
+          updatedCount++
+        }
+      } else {
+        // Insert new article
+        const { error } = await supabase
+          .from('edm_news_articles')
+          .insert({
+            ...article,
+            fetched_at: new Date().toISOString()
+          })
+
+        if (!error) {
+          insertedCount++
         } else {
           console.error('Insert error:', error)
         }
-      } else {
-        insertedCount++
       }
     }
 
@@ -337,14 +349,14 @@ serve(async (req) => {
         .eq('id', recentArticle.id)
     }
 
-    console.log(`✅ News fetch complete: ${insertedCount} new, ${skippedCount} duplicates skipped`)
+    console.log(`✅ News fetch complete: ${insertedCount} new, ${updatedCount} images updated`)
 
     return new Response(
       JSON.stringify({
         success: true,
         fetched: allArticles.length,
         inserted: insertedCount,
-        skipped: skippedCount
+        updated: updatedCount
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
