@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Send, Mail, Eye, EyeOff, Loader2, CheckCircle, AlertCircle, Users } from 'lucide-react';
+import DOMPurify from 'dompurify';
 import { toast } from 'sonner';
 
 const NewsletterCampaign = () => {
@@ -75,31 +76,41 @@ const NewsletterCampaign = () => {
     }
   };
 
-  const previewHtml = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <div style="text-align: center; margin-bottom: 30px;">
-        <h1 style="color: #333;">Dance One Radio Newsletter</h1>
+  // Sanitize HTML content to prevent XSS attacks
+  const sanitizedPreviewHtml = useMemo(() => {
+    const rawHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #333;">Dance One Radio Newsletter</h1>
+        </div>
+        
+        <div style="color: #666; font-size: 16px; line-height: 1.6;">
+          ${content || '<em>Your content will appear here...</em>'}
+        </div>
+        
+        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+        
+        <div style="text-align: center;">
+          <a href="#" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin-bottom: 20px;">
+            Visit Dance One Radio
+          </a>
+        </div>
+        
+        <p style="color: #999; font-size: 12px; text-align: center;">
+          You're receiving this because you subscribed to Dance One Radio newsletter.<br>
+          <a href="#" style="color: #007bff;">Unsubscribe</a> | 
+          <a href="#" style="color: #007bff;">Visit our website</a>
+        </p>
       </div>
-      
-      <div style="color: #666; font-size: 16px; line-height: 1.6;">
-        ${content || '<em>Your content will appear here...</em>'}
-      </div>
-      
-      <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-      
-      <div style="text-align: center;">
-        <a href="#" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin-bottom: 20px;">
-          Visit Dance One Radio
-        </a>
-      </div>
-      
-      <p style="color: #999; font-size: 12px; text-align: center;">
-        You're receiving this because you subscribed to Dance One Radio newsletter.<br>
-        <a href="#" style="color: #007bff;">Unsubscribe</a> | 
-        <a href="#" style="color: #007bff;">Visit our website</a>
-      </p>
-    </div>
-  `;
+    `;
+    
+    // Sanitize HTML while allowing safe formatting tags and styles
+    return DOMPurify.sanitize(rawHtml, {
+      ALLOWED_TAGS: ['div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a', 'strong', 'em', 'br', 'hr', 'ul', 'ol', 'li', 'span'],
+      ALLOWED_ATTR: ['href', 'style', 'class'],
+      ALLOW_DATA_ATTR: false,
+    });
+  }, [content]);
 
   return (
     <Card className="p-6 bg-card/50 backdrop-blur-sm border-border/50">
@@ -176,7 +187,7 @@ const NewsletterCampaign = () => {
             </div>
             <div 
               className="bg-white p-4"
-              dangerouslySetInnerHTML={{ __html: previewHtml }}
+              dangerouslySetInnerHTML={{ __html: sanitizedPreviewHtml }}
             />
           </div>
         )}
