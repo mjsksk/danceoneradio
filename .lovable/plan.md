@@ -1,257 +1,184 @@
 
-# EDM News Feed Implementation Plan
+# Fix Admin Dashboard Access Issue
 
-## Overview
-Build a comprehensive EDM news aggregation system that fetches, stores, and displays daily-updated dance music news from multiple sources. The system will include a main news page with category subpages, database storage for articles, and an automated daily fetch via Supabase cron jobs.
+## Problem Diagnosis
 
----
+The admin dashboard at `/admin` is redirecting to the homepage even for users with the admin role. This is caused by a **race condition** between the authentication context and the role-fetching hook.
 
-## Architecture
+### Root Cause
+The `useUserRole` hook has a timing issue:
+1. It initializes `loading: true` and `roles: []`
+2. It waits for `user` from `AuthContext` before fetching roles
+3. But if the `AdminRoute` component renders before `user` is available, the empty `roles` array causes a redirect to home
+4. Even when `user` becomes available, the redirect has already happened
 
+### Current Flow (Broken)
 ```text
-+-------------------+     +----------------------+     +------------------+
-|   News Sources    |     |  Edge Function       |     |    Database      |
-|   (RSS Feeds)     | --> |  edm-news-fetcher    | --> |  edm_news_articles|
-|   - EDM.com       |     |  (Daily Cron)        |     |                  |
-|   - Mixmag        |     +----------------------+     +------------------+
-|   - DJ Mag        |               |                          |
-+-------------------+               v                          v
-                           +----------------------+     +------------------+
-                           |  Manual Trigger      |     |  Frontend Pages  |
-                           |  (Admin Panel)       |     |  /news/*         |
-                           +----------------------+     +------------------+
++------------------+     +----------------+     +---------------+
+| AuthContext      |     | useUserRole    |     | AdminRoute    |
+| loading: true    |---->| loading: true  |---->| Show spinner  |
++------------------+     +----------------+     +---------------+
+         |                       |                      |
+         v                       v                      v
++------------------+     +----------------+     +---------------+
+| loading: false   |     | roles: []      |     | No admin role |
+| user: available  |     | (not fetched)  |     | REDIRECT HOME |
++------------------+     +----------------+     +---------------+
 ```
 
----
+## Solution
 
-## Database Schema
+Fix the `useUserRole` hook to properly wait for the auth context and ensure roles are fetched before the loading state is set to `false`.
 
-### New Table: `edm_news_articles`
+### Changes Required
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | uuid | Primary key |
-| `title` | text | Article headline |
-| `slug` | text | URL-friendly identifier |
-| `summary` | text | Short rich summary (200-300 chars) |
-| `content` | text | Full article content (optional) |
-| `category` | enum | headline, release, event, artist, industry |
-| `source_url` | text | Original article URL |
-| `source_name` | text | Source publication name |
-| `image_url` | text | Featured image URL (optional) |
-| `published_at` | timestamptz | Original publish date |
-| `fetched_at` | timestamptz | When we fetched it |
-| `is_featured` | boolean | Featured on homepage |
-| `tags` | text[] | Additional tags for filtering |
-| `created_at` | timestamptz | Record creation time |
+**1. Update `src/hooks/useUserRole.tsx`**
+- Keep `loading: true` while `AuthContext.loading` is still true
+- Add debug logging to help diagnose issues
+- Ensure the hook only sets `loading: false` after a fetch attempt is complete
 
-### Enum: `news_category`
-- `headline` - Major industry news
-- `release` - New music releases
-- `event` - Festival/event announcements
-- `artist` - Artist spotlights and news
-- `industry` - Scene and culture updates
+**2. Update `src/components/AdminRoute.tsx`**
+- Add debug logging to understand the state when redirects happen
+- Ensure redirects only occur after roles have been definitively checked
 
----
+### Technical Implementation
 
-## Frontend Components
-
-### Pages to Create
-
-1. **`/news`** - Main news hub with tabbed navigation
-   - Shows featured stories, latest headlines
-   - Links to category subpages
-   
-2. **`/news/top-stories`** - Today's top headlines
-3. **`/news/artists-releases`** - Artist spotlights and new releases
-4. **`/news/festivals-events`** - Festival and event roundups
-5. **`/news/industry-culture`** - Scene and culture updates
-
-### Component Structure
-
-```text
-src/pages/
-  News.tsx                    # Main news hub
-  NewsTopStories.tsx          # Today's top stories
-  NewsArtistsReleases.tsx     # Artists & releases
-  NewsFestivalsEvents.tsx     # Festivals & events
-  NewsIndustryCulture.tsx     # Industry & culture
-
-src/components/news/
-  NewsCard.tsx                # Individual article card
-  NewsCategorySection.tsx     # Section with category header
-  NewsFeaturedHero.tsx        # Hero section for featured story
-  NewsGrid.tsx                # Grid layout for articles
-  NewsFilters.tsx             # Date/category filters
-  NewsSkeleton.tsx            # Loading skeleton
-```
-
-### Design Elements
-- Mobile-first responsive grid layout
-- Card-based article display with image, title, date, summary, and source
-- Category color-coding (neon accent colors matching site theme)
-- Smooth animations using Framer Motion
-- "Read More" links to original sources (opens in new tab)
-
----
-
-## Edge Function: `edm-news-fetcher`
-
-### Responsibilities
-1. Fetch RSS feeds from whitelisted EDM news sources
-2. Parse and extract article data
-3. Auto-categorize articles by keywords
-4. Deduplicate by title + source URL
-5. Store new articles in database
-6. Run daily via Supabase cron job
-
-### RSS Sources to Add to Whitelist
-- `www.edm.com` - Main EDM news
-- `mixmag.net` - DJ culture and news
-- `djmag.com` - Industry news
-- `dancingastronaut.com` - Electronic music news
-- `youredm.com` - EDM community news
-
-### Auto-Categorization Logic
-```text
-Keywords → Category mapping:
-- "festival", "tour", "announce", "lineup" → event
-- "release", "single", "album", "EP", "track" → release
-- "DJ", "producer", "artist" → artist
-- "industry", "streaming", "label" → industry
-- Default → headline
-```
-
----
-
-## Cron Job Setup
-
-### Daily News Fetch (7:00 AM UTC)
-```sql
-SELECT cron.schedule(
-  'daily-edm-news-fetch',
-  '0 7 * * *',
-  $$
-  SELECT net.http_post(
-    url := 'https://[project].supabase.co/functions/v1/edm-news-fetcher',
-    headers := jsonb_build_object(
-      'Content-Type', 'application/json',
-      'Authorization', 'Bearer ' || current_setting('supabase.service_role_key', true)
-    ),
-    body := jsonb_build_object('source', 'cron')
-  );
-  $$
-);
-```
-
----
-
-## Implementation Steps
-
-### Phase 1: Database Setup
-1. Create `news_category` enum type
-2. Create `edm_news_articles` table with proper indexes
-3. Add RLS policies (public read, service role write)
-4. Create index on `published_at` for efficient queries
-
-### Phase 2: Edge Function
-1. Create `supabase/functions/edm-news-fetcher/index.ts`
-2. Add RSS domains to whitelist in `rss-feed-fetch` or create dedicated fetcher
-3. Implement parsing, categorization, and deduplication logic
-4. Add rate limiting and error handling
-5. Deploy and test manually
-
-### Phase 3: Frontend Pages
-1. Create main `/news` page with hero and category tabs
-2. Build reusable `NewsCard` and `NewsGrid` components
-3. Implement category subpages
-4. Add React Query hooks for data fetching
-5. Style with Tailwind matching existing cyber/neon theme
-
-### Phase 4: Navigation & SEO
-1. Add "News" to main navigation
-2. Implement SEO component with news-specific meta tags
-3. Add structured data (NewsArticle schema)
-4. Update sitemap
-
-### Phase 5: Automation
-1. Set up daily cron job for news fetching
-2. Add manual fetch trigger in admin panel
-3. Implement cleanup job for old articles (optional)
-
----
-
-## Technical Details
-
-### React Query Hook Example
+**File: `src/hooks/useUserRole.tsx`**
 ```typescript
-export function useNewsArticles(category?: string, limit = 20) {
-  return useQuery({
-    queryKey: ['news', category, limit],
-    queryFn: async () => {
-      let query = supabase
-        .from('edm_news_articles')
-        .select('*')
-        .order('published_at', { ascending: false })
-        .limit(limit);
-      
-      if (category) {
-        query = query.eq('category', category);
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+
+export type AppRole = 'admin' | 'moderator' | 'user';
+
+interface UserRoleState {
+  roles: AppRole[];
+  isAdmin: boolean;
+  isModerator: boolean;
+  loading: boolean;
+}
+
+export function useUserRole(): UserRoleState {
+  const { user, loading: authLoading } = useAuth();  // Also get authLoading
+  const [roles, setRoles] = useState<AppRole[]>([]);
+  const [roleLoading, setRoleLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchRoles() {
+      // Wait for auth to finish loading first
+      if (authLoading) {
+        return; // Don't set loading to false yet
       }
-      
-      const { data, error } = await query;
-      if (error) throw error;
-      return data;
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
+
+      if (!user) {
+        setRoles([]);
+        setRoleLoading(false);
+        return;
+      }
+
+      try {
+        console.log('Fetching roles for user:', user.id);
+        const { data, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id);
+
+        if (error) {
+          console.error('Error fetching user roles:', error);
+          setRoles([]);
+        } else {
+          const fetchedRoles = (data || []).map(r => r.role as AppRole);
+          console.log('Fetched roles:', fetchedRoles);
+          setRoles(fetchedRoles);
+        }
+      } catch (error) {
+        console.error('Error fetching user roles:', error);
+        setRoles([]);
+      } finally {
+        setRoleLoading(false);
+      }
+    }
+
+    fetchRoles();
+  }, [user, authLoading]);  // Add authLoading as dependency
+
+  // Only report as "done loading" when both auth is done AND roles are fetched
+  const loading = authLoading || roleLoading;
+
+  return {
+    roles,
+    isAdmin: roles.includes('admin'),
+    isModerator: roles.includes('moderator'),
+    loading
+  };
 }
 ```
 
-### SEO Keywords
-- EDM news
-- Dance music updates
-- Festival announcements
-- Electronic music news
-- DJ news and releases
-- Rave culture updates
+**File: `src/components/AdminRoute.tsx`**
+```typescript
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole, AppRole } from '@/hooks/useUserRole';
 
----
+interface AdminRouteProps {
+  children: React.ReactNode;
+  requiredRole?: AppRole;
+}
 
-## File Changes Summary
+export function AdminRoute({ children, requiredRole = 'admin' }: AdminRouteProps) {
+  const { user, loading: authLoading } = useAuth();
+  const { roles, loading: roleLoading } = useUserRole();
 
-### New Files
-- `supabase/functions/edm-news-fetcher/index.ts` - News fetching edge function
-- `src/pages/News.tsx` - Main news hub page
-- `src/pages/NewsTopStories.tsx` - Top stories subpage
-- `src/pages/NewsArtistsReleases.tsx` - Artists & releases subpage
-- `src/pages/NewsFestivalsEvents.tsx` - Events subpage
-- `src/pages/NewsIndustryCulture.tsx` - Industry subpage
-- `src/components/news/NewsCard.tsx` - Article card component
-- `src/components/news/NewsGrid.tsx` - Grid layout component
-- `src/components/news/NewsFeaturedHero.tsx` - Featured story hero
-- `src/components/news/NewsSkeleton.tsx` - Loading states
-- `src/hooks/useNewsArticles.tsx` - Data fetching hook
+  // Debug logging
+  console.log('AdminRoute state:', { 
+    authLoading, 
+    roleLoading, 
+    user: user?.email, 
+    roles 
+  });
 
-### Modified Files
-- `src/App.tsx` - Add news routes
-- `src/components/Navigation.tsx` - Add News link
-- `supabase/config.toml` - Add edge function config
-- `supabase/functions/rss-feed-fetch/index.ts` - Extend whitelist OR create new function
-- `scripts/generate-prerender.ts` - Add news pages
-- `public/sitemap.xml` - Add news URLs
+  // Show loading while checking auth and roles
+  if (authLoading || roleLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
-### Database Migration
-- Create `news_category` enum
-- Create `edm_news_articles` table
-- Add RLS policies
-- Set up daily cron job
+  // Redirect to auth if not logged in
+  if (!user) {
+    console.log('AdminRoute: No user, redirecting to /auth');
+    return <Navigate to="/auth" replace />;
+  }
 
----
+  // Check if user has the required role
+  const hasRequiredRole = roles.includes(requiredRole);
+  
+  if (!hasRequiredRole) {
+    console.log('AdminRoute: User lacks required role, redirecting to /');
+    return <Navigate to="/" replace />;
+  }
 
-## Notes
+  console.log('AdminRoute: Access granted');
+  return <>{children}</>;
+}
+```
 
-- The RSS whitelist in `rss-feed-fetch` will need to be extended to include EDM news domains
-- Articles link to original sources rather than hosting full content (respecting copyright)
-- Consider adding a "last updated" timestamp display on the news page
-- Future enhancement: Add user favorites/bookmarks for logged-in users
+## Why This Fixes the Issue
+
+1. **Proper dependency on `authLoading`**: The `useUserRole` hook now waits for `AuthContext` to finish loading before attempting to fetch roles
+2. **Combined loading state**: The hook returns `loading: true` until BOTH auth is complete AND roles are fetched
+3. **Debug logging**: Added console logs to help diagnose any future issues
+4. **Clear flow**: The `AdminRoute` spinner stays visible until we definitively know the user's roles
+
+## Testing Steps
+
+1. Log out completely, then log in as `mario@danceoneradio.com`
+2. Navigate to `/admin`
+3. You should see the loading spinner briefly, then the admin dashboard
+4. Check console logs for the role-fetching debug messages
+
+## Bonus: Add Admin Link to Navigation
+
+After fixing the access issue, we can add a visible "Admin" link to the navigation that only appears for admin users. This will make the dashboard discoverable without manually typing the URL.
