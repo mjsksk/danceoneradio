@@ -11,6 +11,14 @@ export function AdminRoute({ children, requiredRole = 'admin' }: AdminRouteProps
   const { user, loading: authLoading } = useAuth();
   const { roles, loading: roleLoading } = useUserRole();
 
+  // Debug logging
+  console.log('AdminRoute state:', { 
+    authLoading, 
+    roleLoading, 
+    user: user?.email, 
+    roles 
+  });
+
   // Show loading while checking auth and roles
   if (authLoading || roleLoading) {
     return (
@@ -22,6 +30,7 @@ export function AdminRoute({ children, requiredRole = 'admin' }: AdminRouteProps
 
   // Redirect to auth if not logged in
   if (!user) {
+    console.log('AdminRoute: No user, redirecting to /auth');
     return <Navigate to="/auth" replace />;
   }
 
@@ -29,9 +38,10 @@ export function AdminRoute({ children, requiredRole = 'admin' }: AdminRouteProps
   const hasRequiredRole = roles.includes(requiredRole);
   
   if (!hasRequiredRole) {
-    // Redirect to home if user doesn't have required role
+    console.log('AdminRoute: User lacks required role, redirecting to /');
     return <Navigate to="/" replace />;
   }
 
+  console.log('AdminRoute: Access granted');
   return <>{children}</>;
 }
