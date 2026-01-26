@@ -4,6 +4,7 @@ import SEO from "@/components/SEO";
 import CSVTrackImporter from "@/components/admin/CSVTrackImporter";
 import NewsletterSubscribers from "@/components/admin/NewsletterSubscribers";
 import SubscriberGrowthChart from "@/components/admin/SubscriberGrowthChart";
+import NewsletterCampaign from "@/components/admin/NewsletterCampaign";
 import { Card } from "@/components/ui/card";
 
 const Admin = () => {
@@ -51,6 +52,8 @@ const Admin = () => {
             </Card>
 
             <SubscriberGrowthChart />
+
+            <NewsletterCampaign />
 
             <NewsletterSubscribers />
 
