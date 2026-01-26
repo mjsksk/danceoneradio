@@ -10,6 +10,7 @@ import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminRoute } from "@/components/AdminRoute";
 import FloatingPlayer from "@/components/FloatingPlayer";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import NewYearBanner from "@/components/NewYearBanner";
 import Index from "./pages/Index";
 import Shows from "./pages/Shows";
@@ -61,6 +62,7 @@ const App = () => (
           <CookieConsent />
           <BrowserRouter>
             <ErrorBoundary>
+              <ScrollToTop />
               <NewYearBanner />
               <div className="pb-20">
                 <Routes>
