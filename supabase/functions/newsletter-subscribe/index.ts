@@ -124,6 +124,7 @@ const handler = async (req: Request): Promise<Response> => {
     const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
     
     try {
+      // Send welcome email to subscriber
       await resend.emails.send({
         from: "Dance One Radio <noreply@danceoneradio.com>",
         to: [email],
@@ -165,8 +166,30 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
         `,
       });
+
+      // Send notification email to admin
+      await resend.emails.send({
+        from: "Dance One Radio <noreply@danceoneradio.com>",
+        to: ["mario.rybansky@gmail.com"],
+        subject: "🎵 New Newsletter Subscriber!",
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h1 style="color: #333;">New Newsletter Subscriber</h1>
+            <p style="color: #666; font-size: 16px; line-height: 1.6;">
+              A new visitor has subscribed to the Dance One Radio newsletter:
+            </p>
+            <div style="background-color: #f4f4f4; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <p style="margin: 0; color: #333; font-size: 18px;"><strong>Email:</strong> ${email}</p>
+              <p style="margin: 10px 0 0; color: #666; font-size: 14px;"><strong>Subscribed at:</strong> ${new Date().toLocaleString('en-US', { timeZone: 'UTC' })} UTC</p>
+            </div>
+            <p style="color: #999; font-size: 12px; margin-top: 30px;">
+              This is an automated notification from Dance One Radio.
+            </p>
+          </div>
+        `,
+      });
     } catch (emailError) {
-      console.error("Error sending welcome email:", emailError);
+      console.error("Error sending emails:", emailError);
       // Don't fail the subscription if email fails
     }
 
