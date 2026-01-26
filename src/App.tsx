@@ -36,6 +36,11 @@ import Episode399 from "./pages/Episode399";
 import Episode400 from "./pages/Episode400";
 import Episode401 from "./pages/Episode401";
 import Episode402 from "./pages/Episode402";
+import News from "./pages/News";
+import NewsTopStories from "./pages/NewsTopStories";
+import NewsArtistsReleases from "./pages/NewsArtistsReleases";
+import NewsFestivalsEvents from "./pages/NewsFestivalsEvents";
+import NewsIndustryCulture from "./pages/NewsIndustryCulture";
 import About from "./pages/About";
 import Admin from "./pages/Admin";
 import DesktopPlayer from "./pages/DesktopPlayer";
@@ -85,6 +90,11 @@ const App = () => (
                 <Route path="/episode/400" element={<Episode400 />} />
                 <Route path="/episode/401" element={<Episode401 />} />
                 <Route path="/episode/402" element={<Episode402 />} />
+                <Route path="/news" element={<News />} />
+                <Route path="/news/top-stories" element={<NewsTopStories />} />
+                <Route path="/news/artists-releases" element={<NewsArtistsReleases />} />
+                <Route path="/news/festivals-events" element={<NewsFestivalsEvents />} />
+                <Route path="/news/industry-culture" element={<NewsIndustryCulture />} />
                 <Route path="/admin" element={<AdminRoute requiredRole="admin"><Admin /></AdminRoute>} />
                 <Route path="/desktop" element={<DesktopPlayer />} />
                 <Route path="/auth" element={<Auth />} />

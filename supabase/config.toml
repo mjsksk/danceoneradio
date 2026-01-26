@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.og-meta-generator]
 verify_jwt = false
+
+[functions.edm-news-fetcher]
+verify_jwt = false
