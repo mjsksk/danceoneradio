@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Play, Pause, ExternalLink, Calendar, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { StaggeredItem } from '@/components/ui/staggered-animation';
 
 interface Episode {
   title: string;
@@ -139,7 +140,8 @@ const PodcastPreview = () => {
 
       <div className="space-y-4 mb-6">
         {episodes.map((episode, index) => (
-          <Card key={episode.guid || index} className="bg-transparent border-primary/20 p-4 hover:bg-primary/5 transition-all duration-300 group">
+          <StaggeredItem key={episode.guid || index} index={index}>
+            <Card className="bg-transparent border-primary/20 p-4 hover:bg-primary/5 transition-all duration-300 group">
             <div className="flex items-start gap-4">
               <div className="bg-gradient-to-br from-neon to-neon-purple text-background rounded-lg w-10 h-10 flex items-center justify-center font-['Orbitron'] font-bold text-sm flex-shrink-0">
                 #{episode.episodeNumber}
@@ -204,6 +206,7 @@ const PodcastPreview = () => {
               </Button>
             </div>
           </Card>
+          </StaggeredItem>
         ))}
       </div>
 
