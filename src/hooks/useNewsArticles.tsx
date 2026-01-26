@@ -33,6 +33,7 @@ export function useNewsArticles(options?: {
       let query = supabase
         .from('edm_news_articles')
         .select('*')
+        .not('image_url', 'is', null) // Prioritize articles with images
         .order('published_at', { ascending: false })
         .limit(limit);
 
@@ -44,7 +45,22 @@ export function useNewsArticles(options?: {
         query = query.eq('is_featured', featured);
       }
 
-      const { data, error } = await query;
+      let { data, error } = await query;
+      
+      // If not enough articles with images, fetch some without
+      if (!error && data && data.length < limit) {
+        const remaining = limit - data.length;
+        const { data: moreData } = await supabase
+          .from('edm_news_articles')
+          .select('*')
+          .is('image_url', null)
+          .order('published_at', { ascending: false })
+          .limit(remaining);
+        
+        if (moreData) {
+          data = [...data, ...moreData];
+        }
+      }
 
       if (error) {
         console.error('Error fetching news articles:', error);
