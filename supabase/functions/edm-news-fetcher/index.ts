@@ -99,12 +99,54 @@ function parseRSSItem(item: string, sourceName: string): ParsedArticle | null {
     const dateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/)
     const pubDate = dateMatch?.[1] ? new Date(dateMatch[1]).toISOString() : new Date().toISOString()
 
-    // Extract image from various possible locations
-    const mediaMatch = item.match(/<media:content[^>]*url="([^"]*)"/)
-      || item.match(/<enclosure[^>]*url="([^"]*)"/)
-      || item.match(/<image>(.*?)<\/image>/s)
-      || item.match(/src="(https?:\/\/[^"]*\.(?:jpg|jpeg|png|webp|gif))"/i)
-    const imageUrl = mediaMatch?.[1] || null
+    // Extract image from various possible locations (prioritize high-res)
+    let imageUrl: string | null = null
+    
+    // Try media:content with highest width first
+    const mediaContents = item.matchAll(/<media:content[^>]*url="([^"]*)"[^>]*(?:width="(\d+)")?/gi)
+    let bestMedia = { url: '', width: 0 }
+    for (const match of mediaContents) {
+      const width = parseInt(match[2] || '0', 10)
+      if (width > bestMedia.width || (!bestMedia.url && match[1])) {
+        bestMedia = { url: match[1], width }
+      }
+    }
+    if (bestMedia.url) imageUrl = bestMedia.url
+    
+    // Try media:thumbnail (often higher res)
+    if (!imageUrl) {
+      const thumbMatch = item.match(/<media:thumbnail[^>]*url="([^"]*)"/)
+      if (thumbMatch) imageUrl = thumbMatch[1]
+    }
+    
+    // Try enclosure (podcasts/media)
+    if (!imageUrl) {
+      const encMatch = item.match(/<enclosure[^>]*url="([^"]*\.(jpg|jpeg|png|webp|gif))"[^>]*type="image/i)
+      if (encMatch) imageUrl = encMatch[1]
+    }
+    
+    // Try og:image or featured image in content
+    if (!imageUrl) {
+      const ogMatch = item.match(/og:image[^>]*content="([^"]*)"/)
+        || item.match(/property="og:image"[^>]*content="([^"]*)"/)
+      if (ogMatch) imageUrl = ogMatch[1]
+    }
+    
+    // Try any large image in content (prefer larger dimensions in URL)
+    if (!imageUrl) {
+      const imgMatches = item.matchAll(/src="(https?:\/\/[^"]*(?:1200|1024|800|large|full|original)[^"]*\.(?:jpg|jpeg|png|webp))"/gi)
+      for (const match of imgMatches) {
+        imageUrl = match[1]
+        break
+      }
+    }
+    
+    // Fallback to any image
+    if (!imageUrl) {
+      const anyImg = item.match(/src="(https?:\/\/[^"]*\.(?:jpg|jpeg|png|webp|gif))"/i)
+        || item.match(/<image>.*?<url>(.*?)<\/url>.*?<\/image>/s)
+      if (anyImg) imageUrl = anyImg[1]
+    }
 
     const category = categorizeArticle(title, summary)
     const tags = extractTags(title, summary)

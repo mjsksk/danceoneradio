@@ -44,12 +44,16 @@ export function NewsCard({ article, featured = false }: NewsCardProps) {
     >
       <Card className={`h-full bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 ${featured ? 'md:flex md:flex-row' : ''}`}>
         {article.image_url && (
-          <div className={`relative overflow-hidden ${featured ? 'md:w-1/2' : 'aspect-video'}`}>
+          <div className={`relative overflow-hidden ${featured ? 'md:w-1/2 md:min-h-[280px]' : 'aspect-video'}`}>
             <img
               src={article.image_url}
               alt={article.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
+              onError={(e) => {
+                // Hide broken images
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
           </div>
