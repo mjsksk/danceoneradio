@@ -1,6 +1,7 @@
 import { NewsArticle } from '@/hooks/useNewsArticles';
 import { NewsCard } from './NewsCard';
 import { NewsSkeleton } from './NewsSkeleton';
+import { StaggeredItem } from '@/components/ui/staggered-animation';
 
 interface NewsGridProps {
   articles: NewsArticle[];
@@ -9,15 +10,19 @@ interface NewsGridProps {
 }
 
 export function NewsGrid({ articles, isLoading, columns = 2 }: NewsGridProps) {
+  const gridClasses = columns === 1 
+    ? 'grid-cols-1' 
+    : columns === 2 
+      ? 'grid-cols-1 md:grid-cols-2' 
+      : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
+
   if (isLoading) {
     return (
-      <div className={`grid gap-6 ${
-        columns === 1 ? 'grid-cols-1' : 
-        columns === 2 ? 'grid-cols-1 md:grid-cols-2' : 
-        'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-      }`}>
+      <div className={`grid gap-6 ${gridClasses}`}>
         {Array.from({ length: 6 }).map((_, i) => (
-          <NewsSkeleton key={i} />
+          <StaggeredItem key={i} index={i}>
+            <NewsSkeleton />
+          </StaggeredItem>
         ))}
       </div>
     );
@@ -33,13 +38,11 @@ export function NewsGrid({ articles, isLoading, columns = 2 }: NewsGridProps) {
   }
 
   return (
-    <div className={`grid gap-6 ${
-      columns === 1 ? 'grid-cols-1' : 
-      columns === 2 ? 'grid-cols-1 md:grid-cols-2' : 
-      'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-    }`}>
+    <div className={`grid gap-6 ${gridClasses}`}>
       {articles.map((article, index) => (
-        <NewsCard key={article.id} article={article} />
+        <StaggeredItem key={article.id} index={index}>
+          <NewsCard article={article} />
+        </StaggeredItem>
       ))}
     </div>
   );
