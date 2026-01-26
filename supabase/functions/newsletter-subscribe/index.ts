@@ -12,6 +12,60 @@ interface SubscribeRequest {
   email: string;
 }
 
+// Helper to parse user agent into readable browser/OS info
+const parseUserAgent = (ua: string | null): { browser: string; os: string; device: string } => {
+  if (!ua) return { browser: 'Unknown', os: 'Unknown', device: 'Unknown' };
+  
+  let browser = 'Unknown';
+  let os = 'Unknown';
+  let device = 'Desktop';
+
+  // Detect browser
+  if (ua.includes('Firefox/')) browser = 'Firefox';
+  else if (ua.includes('Edg/')) browser = 'Microsoft Edge';
+  else if (ua.includes('Chrome/')) browser = 'Chrome';
+  else if (ua.includes('Safari/') && !ua.includes('Chrome')) browser = 'Safari';
+  else if (ua.includes('Opera/') || ua.includes('OPR/')) browser = 'Opera';
+
+  // Detect OS
+  if (ua.includes('Windows NT 10')) os = 'Windows 10/11';
+  else if (ua.includes('Windows NT')) os = 'Windows';
+  else if (ua.includes('Mac OS X')) os = 'macOS';
+  else if (ua.includes('Linux')) os = 'Linux';
+  else if (ua.includes('Android')) os = 'Android';
+  else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
+
+  // Detect device type
+  if (ua.includes('Mobile') || ua.includes('Android') || ua.includes('iPhone')) device = 'Mobile';
+  else if (ua.includes('iPad') || ua.includes('Tablet')) device = 'Tablet';
+
+  return { browser, os, device };
+};
+
+// Fetch geolocation from IP using free API
+const getGeoLocation = async (ip: string): Promise<{ country: string; city: string; region: string }> => {
+  try {
+    // Skip localhost/private IPs
+    if (ip === '127.0.0.1' || ip === '::1' || ip.startsWith('192.168.') || ip.startsWith('10.')) {
+      return { country: 'Local', city: 'Development', region: '' };
+    }
+    
+    const response = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,regionName,city`);
+    const data = await response.json();
+    
+    if (data.status === 'success') {
+      return { 
+        country: data.country || 'Unknown', 
+        city: data.city || 'Unknown', 
+        region: data.regionName || '' 
+      };
+    }
+  } catch (e) {
+    console.error('Geolocation lookup failed:', e);
+  }
+  return { country: 'Unknown', city: 'Unknown', region: '' };
+};
+
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -20,6 +74,15 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const { email }: SubscribeRequest = await req.json();
+    
+    // Extract visitor info early
+    const userAgent = req.headers.get('user-agent') || '';
+    const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
+                     req.headers.get('cf-connecting-ip') || 
+                     req.headers.get('x-real-ip') || 
+                     'Unknown';
+    const referer = req.headers.get('referer') || 'Direct';
+    const { browser, os, device } = parseUserAgent(userAgent);
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -167,6 +230,12 @@ const handler = async (req: Request): Promise<Response> => {
         `,
       });
 
+      // Get geolocation for admin notification
+      const geoLocation = await getGeoLocation(clientIp);
+      const locationString = geoLocation.city !== 'Unknown' 
+        ? `${geoLocation.city}${geoLocation.region ? ', ' + geoLocation.region : ''}, ${geoLocation.country}`
+        : geoLocation.country;
+
       // Send notification email to admin
       await resend.emails.send({
         from: "Dance One Radio <noreply@danceoneradio.com>",
@@ -178,10 +247,43 @@ const handler = async (req: Request): Promise<Response> => {
             <p style="color: #666; font-size: 16px; line-height: 1.6;">
               A new visitor has subscribed to the Dance One Radio newsletter:
             </p>
-            <div style="background-color: #f4f4f4; padding: 15px; border-radius: 5px; margin: 20px 0;">
-              <p style="margin: 0; color: #333; font-size: 18px;"><strong>Email:</strong> ${email}</p>
-              <p style="margin: 10px 0 0; color: #666; font-size: 14px;"><strong>Subscribed at:</strong> ${new Date().toLocaleString('en-US', { timeZone: 'UTC' })} UTC</p>
+            
+            <div style="background-color: #f4f4f4; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3 style="margin: 0 0 15px 0; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 10px;">📧 Subscriber Info</h3>
+              <p style="margin: 0 0 8px 0; color: #333; font-size: 16px;"><strong>Email:</strong> ${email}</p>
+              <p style="margin: 0; color: #666; font-size: 14px;"><strong>Subscribed at:</strong> ${new Date().toLocaleString('en-US', { timeZone: 'UTC' })} UTC</p>
             </div>
+            
+            <div style="background-color: #e8f4fd; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3 style="margin: 0 0 15px 0; color: #333; border-bottom: 1px solid #cce5f7; padding-bottom: 10px;">🌍 Location & Device</h3>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 5px 0; color: #666; font-size: 14px; width: 120px;"><strong>Location:</strong></td>
+                  <td style="padding: 5px 0; color: #333; font-size: 14px;">${locationString}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 5px 0; color: #666; font-size: 14px;"><strong>IP Address:</strong></td>
+                  <td style="padding: 5px 0; color: #333; font-size: 14px;">${clientIp}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 5px 0; color: #666; font-size: 14px;"><strong>Browser:</strong></td>
+                  <td style="padding: 5px 0; color: #333; font-size: 14px;">${browser}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 5px 0; color: #666; font-size: 14px;"><strong>Operating System:</strong></td>
+                  <td style="padding: 5px 0; color: #333; font-size: 14px;">${os}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 5px 0; color: #666; font-size: 14px;"><strong>Device Type:</strong></td>
+                  <td style="padding: 5px 0; color: #333; font-size: 14px;">${device}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 5px 0; color: #666; font-size: 14px;"><strong>Referrer:</strong></td>
+                  <td style="padding: 5px 0; color: #333; font-size: 14px;">${referer}</td>
+                </tr>
+              </table>
+            </div>
+            
             <p style="color: #999; font-size: 12px; margin-top: 30px;">
               This is an automated notification from Dance One Radio.
             </p>
