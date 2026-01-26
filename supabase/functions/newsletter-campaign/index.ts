@@ -53,7 +53,29 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    console.log(`Newsletter campaign requested by user: ${user.id} (${user.email})`);
+    // Verify user has admin role - SERVER-SIDE authorization check
+    const supabaseService = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
+    const { data: isAdmin, error: roleError } = await supabaseService.rpc('has_role', {
+      _user_id: user.id,
+      _role: 'admin'
+    });
+
+    if (roleError || !isAdmin) {
+      console.error(`Access denied: User ${user.id} (${user.email}) attempted admin action without admin role`);
+      return new Response(
+        JSON.stringify({ error: "Forbidden - admin role required" }),
+        {
+          status: 403,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    console.log(`Newsletter campaign requested by admin: ${user.id} (${user.email})`);
 
     const { subject, content, sent_by }: CampaignRequest = await req.json();
 
