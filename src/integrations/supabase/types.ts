@@ -353,6 +353,7 @@ export type Database = {
     }
     Functions: {
       cleanup_old_request_logs: { Args: never; Returns: undefined }
+      cleanup_old_subscriber_tracking_data: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
