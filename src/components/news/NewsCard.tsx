@@ -48,13 +48,10 @@ export function NewsCard({ article, featured = false }: NewsCardProps) {
   );
 
   return (
-    <motion.a
+    <a
       href={article.source_url}
       target="_blank"
       rel="noopener noreferrer"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
       className="block group"
     >
       <Card className={`h-full bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 ${featured ? 'md:flex md:flex-row' : ''}`}>
@@ -117,6 +114,6 @@ export function NewsCard({ article, featured = false }: NewsCardProps) {
           </CardContent>
         </div>
       </Card>
-    </motion.a>
+    </a>
   );
 }
