@@ -10,6 +10,7 @@ import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
 import FloatingPlayer from "@/components/FloatingPlayer";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { BackToTop } from "@/components/BackToTop";
+import { ReadingProgressBar } from "@/components/ReadingProgressBar";
 import { AnimatedRoutes } from "@/components/AnimatedRoutes";
 import NewYearBanner from "@/components/NewYearBanner";
 
@@ -25,6 +26,7 @@ const App = () => (
           <CookieConsent />
           <BrowserRouter>
             <ErrorBoundary>
+              <ReadingProgressBar />
               <ScrollToTop />
               <NewYearBanner />
               <div className="pb-20">
