@@ -95,6 +95,57 @@ export type Database = {
         }
         Relationships: []
       }
+      edm_news_articles: {
+        Row: {
+          category: Database["public"]["Enums"]["news_category"]
+          content: string | null
+          created_at: string
+          fetched_at: string
+          id: string
+          image_url: string | null
+          is_featured: boolean
+          published_at: string
+          slug: string
+          source_name: string
+          source_url: string
+          summary: string
+          tags: string[] | null
+          title: string
+        }
+        Insert: {
+          category?: Database["public"]["Enums"]["news_category"]
+          content?: string | null
+          created_at?: string
+          fetched_at?: string
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean
+          published_at?: string
+          slug: string
+          source_name: string
+          source_url: string
+          summary: string
+          tags?: string[] | null
+          title: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["news_category"]
+          content?: string | null
+          created_at?: string
+          fetched_at?: string
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean
+          published_at?: string
+          slug?: string
+          source_name?: string
+          source_url?: string
+          summary?: string
+          tags?: string[] | null
+          title?: string
+        }
+        Relationships: []
+      }
       episode_listening_progress: {
         Row: {
           audio_url: string
@@ -295,6 +346,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      news_category: "headline" | "release" | "event" | "artist" | "industry"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -423,6 +475,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      news_category: ["headline", "release", "event", "artist", "industry"],
     },
   },
 } as const
