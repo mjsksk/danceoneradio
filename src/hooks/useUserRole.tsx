@@ -12,19 +12,25 @@ interface UserRoleState {
 }
 
 export function useUserRole(): UserRoleState {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [roles, setRoles] = useState<AppRole[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [roleLoading, setRoleLoading] = useState(true);
 
   useEffect(() => {
     async function fetchRoles() {
+      // Wait for auth to finish loading first
+      if (authLoading) {
+        return; // Don't set loading to false yet
+      }
+
       if (!user) {
         setRoles([]);
-        setLoading(false);
+        setRoleLoading(false);
         return;
       }
 
       try {
+        console.log('Fetching roles for user:', user.id);
         const { data, error } = await supabase
           .from('user_roles')
           .select('role')
@@ -34,18 +40,23 @@ export function useUserRole(): UserRoleState {
           console.error('Error fetching user roles:', error);
           setRoles([]);
         } else {
-          setRoles((data || []).map(r => r.role as AppRole));
+          const fetchedRoles = (data || []).map(r => r.role as AppRole);
+          console.log('Fetched roles:', fetchedRoles);
+          setRoles(fetchedRoles);
         }
       } catch (error) {
         console.error('Error fetching user roles:', error);
         setRoles([]);
       } finally {
-        setLoading(false);
+        setRoleLoading(false);
       }
     }
 
     fetchRoles();
-  }, [user]);
+  }, [user, authLoading]);
+
+  // Only report as "done loading" when both auth is done AND roles are fetched
+  const loading = authLoading || roleLoading;
 
   return {
     roles,
