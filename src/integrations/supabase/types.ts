@@ -220,28 +220,49 @@ export type Database = {
       }
       newsletter_subscribers: {
         Row: {
+          browser: string | null
+          city: string | null
+          country: string | null
           created_at: string
+          device_type: string | null
           email: string
           id: string
+          ip_address: string | null
           is_active: boolean
+          os: string | null
+          region: string | null
           subscribed_at: string
           unsubscribe_token: string
           updated_at: string
         }
         Insert: {
+          browser?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
+          device_type?: string | null
           email: string
           id?: string
+          ip_address?: string | null
           is_active?: boolean
+          os?: string | null
+          region?: string | null
           subscribed_at?: string
           unsubscribe_token?: string
           updated_at?: string
         }
         Update: {
+          browser?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
+          device_type?: string | null
           email?: string
           id?: string
+          ip_address?: string | null
           is_active?: boolean
+          os?: string | null
+          region?: string | null
           subscribed_at?: string
           unsubscribe_token?: string
           updated_at?: string

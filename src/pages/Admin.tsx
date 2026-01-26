@@ -2,6 +2,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
 import CSVTrackImporter from "@/components/admin/CSVTrackImporter";
+import NewsletterSubscribers from "@/components/admin/NewsletterSubscribers";
 import { Card } from "@/components/ui/card";
 
 const Admin = () => {
@@ -18,13 +19,13 @@ const Admin = () => {
         <Navigation />
         
         <main className="container mx-auto px-4 pt-24 pb-16 relative z-10">
-          <div className="max-w-4xl mx-auto space-y-8">
+          <div className="max-w-6xl mx-auto space-y-8">
             <Card className="p-8 bg-card/50 backdrop-blur-sm border-border/50">
               <h1 className="text-4xl font-['Orbitron'] font-bold mb-6 text-neon">
                 Admin Tools
               </h1>
               <p className="text-muted-foreground font-['Rajdhani'] mb-8">
-                Tools for managing podcast episodes and content
+                Tools for managing podcast episodes, newsletter subscribers, and content
               </p>
               
               <div className="space-y-6">
@@ -47,6 +48,8 @@ const Admin = () => {
                 </div>
               </div>
             </Card>
+
+            <NewsletterSubscribers />
 
             <CSVTrackImporter />
           </div>

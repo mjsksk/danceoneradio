@@ -156,10 +156,21 @@ const handler = async (req: Request): Promise<Response> => {
           }
         );
       } else {
-        // Reactivate the subscription
+        // Reactivate the subscription with updated location info
+        const geoLocation = await getGeoLocation(clientIp);
         const { error: updateError } = await supabase
           .from("newsletter_subscribers")
-          .update({ is_active: true, subscribed_at: new Date().toISOString() })
+          .update({ 
+            is_active: true, 
+            subscribed_at: new Date().toISOString(),
+            ip_address: clientIp,
+            country: geoLocation.country,
+            city: geoLocation.city,
+            region: geoLocation.region,
+            browser,
+            os,
+            device_type: device
+          })
           .eq("email", email);
 
         if (updateError) {
@@ -168,10 +179,22 @@ const handler = async (req: Request): Promise<Response> => {
         }
       }
     } else {
-      // Insert new subscriber and get the unsubscribe token
+      // Get geolocation for new subscriber
+      const geoLocation = await getGeoLocation(clientIp);
+      
+      // Insert new subscriber with location info
       const { data: newSubscriber, error: insertError } = await supabase
         .from("newsletter_subscribers")
-        .insert({ email })
+        .insert({ 
+          email,
+          ip_address: clientIp,
+          country: geoLocation.country,
+          city: geoLocation.city,
+          region: geoLocation.region,
+          browser,
+          os,
+          device_type: device
+        })
         .select("unsubscribe_token")
         .single();
 
