@@ -27,6 +27,26 @@ export class AppleMusicService {
   private static baseUrl = 'https://upbwlnpycrbhxahjztrf.supabase.co/functions/v1/apple-music-search';
   private static cache = new Map<string, Promise<string | null>>();
   private static connectionTestPromise: Promise<boolean> | null = null;
+  private static requestQueue: Array<() => Promise<void>> = [];
+  private static isProcessingQueue = false;
+  private static REQUEST_DELAY = 100; // 100ms between requests to avoid bursts
+
+  private static async processQueue(): Promise<void> {
+    if (this.isProcessingQueue || this.requestQueue.length === 0) return;
+    
+    this.isProcessingQueue = true;
+    
+    while (this.requestQueue.length > 0) {
+      const request = this.requestQueue.shift();
+      if (request) {
+        await request();
+        // Small delay between requests to prevent rate limiting
+        await new Promise(resolve => setTimeout(resolve, this.REQUEST_DELAY));
+      }
+    }
+    
+    this.isProcessingQueue = false;
+  }
 
   static async testConnection(): Promise<boolean> {
     // Return existing promise if test is in progress or completed
@@ -67,8 +87,16 @@ export class AppleMusicService {
         return await this.cache.get(cacheKey)!;
       }
       
-      // Create and cache the promise
-      const searchPromise = this.performSearch(query);
+      // Create promise that will be resolved through the queue
+      const searchPromise = new Promise<string | null>((resolve) => {
+        this.requestQueue.push(async () => {
+          const result = await this.performSearch(query);
+          resolve(result);
+        });
+        // Start processing queue
+        this.processQueue();
+      });
+      
       this.cache.set(cacheKey, searchPromise);
       
       return await searchPromise;
