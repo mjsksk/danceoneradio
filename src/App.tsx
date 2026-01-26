@@ -11,6 +11,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminRoute } from "@/components/AdminRoute";
 import FloatingPlayer from "@/components/FloatingPlayer";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { BackToTop } from "@/components/BackToTop";
 import NewYearBanner from "@/components/NewYearBanner";
 import Index from "./pages/Index";
 import Shows from "./pages/Shows";
@@ -107,6 +108,7 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
                 </Routes>
               </div>
+              <BackToTop />
               <FloatingPlayer />
             </ErrorBoundary>
           </BrowserRouter>
