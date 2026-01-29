@@ -104,10 +104,10 @@ const NewsletterCampaign = () => {
       </div>
     `;
     
-    // Sanitize HTML while allowing safe formatting tags and styles
+    // Sanitize HTML while allowing safe formatting tags, images, tables, and styles
     return DOMPurify.sanitize(rawHtml, {
-      ALLOWED_TAGS: ['div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a', 'strong', 'em', 'br', 'hr', 'ul', 'ol', 'li', 'span'],
-      ALLOWED_ATTR: ['href', 'style', 'class'],
+      ALLOWED_TAGS: ['div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a', 'strong', 'em', 'br', 'hr', 'ul', 'ol', 'li', 'span', 'img', 'table', 'tr', 'td', 'th', 'thead', 'tbody', 'tfoot', 'caption', 'colgroup', 'col', 'center', 'blockquote'],
+      ALLOWED_ATTR: ['href', 'style', 'class', 'src', 'alt', 'width', 'height', 'border', 'cellpadding', 'cellspacing', 'align', 'valign', 'bgcolor', 'colspan', 'rowspan', 'target'],
       ALLOW_DATA_ATTR: false,
     });
   }, [content]);
@@ -186,7 +186,8 @@ const NewsletterCampaign = () => {
               </p>
             </div>
             <div 
-              className="bg-white p-4"
+              className="p-4"
+              style={{ backgroundColor: '#ffffff' }}
               dangerouslySetInnerHTML={{ __html: sanitizedPreviewHtml }}
             />
           </div>
