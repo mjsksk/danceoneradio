@@ -379,7 +379,45 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      newsletter_subscribers_admin: {
+        Row: {
+          browser: string | null
+          city: string | null
+          country: string | null
+          device_type: string | null
+          id: string | null
+          is_active: boolean | null
+          masked_email: string | null
+          os: string | null
+          region: string | null
+          subscribed_at: string | null
+        }
+        Insert: {
+          browser?: string | null
+          city?: never
+          country?: string | null
+          device_type?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          masked_email?: never
+          os?: string | null
+          region?: never
+          subscribed_at?: string | null
+        }
+        Update: {
+          browser?: string | null
+          city?: never
+          country?: string | null
+          device_type?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          masked_email?: never
+          os?: string | null
+          region?: never
+          subscribed_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       cleanup_old_request_logs: { Args: never; Returns: undefined }
