@@ -19,6 +19,7 @@ interface AudioPlayerState {
   streamTitle: string;
   albumArt: string | null;
   isVisible: boolean;
+  autoplayEnabled: boolean;
 }
 
 interface AudioPlayerContextType extends AudioPlayerState {
@@ -29,6 +30,7 @@ interface AudioPlayerContextType extends AudioPlayerState {
   seek: (time: number) => void;
   setVolume: (volume: number) => void;
   closePlayer: () => void;
+  toggleAutoplay: () => void;
   audioRef: React.RefObject<HTMLAudioElement>;
 }
 
@@ -41,8 +43,18 @@ const STREAM_URLS = [
   "https://live-radio-stream.online/dance-one-radio.mp3"
 ];
 
+// Available episode numbers with pages (sorted descending)
+const AVAILABLE_EPISODES = [402, 401, 400, 399, 398, 397, 396, 395, 394, 393, 392, 391, 390, 389];
+
 export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
+  
+  // Load autoplay preference from localStorage
+  const [autoplayEnabled, setAutoplayEnabled] = useState(() => {
+    const saved = localStorage.getItem('autoplay-enabled');
+    return saved === 'true';
+  });
+  
   const [state, setState] = useState<AudioPlayerState>({
     source: null,
     isPlaying: false,
@@ -54,7 +66,13 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     streamTitle: '🎵 Dance One Radio - Live Stream 🎵',
     albumArt: null,
     isVisible: false,
+    autoplayEnabled: false,
   });
+
+  // Keep state in sync with autoplayEnabled
+  useEffect(() => {
+    setState(prev => ({ ...prev, autoplayEnabled }));
+  }, [autoplayEnabled]);
 
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
   const [streamUrls, setStreamUrls] = useState<string[]>(STREAM_URLS);
@@ -180,6 +198,58 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     }));
   }, []);
 
+  const toggleAutoplay = useCallback(() => {
+    setAutoplayEnabled(prev => {
+      const newValue = !prev;
+      localStorage.setItem('autoplay-enabled', String(newValue));
+      return newValue;
+    });
+  }, []);
+
+  // Helper function to get next episode info
+  const getNextEpisode = useCallback((currentEpisodeNumber: number): EpisodeInfo | null => {
+    const currentIndex = AVAILABLE_EPISODES.indexOf(currentEpisodeNumber);
+    // Get next episode (lower number, next in the sorted list)
+    if (currentIndex >= 0 && currentIndex < AVAILABLE_EPISODES.length - 1) {
+      const nextEpisodeNumber = AVAILABLE_EPISODES[currentIndex + 1];
+      return {
+        number: nextEpisodeNumber,
+        title: `Future Dance Anthems with Mario ${nextEpisodeNumber}`,
+        audioUrl: '' // Will be fetched from RSS when played
+      };
+    }
+    return null;
+  }, []);
+
+  // Fetch episode URL from RSS feed
+  const fetchEpisodeUrl = useCallback(async (episodeNumber: number): Promise<string | null> => {
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const rssUrl = `https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml?t=${Date.now()}`;
+      
+      const { data, error } = await supabase.functions.invoke('rss-feed-fetch', {
+        body: { url: rssUrl }
+      });
+
+      if (error || !data?.content) return null;
+
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(data.content, 'text/xml');
+      const items = xmlDoc.querySelectorAll('item');
+
+      for (const item of Array.from(items)) {
+        const title = item.querySelector('title')?.textContent || '';
+        const match = title.match(/(\d+)(?:\s*-|\s*:|$)/);
+        if (match && parseInt(match[1]) === episodeNumber) {
+          return item.querySelector('enclosure')?.getAttribute('url') || null;
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching episode URL:', error);
+    }
+    return null;
+  }, []);
+
   // Audio event handlers
   useEffect(() => {
     const audio = audioRef.current;
@@ -192,7 +262,27 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       const nextDuration = Number.isFinite(audio.duration) ? audio.duration : 0;
       setState(prev => ({ ...prev, duration: nextDuration, isLoading: false }));
     };
-    const handleEnded = () => setState(prev => ({ ...prev, isPlaying: false }));
+    
+    const handleEnded = async () => {
+      setState(prev => ({ ...prev, isPlaying: false }));
+      
+      // Autoplay next episode if enabled and playing an episode
+      if (autoplayEnabled && state.source === 'episode' && state.episodeInfo) {
+        const nextEp = getNextEpisode(state.episodeInfo.number);
+        if (nextEp) {
+          console.log(`🔄 Autoplay: Loading episode ${nextEp.number}`);
+          const audioUrl = await fetchEpisodeUrl(nextEp.number);
+          if (audioUrl) {
+            playEpisode({
+              number: nextEp.number,
+              title: nextEp.title,
+              audioUrl
+            });
+          }
+        }
+      }
+    };
+    
     const handleError = () => {
       console.error('Audio error, trying next URL');
       if (state.source === 'live' && tryNextUrl()) {
@@ -219,7 +309,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
     };
-  }, [state.source, tryNextUrl, streamUrls, currentUrlIndex]);
+  }, [state.source, state.episodeInfo, autoplayEnabled, tryNextUrl, streamUrls, currentUrlIndex, getNextEpisode, fetchEpisodeUrl, playEpisode]);
 
   // Some browsers can throttle `timeupdate`; keep episode progress in sync while playing.
   useEffect(() => {
@@ -257,6 +347,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
         seek,
         setVolume,
         closePlayer,
+        toggleAutoplay,
         audioRef,
       }}
     >

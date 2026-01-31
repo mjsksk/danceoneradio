@@ -1,5 +1,6 @@
-import { Play, Pause, X, Radio, Music, RotateCcw, RotateCw } from 'lucide-react';
+import { Play, Pause, X, Radio, Music, RotateCcw, RotateCw, ListMusic } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import stationLogo from '@/assets/dance-one-logo.png';
 
@@ -14,10 +15,12 @@ const FloatingPlayer = () => {
     streamTitle,
     albumArt,
     isVisible,
+    autoplayEnabled,
     pause,
     resume,
     seek,
     closePlayer,
+    toggleAutoplay,
   } = useAudioPlayer();
 
   if (!isVisible) return null;
@@ -157,6 +160,32 @@ const FloatingPlayer = () => {
                   20
                 </span>
               </Button>
+            )}
+
+            {/* Autoplay Toggle (episodes only) */}
+            {source === 'episode' && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={`w-8 h-8 transition-colors ${
+                        autoplayEnabled 
+                          ? 'text-neon bg-neon/10 hover:bg-neon/20' 
+                          : 'text-muted-foreground hover:text-primary'
+                      }`}
+                      onClick={toggleAutoplay}
+                      title={autoplayEnabled ? 'Autoplay ON' : 'Autoplay OFF'}
+                    >
+                      <ListMusic className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="font-['Rajdhani']">
+                    <p>{autoplayEnabled ? 'Autoplay: ON - Next episode will play automatically' : 'Autoplay: OFF'}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
 
             {/* Close */}
