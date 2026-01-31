@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { Resend } from "npm:resend@2.0.0";
+import * as ammonia from "https://deno.land/x/ammonia@0.3.1/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,6 +12,84 @@ interface CampaignRequest {
   subject: string;
   content: string;
   sent_by?: string;
+}
+
+// Server-side HTML sanitization configuration
+// Allowlist of safe HTML tags for email content
+const ALLOWED_TAGS = [
+  'p', 'br', 'strong', 'b', 'em', 'i', 'u', 'a', 'ul', 'ol', 'li',
+  'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'span', 'hr', 'blockquote',
+  'table', 'tr', 'td', 'th', 'thead', 'tbody', 'tfoot', 'caption',
+  'img', 'center'
+];
+
+const ALLOWED_ATTRIBUTES: Record<string, string[]> = {
+  'a': ['href', 'title', 'target'],
+  'img': ['src', 'alt', 'width', 'height'],
+  'table': ['border', 'cellpadding', 'cellspacing', 'width'],
+  'td': ['align', 'valign', 'width', 'colspan', 'rowspan'],
+  'th': ['align', 'valign', 'width', 'colspan', 'rowspan'],
+  'div': ['align'],
+  'p': ['align'],
+  '*': ['style', 'class'] // Allow style and class on all elements
+};
+
+// Simple HTML sanitizer function
+function sanitizeHtml(html: string): string {
+  if (!html || typeof html !== 'string') {
+    return '';
+  }
+
+  // Remove all script tags and their content
+  let sanitized = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  
+  // Remove all event handlers (onclick, onload, onerror, etc.)
+  sanitized = sanitized.replace(/\s+on\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '');
+  
+  // Remove javascript: URLs
+  sanitized = sanitized.replace(/javascript\s*:/gi, '');
+  
+  // Remove data: URLs (potential XSS vector)
+  sanitized = sanitized.replace(/data\s*:[^"'\s>]*/gi, 'data:blocked');
+  
+  // Remove vbscript: URLs
+  sanitized = sanitized.replace(/vbscript\s*:/gi, '');
+  
+  // Remove expression() CSS (IE-specific XSS)
+  sanitized = sanitized.replace(/expression\s*\(/gi, 'blocked(');
+  
+  // Remove behavior: CSS property (IE-specific)
+  sanitized = sanitized.replace(/behavior\s*:/gi, '');
+  
+  // Remove -moz-binding CSS property (Firefox-specific)
+  sanitized = sanitized.replace(/-moz-binding\s*:/gi, '');
+  
+  // Remove iframe, object, embed, form elements
+  sanitized = sanitized.replace(/<(iframe|object|embed|form|input|button|select|textarea)[^>]*>[\s\S]*?<\/\1>/gi, '');
+  sanitized = sanitized.replace(/<(iframe|object|embed|form|input|button|select|textarea)[^>]*\/?>/gi, '');
+  
+  // Remove style tags
+  sanitized = sanitized.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+  
+  // Remove link tags
+  sanitized = sanitized.replace(/<link[^>]*\/?>/gi, '');
+  
+  // Remove meta tags
+  sanitized = sanitized.replace(/<meta[^>]*\/?>/gi, '');
+  
+  // Remove base tags
+  sanitized = sanitized.replace(/<base[^>]*\/?>/gi, '');
+
+  return sanitized;
+}
+
+// Validate subject line (no HTML, reasonable length)
+function sanitizeSubject(subject: string): string {
+  if (!subject || typeof subject !== 'string') {
+    return '';
+  }
+  // Strip all HTML tags from subject
+  return subject.replace(/<[^>]*>/g, '').trim().substring(0, 200);
 }
 
 const handler = async (req: Request): Promise<Response> => {
