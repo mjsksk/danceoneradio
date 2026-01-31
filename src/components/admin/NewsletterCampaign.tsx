@@ -150,7 +150,8 @@ const NewsletterCampaign = () => {
           onSelectTemplate={(templateContent) => {
             setContent(prev => prev ? `${prev}\n\n${templateContent}` : templateContent);
             toast.success('Template inserted! Edit the placeholders.');
-          }} 
+          }}
+          currentContent={content}
         />
 
         {/* Content */}
