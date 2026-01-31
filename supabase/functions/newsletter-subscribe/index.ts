@@ -259,7 +259,7 @@ const handler = async (req: Request): Promise<Response> => {
         ? `${geoLocation.city}${geoLocation.region ? ', ' + geoLocation.region : ''}, ${geoLocation.country}`
         : geoLocation.country;
 
-      // Send notification email to admin
+      // Send notification email to admin (minimal PII to protect subscriber privacy)
       await resend.emails.send({
         from: "Dance One Radio <noreply@danceoneradio.com>",
         to: ["mario.rybansky@gmail.com"],
@@ -278,37 +278,13 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             
             <div style="background-color: #e8f4fd; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <h3 style="margin: 0 0 15px 0; color: #333; border-bottom: 1px solid #cce5f7; padding-bottom: 10px;">🌍 Location & Device</h3>
-              <table style="width: 100%; border-collapse: collapse;">
-                <tr>
-                  <td style="padding: 5px 0; color: #666; font-size: 14px; width: 120px;"><strong>Location:</strong></td>
-                  <td style="padding: 5px 0; color: #333; font-size: 14px;">${locationString}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 5px 0; color: #666; font-size: 14px;"><strong>IP Address:</strong></td>
-                  <td style="padding: 5px 0; color: #333; font-size: 14px;">${clientIp}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 5px 0; color: #666; font-size: 14px;"><strong>Browser:</strong></td>
-                  <td style="padding: 5px 0; color: #333; font-size: 14px;">${browser}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 5px 0; color: #666; font-size: 14px;"><strong>Operating System:</strong></td>
-                  <td style="padding: 5px 0; color: #333; font-size: 14px;">${os}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 5px 0; color: #666; font-size: 14px;"><strong>Device Type:</strong></td>
-                  <td style="padding: 5px 0; color: #333; font-size: 14px;">${device}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 5px 0; color: #666; font-size: 14px;"><strong>Referrer:</strong></td>
-                  <td style="padding: 5px 0; color: #333; font-size: 14px;">${referer}</td>
-                </tr>
-              </table>
+              <h3 style="margin: 0 0 15px 0; color: #333; border-bottom: 1px solid #cce5f7; padding-bottom: 10px;">🌍 Region</h3>
+              <p style="margin: 0; color: #333; font-size: 14px;"><strong>Country:</strong> ${geoLocation.country}</p>
             </div>
             
             <p style="color: #999; font-size: 12px; margin-top: 30px;">
-              This is an automated notification from Dance One Radio.
+              This is an automated notification from Dance One Radio.<br/>
+              For detailed subscriber analytics, view the admin dashboard.
             </p>
           </div>
         `,
