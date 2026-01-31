@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useRef, useCallback, useEffect, ReactNode } from 'react';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import { AlbumArtService } from '@/utils/AlbumArtService';
+import { toast } from 'sonner';
 
 interface EpisodeInfo {
   number: number;
@@ -271,14 +272,39 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
         const nextEp = getNextEpisode(state.episodeInfo.number);
         if (nextEp) {
           console.log(`🔄 Autoplay: Loading episode ${nextEp.number}`);
+          
+          // Show toast notification
+          toast.info(`Loading Episode ${nextEp.number}`, {
+            description: 'Autoplay is finding the next episode...',
+            icon: '🎵',
+            duration: 3000,
+          });
+          
           const audioUrl = await fetchEpisodeUrl(nextEp.number);
           if (audioUrl) {
+            toast.success(`Now playing Episode ${nextEp.number}`, {
+              description: nextEp.title,
+              icon: '▶️',
+              duration: 4000,
+            });
+            
             playEpisode({
               number: nextEp.number,
               title: nextEp.title,
               audioUrl
             });
+          } else {
+            toast.error('Could not load next episode', {
+              description: 'Autoplay stopped - episode not found',
+              duration: 4000,
+            });
           }
+        } else {
+          toast.info('Playlist complete', {
+            description: 'No more episodes available',
+            icon: '✅',
+            duration: 3000,
+          });
         }
       }
     };
