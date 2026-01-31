@@ -170,8 +170,18 @@ export function ParticleTextEffect({ words = DEFAULT_WORDS, className }: Particl
     offscreenCanvas.height = canvas.height
     const offscreenCtx = offscreenCanvas.getContext("2d")!
 
+    // Dynamic font size based on text length and canvas width
+    const maxWidth = canvas.width * 0.85
+    let fontSize = 80
+    offscreenCtx.font = `bold ${fontSize}px Arial`
+    
+    // Reduce font size until text fits
+    while (offscreenCtx.measureText(word).width > maxWidth && fontSize > 20) {
+      fontSize -= 2
+      offscreenCtx.font = `bold ${fontSize}px Arial`
+    }
+
     offscreenCtx.fillStyle = "white"
-    offscreenCtx.font = "bold 100px Arial"
     offscreenCtx.textAlign = "center"
     offscreenCtx.textBaseline = "middle"
     offscreenCtx.fillText(word, canvas.width / 2, canvas.height / 2)
