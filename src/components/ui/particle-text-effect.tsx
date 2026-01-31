@@ -145,7 +145,8 @@ export function ParticleTextEffect({ words = DEFAULT_WORDS, className }: Particl
   const getSafeInsets = (w: number, h: number) => {
     const leftRight = w >= 1280 ? 340 : w >= 1024 ? 260 : 24
     const top = w >= 768 ? 80 : 60
-    const bottom = w >= 1024 ? 220 : 180
+    // Extra bottom clearance for Google anchor ads in Chrome (can be taller than preview).
+    const bottom = w >= 1536 ? 320 : w >= 1024 ? 280 : 220
     return { left: leftRight, right: leftRight, top, bottom }
   }
 
@@ -206,15 +207,35 @@ export function ParticleTextEffect({ words = DEFAULT_WORDS, className }: Particl
     const safe = getSafeInsets(canvas.width, canvas.height)
     const safeWidth = Math.max(0, canvas.width - safe.left - safe.right)
     const safeHeight = Math.max(0, canvas.height - safe.top - safe.bottom)
-    const maxWidth = Math.max(0, safeWidth * 0.95)
+
+    // Use slightly more width to avoid unnecessary wrapping which can push lines into
+    // the bottom anchor-ad region.
+    const maxWidth = Math.max(0, safeWidth * 0.98)
+
     let fontSize = 80
     offscreenCtx.font = `bold ${fontSize}px Arial`
     
     // Get wrapped lines
     let lines = wrapText(offscreenCtx, word, maxWidth, fontSize)
+
+    const fitsHeight = (fs: number, lineCount: number) => {
+      const lineHeight = fs * 1.2
+      const totalHeight = lineCount * lineHeight
+      return totalHeight <= safeHeight * 0.9
+    }
     
-    // Reduce font size if we have too many lines or text is still too wide
-    while ((lines.length > 3 || lines.some(line => offscreenCtx.measureText(line).width > maxWidth)) && fontSize > 24) {
+    // Reduce font size if:
+    // - we have too many wrapped lines,
+    // - any line is still too wide,
+    // - OR the total block height doesn't fit the safe vertical space (anchor ads).
+    while (
+      (
+        lines.length > 3 ||
+        lines.some((line) => offscreenCtx.measureText(line).width > maxWidth) ||
+        !fitsHeight(fontSize, lines.length)
+      ) &&
+      fontSize > 18
+    ) {
       fontSize -= 2
       offscreenCtx.font = `bold ${fontSize}px Arial`
       lines = wrapText(offscreenCtx, word, maxWidth, fontSize)
@@ -222,7 +243,8 @@ export function ParticleTextEffect({ words = DEFAULT_WORDS, className }: Particl
 
     const lineHeight = fontSize * 1.2
     const totalHeight = lines.length * lineHeight
-    const startY = safe.top + (safeHeight - totalHeight) / 2 + lineHeight / 2
+    // Never allow negative centering to push text above safe.top.
+    const startY = safe.top + Math.max(0, (safeHeight - totalHeight) / 2) + lineHeight / 2
     const centerX = safe.left + safeWidth / 2
 
     offscreenCtx.fillStyle = "white"
