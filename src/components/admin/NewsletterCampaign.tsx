@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Send, Mail, Eye, EyeOff, Loader2, CheckCircle, AlertCircle, Users } from 'lucide-react';
+import { Send, Mail, Eye, EyeOff, Loader2, CheckCircle, Users } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { toast } from 'sonner';
+import NewsletterTemplateGallery from './NewsletterTemplateGallery';
 
 const NewsletterCampaign = () => {
   const [subject, setSubject] = useState('');
@@ -144,20 +145,28 @@ const NewsletterCampaign = () => {
           />
         </div>
 
+        {/* Template Gallery */}
+        <NewsletterTemplateGallery 
+          onSelectTemplate={(templateContent) => {
+            setContent(prev => prev ? `${prev}\n\n${templateContent}` : templateContent);
+            toast.success('Template inserted! Edit the placeholders.');
+          }} 
+        />
+
         {/* Content */}
         <div>
           <label className="block text-sm font-['Orbitron'] mb-2 text-muted-foreground">
             Email Content (HTML supported)
           </label>
           <Textarea
-            placeholder="Enter your newsletter content... You can use HTML for formatting."
+            placeholder="Enter your newsletter content or select a template above..."
             value={content}
             onChange={(e) => setContent(e.target.value)}
             className="font-['Rajdhani'] min-h-[200px]"
             disabled={sending}
           />
           <p className="text-xs text-muted-foreground mt-1 font-['Rajdhani']">
-            Tip: Use &lt;p&gt;, &lt;strong&gt;, &lt;a href="..."&gt; for formatting
+            Tip: Use &lt;p&gt;, &lt;strong&gt;, &lt;a href="..."&gt;, &lt;img&gt;, &lt;table&gt; for formatting
           </p>
         </div>
 
