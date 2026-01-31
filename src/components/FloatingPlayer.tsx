@@ -125,9 +125,10 @@ const FloatingPlayer = () => {
                 
                 {/* Next Up indicator */}
                 {autoplayEnabled && nextEpisodeNumber && (
-                  <span className="hidden sm:flex items-center gap-1 text-[10px] text-neon/80 bg-neon/10 px-2 py-0.5 rounded-full whitespace-nowrap">
-                    <SkipForward className="w-3 h-3" />
-                    <span>Next: #{nextEpisodeNumber}</span>
+                  <span className="flex items-center gap-1 text-[10px] text-neon/80 bg-neon/10 px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap">
+                    <SkipForward className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                    <span className="hidden xs:inline">Next:</span>
+                    <span>#{nextEpisodeNumber}</span>
                   </span>
                 )}
               </div>
