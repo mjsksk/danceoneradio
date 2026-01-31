@@ -115,11 +115,14 @@ const FloatingPlayer = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="w-8 h-8 text-muted-foreground hover:text-primary"
+                className="w-8 h-8 text-muted-foreground hover:text-primary relative group"
                 onClick={() => seek(Math.max(0, currentTime - 20))}
                 title="Skip back 20 seconds"
               >
                 <RotateCcw className="w-4 h-4" />
+                <span className="absolute -top-1 -left-1 text-[9px] font-bold text-neon-purple bg-background/80 rounded px-0.5">
+                  20
+                </span>
               </Button>
             )}
 
@@ -145,11 +148,14 @@ const FloatingPlayer = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="w-8 h-8 text-muted-foreground hover:text-primary"
+                className="w-8 h-8 text-muted-foreground hover:text-primary relative group"
                 onClick={() => seek(Math.min(duration, currentTime + 20))}
                 title="Skip forward 20 seconds"
               >
                 <RotateCw className="w-4 h-4" />
+                <span className="absolute -top-1 -right-1 text-[9px] font-bold text-neon-purple bg-background/80 rounded px-0.5">
+                  20
+                </span>
               </Button>
             )}
 
