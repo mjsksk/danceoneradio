@@ -140,6 +140,15 @@ export function ParticleTextEffect({ words = DEFAULT_WORDS, className }: Particl
   const wordIndexRef = useRef(0)
   const mouseRef = useRef({ x: 0, y: 0, isPressed: false, isRightClick: false })
 
+  // Conservative safe insets to keep long phrases from rendering under AdSense side-rails
+  // (especially on wide desktop where auto-ads can appear on left/right).
+  const getSafeInsets = (w: number, h: number) => {
+    const leftRight = w >= 1280 ? 340 : w >= 1024 ? 260 : 24
+    const top = w >= 768 ? 100 : 80
+    const bottom = w >= 1024 ? 160 : 120
+    return { left: leftRight, right: leftRight, top, bottom }
+  }
+
   const pixelSteps = 6
   const drawAsPoints = true
 
@@ -194,7 +203,10 @@ export function ParticleTextEffect({ words = DEFAULT_WORDS, className }: Particl
     offscreenCanvas.height = canvas.height
     const offscreenCtx = offscreenCanvas.getContext("2d")!
 
-    const maxWidth = canvas.width * 0.85
+    const safe = getSafeInsets(canvas.width, canvas.height)
+    const safeWidth = Math.max(0, canvas.width - safe.left - safe.right)
+    const safeHeight = Math.max(0, canvas.height - safe.top - safe.bottom)
+    const maxWidth = Math.max(0, safeWidth * 0.95)
     let fontSize = 80
     offscreenCtx.font = `bold ${fontSize}px Arial`
     
@@ -210,7 +222,8 @@ export function ParticleTextEffect({ words = DEFAULT_WORDS, className }: Particl
 
     const lineHeight = fontSize * 1.2
     const totalHeight = lines.length * lineHeight
-    const startY = (canvas.height - totalHeight) / 2 + lineHeight / 2
+    const startY = safe.top + (safeHeight - totalHeight) / 2 + lineHeight / 2
+    const centerX = safe.left + safeWidth / 2
 
     offscreenCtx.fillStyle = "white"
     offscreenCtx.textAlign = "center"
@@ -218,7 +231,7 @@ export function ParticleTextEffect({ words = DEFAULT_WORDS, className }: Particl
     
     // Draw each line
     lines.forEach((line, index) => {
-      offscreenCtx.fillText(line, canvas.width / 2, startY + index * lineHeight)
+      offscreenCtx.fillText(line, centerX, startY + index * lineHeight)
     })
 
     const imageData = offscreenCtx.getImageData(0, 0, canvas.width, canvas.height)
