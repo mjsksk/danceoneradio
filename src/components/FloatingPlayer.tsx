@@ -1,8 +1,11 @@
-import { Play, Pause, X, Radio, Music, RotateCcw, RotateCw, ListMusic } from 'lucide-react';
+import { Play, Pause, X, Radio, Music, RotateCcw, RotateCw, ListMusic, SkipForward } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import stationLogo from '@/assets/dance-one-logo.png';
+
+// Available episode numbers (must match AudioPlayerContext)
+const AVAILABLE_EPISODES = [402, 401, 400, 399, 398, 397, 396, 395, 394, 393, 392, 391, 390, 389];
 
 const FloatingPlayer = () => {
   const {
@@ -51,6 +54,18 @@ const FloatingPlayer = () => {
     const percentage = x / rect.width;
     seek(percentage * duration);
   };
+
+  // Get next episode number for autoplay indicator
+  const getNextEpisodeNumber = () => {
+    if (!episodeInfo?.number) return null;
+    const currentIndex = AVAILABLE_EPISODES.indexOf(episodeInfo.number);
+    if (currentIndex >= 0 && currentIndex < AVAILABLE_EPISODES.length - 1) {
+      return AVAILABLE_EPISODES[currentIndex + 1];
+    }
+    return null;
+  };
+
+  const nextEpisodeNumber = getNextEpisodeNumber();
 
   const displayTitle = source === 'live' 
     ? streamTitle.replace(/🎵+\s*/g, '').trim() 
@@ -107,6 +122,14 @@ const FloatingPlayer = () => {
                   />
                 </div>
                 <span className="text-xs text-muted-foreground w-12 tabular-nums text-right">{formatTime(duration)}</span>
+                
+                {/* Next Up indicator */}
+                {autoplayEnabled && nextEpisodeNumber && (
+                  <span className="hidden sm:flex items-center gap-1 text-[10px] text-neon/80 bg-neon/10 px-2 py-0.5 rounded-full whitespace-nowrap">
+                    <SkipForward className="w-3 h-3" />
+                    <span>Next: #{nextEpisodeNumber}</span>
+                  </span>
+                )}
               </div>
             )}
           </div>
