@@ -164,27 +164,62 @@ export function ParticleTextEffect({ words = DEFAULT_WORDS, className }: Particl
     }
   }
 
+  const wrapText = (ctx: CanvasRenderingContext2D, text: string, maxWidth: number, fontSize: number): string[] => {
+    const words = text.split(' ')
+    const lines: string[] = []
+    let currentLine = ''
+
+    for (const word of words) {
+      const testLine = currentLine ? `${currentLine} ${word}` : word
+      const metrics = ctx.measureText(testLine)
+      
+      if (metrics.width > maxWidth && currentLine) {
+        lines.push(currentLine)
+        currentLine = word
+      } else {
+        currentLine = testLine
+      }
+    }
+    
+    if (currentLine) {
+      lines.push(currentLine)
+    }
+    
+    return lines
+  }
+
   const nextWord = (word: string, canvas: HTMLCanvasElement) => {
     const offscreenCanvas = document.createElement("canvas")
     offscreenCanvas.width = canvas.width
     offscreenCanvas.height = canvas.height
     const offscreenCtx = offscreenCanvas.getContext("2d")!
 
-    // Dynamic font size based on text length and canvas width
     const maxWidth = canvas.width * 0.85
     let fontSize = 80
     offscreenCtx.font = `bold ${fontSize}px Arial`
     
-    // Reduce font size until text fits
-    while (offscreenCtx.measureText(word).width > maxWidth && fontSize > 20) {
+    // Get wrapped lines
+    let lines = wrapText(offscreenCtx, word, maxWidth, fontSize)
+    
+    // Reduce font size if we have too many lines or text is still too wide
+    while ((lines.length > 3 || lines.some(line => offscreenCtx.measureText(line).width > maxWidth)) && fontSize > 24) {
       fontSize -= 2
       offscreenCtx.font = `bold ${fontSize}px Arial`
+      lines = wrapText(offscreenCtx, word, maxWidth, fontSize)
     }
+
+    const lineHeight = fontSize * 1.2
+    const totalHeight = lines.length * lineHeight
+    const startY = (canvas.height - totalHeight) / 2 + lineHeight / 2
 
     offscreenCtx.fillStyle = "white"
     offscreenCtx.textAlign = "center"
     offscreenCtx.textBaseline = "middle"
-    offscreenCtx.fillText(word, canvas.width / 2, canvas.height / 2)
+    
+    // Draw each line
+    lines.forEach((line, index) => {
+      offscreenCtx.fillText(line, canvas.width / 2, startY + index * lineHeight)
+    })
 
     const imageData = offscreenCtx.getImageData(0, 0, canvas.width, canvas.height)
     const pixels = imageData.data
