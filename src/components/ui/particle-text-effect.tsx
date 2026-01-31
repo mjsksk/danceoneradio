@@ -402,7 +402,7 @@ export function ParticleTextEffect({ words = DEFAULT_WORDS, className }: Particl
   return (
     <canvas
       ref={canvasRef}
-      className={`absolute inset-0 w-full h-full ${className || ''}`}
+      className={`absolute inset-0 w-full h-full z-10 pointer-events-auto ${className || ''}`}
     />
   )
 }
