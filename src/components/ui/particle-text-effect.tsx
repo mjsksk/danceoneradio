@@ -334,7 +334,8 @@ export function ParticleTextEffect({ words = DEFAULT_WORDS, className }: Particl
     }
 
     frameCountRef.current++
-    if (frameCountRef.current % 240 === 0) {
+    // Change words every 360 frames (~6 seconds at 60fps)
+    if (frameCountRef.current % 360 === 0) {
       wordIndexRef.current = (wordIndexRef.current + 1) % words.length
       nextWord(words[wordIndexRef.current], canvas)
     }
