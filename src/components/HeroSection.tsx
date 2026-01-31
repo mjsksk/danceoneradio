@@ -80,7 +80,7 @@ const HeroSection = () => {
   }, []);
   return <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Particle Text Animation Background */}
-      <ParticleTextEffect words={["DANCE ONE", "RADIO", "ELECTRONIC MUSIC", "24/7 LIVE", "DJ SETS"]} />
+      <ParticleTextEffect words={["This is not your ordinary radio station", "This is your LifeStyle", "Brought to you", "By the Best in Music and Sound"]} />
       <div className="absolute inset-0 bg-background/40 backdrop-blur-[1px]"></div>
 
       {/* Animated Particles */}
