@@ -168,6 +168,26 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // SERVER-SIDE SANITIZATION - Critical security measure
+    // Sanitize subject line (strip all HTML, limit length)
+    const sanitizedSubject = sanitizeSubject(subject);
+    
+    // Sanitize HTML content (remove dangerous elements, scripts, event handlers)
+    const sanitizedContent = sanitizeHtml(content);
+    
+    console.log(`Sanitized subject: "${sanitizedSubject}" (original length: ${subject.length}, sanitized length: ${sanitizedSubject.length})`);
+    console.log(`Content sanitized: original length ${content.length}, sanitized length ${sanitizedContent.length}`);
+
+    if (!sanitizedSubject) {
+      return new Response(
+        JSON.stringify({ error: "Subject is required and cannot be empty after sanitization" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
     // Initialize Supabase client
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -198,7 +218,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Initialize Resend
     const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
-    // Send emails to all subscribers
+    // Send emails to all subscribers using SANITIZED content
     const emailPromises = subscribers.map(async (subscriber) => {
       const unsubscribeUrl = `https://your-domain.com/unsubscribe?token=${subscriber.unsubscribe_token}`;
       
@@ -209,7 +229,7 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
           
           <div style="color: #666; font-size: 16px; line-height: 1.6;">
-            ${content}
+            ${sanitizedContent}
           </div>
           
           <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
@@ -232,7 +252,7 @@ const handler = async (req: Request): Promise<Response> => {
         await resend.emails.send({
           from: "Dance One Radio <noreply@resend.dev>",
           to: [subscriber.email],
-          subject: subject,
+          subject: sanitizedSubject,
           html: emailContent,
         });
         return { email: subscriber.email, status: "sent" };
@@ -248,12 +268,12 @@ const handler = async (req: Request): Promise<Response> => {
       result.status === "fulfilled" && result.value.status === "sent"
     ).length;
 
-    // Save campaign to database
+    // Save campaign to database with sanitized content
     const { error: campaignError } = await supabase
       .from("newsletter_campaigns")
       .insert({
-        subject,
-        content,
+        subject: sanitizedSubject,
+        content: sanitizedContent,
         sent_by: sent_by || "system",
         recipient_count: successCount,
       });
