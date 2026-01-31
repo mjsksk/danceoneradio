@@ -144,8 +144,8 @@ export function ParticleTextEffect({ words = DEFAULT_WORDS, className }: Particl
   // (especially on wide desktop where auto-ads can appear on left/right).
   const getSafeInsets = (w: number, h: number) => {
     const leftRight = w >= 1280 ? 340 : w >= 1024 ? 260 : 24
-    const top = w >= 768 ? 100 : 80
-    const bottom = w >= 1024 ? 160 : 120
+    const top = w >= 768 ? 80 : 60
+    const bottom = w >= 1024 ? 220 : 180
     return { left: leftRight, right: leftRight, top, bottom }
   }
 
