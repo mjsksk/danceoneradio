@@ -1,12 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Volume2 } from 'lucide-react';
 import SocialShare from '@/components/SocialShare';
-
-import heroImage from '@/assets/hero-bg.jpg';
 import LiveRadioPlayer from './LiveRadioPlayer';
 import { RadioStreamService } from '@/utils/RadioStreamService';
-import ShaderBackground from '@/components/ui/shader-background';
+import { ParticleTextEffect } from '@/components/ui/particle-text-effect';
+
 const HeroSection = () => {
   const [streamTitle, setStreamTitle] = useState('🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵');
   
@@ -82,9 +79,9 @@ const HeroSection = () => {
     setVideoKey(prev => prev + 1);
   }, []);
   return <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Shader Animation Background */}
-      <ShaderBackground />
-      <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]"></div>
+      {/* Particle Text Animation Background */}
+      <ParticleTextEffect words={["DANCE ONE", "RADIO", "ELECTRONIC MUSIC", "24/7 LIVE", "DJ SETS"]} />
+      <div className="absolute inset-0 bg-background/40 backdrop-blur-[1px]"></div>
 
       {/* Animated Particles */}
       <div className="absolute inset-0">
