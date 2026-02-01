@@ -4,9 +4,8 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import GoogleAds from "@/components/GoogleAds";
 import SocialShare from "@/components/SocialShare";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import GalleryImage from "@/components/gallery/GalleryImage";
+import GalleryLightbox from "@/components/gallery/GalleryLightbox";
 import { Link } from "react-router-dom";
 
 // Image metadata with explicit content marking
@@ -135,24 +134,6 @@ const ALL_IMAGES: ImageData[] = [
 const LoveParade2005 = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
 
-  const handlePrevious = () => {
-    if (selectedImageIndex !== null) {
-      setSelectedImageIndex((selectedImageIndex - 1 + ALL_IMAGES.length) % ALL_IMAGES.length);
-    }
-  };
-
-  const handleNext = () => {
-    if (selectedImageIndex !== null) {
-      setSelectedImageIndex((selectedImageIndex + 1) % ALL_IMAGES.length);
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "ArrowLeft") handlePrevious();
-    if (e.key === "ArrowRight") handleNext();
-    if (e.key === "Escape") setSelectedImageIndex(null);
-  };
-
   return (
     <>
       <SEO
@@ -190,25 +171,13 @@ const LoveParade2005 = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {ALL_IMAGES.map((image, index) => (
-              <div
+              <GalleryImage
                 key={index}
-                className="relative group cursor-pointer overflow-hidden rounded-lg card-cyber hover:shadow-glow-cyber transition-all duration-300"
+                src={image.url}
+                alt={`Love Parade 2005 - Photo ${index + 1}`}
+                explicit={image.explicit}
                 onClick={() => setSelectedImageIndex(index)}
-              >
-                <img
-                  src={image.url}
-                  alt={`Love Parade 2005 - Photo ${index + 1}`}
-                  className={`w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110 ${
-                    image.explicit ? 'blur-xl' : ''
-                  }`}
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <span className="text-foreground font-semibold text-lg">
-                    {image.explicit ? 'View Photo (18+)' : 'View Photo'}
-                  </span>
-                </div>
-              </div>
+              />
             ))}
           </div>
         </div>
@@ -216,59 +185,13 @@ const LoveParade2005 = () => {
         <Footer />
       </div>
 
-      {/* Lightbox Dialog */}
-      <Dialog open={selectedImageIndex !== null} onOpenChange={() => setSelectedImageIndex(null)}>
-        <DialogContent
-          className="max-w-[95vw] max-h-[95vh] p-0 bg-background/95 backdrop-blur-sm border-0"
-          onKeyDown={handleKeyDown}
-        >
-          <div className="relative w-full h-full flex items-center justify-center">
-            {selectedImageIndex !== null && (
-              <>
-                <img
-                  src={ALL_IMAGES[selectedImageIndex].url}
-                  alt={`Love Parade 2005 - Photo ${selectedImageIndex + 1}`}
-                  className="max-w-full max-h-[90vh] object-contain"
-                />
-
-                {/* Navigation Buttons */}
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background"
-                  onClick={handlePrevious}
-                >
-                  <ChevronLeft className="h-6 w-6" />
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background"
-                  onClick={handleNext}
-                >
-                  <ChevronRight className="h-6 w-6" />
-                </Button>
-
-                {/* Close Button */}
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="absolute top-4 right-4 bg-background/80 hover:bg-background"
-                  onClick={() => setSelectedImageIndex(null)}
-                >
-                  <X className="h-6 w-6" />
-                </Button>
-
-                {/* Image Counter */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/80 px-4 py-2 rounded-full text-sm">
-                  {selectedImageIndex + 1} / {ALL_IMAGES.length}
-                </div>
-              </>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <GalleryLightbox
+        images={ALL_IMAGES}
+        selectedIndex={selectedImageIndex}
+        onClose={() => setSelectedImageIndex(null)}
+        onNavigate={setSelectedImageIndex}
+        altPrefix="Love Parade 2005"
+      />
     </>
   );
 };
