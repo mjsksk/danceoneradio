@@ -1,57 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Instagram, Facebook, Youtube } from 'lucide-react';
 import appStoreBadge from '@/assets/app-store-badge-new.svg';
 import googlePlayBadge from '@/assets/google-play-badge-new.svg';
 import { useNewsletter } from '@/hooks/useNewsletter';
 import { CookieSettingsButton } from '@/components/CookieConsent';
-import LiveRadioPlayer from './LiveRadioPlayer';
-import { RadioStreamService } from '@/utils/RadioStreamService';
+
 const Footer = () => {
   const [email, setEmail] = useState('');
   const { subscribe, isSubmitting } = useNewsletter();
-  const [streamTitle, setStreamTitle] = useState('🎵 Dance One Radio - Live Stream 🎵');
-
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    let isVisible = !document.hidden;
-
-    const handleVisibilityChange = () => {
-      isVisible = !document.hidden;
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    const fetchStreamMetadata = async () => {
-      if (!isVisible) return;
-      try {
-        const metadata = await RadioStreamService.getStreamMetadata();
-        const formattedTitle = RadioStreamService.formatTitle(metadata);
-        setStreamTitle(formattedTitle);
-      } catch (error) {
-        console.error('Error fetching stream metadata:', error);
-      }
-    };
-
-    const scheduleNext = () => {
-      timeoutId = setTimeout(() => {
-        fetchStreamMetadata().then(scheduleNext);
-      }, 10000);
-    };
-
-    if (isVisible) {
-      fetchStreamMetadata().then(scheduleNext);
-    } else {
-      scheduleNext();
-    }
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,18 +32,6 @@ const Footer = () => {
       </div>
 
       <div className="container mx-auto px-4 relative">
-        {/* Integrated Radio Player */}
-        <div className="mb-12">
-          <LiveRadioPlayer 
-            streamUrls={[
-              "http://s9.myradiostream.com:14296/;", 
-              "http://s9.myradiostream.com:14296/stream", 
-              "http://s9.myradiostream.com:14296", 
-              "https://live-radio-stream.online/dance-one-radio.mp3"
-            ]} 
-            streamTitle={streamTitle}
-          />
-        </div>
 
         <div className="flex flex-col items-center text-center space-y-8">
           {/* Social Media Links */}
