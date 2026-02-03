@@ -1,184 +1,160 @@
 
-# Fix Admin Dashboard Access Issue
 
-## Problem Diagnosis
+# Plan: Fix Social Sharing Metadata for All Pages
 
-The admin dashboard at `/admin` is redirecting to the homepage even for users with the admin role. This is caused by a **race condition** between the authentication context and the role-fetching hook.
+## Problem Analysis
 
-### Root Cause
-The `useUserRole` hook has a timing issue:
-1. It initializes `loading: true` and `roles: []`
-2. It waits for `user` from `AuthContext` before fetching roles
-3. But if the `AdminRoute` component renders before `user` is available, the empty `roles` array causes a redirect to home
-4. Even when `user` becomes available, the redirect has already happened
+When pages are shared on social media (Facebook, Twitter, WhatsApp, etc.), they display the home page metadata instead of page-specific information. This happens because:
 
-### Current Flow (Broken)
+1. Social media crawlers do not run JavaScript
+2. The current setup serves `index.html` (with home page metadata) for all routes via SPA routing
+3. While page-specific SEO metadata exists in the `generate-prerender.ts` script, the prerendered files are not being served to crawlers
+
+## Solution Overview
+
+Modify the Netlify configuration to serve prerendered HTML files (with correct metadata) to bot/crawler requests while maintaining SPA behavior for regular users.
+
+## Implementation Steps
+
+### Step 1: Update Netlify Configuration
+
+Add crawler detection to serve prerendered HTML files to social media bots:
+
 ```text
-+------------------+     +----------------+     +---------------+
-| AuthContext      |     | useUserRole    |     | AdminRoute    |
-| loading: true    |---->| loading: true  |---->| Show spinner  |
-+------------------+     +----------------+     +---------------+
-         |                       |                      |
-         v                       v                      v
-+------------------+     +----------------+     +---------------+
-| loading: false   |     | roles: []      |     | No admin role |
-| user: available  |     | (not fetched)  |     | REDIRECT HOME |
-+------------------+     +----------------+     +---------------+
++-------------------------------+
+|   Request from User/Bot       |
++-------------------------------+
+              |
+              v
++-------------------------------+
+|   Is this a crawler bot?      |
+|   (Facebook, Twitter, etc.)   |
++-------------------------------+
+        |             |
+       Yes           No
+        |             |
+        v             v
++----------------+  +------------------+
+| Serve static   |  | Serve index.html |
+| prerendered    |  | (SPA routing)    |
+| HTML with SEO  |  |                  |
++----------------+  +------------------+
 ```
 
-## Solution
+**Changes to `netlify.toml`:**
+- Add edge function or redirect rules to detect crawler user agents
+- Route crawlers to prerendered HTML files with proper meta tags
+- Keep regular users on SPA routing
 
-Fix the `useUserRole` hook to properly wait for the auth context and ensure roles are fetched before the loading state is set to `false`.
+### Step 2: Update Prerender Script
 
-### Changes Required
+Ensure all pages are covered and generate properly in the dist folder:
 
-**1. Update `src/hooks/useUserRole.tsx`**
-- Keep `loading: true` while `AuthContext.loading` is still true
-- Add debug logging to help diagnose issues
-- Ensure the hook only sets `loading: false` after a fetch attempt is complete
+**Add missing routes to `scripts/generate-prerender.ts`:**
+- `/gallery/love-parade-2005`
+- `/gallery/love-parade-2006`
+- `/news`
+- `/news/top-stories`
+- `/news/artists-releases`
+- `/news/festivals-events`
+- `/news/industry-culture`
+- `/account`
+- `/auth`
 
-**2. Update `src/components/AdminRoute.tsx`**
-- Add debug logging to understand the state when redirects happen
-- Ensure redirects only occur after roles have been definitively checked
+### Step 3: Create Edge Function for Bot Detection (Alternative to Netlify redirects)
 
-### Technical Implementation
+Create a Netlify Edge Function that:
+1. Detects crawler user agents (facebookexternalhit, Twitterbot, LinkedInBot, WhatsApp, etc.)
+2. Serves the appropriate prerendered HTML file with correct metadata
+3. Falls back to SPA routing for regular users
 
-**File: `src/hooks/useUserRole.tsx`**
+### Step 4: Verify Existing SEO Component Usage
+
+All pages already have proper SEO component usage with page-specific metadata. Ensure consistency:
+
+| Page | Image | Status |
+|------|-------|--------|
+| Episodes | `/lovable-uploads/mario-show.jpg` | Correct |
+| Shows | `/lovable-uploads/mario-show.jpg` | Correct |
+| Gallery | `/assets/love-parade-2006.png` | Correct |
+| News | Default logo | Needs image |
+| About | Default logo | Needs image |
+
+---
+
+## Technical Details
+
+### Netlify Edge Function (Recommended Approach)
+
+Create `netlify/edge-functions/prerender.ts`:
+
 ```typescript
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+const BOTS = [
+  'facebookexternalhit',
+  'Facebot',
+  'Twitterbot',
+  'LinkedInBot',
+  'WhatsApp',
+  'Slackbot',
+  'TelegramBot',
+  'Pinterest',
+  'Googlebot',
+  'bingbot',
+  'Discordbot'
+];
 
-export type AppRole = 'admin' | 'moderator' | 'user';
-
-interface UserRoleState {
-  roles: AppRole[];
-  isAdmin: boolean;
-  isModerator: boolean;
-  loading: boolean;
-}
-
-export function useUserRole(): UserRoleState {
-  const { user, loading: authLoading } = useAuth();  // Also get authLoading
-  const [roles, setRoles] = useState<AppRole[]>([]);
-  const [roleLoading, setRoleLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchRoles() {
-      // Wait for auth to finish loading first
-      if (authLoading) {
-        return; // Don't set loading to false yet
-      }
-
-      if (!user) {
-        setRoles([]);
-        setRoleLoading(false);
-        return;
-      }
-
-      try {
-        console.log('Fetching roles for user:', user.id);
-        const { data, error } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id);
-
-        if (error) {
-          console.error('Error fetching user roles:', error);
-          setRoles([]);
-        } else {
-          const fetchedRoles = (data || []).map(r => r.role as AppRole);
-          console.log('Fetched roles:', fetchedRoles);
-          setRoles(fetchedRoles);
-        }
-      } catch (error) {
-        console.error('Error fetching user roles:', error);
-        setRoles([]);
-      } finally {
-        setRoleLoading(false);
-      }
-    }
-
-    fetchRoles();
-  }, [user, authLoading]);  // Add authLoading as dependency
-
-  // Only report as "done loading" when both auth is done AND roles are fetched
-  const loading = authLoading || roleLoading;
-
-  return {
-    roles,
-    isAdmin: roles.includes('admin'),
-    isModerator: roles.includes('moderator'),
-    loading
-  };
-}
-```
-
-**File: `src/components/AdminRoute.tsx`**
-```typescript
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserRole, AppRole } from '@/hooks/useUserRole';
-
-interface AdminRouteProps {
-  children: React.ReactNode;
-  requiredRole?: AppRole;
-}
-
-export function AdminRoute({ children, requiredRole = 'admin' }: AdminRouteProps) {
-  const { user, loading: authLoading } = useAuth();
-  const { roles, loading: roleLoading } = useUserRole();
-
-  // Debug logging
-  console.log('AdminRoute state:', { 
-    authLoading, 
-    roleLoading, 
-    user: user?.email, 
-    roles 
-  });
-
-  // Show loading while checking auth and roles
-  if (authLoading || roleLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  // Redirect to auth if not logged in
-  if (!user) {
-    console.log('AdminRoute: No user, redirecting to /auth');
-    return <Navigate to="/auth" replace />;
-  }
-
-  // Check if user has the required role
-  const hasRequiredRole = roles.includes(requiredRole);
+export default async (request: Request, context: any) => {
+  const userAgent = request.headers.get('user-agent') || '';
+  const isBot = BOTS.some(bot => 
+    userAgent.toLowerCase().includes(bot.toLowerCase())
+  );
   
-  if (!hasRequiredRole) {
-    console.log('AdminRoute: User lacks required role, redirecting to /');
-    return <Navigate to="/" replace />;
+  if (isBot) {
+    const url = new URL(request.url);
+    // Try to serve prerendered file
+    const prerenderPath = url.pathname === '/' 
+      ? '/index.html' 
+      : `${url.pathname}/index.html`;
+    // Attempt to fetch prerendered version
+    return context.rewrite(prerenderPath);
   }
-
-  console.log('AdminRoute: Access granted');
-  return <>{children}</>;
-}
+  
+  return context.next();
+};
 ```
 
-## Why This Fixes the Issue
+### Files to be Modified
 
-1. **Proper dependency on `authLoading`**: The `useUserRole` hook now waits for `AuthContext` to finish loading before attempting to fetch roles
-2. **Combined loading state**: The hook returns `loading: true` until BOTH auth is complete AND roles are fetched
-3. **Debug logging**: Added console logs to help diagnose any future issues
-4. **Clear flow**: The `AdminRoute` spinner stays visible until we definitively know the user's roles
+1. **`netlify.toml`** - Add edge function configuration
+2. **`netlify/edge-functions/prerender.ts`** - New file for bot detection
+3. **`scripts/generate-prerender.ts`** - Add missing routes
+4. **Various page components** - Add missing `image` props to SEO components where needed
 
-## Testing Steps
+### Prerender Routes to Add
 
-1. Log out completely, then log in as `mario@danceoneradio.com`
-2. Navigate to `/admin`
-3. You should see the loading spinner briefly, then the admin dashboard
-4. Check console logs for the role-fetching debug messages
+```typescript
+// Add to generate-prerender.ts routes array:
+{ path: '/gallery/love-parade-2005', title: '...', image: '/assets/love-parade-2005.jpg' },
+{ path: '/gallery/love-parade-2006', title: '...', image: '/assets/love-parade-2006.png' },
+{ path: '/news', title: 'EDM News...', image: '/lovable-uploads/c8f83eb5-...' },
+{ path: '/news/top-stories', title: '...', image: '...' },
+// etc.
+```
 
-## Bonus: Add Admin Link to Navigation
+---
 
-After fixing the access issue, we can add a visible "Admin" link to the navigation that only appears for admin users. This will make the dashboard discoverable without manually typing the URL.
+## Expected Outcome
+
+After implementation:
+- Sharing an Episode page will show "Anthems of the week 402" with mario-show.jpg image
+- Sharing the Gallery page will show "Photo Galleries - Love Parade" with the Love Parade image
+- Each page will display its unique title and description on social platforms
+- Regular users will experience no change in SPA functionality
+
+## Testing
+
+1. Use Facebook Sharing Debugger: https://developers.facebook.com/tools/debug/
+2. Use Twitter Card Validator: https://cards-dev.twitter.com/validator
+3. Test sharing links on WhatsApp and other platforms
+4. Verify bots receive HTML with correct og:image, og:title, og:description
+
