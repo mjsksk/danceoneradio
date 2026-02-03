@@ -212,38 +212,42 @@ const routes = [
   }
 ];
 
-// Generate HTML template with SEO metadata
-function generateHTML(route: typeof routes[0]): string {
+function escapeAttr(value: string) {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
+}
+
+function buildMetaBlock(route: (typeof routes)[number]) {
   const baseUrl = 'https://danceoneradio.com';
   const fullUrl = `${baseUrl}${route.path}`;
   const imageUrl = route.image.startsWith('http') ? route.image : `${baseUrl}${route.image}`;
 
-  return `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="/favicon.png" type="image/png">
-    <title>${route.title}</title>
-    <meta name="description" content="${route.description}" />
+  const title = escapeAttr(route.title);
+  const description = escapeAttr(route.description);
+  const image = escapeAttr(imageUrl);
+  const canonical = escapeAttr(fullUrl);
+
+  return `
+    <title>${title}</title>
+    <meta name="description" content="${description}" />
     <meta name="author" content="Dance One Radio" />
     <meta name="keywords" content="dance music radio, electronic music stream, EDM radio, trance radio, house music, live DJ mixes, dance music podcast, online radio station, electronic dance music" />
-    <link rel="canonical" href="${fullUrl}" />
-    
+    <link rel="canonical" href="${canonical}" />
+
     <!-- Enhanced SEO Meta Tags -->
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="googlebot" content="index, follow" />
     <meta name="bingbot" content="index, follow" />
-    <meta name="language" content="English" />
-    <meta name="revisit-after" content="1 days" />
-    <meta name="rating" content="general" />
-    
+
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="${route.title}" />
-    <meta property="og:description" content="${route.description}" />
+    <meta property="og:title" content="${title}" />
+    <meta property="og:description" content="${description}" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="${fullUrl}" />
-    <meta property="og:image" content="${imageUrl}" />
+    <meta property="og:url" content="${canonical}" />
+    <meta property="og:image" content="${image}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content="Dance One Radio" />
@@ -252,55 +256,48 @@ function generateHTML(route: typeof routes[0]): string {
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@DanceOneRadio" />
-    <meta name="twitter:title" content="${route.title}" />
-    <meta name="twitter:description" content="${route.description}" />
-    <meta name="twitter:image" content="${imageUrl}" />
+    <meta name="twitter:title" content="${title}" />
+    <meta name="twitter:description" content="${description}" />
+    <meta name="twitter:image" content="${image}" />
     <meta name="twitter:creator" content="@DanceOneRadio" />
-    
+
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
-    {
+    ${JSON.stringify({
       "@context": "https://schema.org",
       "@type": "WebPage",
-      "name": "${route.title}",
-      "description": "${route.description}",
-      "url": "${fullUrl}",
-      "image": "${imageUrl}",
-      "publisher": {
+      name: route.title,
+      description: route.description,
+      url: fullUrl,
+      image: imageUrl,
+      publisher: {
         "@type": "RadioStation",
-        "name": "Dance One Radio",
-        "url": "${baseUrl}",
-        "logo": "${baseUrl}/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
+        name: "Dance One Radio",
+        url: baseUrl,
+        logo: `${baseUrl}/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png`,
       }
-    }
+    }, null, 2)}
     </script>
-
-    <!-- Preconnect to critical resources -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
-    <!-- DNS prefetch for external resources -->
-    <link rel="dns-prefetch" href="//s9.myradiostream.com">
-    <link rel="dns-prefetch" href="//api.allorigins.win">
-  </head>
-
-  <body>
-    <div id="root"></div>
-    
-    <!-- Noscript fallback with basic content -->
-    <noscript>
-      <h1>${route.title}</h1>
-      <p>${route.description}</p>
-      <p>Please enable JavaScript to use Dance One Radio.</p>
-    </noscript>
-    
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>`;
+  `;
 }
 
-// Generate prerendered HTML files
-function generatePrerenderFiles() {
+function stripDynamicHeadTags(html: string) {
+  // Remove existing tags we override to avoid duplicates.
+  return html
+    .replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '')
+    .replace(/<meta\s+(?:name|property)="(?:description|keywords|robots|googlebot|bingbot|twitter:[^"]+|og:[^"]+|fb:app_id)"[^>]*>/gi, '')
+    .replace(/<link\s+rel="canonical"[^>]*>/gi, '')
+    .replace(/<script\s+type="application\/ld\+json"[^>]*>[\s\S]*?<\/script>/gi, '');
+}
+
+function generateHTMLFromTemplate(templateHtml: string, route: (typeof routes)[number]) {
+  const cleaned = stripDynamicHeadTags(templateHtml);
+  const injected = cleaned.replace(/<\/head>/i, `${buildMetaBlock(route)}\n  </head>`);
+  return injected;
+}
+
+// Generate prerendered HTML files (runs after Vite build)
+export function generatePrerenderFiles() {
   const distDir = path.resolve(process.cwd(), 'dist');
   
   if (!fs.existsSync(distDir)) {
@@ -308,27 +305,35 @@ function generatePrerenderFiles() {
     return;
   }
 
+  const templatePath = path.join(distDir, 'index.html');
+  if (!fs.existsSync(templatePath)) {
+    console.error('dist/index.html not found. Vite build may have failed.');
+    return;
+  }
+  const templateHtml = fs.readFileSync(templatePath, 'utf-8');
+
   routes.forEach(route => {
-    const routePath = route.path === '/' ? 'index' : route.path.slice(1).replace(/\//g, '-');
-    const fileName = `${routePath}.html`;
-    const filePath = path.join(distDir, fileName);
-    
-    // Create subdirectories if needed
-    if (route.path !== '/') {
-      const subDir = path.join(distDir, route.path.slice(1));
-      if (!fs.existsSync(subDir)) {
-        fs.mkdirSync(subDir, { recursive: true });
-      }
-      const indexPath = path.join(subDir, 'index.html');
-      fs.writeFileSync(indexPath, generateHTML(route));
-      console.log(`Generated: ${indexPath}`);
-    } else {
-      fs.writeFileSync(filePath, generateHTML(route));
-      console.log(`Generated: ${filePath}`);
+    const html = generateHTMLFromTemplate(templateHtml, route);
+
+    if (route.path === '/') {
+      // Update the homepage HTML in-place.
+      fs.writeFileSync(templatePath, html);
+      console.log(`Updated: ${templatePath}`);
+      return;
     }
+
+    const subDir = path.join(distDir, route.path.slice(1));
+    if (!fs.existsSync(subDir)) {
+      fs.mkdirSync(subDir, { recursive: true });
+    }
+
+    const indexPath = path.join(subDir, 'index.html');
+    fs.writeFileSync(indexPath, html);
+    console.log(`Generated: ${indexPath}`);
   });
 
   console.log('Prerendering complete!');
 }
 
+// Allow running as a standalone script.
 generatePrerenderFiles();
