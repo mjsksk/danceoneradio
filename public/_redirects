@@ -1,6 +1,10 @@
 # Prefer prerendered HTML for known routes (generated into dist/<route>/index.html)
 # This ensures crawlers (and anyone else) can receive page-specific OG tags.
 
+# Share pages for social media crawlers (must be before fallback)
+/share/episode/*       /share/episode/:splat/index.html       200
+/share/*               /share/:splat/index.html               200
+
 /episode/*             /episode/:splat/index.html             200
 /news/*                /news/:splat/index.html                200
 
