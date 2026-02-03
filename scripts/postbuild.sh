@@ -1,5 +1,5 @@
 #!/bin/bash
-# Post-build script to generate pre-rendered HTML files
+# Post-build script to generate pre-rendered HTML files for SEO and social sharing
 
 echo "Running post-build script..."
 echo "Generating pre-rendered HTML files for SEO..."
