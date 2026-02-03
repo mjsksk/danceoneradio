@@ -1,7 +1,8 @@
 import type { Context } from "https://edge.netlify.com";
 
-// Version for debugging deployments
-const VERSION = "v4.0.0";
+// Version for debugging deployments - update on every change
+const VERSION = "v5.0.0";
+const DEPLOYED_AT = new Date().toISOString();
 
 // List of known social media and search engine bots that need prerendered content
 const BOTS = [
@@ -165,13 +166,16 @@ export default async function handler(request: Request, context: Context) {
   const url = new URL(request.url);
   const pathname = url.pathname;
   
-  console.log(`[${VERSION}] Request: ${pathname}, UA: ${userAgent.substring(0, 80)}`);
+  // Debug override: add ?__prerender=1 to force prerendered response
+  const forcePrerender = url.searchParams.has('__prerender');
+  
+  console.log(`[${VERSION}] Request: ${pathname}, UA: ${userAgent.substring(0, 80)}, forcePrerender: ${forcePrerender}`);
   
   // Skip for static assets
   const staticExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf', '.mp3', '.mp4', '.webm', '.webp', '.json', '.xml', '.txt', '.html'];
   const isStaticAsset = staticExtensions.some(ext => pathname.endsWith(ext));
   
-  if (isStaticAsset) {
+  if (isStaticAsset && !forcePrerender) {
     return context.next();
   }
   
@@ -179,7 +183,9 @@ export default async function handler(request: Request, context: Context) {
   if (pathname.startsWith('/assets/') || 
       pathname.startsWith('/lovable-uploads/') || 
       pathname.startsWith('/downloads/')) {
-    return context.next();
+    if (!forcePrerender) {
+      return context.next();
+    }
   }
   
   // Check if request is from a bot
@@ -187,10 +193,10 @@ export default async function handler(request: Request, context: Context) {
     userAgent.toLowerCase().includes(bot.toLowerCase())
   );
   
-  console.log(`[${VERSION}] isBot: ${isBot}, pathname: ${pathname}`);
+  console.log(`[${VERSION}] isBot: ${isBot}, forcePrerender: ${forcePrerender}, pathname: ${pathname}`);
   
-  // For bots, generate and serve HTML with correct metadata directly
-  if (isBot) {
+  // For bots OR debug override, generate and serve HTML with correct metadata directly
+  if (isBot || forcePrerender) {
     const html = generateHTML(pathname, url.origin);
     
     console.log(`[${VERSION}] Serving prerendered HTML for: ${pathname}`);
@@ -201,8 +207,10 @@ export default async function handler(request: Request, context: Context) {
         'Content-Type': 'text/html; charset=utf-8',
         'X-Prerender': 'true',
         'X-Prerender-Version': VERSION,
-        'X-Bot-Detected': userAgent.substring(0, 50),
-        'Cache-Control': 'public, max-age=3600',
+        'X-Prerender-Deployed': DEPLOYED_AT,
+        'X-Bot-Detected': isBot ? userAgent.substring(0, 50) : 'debug-override',
+        'X-Prerender-Pathname': pathname,
+        'Cache-Control': forcePrerender ? 'no-cache' : 'public, max-age=3600',
       }
     });
   }
