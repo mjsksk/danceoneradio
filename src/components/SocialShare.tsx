@@ -25,10 +25,24 @@ const SocialShare = ({
 }: SocialShareProps) => {
   const { toast } = useToast();
 
+  const getShareUrl = () => {
+    try {
+      const u = new URL(url);
+      // Normalize trailing slash (except root)
+      const pathname = u.pathname !== '/' ? u.pathname.replace(/\/+$/, '') : '/';
+      const sharePath = pathname === '/' ? '/share/index.html' : `/share${pathname}.html`;
+      return `${u.origin}${sharePath}`;
+    } catch {
+      return url;
+    }
+  };
+
+  const shareUrl = getShareUrl();
+
   const shareData = {
     title,
     text: description,
-    url
+    url: shareUrl
   };
 
   const handleNativeShare = async () => {
@@ -37,7 +51,7 @@ const SocialShare = ({
         await navigator.share(shareData);
       } else {
         // Fallback: copy to clipboard
-        await navigator.clipboard.writeText(`${title}\n\n${description}\n\n${url}`);
+        await navigator.clipboard.writeText(`${title}\n\n${description}\n\n${shareUrl}`);
         toast({
           title: "Link copied!",
           description: "The page link has been copied to your clipboard.",
@@ -50,7 +64,7 @@ const SocialShare = ({
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(shareUrl);
       toast({
         title: "Link copied!",
         description: "The page link has been copied to your clipboard.",
@@ -66,17 +80,17 @@ const SocialShare = ({
   };
 
   const handleFacebookShare = () => {
-    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
     window.open(facebookUrl, '_blank', 'width=600,height=400');
   };
 
   const handleTwitterShare = () => {
-    const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
+    const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(title)}`;
     window.open(twitterUrl, '_blank', 'width=600,height=400');
   };
 
   const handleWhatsAppShare = () => {
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${title} ${url}`)}`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${title} ${shareUrl}`)}`;
     window.open(whatsappUrl, '_blank');
   };
 
