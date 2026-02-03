@@ -1,7 +1,7 @@
 import type { Context } from "https://edge.netlify.com";
 
 // Version for debugging deployments
-const VERSION = "v3.0.0";
+const VERSION = "v4.0.0";
 
 // List of known social media and search engine bots that need prerendered content
 const BOTS = [
