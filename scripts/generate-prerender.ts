@@ -293,8 +293,15 @@ function stripDynamicHeadTags(html: string) {
 
 function generateHTMLFromTemplate(templateHtml: string, route: (typeof routes)[number]) {
   const cleaned = stripDynamicHeadTags(templateHtml);
-  const injected = cleaned.replace(/<\/head>/i, `${buildMetaBlock(route)}\n  </head>`);
-  return injected;
+
+  // IMPORTANT: inject at the START of <head> so crawlers pick up these tags first.
+  // Some scrapers (including Facebook) will use the first occurrence when duplicates exist.
+  const headInjected = cleaned.replace(
+    /<head(\s[^>]*)?>/i,
+    (match) => `${match}${buildMetaBlock(route)}`
+  );
+
+  return headInjected;
 }
 
 // Generate prerendered HTML files (runs after Vite build)
