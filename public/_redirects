@@ -1,5 +1,23 @@
-# Handle client-side routing for SPA
-/*    /index.html   200
+# Prefer prerendered HTML for known routes (generated into dist/<route>/index.html)
+# This ensures crawlers (and anyone else) can receive page-specific OG tags.
 
-# This ensures that all non-existent routes serve the React app
-# but the app itself will render the 404 component with proper meta tags
+/episode/*             /episode/:splat/index.html             200
+/news/*                /news/:splat/index.html                200
+
+/about                 /about/index.html                      200
+/shows                 /shows/index.html                      200
+/downloads             /downloads/index.html                  200
+/love                  /love/index.html                       200
+/contact               /contact/index.html                    200
+/player                /player/index.html                     200
+/gallery               /gallery/index.html                    200
+/love-parade-2005      /love-parade-2005/index.html           200
+/love-parade-2006      /love-parade-2006/index.html           200
+/auth                  /auth/index.html                       200
+/account               /account/index.html                    200
+/reset-password        /reset-password/index.html             200
+/privacy               /privacy/index.html                    200
+/dmca                  /dmca/index.html                       200
+
+# Fallback to SPA entry for anything else
+/*                     /index.html                            200
