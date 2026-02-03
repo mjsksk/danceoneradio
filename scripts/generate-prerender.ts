@@ -243,8 +243,10 @@ function buildMetaBlock(route: (typeof routes)[number]) {
     <meta name="googlebot" content="index, follow" />
     <meta name="bingbot" content="index, follow" />
 
-    <!-- Open Graph Meta Tags -->
+    <!-- Facebook App ID - MUST be before other OG tags -->
     <meta property="fb:app_id" content="111030096697" />
+
+    <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="${title}" />
     <meta property="og:description" content="${description}" />
     <meta property="og:type" content="website" />
