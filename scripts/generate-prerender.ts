@@ -244,6 +244,7 @@ function buildMetaBlock(route: (typeof routes)[number]) {
     <meta name="bingbot" content="index, follow" />
 
     <!-- Open Graph Meta Tags -->
+    <meta property="fb:app_id" content="111030096697" />
     <meta property="og:title" content="${title}" />
     <meta property="og:description" content="${description}" />
     <meta property="og:type" content="website" />

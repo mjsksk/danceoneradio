@@ -111,6 +111,7 @@ function generateHTML(pathname: string, origin: string): string {
     <link rel="canonical" href="${fullUrl}" />
     
     <!-- Open Graph Meta Tags -->
+    <meta property="fb:app_id" content="111030096697" />
     <meta property="og:title" content="${metadata.title}" />
     <meta property="og:description" content="${metadata.description}" />
     <meta property="og:type" content="website" />
