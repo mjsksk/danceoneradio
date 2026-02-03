@@ -63,6 +63,57 @@ const routes = [
     description: 'View photos from Love Parade 2006 in San Francisco, one of the last major Love Parade events celebrating electronic music.',
     image: '/assets/love-parade-2006.png'
   },
+  // News pages
+  {
+    path: '/news',
+    title: 'EDM News & Updates - Dance One Radio',
+    description: 'Stay updated with the latest electronic dance music news, artist announcements, festival updates, and industry insights from Dance One Radio.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  {
+    path: '/news/top-stories',
+    title: 'Top Stories - EDM News | Dance One Radio',
+    description: 'Breaking news and top stories from the electronic dance music world. Stay informed with the latest headlines from Dance One Radio.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  {
+    path: '/news/artists-releases',
+    title: 'Artist News & New Releases - Dance One Radio',
+    description: 'Discover new music releases, artist announcements, and exclusive tracks from top electronic dance music producers and DJs.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  {
+    path: '/news/festivals-events',
+    title: 'Festivals & Events - EDM News | Dance One Radio',
+    description: 'Get the latest updates on electronic music festivals, concerts, and events happening around the world.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  {
+    path: '/news/industry-culture',
+    title: 'Industry & Culture - EDM News | Dance One Radio',
+    description: 'Explore the business and culture of electronic dance music. Industry insights, trends, and cultural commentary.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  // Auth and Account pages
+  {
+    path: '/auth',
+    title: 'Sign In - Dance One Radio',
+    description: 'Sign in or create an account to access your Dance One Radio profile, save your listening progress, and get personalized recommendations.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  {
+    path: '/account',
+    title: 'My Account - Dance One Radio',
+    description: 'Manage your Dance One Radio account settings, listening history, and preferences.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  {
+    path: '/reset-password',
+    title: 'Reset Password - Dance One Radio',
+    description: 'Reset your Dance One Radio account password.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  // Episode pages
   {
     path: '/episode/389',
     title: 'Anthems of the week 389 - Future Dance Anthems with Mario | Dance One Radio',

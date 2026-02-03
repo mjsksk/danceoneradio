@@ -6,6 +6,11 @@
 [build.environment]
   NODE_VERSION = "18"
 
+# Edge Functions configuration for bot detection
+[[edge_functions]]
+  function = "prerender"
+  path = "/*"
+
 # Headers for SEO and security
 [[headers]]
   for = "/*"
@@ -31,6 +36,12 @@
   for = "*.css"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache prerendered HTML files for bots (short cache for freshness)
+[[headers]]
+  for = "/*/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
 
 # Redirect rules - preserve SPA routing
 # Serve static files if they exist, otherwise serve index.html
