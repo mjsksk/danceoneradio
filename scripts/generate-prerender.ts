@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { pathToFileURL } from 'node:url';
 
 // Routes to prerender with their SEO metadata
 const routes = [
@@ -301,14 +302,12 @@ export function generatePrerenderFiles() {
   const distDir = path.resolve(process.cwd(), 'dist');
   
   if (!fs.existsSync(distDir)) {
-    console.error('dist directory does not exist. Run build first.');
-    return;
+    throw new Error('dist directory does not exist. Run build first.');
   }
 
   const templatePath = path.join(distDir, 'index.html');
   if (!fs.existsSync(templatePath)) {
-    console.error('dist/index.html not found. Vite build may have failed.');
-    return;
+    throw new Error('dist/index.html not found. Vite build may have failed.');
   }
   const templateHtml = fs.readFileSync(templatePath, 'utf-8');
 
@@ -336,4 +335,15 @@ export function generatePrerenderFiles() {
 }
 
 // Allow running as a standalone script.
-generatePrerenderFiles();
+const isDirectRun = (() => {
+  try {
+    if (!process.argv[1]) return false;
+    return import.meta.url === pathToFileURL(process.argv[1]).href;
+  } catch {
+    return false;
+  }
+})();
+
+if (isDirectRun) {
+  generatePrerenderFiles();
+}
