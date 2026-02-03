@@ -416,6 +416,18 @@ export function generatePrerenderFiles() {
     const sharePath = path.join(shareDir, 'index.html');
     fs.writeFileSync(sharePath, shareHtml);
     console.log(`Generated share page: ${sharePath}`);
+
+    // Additionally generate a flat .html file so hosts that rewrite “pretty URLs” to the SPA
+    // can still serve a real HTML document at an explicit file path.
+    // Example: /share/episode/402.html
+    const shareFlatRel = route.path === '/' ? '/index' : route.path;
+    const shareFlatPath = path.join(distDir, 'share', `${shareFlatRel.slice(1)}.html`);
+    const shareFlatDir = path.dirname(shareFlatPath);
+    if (!fs.existsSync(shareFlatDir)) {
+      fs.mkdirSync(shareFlatDir, { recursive: true });
+    }
+    fs.writeFileSync(shareFlatPath, shareHtml);
+    console.log(`Generated share page (flat): ${shareFlatPath}`);
   });
 
   console.log('Prerendering complete!');
