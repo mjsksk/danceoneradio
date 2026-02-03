@@ -305,6 +305,74 @@ function generateHTMLFromTemplate(templateHtml: string, route: (typeof routes)[n
   return headInjected;
 }
 
+// Build a minimal share page that auto-redirects to the real page.
+function generateSharePageHTML(route: (typeof routes)[number]) {
+  const baseUrl = 'https://danceoneradio.com';
+  const fullUrl = `${baseUrl}${route.path}`;
+  const imageUrl = route.image.startsWith('http') ? route.image : `${baseUrl}${route.image}`;
+
+  const title = escapeAttr(route.title);
+  const description = escapeAttr(route.description);
+  const image = escapeAttr(imageUrl);
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="/favicon.png" type="image/png" />
+  <title>${title}</title>
+  <meta name="description" content="${description}" />
+  <link rel="canonical" href="${fullUrl}" />
+
+  <!-- Facebook App ID -->
+  <meta property="fb:app_id" content="111030096697" />
+
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="${title}" />
+  <meta property="og:description" content="${description}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="${fullUrl}" />
+  <meta property="og:image" content="${image}" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="Dance One Radio" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@DanceOneRadio" />
+  <meta name="twitter:title" content="${title}" />
+  <meta name="twitter:description" content="${description}" />
+  <meta name="twitter:image" content="${image}" />
+  <meta name="twitter:creator" content="@DanceOneRadio" />
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  ${JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: route.title,
+    description: route.description,
+    url: fullUrl,
+    image: imageUrl,
+    publisher: {
+      "@type": "RadioStation",
+      name: "Dance One Radio",
+      url: baseUrl
+    }
+  }, null, 2)}
+  </script>
+
+  <!-- Redirect to real page after crawlers have captured metadata -->
+  <meta http-equiv="refresh" content="0;url=${fullUrl}" />
+</head>
+<body>
+  <p>Redirecting to <a href="${fullUrl}">${title}</a>...</p>
+</body>
+</html>`;
+}
+
 // Generate prerendered HTML files (runs after Vite build)
 export function generatePrerenderFiles() {
   const distDir = path.resolve(process.cwd(), 'dist');
@@ -326,17 +394,26 @@ export function generatePrerenderFiles() {
       // Update the homepage HTML in-place.
       fs.writeFileSync(templatePath, html);
       console.log(`Updated: ${templatePath}`);
-      return;
+    } else {
+      const subDir = path.join(distDir, route.path.slice(1));
+      if (!fs.existsSync(subDir)) {
+        fs.mkdirSync(subDir, { recursive: true });
+      }
+      const indexPath = path.join(subDir, 'index.html');
+      fs.writeFileSync(indexPath, html);
+      console.log(`Generated: ${indexPath}`);
     }
 
-    const subDir = path.join(distDir, route.path.slice(1));
-    if (!fs.existsSync(subDir)) {
-      fs.mkdirSync(subDir, { recursive: true });
+    // Also generate a /share/<route> page with only meta tags + redirect.
+    // This is useful for social sharing on hosts that don't run edge functions.
+    const shareDir = path.join(distDir, 'share', route.path === '/' ? '' : route.path.slice(1));
+    if (!fs.existsSync(shareDir)) {
+      fs.mkdirSync(shareDir, { recursive: true });
     }
-
-    const indexPath = path.join(subDir, 'index.html');
-    fs.writeFileSync(indexPath, html);
-    console.log(`Generated: ${indexPath}`);
+    const shareHtml = generateSharePageHTML(route);
+    const sharePath = path.join(shareDir, 'index.html');
+    fs.writeFileSync(sharePath, shareHtml);
+    console.log(`Generated share page: ${sharePath}`);
   });
 
   console.log('Prerendering complete!');
