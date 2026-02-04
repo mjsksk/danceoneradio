@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface SocialShareProps {
   url: string;
@@ -24,11 +25,12 @@ const SocialShare = ({
   className = ""
 }: SocialShareProps) => {
   const { toast } = useToast();
+  const isMobileViewport = useIsMobile();
 
   // Desktop OS share targets (notably Facebook) can sometimes turn rich share payloads
   // into a photo-style post where the preview isn’t a clickable link. Detect “mobile”
   // explicitly; otherwise treat it as desktop and prefer URL-only.
-  const isLikelyMobile = (): boolean => {
+  const isLikelyMobileUA = (): boolean => {
     try {
       const uaDataMobile = (navigator as unknown as { userAgentData?: { mobile?: boolean } })
         ?.userAgentData?.mobile;
@@ -42,7 +44,17 @@ const SocialShare = ({
     }
   };
 
-  const isMobile = isLikelyMobile();
+  const isTouchLikeDevice = (): boolean => {
+    try {
+      return !!window.matchMedia?.('(pointer: coarse)')?.matches;
+    } catch {
+      return false;
+    }
+  };
+
+  // Only show native share on real mobile/touch contexts.
+  // This prevents desktop "More…" shares (notably to Facebook) that can create non-clickable cards.
+  const allowNativeShare = isMobileViewport && (isLikelyMobileUA() || isTouchLikeDevice());
 
   // Convert route path to root-level share filename
   // /episode/402 → share-episode-402.html
@@ -89,15 +101,26 @@ const SocialShare = ({
   };
 
   const getSystemShareData = (): ShareData => {
-    // Desktop: URL-only (best chance of a clickable link attachment on Facebook)
-    // Some share targets ignore the `url` field and only use `text`, so include the URL in both.
-    if (!isLikelyMobile()) return { url: socialShareUrl, text: socialShareUrl };
-    // Mobile: keep rich payload
+    // Desktop (or anything not confidently mobile/touch): DO NOT attempt native share.
+    // It can produce a card that looks right but isn't actually clickable on Facebook.
+    if (!allowNativeShare) return { url: socialShareUrl };
+
+    // Mobile/touch: keep rich payload
     return richShareData;
   };
 
   const handleNativeShare = async () => {
     try {
+      if (!allowNativeShare) {
+        // Defensive fallback in case "More…" is somehow reachable.
+        await navigator.clipboard.writeText(socialShareUrl);
+        toast({
+          title: 'Social link copied!',
+          description: 'On desktop, use the Facebook button or paste this Social Link into Facebook for a clickable post.',
+        });
+        return;
+      }
+
       const systemShareData = getSystemShareData();
 
       if (navigator.share && (!navigator.canShare || navigator.canShare(systemShareData))) {
@@ -194,7 +217,7 @@ const SocialShare = ({
           <MessageCircle className="w-4 h-4 mr-2" />
           WhatsApp
         </DropdownMenuItem>
-        {isMobile && (
+        {allowNativeShare && (
           <DropdownMenuItem onClick={handleNativeShare} className="cursor-pointer">
             <Share2 className="w-4 h-4 mr-2" />
             More...
