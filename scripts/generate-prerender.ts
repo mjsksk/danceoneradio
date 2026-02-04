@@ -307,11 +307,28 @@ function generateHTMLFromTemplate(templateHtml: string, route: (typeof routes)[n
   return headInjected;
 }
 
+// Convert route path to safe filename for root-level share file
+function routeToShareFilename(routePath: string): string {
+  if (routePath === '/') return 'share-home.html';
+  // /episode/402 → share-episode-402.html
+  // /about → share-about.html
+  return `share${routePath.replace(/\//g, '-')}.html`;
+}
+
 // Build a minimal share page that auto-redirects to the real page.
 function generateSharePageHTML(route: (typeof routes)[number]) {
   const baseUrl = 'https://danceoneradio.com';
   const fullUrl = `${baseUrl}${route.path}`;
   const imageUrl = route.image.startsWith('http') ? route.image : `${baseUrl}${route.image}`;
+
+  // IMPORTANT:
+  // - Social scrapers may treat meta-refresh as a redirect and then scrape the *target* URL.
+  // - On Lovable hosting, app routes can fall back to the SPA shell for scrapers, causing wrong OG tags.
+  // So we:
+  // - Set og:url to the share page URL itself
+  // - Use a JS redirect for humans (scrapers won't execute JS)
+  const shareFilename = routeToShareFilename(route.path);
+  const shareUrl = `${baseUrl}/${shareFilename}`;
 
   const title = escapeAttr(route.title);
   const description = escapeAttr(route.description);
@@ -334,7 +351,7 @@ function generateSharePageHTML(route: (typeof routes)[number]) {
   <meta property="og:title" content="${title}" />
   <meta property="og:description" content="${description}" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="${fullUrl}" />
+  <meta property="og:url" content="${shareUrl}" />
   <meta property="og:image" content="${image}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -356,7 +373,7 @@ function generateSharePageHTML(route: (typeof routes)[number]) {
     "@type": "WebPage",
     name: route.title,
     description: route.description,
-    url: fullUrl,
+    url: shareUrl,
     image: imageUrl,
     publisher: {
       "@type": "RadioStation",
@@ -365,22 +382,15 @@ function generateSharePageHTML(route: (typeof routes)[number]) {
     }
   }, null, 2)}
   </script>
-
-  <!-- Redirect to real page after crawlers have captured metadata -->
-  <meta http-equiv="refresh" content="0;url=${fullUrl}" />
 </head>
 <body>
   <p>Redirecting to <a href="${fullUrl}">${title}</a>...</p>
+  <script>
+    // Redirect real browsers; social scrapers typically do not execute JS.
+    window.location.replace(${JSON.stringify(fullUrl)});
+  </script>
 </body>
 </html>`;
-}
-
-// Convert route path to safe filename for root-level share file
-function routeToShareFilename(routePath: string): string {
-  if (routePath === '/') return 'share-home.html';
-  // /episode/402 → share-episode-402.html
-  // /about → share-about.html
-  return `share${routePath.replace(/\//g, '-')}.html`;
 }
 
 // Generate prerendered HTML files (runs after Vite build)
