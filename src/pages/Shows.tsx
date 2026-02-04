@@ -305,7 +305,11 @@ const Shows = () => {
         }
       })();
 
-      const systemShareData: ShareData = isDesktopPointer ? { url: socialShareUrl } : shareData;
+      // Some desktop share targets ignore the `url` field and only use `text`.
+      // Keep it URL-only but provide it in both fields.
+      const systemShareData: ShareData = isDesktopPointer
+        ? { url: socialShareUrl, text: socialShareUrl }
+        : shareData;
 
     try {
        if (navigator.share && (!navigator.canShare || navigator.canShare(systemShareData))) {
