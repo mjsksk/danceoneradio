@@ -385,10 +385,46 @@ function generateSharePageHTML(route: (typeof routes)[number]) {
   </script>
 </head>
 <body>
+  <!--
+    IMPORTANT UX NOTE:
+    Some in-app browsers / link shims can block or delay JS redirects, which can look like a blank page.
+    Keep a visible link so humans can always click through, while scrapers still read the OG tags.
+  -->
+  <main style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 24px; max-width: 760px; margin: 0 auto;">
+    <h1 style="font-size: 20px; margin: 0 0 8px;">Opening Dance One Radio…</h1>
+    <p style="margin: 0 0 16px; line-height: 1.5;">If you’re not redirected automatically, use this link:</p>
+    <p style="margin: 0 0 16px;"><a href="${fullUrl}" rel="nofollow noopener noreferrer" style="font-size: 16px;">Continue →</a></p>
+    <p style="margin: 0; font-size: 12px; opacity: 0.75;">(This page exists only to generate a correct social preview.)</p>
+  </main>
   <noscript>
-    <p>Redirecting to <a href="${fullUrl}">${title}</a>...</p>
+    <p style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 0 24px;">JavaScript is disabled. Continue here: <a href="${fullUrl}">${title}</a></p>
   </noscript>
-  <script>window.location.replace(${JSON.stringify(fullUrl)});</script>
+  <script>
+    (function () {
+      var target = ${JSON.stringify(fullUrl)};
+      function go() {
+        try {
+          if (window.top && window.top !== window) {
+            window.top.location.replace(target);
+            return;
+          }
+        } catch (e) {
+          // fall through
+        }
+        try {
+          window.location.replace(target);
+        } catch (e) {
+          try { window.location.href = target; } catch (_) {}
+        }
+      }
+
+      // Attempt immediately.
+      go();
+
+      // And once more shortly after (some environments delay navigation during initial parse).
+      setTimeout(go, 800);
+    })();
+  </script>
 </body>
 </html>`;
 }
