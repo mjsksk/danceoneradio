@@ -86,6 +86,9 @@ serve(async (req) => {
     const safeTitle = escapeHtml(title)
     const safeDescription = escapeHtml(description)
     
+    const redirectUrl = showsUrl || 'https://danceoneradio.com'
+    const safeRedirectUrl = escapeHtml(redirectUrl)
+
     // Generate HTML with proper Open Graph meta tags
     const html = `
 <!DOCTYPE html>
@@ -98,7 +101,7 @@ serve(async (req) => {
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="${safeUrl}">
+     <meta property="og:url" content="${safeRedirectUrl}">
     <meta property="og:title" content="${safeTitle}">
     <meta property="og:description" content="${safeDescription}">
     <meta property="og:image" content="https://danceoneradio.com${image}">
@@ -108,25 +111,19 @@ serve(async (req) => {
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="${safeUrl}">
+     <meta name="twitter:url" content="${safeRedirectUrl}">
     <meta name="twitter:title" content="${safeTitle}">
     <meta name="twitter:description" content="${safeDescription}">
     <meta name="twitter:image" content="https://danceoneradio.com${image}">
     <meta name="twitter:site" content="@DanceOneRadio">
     
-    <!-- Redirect to actual page after meta tags are processed -->
+    <!-- Redirect for real browsers (social scrapers don't execute JS) -->
     <script>
-        // Redirect after 2 seconds to allow crawlers to read meta tags
-        setTimeout(() => {
-            window.location.href = '${safeUrl}';
-        }, 2000);
+      window.location.replace(${JSON.stringify(redirectUrl)});
     </script>
-    
-    <!-- Immediate redirect for non-crawler traffic -->
-    <meta http-equiv="refresh" content="0;url=${safeUrl}">
 </head>
 <body>
-    <p>Redirecting to <a href="${safeUrl}">${safeTitle}</a>...</p>
+      <p>Redirecting to <a href="${safeRedirectUrl}">${safeTitle}</a>...</p>
 </body>
 </html>`
 

@@ -64,7 +64,8 @@ const SocialShare = ({
     title,
     // Some share targets (including Facebook) may ignore the `url` field and only use `text`.
     // Always include a plain URL in `text` so the resulting post is clickable.
-    text: `${description}\n\n${socialShareUrl}`,
+    // Put the URL FIRST: some targets only linkify the first URL they see.
+    text: `${socialShareUrl}\n\n${title}\n\n${description}`,
     url: socialShareUrl
   };
 
@@ -73,8 +74,8 @@ const SocialShare = ({
       if (navigator.share && navigator.canShare?.(shareData)) {
         await navigator.share(shareData);
       } else {
-        // Fallback: copy canonical URL to clipboard
-        await navigator.clipboard.writeText(`${title}\n\n${description}\n\n${canonicalUrl}`);
+        // Fallback: copy the SOCIAL preview URL so Facebook/etc will generate a rich card.
+        await navigator.clipboard.writeText(`${title}\n\n${description}\n\n${socialShareUrl}`);
         toast({
           title: "Link copied!",
           description: "The page link has been copied to your clipboard.",
