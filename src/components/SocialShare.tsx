@@ -160,14 +160,6 @@ const SocialShare = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem onClick={handleNativeShare} className="cursor-pointer">
-          <Share2 className="w-4 h-4 mr-2" />
-          Share
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleCopyLink} className="cursor-pointer">
-          <Copy className="w-4 h-4 mr-2" />
-          Copy Link
-        </DropdownMenuItem>
         <DropdownMenuItem onClick={handleFacebookShare} className="cursor-pointer">
           <Facebook className="w-4 h-4 mr-2" />
           Facebook
@@ -181,6 +173,14 @@ const SocialShare = ({
         <DropdownMenuItem onClick={handleWhatsAppShare} className="cursor-pointer">
           <MessageCircle className="w-4 h-4 mr-2" />
           WhatsApp
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleNativeShare} className="cursor-pointer">
+          <Share2 className="w-4 h-4 mr-2" />
+          More...
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleCopyLink} className="cursor-pointer">
+          <Copy className="w-4 h-4 mr-2" />
+          Copy Link
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
