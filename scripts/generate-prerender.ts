@@ -323,8 +323,14 @@ function generateSharePageHTML(route: (typeof routes)[number]) {
 
   // IMPORTANT:
   // - Social scrapers don't execute JS, so they stay on this static page and read the OG tags.
-  // - og:url points to the canonical clean URL so Facebook displays/links to the real page.
-  // - JS redirect sends real browsers to the app route.
+  // - Facebook uses og:url to identify the "object" and may fetch that URL too.
+  //   If og:url points at the SPA route (/episode/402), Facebook can end up reading the app shell
+  //   (homepage tags) and show the wrong preview.
+  // - Therefore, og:url MUST point to this static share HTML file itself.
+  // - JS redirect sends real browsers to the canonical app route.
+
+  const shareFilename = routeToShareFilename(route.path);
+  const shareUrl = `${baseUrl}/${shareFilename}`;
 
   const title = escapeAttr(route.title);
   const description = escapeAttr(route.description);
@@ -347,7 +353,7 @@ function generateSharePageHTML(route: (typeof routes)[number]) {
   <meta property="og:title" content="${title}" />
   <meta property="og:description" content="${description}" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="${fullUrl}" />
+  <meta property="og:url" content="${shareUrl}" />
   <meta property="og:image" content="${image}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -369,7 +375,7 @@ function generateSharePageHTML(route: (typeof routes)[number]) {
     "@type": "WebPage",
     name: route.title,
     description: route.description,
-    url: fullUrl,
+    url: shareUrl,
     image: imageUrl,
     publisher: {
       "@type": "RadioStation",
