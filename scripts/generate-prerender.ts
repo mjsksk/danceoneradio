@@ -322,13 +322,9 @@ function generateSharePageHTML(route: (typeof routes)[number]) {
   const imageUrl = route.image.startsWith('http') ? route.image : `${baseUrl}${route.image}`;
 
   // IMPORTANT:
-  // - Social scrapers may treat meta-refresh as a redirect and then scrape the *target* URL.
-  // - On Lovable hosting, app routes can fall back to the SPA shell for scrapers, causing wrong OG tags.
-  // So we:
-  // - Set og:url to the share page URL itself
-  // - Use a JS redirect for humans (scrapers won't execute JS)
-  const shareFilename = routeToShareFilename(route.path);
-  const shareUrl = `${baseUrl}/${shareFilename}`;
+  // - Social scrapers don't execute JS, so they stay on this static page and read the OG tags.
+  // - og:url points to the canonical clean URL so Facebook displays/links to the real page.
+  // - JS redirect sends real browsers to the app route.
 
   const title = escapeAttr(route.title);
   const description = escapeAttr(route.description);
@@ -351,7 +347,7 @@ function generateSharePageHTML(route: (typeof routes)[number]) {
   <meta property="og:title" content="${title}" />
   <meta property="og:description" content="${description}" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="${shareUrl}" />
+  <meta property="og:url" content="${fullUrl}" />
   <meta property="og:image" content="${image}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -373,7 +369,7 @@ function generateSharePageHTML(route: (typeof routes)[number]) {
     "@type": "WebPage",
     name: route.title,
     description: route.description,
-    url: shareUrl,
+    url: fullUrl,
     image: imageUrl,
     publisher: {
       "@type": "RadioStation",
