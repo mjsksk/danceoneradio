@@ -30,7 +30,8 @@ const SocialShare = ({
       const u = new URL(url);
       // Normalize trailing slash (except root)
       const pathname = u.pathname !== '/' ? u.pathname.replace(/\/+$/, '') : '/';
-      const sharePath = pathname === '/' ? '/share/index.html' : `/share${pathname}.html`;
+      // Use folder-based share pages: /share/episode/402 (served as /share/episode/402/index.html)
+      const sharePath = pathname === '/' ? '/share' : `/share${pathname}`;
       return `${u.origin}${sharePath}`;
     } catch {
       return url;
