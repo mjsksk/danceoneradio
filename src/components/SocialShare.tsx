@@ -25,25 +25,45 @@ const SocialShare = ({
 }: SocialShareProps) => {
   const { toast } = useToast();
 
-  const getShareUrl = () => {
+  // Convert route path to root-level share filename
+  // /episode/402 → share-episode-402.html
+  // /about → share-about.html
+  // / → share-home.html
+  const routeToShareFilename = (pathname: string): string => {
+    if (pathname === '/') return 'share-home.html';
+    return `share${pathname.replace(/\//g, '-')}.html`;
+  };
+
+  // Get the social preview URL (root-level .html for crawlers)
+  const getSocialShareUrl = () => {
     try {
       const u = new URL(url);
-      // Normalize trailing slash (except root)
       const pathname = u.pathname !== '/' ? u.pathname.replace(/\/+$/, '') : '/';
-      // Use folder-based share pages: /share/episode/402 (served as /share/episode/402/index.html)
-      const sharePath = pathname === '/' ? '/share' : `/share${pathname}`;
-      return `${u.origin}${sharePath}`;
+      const shareFilename = routeToShareFilename(pathname);
+      return `${u.origin}/${shareFilename}`;
     } catch {
       return url;
     }
   };
 
-  const shareUrl = getShareUrl();
+  // Get the canonical URL (clean URL for humans)
+  const getCanonicalUrl = () => {
+    try {
+      const u = new URL(url);
+      const pathname = u.pathname !== '/' ? u.pathname.replace(/\/+$/, '') : '/';
+      return `${u.origin}${pathname}`;
+    } catch {
+      return url;
+    }
+  };
+
+  const socialShareUrl = getSocialShareUrl();
+  const canonicalUrl = getCanonicalUrl();
 
   const shareData = {
     title,
     text: description,
-    url: shareUrl
+    url: socialShareUrl
   };
 
   const handleNativeShare = async () => {
@@ -51,8 +71,8 @@ const SocialShare = ({
       if (navigator.share && navigator.canShare?.(shareData)) {
         await navigator.share(shareData);
       } else {
-        // Fallback: copy to clipboard
-        await navigator.clipboard.writeText(`${title}\n\n${description}\n\n${shareUrl}`);
+        // Fallback: copy canonical URL to clipboard
+        await navigator.clipboard.writeText(`${title}\n\n${description}\n\n${canonicalUrl}`);
         toast({
           title: "Link copied!",
           description: "The page link has been copied to your clipboard.",
@@ -63,9 +83,10 @@ const SocialShare = ({
     }
   };
 
+  // Copy Link uses the clean canonical URL (no .html)
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(shareUrl);
+      await navigator.clipboard.writeText(canonicalUrl);
       toast({
         title: "Link copied!",
         description: "The page link has been copied to your clipboard.",
@@ -80,18 +101,19 @@ const SocialShare = ({
     }
   };
 
+  // Social platforms use the root-level .html URL for proper OG previews
   const handleFacebookShare = () => {
-    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(socialShareUrl)}`;
     window.open(facebookUrl, '_blank', 'width=600,height=400');
   };
 
   const handleTwitterShare = () => {
-    const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(title)}`;
+    const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(socialShareUrl)}&text=${encodeURIComponent(title)}`;
     window.open(twitterUrl, '_blank', 'width=600,height=400');
   };
 
   const handleWhatsAppShare = () => {
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${title} ${shareUrl}`)}`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${title} ${socialShareUrl}`)}`;
     window.open(whatsappUrl, '_blank');
   };
 

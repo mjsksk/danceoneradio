@@ -375,6 +375,14 @@ function generateSharePageHTML(route: (typeof routes)[number]) {
 </html>`;
 }
 
+// Convert route path to safe filename for root-level share file
+function routeToShareFilename(routePath: string): string {
+  if (routePath === '/') return 'share-home.html';
+  // /episode/402 → share-episode-402.html
+  // /about → share-about.html
+  return `share${routePath.replace(/\//g, '-')}.html`;
+}
+
 // Generate prerendered HTML files (runs after Vite build)
 export function generatePrerenderFiles() {
   const distDir = path.resolve(process.cwd(), 'dist');
@@ -406,28 +414,23 @@ export function generatePrerenderFiles() {
       console.log(`Generated: ${indexPath}`);
     }
 
-    // Also generate a /share/<route> page with only meta tags + redirect.
-    // This is useful for social sharing on hosts that don't run edge functions.
+    // Generate ROOT-LEVEL share HTML file for social scrapers
+    // e.g., dist/share-episode-402.html
+    // This is the most reliable way to serve static HTML on Lovable hosting
+    const shareFilename = routeToShareFilename(route.path);
+    const shareRootPath = path.join(distDir, shareFilename);
+    const shareHtml = generateSharePageHTML(route);
+    fs.writeFileSync(shareRootPath, shareHtml);
+    console.log(`Generated root share page: ${shareRootPath}`);
+
+    // Also generate the /share/<route> directory structure (legacy/fallback)
     const shareDir = path.join(distDir, 'share', route.path === '/' ? '' : route.path.slice(1));
     if (!fs.existsSync(shareDir)) {
       fs.mkdirSync(shareDir, { recursive: true });
     }
-    const shareHtml = generateSharePageHTML(route);
-    const sharePath = path.join(shareDir, 'index.html');
-    fs.writeFileSync(sharePath, shareHtml);
-    console.log(`Generated share page: ${sharePath}`);
-
-    // Additionally generate a flat .html file so hosts that rewrite “pretty URLs” to the SPA
-    // can still serve a real HTML document at an explicit file path.
-    // Example: /share/episode/402.html
-    const shareFlatRel = route.path === '/' ? '/index' : route.path;
-    const shareFlatPath = path.join(distDir, 'share', `${shareFlatRel.slice(1)}.html`);
-    const shareFlatDir = path.dirname(shareFlatPath);
-    if (!fs.existsSync(shareFlatDir)) {
-      fs.mkdirSync(shareFlatDir, { recursive: true });
-    }
-    fs.writeFileSync(shareFlatPath, shareHtml);
-    console.log(`Generated share page (flat): ${shareFlatPath}`);
+    const shareDirPath = path.join(shareDir, 'index.html');
+    fs.writeFileSync(shareDirPath, shareHtml);
+    console.log(`Generated share page (dir): ${shareDirPath}`);
   });
 
   console.log('Prerendering complete!');
