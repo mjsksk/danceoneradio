@@ -1,160 +1,79 @@
 
+## What’s happening (root cause)
+- Facebook (and most social scrapers) **only read the first HTML response** and **do not run your React app**.
+- On Lovable hosting, requests like **`/share/episode/402`** are currently being handled like a normal SPA route (served the app shell), so the scraper only sees the **default homepage `<head>` tags** (canonical + OG tags pointing to `/`).
+- Even though we created `public/share/episode/402/index.html`, Lovable’s hosting behavior is not reliably serving nested “directory index” HTML as a standalone document for crawlers at `/share/episode/402`.
 
-# Plan: Fix Social Sharing Metadata for All Pages
+Result: Facebook keeps showing homepage preview.
 
-## Problem Analysis
+## Goal
+Make the URL that Facebook scrapes resolve to a **real static HTML document** containing episode-specific OG/Twitter tags, **without relying on redirects rules** (Lovable doesn’t support Netlify `_redirects`).
 
-When pages are shared on social media (Facebook, Twitter, WhatsApp, etc.), they display the home page metadata instead of page-specific information. This happens because:
+## Key constraint / decision
+On Lovable hosting, “pretty” share URLs like:
+- `/share/episode/402`
+generally require server rewrite support (serve `.../index.html`) which we don’t have.
 
-1. Social media crawlers do not run JavaScript
-2. The current setup serves `index.html` (with home page metadata) for all routes via SPA routing
-3. While page-specific SEO metadata exists in the `generate-prerender.ts` script, the prerendered files are not being served to crawlers
+So the most reliable approach is:
+- use a **root-level static HTML file** per share target (these are served as true static files), e.g.
+  - `https://danceoneradio.com/share-episode-402.html`
 
-## Solution Overview
+This does introduce `.html`, but it is the most dependable way to ensure the crawler sees the correct meta tags.
 
-Modify the Netlify configuration to serve prerendered HTML files (with correct metadata) to bot/crawler requests while maintaining SPA behavior for regular users.
+## Implementation approach (recommended)
+### A) Generate root-level share HTML files at build time
+Update `scripts/generate-prerender.ts` so that for each route it already knows about (including `/episode/402`), it also outputs a root-level share file like:
 
-## Implementation Steps
+- `/episode/402` → `dist/share-episode-402.html`
+- `/about` → `dist/share-about.html`
+- `/` → `dist/share.html` (or `dist/share-home.html`)
 
-### Step 1: Update Netlify Configuration
+Each file contains:
+- `<meta property="fb:app_id" ...>`
+- full OG + Twitter tags for that route
+- `<meta http-equiv="refresh" ...>` redirect to the canonical URL
 
-Add crawler detection to serve prerendered HTML files to social media bots:
+Why this works:
+- Root-level static `.html` assets are consistently served as static files (we already have evidence with `/static-player.html`).
 
-```text
-+-------------------------------+
-|   Request from User/Bot       |
-+-------------------------------+
-              |
-              v
-+-------------------------------+
-|   Is this a crawler bot?      |
-|   (Facebook, Twitter, etc.)   |
-+-------------------------------+
-        |             |
-       Yes           No
-        |             |
-        v             v
-+----------------+  +------------------+
-| Serve static   |  | Serve index.html |
-| prerendered    |  | (SPA routing)    |
-| HTML with SEO  |  |                  |
-+----------------+  +------------------+
-```
+### B) Update SocialShare to use the working share URL for social platforms
+Update `src/components/SocialShare.tsx` so it computes two URLs:
+- `canonicalUrl` (the real page): `https://danceoneradio.com/episode/402`
+- `socialPreviewUrl` (the crawler-friendly static HTML): `https://danceoneradio.com/share-episode-402.html`
 
-**Changes to `netlify.toml`:**
-- Add edge function or redirect rules to detect crawler user agents
-- Route crawlers to prerendered HTML files with proper meta tags
-- Keep regular users on SPA routing
+Then:
+- Facebook / X / WhatsApp / native share should use `socialPreviewUrl`
+- “Copy Link” should copy **canonicalUrl** (so humans get the clean URL)
 
-### Step 2: Update Prerender Script
+This keeps user-facing links clean while still getting correct previews.
 
-Ensure all pages are covered and generate properly in the dist folder:
+### C) Keep your existing `/public/share/...` files optional
+We can keep (or remove) `public/share/episode/402/index.html`, but it won’t be relied on for previews anymore.
 
-**Add missing routes to `scripts/generate-prerender.ts`:**
-- `/gallery/love-parade-2005`
-- `/gallery/love-parade-2006`
-- `/news`
-- `/news/top-stories`
-- `/news/artists-releases`
-- `/news/festivals-events`
-- `/news/industry-culture`
-- `/account`
-- `/auth`
+## Files to change (once you approve)
+1) `scripts/generate-prerender.ts`
+- Add a helper to convert route paths into safe filenames:
+  - `/episode/402` → `share-episode-402.html`
+- Write the generated share HTML to `dist/<filename>` (root-level)
+- Continue generating `dist/share/...` if you want, but root-level becomes the canonical share mechanism.
 
-### Step 3: Create Edge Function for Bot Detection (Alternative to Netlify redirects)
+2) `src/components/SocialShare.tsx`
+- Replace current `/share${pathname}` logic with:
+  - a deterministic mapping to the root-level share file for social networks
+  - copy-to-clipboard uses the original page URL
+- Optional: add a small “(Best preview for Facebook)” note or a second menu item like “Copy Social Preview Link”.
 
-Create a Netlify Edge Function that:
-1. Detects crawler user agents (facebookexternalhit, Twitterbot, LinkedInBot, WhatsApp, etc.)
-2. Serves the appropriate prerendered HTML file with correct metadata
-3. Falls back to SPA routing for regular users
+## Verification steps (end-to-end)
+After Publish → Update:
+1) Open `https://danceoneradio.com/share-episode-402.html` in a browser:
+   - you should briefly see “Redirecting…” then land on `/episode/402`
+2) Facebook Sharing Debugger:
+   - paste `https://danceoneradio.com/share-episode-402.html`
+   - click “Scrape Again”
+   - confirm OG title/description/image match Episode 402
+3) In the app, go to Episode 402 → Share:
+   - Facebook/X/WhatsApp should share the `share-episode-402.html` URL
+   - “Copy Link” should copy `/episode/402`
 
-### Step 4: Verify Existing SEO Component Usage
-
-All pages already have proper SEO component usage with page-specific metadata. Ensure consistency:
-
-| Page | Image | Status |
-|------|-------|--------|
-| Episodes | `/lovable-uploads/mario-show.jpg` | Correct |
-| Shows | `/lovable-uploads/mario-show.jpg` | Correct |
-| Gallery | `/assets/love-parade-2006.png` | Correct |
-| News | Default logo | Needs image |
-| About | Default logo | Needs image |
-
----
-
-## Technical Details
-
-### Netlify Edge Function (Recommended Approach)
-
-Create `netlify/edge-functions/prerender.ts`:
-
-```typescript
-const BOTS = [
-  'facebookexternalhit',
-  'Facebot',
-  'Twitterbot',
-  'LinkedInBot',
-  'WhatsApp',
-  'Slackbot',
-  'TelegramBot',
-  'Pinterest',
-  'Googlebot',
-  'bingbot',
-  'Discordbot'
-];
-
-export default async (request: Request, context: any) => {
-  const userAgent = request.headers.get('user-agent') || '';
-  const isBot = BOTS.some(bot => 
-    userAgent.toLowerCase().includes(bot.toLowerCase())
-  );
-  
-  if (isBot) {
-    const url = new URL(request.url);
-    // Try to serve prerendered file
-    const prerenderPath = url.pathname === '/' 
-      ? '/index.html' 
-      : `${url.pathname}/index.html`;
-    // Attempt to fetch prerendered version
-    return context.rewrite(prerenderPath);
-  }
-  
-  return context.next();
-};
-```
-
-### Files to be Modified
-
-1. **`netlify.toml`** - Add edge function configuration
-2. **`netlify/edge-functions/prerender.ts`** - New file for bot detection
-3. **`scripts/generate-prerender.ts`** - Add missing routes
-4. **Various page components** - Add missing `image` props to SEO components where needed
-
-### Prerender Routes to Add
-
-```typescript
-// Add to generate-prerender.ts routes array:
-{ path: '/gallery/love-parade-2005', title: '...', image: '/assets/love-parade-2005.jpg' },
-{ path: '/gallery/love-parade-2006', title: '...', image: '/assets/love-parade-2006.png' },
-{ path: '/news', title: 'EDM News...', image: '/lovable-uploads/c8f83eb5-...' },
-{ path: '/news/top-stories', title: '...', image: '...' },
-// etc.
-```
-
----
-
-## Expected Outcome
-
-After implementation:
-- Sharing an Episode page will show "Anthems of the week 402" with mario-show.jpg image
-- Sharing the Gallery page will show "Photo Galleries - Love Parade" with the Love Parade image
-- Each page will display its unique title and description on social platforms
-- Regular users will experience no change in SPA functionality
-
-## Testing
-
-1. Use Facebook Sharing Debugger: https://developers.facebook.com/tools/debug/
-2. Use Twitter Card Validator: https://cards-dev.twitter.com/validator
-3. Test sharing links on WhatsApp and other platforms
-4. Verify bots receive HTML with correct og:image, og:title, og:description
-
+## Backup option (if you absolutely must avoid `.html`)
+If you decide `.html` is unacceptable, the only robust alternative on Lovable hosting is to share a Supabase Edge Function URL (e.g. `/functions/v1/og-meta-generator?...`) that returns an HTML document with OG tags and redirects. This would keep “no .html”, but the link domain would be `supabase.co` (not `danceoneradio.com`). I can implement this fallback if you want, but the root-level `.html` files are the cleanest on your own domain.
