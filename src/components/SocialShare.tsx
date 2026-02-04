@@ -26,11 +26,17 @@ const SocialShare = ({
   const { toast } = useToast();
 
   // Desktop OS share targets (notably Facebook) can sometimes turn rich share payloads
-  // into a photo-style post where the preview isn’t a clickable link. On desktop we
-  // prefer sharing URL-only to encourage a proper “link” attachment.
-  const isDesktopPointer = () => {
+  // into a photo-style post where the preview isn’t a clickable link. Detect “mobile”
+  // explicitly; otherwise treat it as desktop and prefer URL-only.
+  const isLikelyMobile = (): boolean => {
     try {
-      return window.matchMedia?.('(hover: hover) and (pointer: fine)')?.matches ?? false;
+      const uaDataMobile = (navigator as unknown as { userAgentData?: { mobile?: boolean } })
+        ?.userAgentData?.mobile;
+      if (typeof uaDataMobile === 'boolean') return uaDataMobile;
+
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
     } catch {
       return false;
     }
@@ -83,7 +89,7 @@ const SocialShare = ({
   const getSystemShareData = (): ShareData => {
     // Desktop: URL-only (best chance of a clickable link attachment on Facebook)
     // Some share targets ignore the `url` field and only use `text`, so include the URL in both.
-    if (isDesktopPointer()) return { url: socialShareUrl, text: socialShareUrl };
+    if (!isLikelyMobile()) return { url: socialShareUrl, text: socialShareUrl };
     // Mobile: keep rich payload
     return richShareData;
   };

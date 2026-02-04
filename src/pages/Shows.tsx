@@ -296,10 +296,13 @@ const Shows = () => {
      };
 
       // Desktop system share targets (notably Facebook) can produce a photo-style post where
-      // the preview isn’t a clickable link. Sharing URL-only encourages a proper link attachment.
-      const isDesktopPointer = (() => {
+      // the preview isn’t a clickable link. Detect “mobile” explicitly; otherwise treat it as desktop.
+      const isLikelyMobile = (() => {
         try {
-          return window.matchMedia?.('(hover: hover) and (pointer: fine)')?.matches ?? false;
+          const uaDataMobile = (navigator as unknown as { userAgentData?: { mobile?: boolean } })
+            ?.userAgentData?.mobile;
+          if (typeof uaDataMobile === 'boolean') return uaDataMobile;
+          return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         } catch {
           return false;
         }
@@ -307,7 +310,7 @@ const Shows = () => {
 
       // Some desktop share targets ignore the `url` field and only use `text`.
       // Keep it URL-only but provide it in both fields.
-      const systemShareData: ShareData = isDesktopPointer
+      const systemShareData: ShareData = !isLikelyMobile
         ? { url: socialShareUrl, text: socialShareUrl }
         : shareData;
 
