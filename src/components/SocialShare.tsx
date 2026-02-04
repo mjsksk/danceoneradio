@@ -62,7 +62,9 @@ const SocialShare = ({
 
   const shareData = {
     title,
-    text: description,
+    // Some share targets (including Facebook) may ignore the `url` field and only use `text`.
+    // Always include a plain URL in `text` so the resulting post is clickable.
+    text: `${description}\n\n${socialShareUrl}`,
     url: socialShareUrl
   };
 

@@ -320,13 +320,15 @@ function generateSharePageHTML(route: (typeof routes)[number]) {
   const baseUrl = 'https://danceoneradio.com';
   const fullUrl = `${baseUrl}${route.path}`;
   const imageUrl = route.image.startsWith('http') ? route.image : `${baseUrl}${route.image}`;
+  const shareFilename = routeToShareFilename(route.path);
+  const shareUrl = `${baseUrl}/${shareFilename}`;
 
   // IMPORTANT:
   // - Social scrapers don't execute JS, so they stay on this static page and read the OG tags.
-  // - og:url now points to the CANONICAL clean URL (e.g., /episode/402).
-  //   Facebook will display this clean URL in the link preview, making it clickable.
-  // - The <link rel="canonical"> also points to the clean URL for consistency.
-  // - We redirect real browsers via meta refresh (no-JS fallback) + JS for speed.
+  // - Facebook may treat `og:url` / canonical as the "object" identifier and re-scrape it.
+  //   If that points to an SPA route, it can fall back to homepage tags.
+  // - Therefore, `og:url` + canonical MUST point to this static share HTML file.
+  // - We redirect real browsers with JS; scrapers ignore it.
 
   const title = escapeAttr(route.title);
   const description = escapeAttr(route.description);
@@ -340,10 +342,8 @@ function generateSharePageHTML(route: (typeof routes)[number]) {
   <link rel="icon" href="/favicon.png" type="image/png" />
   <title>${title}</title>
   <meta name="description" content="${description}" />
-  <link rel="canonical" href="${fullUrl}" />
-
-  <!-- Redirect for browsers (meta refresh is no-JS fallback, then JS for speed) -->
-  <meta http-equiv="refresh" content="0;url=${fullUrl}" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="canonical" href="${shareUrl}" />
 
   <!-- Facebook App ID -->
   <meta property="fb:app_id" content="111030096697" />
@@ -352,7 +352,7 @@ function generateSharePageHTML(route: (typeof routes)[number]) {
   <meta property="og:title" content="${title}" />
   <meta property="og:description" content="${description}" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="${fullUrl}" />
+  <meta property="og:url" content="${shareUrl}" />
   <meta property="og:image" content="${image}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -374,7 +374,7 @@ function generateSharePageHTML(route: (typeof routes)[number]) {
     "@type": "WebPage",
     name: route.title,
     description: route.description,
-    url: fullUrl,
+    url: shareUrl,
     image: imageUrl,
     publisher: {
       "@type": "RadioStation",

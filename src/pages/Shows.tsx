@@ -279,7 +279,9 @@ const Shows = () => {
      const episodeUrl = `${window.location.origin}/shows#episode-${episodeNumber}`;
      const shareData = {
        title: `${episode.title} - Future Dance Anthems with Mario`,
-       text: `Listen to "${episode.title}" from Future Dance Anthems with Mario podcast. ${episode.description.substring(0, 100)}...`,
+       // Some share targets ignore the `url` field and only use `text`.
+       // Include the URL in the text so the shared post is always clickable.
+       text: `Listen to "${episode.title}" from Future Dance Anthems with Mario podcast. ${episode.description.substring(0, 100)}...\n\n${episodeUrl}`,
        url: episodeUrl
      };
 
