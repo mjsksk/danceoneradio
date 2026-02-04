@@ -276,13 +276,23 @@ const Shows = () => {
 
    const handleShareEpisode = async (episode: Episode, episodeIndex: number) => {
      const episodeNumber = episode.episodeNumber || (totalEpisodes - episodeIndex);
-     const episodeUrl = `${window.location.origin}/shows#episode-${episodeNumber}`;
+
+     // For episodes that have dedicated pages, share the ROOT-LEVEL social preview HTML.
+     // This gives Facebook a stable, scraper-friendly URL with correct OG tags.
+     const origin = window.location.origin;
+     const hasDedicatedEpisodePage = availableEpisodePages.includes(episodeNumber);
+     const canonicalEpisodeUrl = hasDedicatedEpisodePage
+       ? `${origin}/episode/${episodeNumber}`
+       : `${origin}/shows#episode-${episodeNumber}`;
+     const socialShareUrl = hasDedicatedEpisodePage
+       ? `${origin}/share-episode-${episodeNumber}.html`
+       : canonicalEpisodeUrl;
+
      const shareData = {
        title: `${episode.title} - Future Dance Anthems with Mario`,
-       // Some share targets ignore the `url` field and only use `text`.
-       // Include the URL in the text so the shared post is always clickable.
-       text: `Listen to "${episode.title}" from Future Dance Anthems with Mario podcast. ${episode.description.substring(0, 100)}...\n\n${episodeUrl}`,
-       url: episodeUrl
+       // URL first: increases the chance Facebook turns it into a clickable link.
+       text: `${socialShareUrl}\n\nListen to "${episode.title}" from Future Dance Anthems with Mario podcast. ${episode.description.substring(0, 100)}...`,
+       url: socialShareUrl
      };
 
     try {
@@ -290,14 +300,14 @@ const Shows = () => {
         await navigator.share(shareData);
       } else {
         // Fallback: copy to clipboard
-        await navigator.clipboard.writeText(`${shareData.title}\n\n${shareData.text}\n\n${shareData.url}`);
+         await navigator.clipboard.writeText(`${shareData.title}\n\n${shareData.text}\n\n${canonicalEpisodeUrl}`);
         // You could add a toast notification here if you have one
         alert('Episode link copied to clipboard!');
       }
     } catch (error) {
       // Final fallback: just copy the URL
       try {
-        await navigator.clipboard.writeText(episodeUrl);
+         await navigator.clipboard.writeText(canonicalEpisodeUrl);
         alert('Episode link copied to clipboard!');
       } catch (clipboardError) {
         console.error('Failed to share or copy:', error, clipboardError);
