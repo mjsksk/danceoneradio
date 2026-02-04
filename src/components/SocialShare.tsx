@@ -139,7 +139,9 @@ const SocialShare = ({
 
   // Social platforms use the root-level .html URL for proper OG previews
   const handleFacebookShare = () => {
-    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(socialShareUrl)}`;
+    // On desktop facebook.com, sharing the canonical URL is more consistently treated as a *link post*
+    // (clickable) than sharing the bridge .html page.
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(canonicalUrl)}`;
     window.open(facebookUrl, '_blank', 'width=600,height=400');
   };
 
