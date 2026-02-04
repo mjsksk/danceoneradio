@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { getShareUrls } from '@/utils/shareUrls';
 
 interface SocialShareProps {
   url: string;
@@ -25,7 +25,6 @@ const SocialShare = ({
   className = ""
 }: SocialShareProps) => {
   const { toast } = useToast();
-  const isMobileViewport = useIsMobile();
 
   // Desktop OS share targets (notably Facebook) can sometimes turn rich share payloads
   // into a photo-style post where the preview isn’t a clickable link. Detect “mobile”
@@ -44,52 +43,16 @@ const SocialShare = ({
     }
   };
 
-  const isTouchLikeDevice = (): boolean => {
-    try {
-      return !!window.matchMedia?.('(pointer: coarse)')?.matches;
-    } catch {
-      return false;
-    }
-  };
+  // Native share is *only* allowed when we’re confident this is a real mobile UA.
+  // (Desktop Web Share is the main source of “looks like a link, but isn’t clickable” Facebook posts.)
+  const allowNativeShare = isLikelyMobileUA();
 
-  // Only show native share on real mobile/touch contexts.
-  // This prevents desktop "More…" shares (notably to Facebook) that can create non-clickable cards.
-  const allowNativeShare = isMobileViewport && (isLikelyMobileUA() || isTouchLikeDevice());
+  // CRITICAL: when the app is opened on a Lovable preview domain, that URL is not publicly accessible
+  // (it shows a Lovable login screen). Always build share URLs against the public/canonical domain.
+  const publicSiteOrigin = (import.meta.env as unknown as Record<string, string | undefined>)
+    .VITE_PUBLIC_SITE_ORIGIN;
 
-  // Convert route path to root-level share filename
-  // /episode/402 → share-episode-402.html
-  // /about → share-about.html
-  // / → share-home.html
-  const routeToShareFilename = (pathname: string): string => {
-    if (pathname === '/') return 'share-home.html';
-    return `share${pathname.replace(/\//g, '-')}.html`;
-  };
-
-  // Get the social preview URL (root-level .html for crawlers)
-  const getSocialShareUrl = () => {
-    try {
-      const u = new URL(url);
-      const pathname = u.pathname !== '/' ? u.pathname.replace(/\/+$/, '') : '/';
-      const shareFilename = routeToShareFilename(pathname);
-      return `${u.origin}/${shareFilename}`;
-    } catch {
-      return url;
-    }
-  };
-
-  // Get the canonical URL (clean URL for humans)
-  const getCanonicalUrl = () => {
-    try {
-      const u = new URL(url);
-      const pathname = u.pathname !== '/' ? u.pathname.replace(/\/+$/, '') : '/';
-      return `${u.origin}${pathname}`;
-    } catch {
-      return url;
-    }
-  };
-
-  const socialShareUrl = getSocialShareUrl();
-  const canonicalUrl = getCanonicalUrl();
+  const { socialShareUrl, canonicalUrl } = getShareUrls(url, publicSiteOrigin);
 
   const richShareData: ShareData = {
     title,
