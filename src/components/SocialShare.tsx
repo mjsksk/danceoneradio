@@ -42,6 +42,8 @@ const SocialShare = ({
     }
   };
 
+  const isMobile = isLikelyMobile();
+
   // Convert route path to root-level share filename
   // /episode/402 → share-episode-402.html
   // /about → share-about.html
@@ -131,6 +133,24 @@ const SocialShare = ({
     }
   };
 
+  // Copies the crawler-friendly .html URL (useful when manually pasting into Facebook)
+  const handleCopySocialPreviewLink = async () => {
+    try {
+      await navigator.clipboard.writeText(socialShareUrl);
+      toast({
+        title: "Social preview link copied!",
+        description: "Paste this link into Facebook for the best clickable preview.",
+      });
+    } catch (error) {
+      console.error('Failed to copy social preview link:', error);
+      toast({
+        title: "Copy failed",
+        description: "Unable to copy social preview link to clipboard.",
+        variant: "destructive"
+      });
+    }
+  };
+
   // Social platforms use the root-level .html URL for proper OG previews
   const handleFacebookShare = () => {
     const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(socialShareUrl)}`;
@@ -174,13 +194,19 @@ const SocialShare = ({
           <MessageCircle className="w-4 h-4 mr-2" />
           WhatsApp
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleNativeShare} className="cursor-pointer">
-          <Share2 className="w-4 h-4 mr-2" />
-          More...
-        </DropdownMenuItem>
+        {isMobile && (
+          <DropdownMenuItem onClick={handleNativeShare} className="cursor-pointer">
+            <Share2 className="w-4 h-4 mr-2" />
+            More...
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onClick={handleCopyLink} className="cursor-pointer">
           <Copy className="w-4 h-4 mr-2" />
           Copy Link
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleCopySocialPreviewLink} className="cursor-pointer">
+          <Copy className="w-4 h-4 mr-2" />
+          Copy Social Link
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
