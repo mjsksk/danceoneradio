@@ -139,9 +139,9 @@ const SocialShare = ({
 
   // Social platforms use the root-level .html URL for proper OG previews
   const handleFacebookShare = () => {
-    // On desktop facebook.com, sharing the canonical URL is more consistently treated as a *link post*
-    // (clickable) than sharing the bridge .html page.
-    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(canonicalUrl)}`;
+    // IMPORTANT: share the bridge .html URL so Facebook scrapes episode-specific OG tags.
+    // Sharing the SPA route (/episode/402) will typically resolve to index.html -> homepage metadata.
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(socialShareUrl)}`;
     window.open(facebookUrl, '_blank', 'width=600,height=400');
   };
 
