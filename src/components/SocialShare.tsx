@@ -139,10 +139,21 @@ const SocialShare = ({
 
   // Social platforms use the root-level .html URL for proper OG previews
   const handleFacebookShare = () => {
-    // IMPORTANT: share the bridge .html URL so Facebook scrapes episode-specific OG tags.
-    // Sharing the SPA route (/episode/402) will typically resolve to index.html -> homepage metadata.
-    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(socialShareUrl)}`;
-    window.open(facebookUrl, '_blank', 'width=600,height=400');
+    // Use Facebook's official Feed Dialog (v18.0) with our fb:app_id.
+    // This produces a true "link" attachment (clickable title+description card) instead of
+    // the sharer.php photo-style post that can be non-clickable on Pages.
+    const fbAppId = '111030096697';
+    const redirectUri = encodeURIComponent(socialShareUrl); // after share, user lands back on episode
+    const linkUrl = encodeURIComponent(socialShareUrl);     // the page to share
+
+    const dialogUrl =
+      `https://www.facebook.com/dialog/feed` +
+      `?app_id=${fbAppId}` +
+      `&display=popup` +
+      `&link=${linkUrl}` +
+      `&redirect_uri=${redirectUri}`;
+
+    window.open(dialogUrl, '_blank', 'width=626,height=436');
   };
 
   const handleTwitterShare = () => {
