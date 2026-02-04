@@ -82,7 +82,8 @@ const SocialShare = ({
 
   const getSystemShareData = (): ShareData => {
     // Desktop: URL-only (best chance of a clickable link attachment on Facebook)
-    if (isDesktopPointer()) return { url: socialShareUrl };
+    // Some share targets ignore the `url` field and only use `text`, so include the URL in both.
+    if (isDesktopPointer()) return { url: socialShareUrl, text: socialShareUrl };
     // Mobile: keep rich payload
     return richShareData;
   };
