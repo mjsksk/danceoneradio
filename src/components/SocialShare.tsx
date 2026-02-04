@@ -25,6 +25,17 @@ const SocialShare = ({
 }: SocialShareProps) => {
   const { toast } = useToast();
 
+  // Desktop OS share targets (notably Facebook) can sometimes turn rich share payloads
+  // into a photo-style post where the preview isn’t a clickable link. On desktop we
+  // prefer sharing URL-only to encourage a proper “link” attachment.
+  const isDesktopPointer = () => {
+    try {
+      return window.matchMedia?.('(hover: hover) and (pointer: fine)')?.matches ?? false;
+    } catch {
+      return false;
+    }
+  };
+
   // Convert route path to root-level share filename
   // /episode/402 → share-episode-402.html
   // /about → share-about.html
@@ -60,7 +71,7 @@ const SocialShare = ({
   const socialShareUrl = getSocialShareUrl();
   const canonicalUrl = getCanonicalUrl();
 
-  const shareData = {
+  const richShareData: ShareData = {
     title,
     // Some share targets (including Facebook) may ignore the `url` field and only use `text`.
     // Always include a plain URL in `text` so the resulting post is clickable.
@@ -69,13 +80,22 @@ const SocialShare = ({
     url: socialShareUrl
   };
 
+  const getSystemShareData = (): ShareData => {
+    // Desktop: URL-only (best chance of a clickable link attachment on Facebook)
+    if (isDesktopPointer()) return { url: socialShareUrl };
+    // Mobile: keep rich payload
+    return richShareData;
+  };
+
   const handleNativeShare = async () => {
     try {
-      if (navigator.share && navigator.canShare?.(shareData)) {
-        await navigator.share(shareData);
+      const systemShareData = getSystemShareData();
+
+      if (navigator.share && (!navigator.canShare || navigator.canShare(systemShareData))) {
+        await navigator.share(systemShareData);
       } else {
-        // Fallback: copy the SOCIAL preview URL so Facebook/etc will generate a rich card.
-        await navigator.clipboard.writeText(`${title}\n\n${description}\n\n${socialShareUrl}`);
+        // Fallback: copy URL-first for best linkification on Facebook.
+        await navigator.clipboard.writeText(`${socialShareUrl}\n\n${title}\n\n${description}`);
         toast({
           title: "Link copied!",
           description: "The page link has been copied to your clipboard.",

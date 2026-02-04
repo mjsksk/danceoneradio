@@ -295,12 +295,24 @@ const Shows = () => {
        url: socialShareUrl
      };
 
+      // Desktop system share targets (notably Facebook) can produce a photo-style post where
+      // the preview isn’t a clickable link. Sharing URL-only encourages a proper link attachment.
+      const isDesktopPointer = (() => {
+        try {
+          return window.matchMedia?.('(hover: hover) and (pointer: fine)')?.matches ?? false;
+        } catch {
+          return false;
+        }
+      })();
+
+      const systemShareData: ShareData = isDesktopPointer ? { url: socialShareUrl } : shareData;
+
     try {
-      if (navigator.share && navigator.canShare?.(shareData)) {
-        await navigator.share(shareData);
+       if (navigator.share && (!navigator.canShare || navigator.canShare(systemShareData))) {
+         await navigator.share(systemShareData);
       } else {
         // Fallback: copy to clipboard
-         await navigator.clipboard.writeText(`${shareData.title}\n\n${shareData.text}\n\n${canonicalEpisodeUrl}`);
+          await navigator.clipboard.writeText(`${socialShareUrl}\n\n${shareData.title}\n\n${episode.description}\n\n${canonicalEpisodeUrl}`);
         // You could add a toast notification here if you have one
         alert('Episode link copied to clipboard!');
       }
