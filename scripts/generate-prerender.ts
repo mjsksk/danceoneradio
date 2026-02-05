@@ -462,18 +462,24 @@ export function generatePrerenderFiles() {
       console.log(`Generated: ${indexPath}`);
     }
 
-    // Generate ROOT-LEVEL share directory for social scrapers
-    // e.g., dist/share-episode-402/index.html
-    // Lovable hosting serves /share-episode-402/index.html correctly as static HTML
-    const shareFilename = routeToShareFilename(route.path).replace('.html', '');
-    const shareRootDir = path.join(distDir, shareFilename);
+    // Generate ROOT-LEVEL share HTML file for social scrapers
+    // e.g., dist/share-episode-402.html
+    // This is the most reliable way to serve static HTML on Lovable hosting
+    const shareFilenameHtml = routeToShareFilename(route.path);
+    const shareRootHtmlPath = path.join(distDir, shareFilenameHtml);
+    const shareHtml = generateSharePageHTML(route);
+    fs.writeFileSync(shareRootHtmlPath, shareHtml);
+    console.log(`Generated root share page: ${shareRootHtmlPath}`);
+
+    // Also generate a directory-index variant (some environments prefer /share-episode-402/)
+    const shareDirName = shareFilenameHtml.replace(/\.html$/, '');
+    const shareRootDir = path.join(distDir, shareDirName);
     if (!fs.existsSync(shareRootDir)) {
       fs.mkdirSync(shareRootDir, { recursive: true });
     }
-    const shareRootPath = path.join(shareRootDir, 'index.html');
-    const shareHtml = generateSharePageHTML(route);
-    fs.writeFileSync(shareRootPath, shareHtml);
-    console.log(`Generated root share page: ${shareRootPath}`);
+    const shareRootDirPath = path.join(shareRootDir, 'index.html');
+    fs.writeFileSync(shareRootDirPath, shareHtml);
+    console.log(`Generated root share page (dir): ${shareRootDirPath}`);
 
     // Also generate the /share/<route> directory structure (legacy/fallback)
     const shareDir = path.join(distDir, 'share', route.path === '/' ? '' : route.path.slice(1));
