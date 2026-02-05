@@ -26,18 +26,27 @@ const SocialShare = ({
 }: SocialShareProps) => {
   const { toast } = useToast();
 
+
   // Desktop OS share targets (notably Facebook) can sometimes turn rich share payloads
-  // into a photo-style post where the preview isn’t a clickable link. Detect “mobile”
-  // explicitly; otherwise treat it as desktop and prefer URL-only.
-  const isLikelyMobileUA = (): boolean => {
+  // into a photo-style post where the preview isn’t a clickable link.
+  // Detect “mobile” *strictly*; otherwise treat it as desktop and prefer URL-only.
+  const isNativeShareEnvironment = (): boolean => {
     try {
+      if (typeof navigator === 'undefined' || typeof window === 'undefined') return false;
+      if (typeof navigator.share !== 'function') return false;
+
       const uaDataMobile = (navigator as unknown as { userAgentData?: { mobile?: boolean } })
         ?.userAgentData?.mobile;
       if (typeof uaDataMobile === 'boolean') return uaDataMobile;
 
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      const uaLooksMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
         navigator.userAgent
       );
+
+      // Reduce false positives on desktop: require a coarse pointer (touch-like).
+      const coarsePointer = window.matchMedia?.('(pointer: coarse)')?.matches ?? false;
+
+      return uaLooksMobile && coarsePointer;
     } catch {
       return false;
     }
@@ -45,7 +54,7 @@ const SocialShare = ({
 
   // Native share is *only* allowed when we’re confident this is a real mobile UA.
   // (Desktop Web Share is the main source of “looks like a link, but isn’t clickable” Facebook posts.)
-  const allowNativeShare = isLikelyMobileUA();
+  const allowNativeShare = isNativeShareEnvironment();
 
   // CRITICAL: when the app is opened on a Lovable preview domain, that URL is not publicly accessible
   // (it shows a Lovable login screen). Always build share URLs against the public/canonical domain.
@@ -54,12 +63,16 @@ const SocialShare = ({
 
   const { socialShareUrl, canonicalUrl } = getShareUrls(url, publicSiteOrigin);
 
+  // Facebook Pages sometimes convert link previews into photo-style posts.
+  // Including a *second* explicit URL line gives you a guaranteed clickable link even in that case.
+  const facebookPasteText = `${socialShareUrl}\n${canonicalUrl}\n\n${title}\n\n${description}`;
+
   const richShareData: ShareData = {
     title,
     // Some share targets (including Facebook) may ignore the `url` field and only use `text`.
     // Always include a plain URL in `text` so the resulting post is clickable.
     // Put the URL FIRST: some targets only linkify the first URL they see.
-    text: `${socialShareUrl}\n\n${title}\n\n${description}`,
+    text: facebookPasteText,
     url: socialShareUrl
   };
 
@@ -90,7 +103,7 @@ const SocialShare = ({
         await navigator.share(systemShareData);
       } else {
         // Fallback: copy URL-first for best linkification on Facebook.
-        await navigator.clipboard.writeText(`${socialShareUrl}\n\n${title}\n\n${description}`);
+        await navigator.clipboard.writeText(facebookPasteText);
         toast({
           title: "Link copied!",
           description: "The page link has been copied to your clipboard.",
@@ -119,13 +132,13 @@ const SocialShare = ({
     }
   };
 
-  // Copies the crawler-friendly .html URL (useful when manually pasting into Facebook)
+  // Copies the crawler-friendly .html URL + an explicit canonical URL line (best for Facebook Pages)
   const handleCopySocialPreviewLink = async () => {
     try {
-      await navigator.clipboard.writeText(socialShareUrl);
+      await navigator.clipboard.writeText(facebookPasteText);
       toast({
-        title: "Social preview link copied!",
-        description: "Paste this link into Facebook for the best clickable preview.",
+        title: "Facebook paste text copied!",
+        description: "Paste this into a Facebook Page post. If Facebook turns the preview into a photo, the Episode link line is still clickable.",
       });
     } catch (error) {
       console.error('Failed to copy social preview link:', error);
@@ -136,6 +149,7 @@ const SocialShare = ({
       });
     }
   };
+
 
   // Social platforms use the root-level .html URL for proper OG previews
   const handleFacebookShare = () => {
