@@ -69,7 +69,21 @@ const SocialShare = ({
   // usually survives the auto-hide behavior (e.g. canonical + query param).
   const canonicalUrlForFacebook = `${canonicalUrl}?src=fbpage`;
   const canonicalUrlBareForFacebook = canonicalUrl.replace(/^https?:\/\//, '');
-  const facebookPasteText = `${socialShareUrl}\n${canonicalUrlForFacebook}\n${canonicalUrlBareForFacebook}\n\n${title}\n\n${description}`;
+
+  // Facebook Pages sometimes convert link previews into photo-style posts.
+  // To preserve a clickable link, include a *different* short URL that won't get auto-hidden.
+  const shortEpisodeUrlForFacebook = (() => {
+    try {
+      const origin = new URL(canonicalUrl).origin;
+      const match = canonicalUrl.match(/\/episode\/(\d+)(?:\/|$)/);
+      if (!match) return null;
+      return `${origin}/e/${match[1]}`;
+    } catch {
+      return null;
+    }
+  })();
+
+  const facebookPasteText = `${socialShareUrl}\n${shortEpisodeUrlForFacebook ? `${shortEpisodeUrlForFacebook}\n` : ''}${canonicalUrlForFacebook}\n${canonicalUrlBareForFacebook}\n\n${title}\n\n${description}`;
 
   const richShareData: ShareData = {
     title,
@@ -142,7 +156,8 @@ const SocialShare = ({
       await navigator.clipboard.writeText(facebookPasteText);
         toast({
           title: "Facebook paste text copied!",
-          description: "Paste this into a Facebook Page post. If Facebook hides/removes the preview URL, the Episode link lines should still remain clickable.",
+          description:
+            "Paste into a Facebook Page post. If the preview card becomes non-clickable, use the /e/### line — it stays clickable and still opens the episode.",
         });
     } catch (error) {
       console.error('Failed to copy social preview link:', error);

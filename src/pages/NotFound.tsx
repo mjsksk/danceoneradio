@@ -35,6 +35,14 @@ const NotFound = () => {
     // share page (the .html file is what social scrapers can read on Lovable hosting).
     const normalizedPath = location.pathname.replace(/\/+$/, '') || '/';
 
+    // Short, human-friendly click-through links for Facebook post bodies.
+    // These are NOT for scrapers; they exist purely to keep a clickable URL in photo-style posts.
+    const shortEpisode = normalizedPath.match(/^\/e\/(\d+)$/);
+    if (shortEpisode) {
+      window.location.replace(`/episode/${shortEpisode[1]}`);
+      return;
+    }
+
     const shareEpisode = normalizedPath.match(/^\/share-episode-(\d+)$/);
     if (shareEpisode) {
       window.location.replace(`/share-episode-${shareEpisode[1]}.html`);
