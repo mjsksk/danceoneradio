@@ -342,7 +342,7 @@ function generateSharePageHTML(route: (typeof routes)[number]) {
   <link rel="icon" href="/favicon.png" type="image/png" />
   <title>${title}</title>
   <meta name="description" content="${description}" />
-  <meta name="robots" content="noindex, nofollow" />
+  <meta name="robots" content="noindex, follow" />
   <link rel="canonical" href="${shareUrl}" />
 
   <!-- Facebook App ID -->
@@ -354,6 +354,8 @@ function generateSharePageHTML(route: (typeof routes)[number]) {
   <meta property="og:type" content="website" />
   <meta property="og:url" content="${shareUrl}" />
   <meta property="og:image" content="${image}" />
+  <meta property="og:image:secure_url" content="${image}" />
+  <meta property="og:image:alt" content="${title}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:site_name" content="Dance One Radio" />
@@ -393,7 +395,7 @@ function generateSharePageHTML(route: (typeof routes)[number]) {
   <main style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 24px; max-width: 760px; margin: 0 auto;">
     <h1 style="font-size: 20px; margin: 0 0 8px;">Opening Dance One Radio…</h1>
     <p style="margin: 0 0 16px; line-height: 1.5;">If you’re not redirected automatically, use this link:</p>
-    <p style="margin: 0 0 16px;"><a href="${fullUrl}" rel="nofollow noopener noreferrer" style="font-size: 16px;">Continue →</a></p>
+    <p style="margin: 0 0 16px;"><a href="${fullUrl}" rel="noopener noreferrer" style="font-size: 16px;">Continue →</a></p>
     <p style="margin: 0; font-size: 12px; opacity: 0.75;">(This page exists only to generate a correct social preview.)</p>
   </main>
   <noscript>
