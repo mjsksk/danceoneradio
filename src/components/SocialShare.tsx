@@ -64,8 +64,12 @@ const SocialShare = ({
   const { socialShareUrl, canonicalUrl } = getShareUrls(url, publicSiteOrigin);
 
   // Facebook Pages sometimes convert link previews into photo-style posts.
-  // Including a *second* explicit URL line gives you a guaranteed clickable link even in that case.
-  const facebookPasteText = `${socialShareUrl}\n${canonicalUrl}\n\n${title}\n\n${description}`;
+  // FB may also hide/remove the "pasted" URL from the post body after the preview loads.
+  // To preserve a clickable link in the final post, include a *second* URL variant that
+  // usually survives the auto-hide behavior (e.g. canonical + query param).
+  const canonicalUrlForFacebook = `${canonicalUrl}?src=fbpage`;
+  const canonicalUrlBareForFacebook = canonicalUrl.replace(/^https?:\/\//, '');
+  const facebookPasteText = `${socialShareUrl}\n${canonicalUrlForFacebook}\n${canonicalUrlBareForFacebook}\n\n${title}\n\n${description}`;
 
   const richShareData: ShareData = {
     title,
@@ -136,10 +140,10 @@ const SocialShare = ({
   const handleCopySocialPreviewLink = async () => {
     try {
       await navigator.clipboard.writeText(facebookPasteText);
-      toast({
-        title: "Facebook paste text copied!",
-        description: "Paste this into a Facebook Page post. If Facebook turns the preview into a photo, the Episode link line is still clickable.",
-      });
+        toast({
+          title: "Facebook paste text copied!",
+          description: "Paste this into a Facebook Page post. If Facebook hides/removes the preview URL, the Episode link lines should still remain clickable.",
+        });
     } catch (error) {
       console.error('Failed to copy social preview link:', error);
       toast({
