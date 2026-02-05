@@ -9,12 +9,12 @@ function normalizeOrigin(origin: string): string {
   return origin.replace(/\/+$/, '');
 }
 
-// /episode/402 → share-episode-402.html
-// /about → share-about.html
-// / → share-home.html
+// /episode/402 → share-episode-402
+// /about → share-about
+// / → share-home
 export function routeToShareFilename(pathname: string): string {
-  if (pathname === '/') return 'share-home.html';
-  return `share${pathname.replace(/\//g, '-')}.html`;
+  if (pathname === '/') return 'share-home';
+  return `share${pathname.replace(/\//g, '-')}`;
 }
 
 /**
@@ -28,10 +28,10 @@ export function getShareUrls(inputUrl: string, publicSiteOrigin?: string): Share
     const pathname = u.pathname !== '/' ? u.pathname.replace(/\/+$/, '') : '/';
 
     const origin = normalizeOrigin(publicSiteOrigin?.trim() || u.origin);
-    const shareFilename = routeToShareFilename(pathname);
+    const sharePath = routeToShareFilename(pathname);
 
     return {
-      socialShareUrl: `${origin}/${shareFilename}`,
+      socialShareUrl: `${origin}/${sharePath}`,
       canonicalUrl: `${origin}${pathname}`,
     };
   } catch {

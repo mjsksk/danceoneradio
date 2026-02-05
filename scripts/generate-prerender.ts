@@ -462,11 +462,15 @@ export function generatePrerenderFiles() {
       console.log(`Generated: ${indexPath}`);
     }
 
-    // Generate ROOT-LEVEL share HTML file for social scrapers
-    // e.g., dist/share-episode-402.html
-    // This is the most reliable way to serve static HTML on Lovable hosting
-    const shareFilename = routeToShareFilename(route.path);
-    const shareRootPath = path.join(distDir, shareFilename);
+    // Generate ROOT-LEVEL share directory for social scrapers
+    // e.g., dist/share-episode-402/index.html
+    // Lovable hosting serves /share-episode-402/index.html correctly as static HTML
+    const shareFilename = routeToShareFilename(route.path).replace('.html', '');
+    const shareRootDir = path.join(distDir, shareFilename);
+    if (!fs.existsSync(shareRootDir)) {
+      fs.mkdirSync(shareRootDir, { recursive: true });
+    }
+    const shareRootPath = path.join(shareRootDir, 'index.html');
     const shareHtml = generateSharePageHTML(route);
     fs.writeFileSync(shareRootPath, shareHtml);
     console.log(`Generated root share page: ${shareRootPath}`);
