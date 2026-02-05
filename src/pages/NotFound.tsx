@@ -31,6 +31,27 @@ const NotFound = () => {
   ];
 
   useEffect(() => {
+    // If someone hits an extensionless share bridge URL, redirect them to the real static
+    // share page (the .html file is what social scrapers can read on Lovable hosting).
+    const normalizedPath = location.pathname.replace(/\/+$/, '') || '/';
+
+    const shareEpisode = normalizedPath.match(/^\/share-episode-(\d+)$/);
+    if (shareEpisode) {
+      window.location.replace(`/share-episode-${shareEpisode[1]}.html`);
+      return;
+    }
+
+    const legacyShareEpisode = normalizedPath.match(/^\/share\/episode\/(\d+)$/);
+    if (legacyShareEpisode) {
+      window.location.replace(`/share-episode-${legacyShareEpisode[1]}.html`);
+      return;
+    }
+
+    if (normalizedPath === '/share-home') {
+      window.location.replace('/share-home.html');
+      return;
+    }
+
     // Set proper HTTP status code for SEO
     if (typeof window !== 'undefined' && window.history) {
       document.title = '404 - Page Not Found | Dance One Radio';
