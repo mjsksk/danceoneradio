@@ -250,6 +250,7 @@ const GalleryLightbox = ({
       <DialogContent
         className="max-w-[95vw] max-h-[95vh] p-0 bg-background/95 backdrop-blur-sm border-0"
         onKeyDown={handleKeyDown}
+        hideCloseButton
       >
         <div 
           ref={containerRef}
