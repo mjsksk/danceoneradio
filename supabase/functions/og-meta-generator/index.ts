@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { checkRateLimit, getClientIdentifier } from '../_shared/rateLimiter.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -32,6 +33,33 @@ serve(async (req) => {
   }
 
   try {
+    // Rate limiting: 20 requests per minute per IP
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const supabase = createClient(supabaseUrl, supabaseKey)
+    
+    const identifier = getClientIdentifier(req)
+    const rateLimitResult = await checkRateLimit(supabase, {
+      endpoint: 'og-meta-generator',
+      maxRequests: 20,
+      windowMs: 60000 // 1 minute
+    }, identifier, req.headers.get('user-agent') || undefined)
+
+    if (!rateLimitResult.allowed) {
+      console.log(`⚠️ Rate limit exceeded for ${identifier}`)
+      return new Response(
+        JSON.stringify({ error: 'Rate limit exceeded', retryAfter: rateLimitResult.retryAfter }),
+        { 
+          status: 429,
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json',
+            'Retry-After': String(rateLimitResult.retryAfter || 60)
+          } 
+        }
+      )
+    }
+
     const url = new URL(req.url)
     const episodeId = url.searchParams.get('episode') || ''
     const showsUrl = url.searchParams.get('url') || ''
@@ -72,7 +100,7 @@ serve(async (req) => {
         
         if (descriptionMatch && descriptionMatch[1]) {
           const episodeDesc = descriptionMatch[1].replace(/<!\[CDATA\[|\]\]>/g, '').substring(0, 120)
-          description = `Listen to the latest episode: "${episodeTitle}". ${episodeDesc}...`
+          description = `Listen to the latest episode: "${title}". ${episodeDesc}...`
         }
         
         // Use shows background image for better visual appeal
