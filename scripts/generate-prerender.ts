@@ -2,8 +2,38 @@ import fs from 'fs';
 import path from 'path';
 import { pathToFileURL } from 'node:url';
 
-// Routes to prerender with their SEO metadata
-const routes = [
+// Auto-detect episode pages from src/pages directory
+function detectEpisodeNumbers(): number[] {
+  const pagesDir = path.resolve(process.cwd(), 'src/pages');
+  if (!fs.existsSync(pagesDir)) return [];
+  
+  const files = fs.readdirSync(pagesDir);
+  const episodes: number[] = [];
+  
+  for (const file of files) {
+    const match = file.match(/^Episode(\d+)\.tsx$/);
+    if (match) {
+      episodes.push(parseInt(match[1], 10));
+    }
+  }
+  
+  return episodes.sort((a, b) => a - b);
+}
+
+// Generate episode route metadata dynamically
+function generateEpisodeRoutes(): Array<{ path: string; title: string; description: string; image: string }> {
+  const episodeNumbers = detectEpisodeNumbers();
+  
+  return episodeNumbers.map(num => ({
+    path: `/episode/${num}`,
+    title: `Anthems of the week ${num} - Future Dance Anthems with Mario | Dance One Radio`,
+    description: `Episode ${num} featuring the latest electronic dance music tracks and unreleased anthems.`,
+    image: '/lovable-uploads/mario-show.jpg'
+  }));
+}
+
+// Static routes (non-episode pages)
+const staticRoutes = [
   {
     path: '/',
     title: 'Dance One Radio - The Castle of Dance | Live Electronic & Dance Music Stream',
@@ -114,91 +144,6 @@ const routes = [
     description: 'Reset your Dance One Radio account password.',
     image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
   },
-  // Episode pages
-  {
-    path: '/episode/389',
-    title: 'Anthems of the week 389 - Future Dance Anthems with Mario | Dance One Radio',
-    description: 'Episode 389 featuring 54 tracks of the latest electronic dance music, including exclusive unreleased tracks from top artists.',
-    image: '/lovable-uploads/mario-show.jpg'
-  },
-  {
-    path: '/episode/390',
-    title: 'Anthems of the week 390 - Future Dance Anthems with Mario | Dance One Radio',
-    description: 'Episode 390 featuring 28 tracks of the latest electronic dance music, including exclusive unreleased tracks from top artists.',
-    image: '/lovable-uploads/mario-show.jpg'
-  },
-  {
-    path: '/episode/391',
-    title: 'Anthems of the week 391 - Future Dance Anthems with Mario | Dance One Radio',
-    description: 'Episode 391 featuring 26 tracks of the latest electronic dance music, including tracks from Above & Beyond, Prospa, KETTAMA, and more.',
-    image: '/lovable-uploads/mario-show.jpg'
-  },
-  {
-    path: '/episode/392',
-    title: 'Anthems of the week 392 - Future Dance Anthems with Mario | Dance One Radio',
-    description: 'Episode 392 featuring 25 tracks of the latest electronic dance music, including tracks from John Summit, KETTAMA, Hot Since 82, and more.',
-    image: '/lovable-uploads/mario-show.jpg'
-  },
-  {
-    path: '/episode/393',
-    title: 'Anthems of the week 393 - Future Dance Anthems with Mario | Dance One Radio',
-    description: 'Episode 393 featuring 35 tracks of the latest electronic dance music, including tracks from Hana, Chaney, Bruno Martini, Kaskade, and more.',
-    image: '/lovable-uploads/mario-show.jpg'
-  },
-  {
-    path: '/episode/394',
-    title: 'Anthems of the week 394 - Future Dance Anthems with Mario | Dance One Radio',
-    description: 'Episode 394 featuring 19 tracks of the latest electronic dance music, including tracks from CamelPhat, Kaz James, Nic Fanciulli, and more.',
-    image: '/lovable-uploads/mario-show.jpg'
-  },
-  {
-    path: '/episode/395',
-    title: 'Anthems of the week 395 - Future Dance Anthems with Mario | Dance One Radio',
-    description: 'Episode 395 featuring 15 tracks of the latest electronic dance music, including tracks from Durante, Faithless, Above & Beyond, and more.',
-    image: '/lovable-uploads/mario-show.jpg'
-  },
-  {
-    path: '/episode/396',
-    title: 'Anthems of the week 396 - Future Dance Anthems with Mario | Dance One Radio',
-    description: 'Episode 396 featuring the latest electronic dance music tracks and unreleased anthems.',
-    image: '/lovable-uploads/mario-show.jpg'
-  },
-  {
-    path: '/episode/397',
-    title: 'Anthems of the week 397 - Future Dance Anthems with Mario | Dance One Radio',
-    description: 'Episode 397 featuring the latest electronic dance music tracks and unreleased anthems.',
-    image: '/lovable-uploads/mario-show.jpg'
-  },
-  {
-    path: '/episode/398',
-    title: 'Anthems of the week 398 - Future Dance Anthems with Mario | Dance One Radio',
-    description: 'Episode 398 featuring the latest electronic dance music tracks and unreleased anthems.',
-    image: '/lovable-uploads/mario-show.jpg'
-  },
-  {
-    path: '/episode/399',
-    title: 'Anthems of the week 399 - Future Dance Anthems with Mario | Dance One Radio',
-    description: 'Episode 399 featuring the latest electronic dance music tracks and unreleased anthems.',
-    image: '/lovable-uploads/mario-show.jpg'
-  },
-  {
-    path: '/episode/400',
-    title: 'Anthems of the week 400 - Future Dance Anthems with Mario | Dance One Radio',
-    description: 'Episode 400 featuring the latest electronic dance music tracks and unreleased anthems.',
-    image: '/lovable-uploads/mario-show.jpg'
-  },
-  {
-    path: '/episode/401',
-    title: 'Anthems of the week 401 - Future Dance Anthems with Mario | Dance One Radio',
-    description: 'Episode 401 featuring the latest electronic dance music tracks and unreleased anthems.',
-    image: '/lovable-uploads/mario-show.jpg'
-  },
-  {
-    path: '/episode/402',
-    title: 'Anthems of the week 402 - Future Dance Anthems with Mario | Dance One Radio',
-    description: 'Episode 402 featuring 21 tracks including Claptone, Simon Doty, Marsh, Meduza, Vintage Culture and more.',
-    image: '/lovable-uploads/mario-show.jpg'
-  },
   {
     path: '/privacy',
     title: 'Privacy Policy - Dance One Radio',
@@ -213,6 +158,13 @@ const routes = [
   }
 ];
 
+// Combined routes: static + auto-detected episodes
+function getAllRoutes() {
+  return [...staticRoutes, ...generateEpisodeRoutes()];
+}
+// Route type definition
+type RouteMetadata = { path: string; title: string; description: string; image: string };
+
 function escapeAttr(value: string) {
   return value
     .replaceAll('&', '&amp;')
@@ -221,7 +173,7 @@ function escapeAttr(value: string) {
     .replaceAll('>', '&gt;');
 }
 
-function buildMetaBlock(route: (typeof routes)[number]) {
+function buildMetaBlock(route: RouteMetadata) {
   const baseUrl = 'https://danceoneradio.com';
   const fullUrl = `${baseUrl}${route.path}`;
   const imageUrl = route.image.startsWith('http') ? route.image : `${baseUrl}${route.image}`;
@@ -294,7 +246,7 @@ function stripDynamicHeadTags(html: string) {
     .replace(/<script\s+type="application\/ld\+json"[^>]*>[\s\S]*?<\/script>/gi, '');
 }
 
-function generateHTMLFromTemplate(templateHtml: string, route: (typeof routes)[number]) {
+function generateHTMLFromTemplate(templateHtml: string, route: RouteMetadata) {
   const cleaned = stripDynamicHeadTags(templateHtml);
 
   // IMPORTANT: inject at the START of <head> so crawlers pick up these tags first.
@@ -316,7 +268,7 @@ function routeToShareFilename(routePath: string): string {
 }
 
 // Build a minimal share page that auto-redirects to the real page.
-function generateSharePageHTML(route: (typeof routes)[number]) {
+function generateSharePageHTML(route: RouteMetadata) {
   const baseUrl = 'https://danceoneradio.com';
   const fullUrl = `${baseUrl}${route.path}`;
   const imageUrl = route.image.startsWith('http') ? route.image : `${baseUrl}${route.image}`;
@@ -445,6 +397,9 @@ export function generatePrerenderFiles() {
   }
   const templateHtml = fs.readFileSync(templatePath, 'utf-8');
 
+  const routes = getAllRoutes();
+  console.log(`Processing ${routes.length} routes (including ${routes.filter(r => r.path.startsWith('/episode/')).length} episodes)...`);
+  
   routes.forEach(route => {
     const html = generateHTMLFromTemplate(templateHtml, route);
 
