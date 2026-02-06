@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { checkRateLimit, getClientIdentifier } from '../_shared/rateLimiter.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,6 +13,33 @@ serve(async (req) => {
   }
 
   try {
+    // Rate limiting: 100 requests per minute per IP (UI polls frequently)
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const supabase = createClient(supabaseUrl, supabaseKey)
+    
+    const identifier = getClientIdentifier(req)
+    const rateLimitResult = await checkRateLimit(supabase, {
+      endpoint: 'stream-metadata',
+      maxRequests: 100,
+      windowMs: 60000 // 1 minute
+    }, identifier, req.headers.get('user-agent') || undefined)
+
+    if (!rateLimitResult.allowed) {
+      console.log(`⚠️ Rate limit exceeded for ${identifier}`)
+      return new Response(
+        JSON.stringify({ error: 'Rate limit exceeded', retryAfter: rateLimitResult.retryAfter }),
+        { 
+          status: 429,
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json',
+            'Retry-After': String(rateLimitResult.retryAfter || 60)
+          } 
+        }
+      )
+    }
+
     console.log('🔍 Fetching stream metadata...')
     
     // Try multiple endpoints for stream metadata
