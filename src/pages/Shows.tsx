@@ -467,34 +467,28 @@ const Shows = () => {
                 </div>
               ) : (
                 <div className="grid gap-8">
-                  {episodes.map((episode, index) => (
-                    <Card key={episode.guid || index} className="card-cyber p-8 hover:scale-[1.01] transition-all duration-300 group">
+                  {episodes.map((episode, index) => {
+                    const episodeNumber = episode.episodeNumber || (totalEpisodes - index);
+                    const hasDedicatedPage = episode.episodeNumber !== undefined && episode.episodeNumber > 0 && availableEpisodePages.includes(episode.episodeNumber);
+                    
+                    const cardContent = (
                       <div className="flex flex-col lg:flex-row gap-8">
                         {/* Episode Number Badge */}
                         <div className="lg:w-20 flex lg:flex-col items-center lg:items-start gap-4">
-                           <div className="bg-gradient-to-br from-neon to-neon-purple text-background rounded-full w-16 h-16 flex items-center justify-center font-['Orbitron'] font-bold text-lg">
-                             #{episode.episodeNumber || (totalEpisodes - index)}
-                           </div>
+                          <div className="bg-gradient-to-br from-neon to-neon-purple text-background rounded-full w-16 h-16 flex items-center justify-center font-['Orbitron'] font-bold text-lg">
+                            #{episodeNumber}
+                          </div>
                         </div>
 
                         {/* Episode Content */}
-                         <div className="flex-1 space-y-4">
-                              <div id={`episode-${episode.episodeNumber || (totalEpisodes - index)}`}>
-                               {episode.episodeNumber && availableEpisodePages.includes(episode.episodeNumber) ? (
-                                 <Link 
-                                   to={`/episode/${episode.episodeNumber}`}
-                                   className="block group/link"
-                                   key={`link-${index}-${episode.guid || 'no-guid'}`}
-                                 >
-                                   <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold mb-3 text-primary group-hover/link:text-neon transition-colors cursor-pointer hover:underline">
-                                     {episode.title}
-                                   </h3>
-                                 </Link>
-                               ) : (
-                                 <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold mb-3 text-primary group-hover:text-neon transition-colors">
-                                   {episode.title}
-                                 </h3>
-                               )}
+                        <div className="flex-1 space-y-4">
+                          <div id={`episode-${episodeNumber}`}>
+                            <h3 className={`text-xl md:text-2xl font-['Orbitron'] font-bold mb-3 text-primary transition-colors ${hasDedicatedPage ? 'group-hover:text-neon cursor-pointer' : ''}`}>
+                              {episode.title}
+                              {hasDedicatedPage && (
+                                <span className="inline-block ml-2 text-sm text-neon opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                              )}
+                            </h3>
                             
                             <div className="flex flex-wrap items-center gap-6 mb-4 text-sm text-muted-foreground">
                               <div className="flex items-center gap-2">
@@ -525,7 +519,11 @@ const Shows = () => {
                           {episode.enclosure.url && (
                             <Button 
                               className="w-full flex items-center gap-2 hover:scale-105 transition-all duration-200 bg-gradient-to-r from-neon to-neon-purple text-background hover:shadow-lg hover:shadow-neon/25"
-                              onClick={() => handlePlayPauseWithProgress(episode)}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handlePlayPauseWithProgress(episode);
+                              }}
                             >
                               {isEpisodePlaying(episode.episodeNumber || 0) ? (
                                 <Pause className="w-4 h-4" />
@@ -539,7 +537,11 @@ const Shows = () => {
                           <Button 
                             variant="outline" 
                             className="w-full flex items-center gap-2 hover:scale-105 transition-all duration-200 border-primary/30 hover:border-primary hover:bg-primary/10"
-                            onClick={() => window.open(`https://podcasts.apple.com/podcast/future-dance-anthems-with-mario/id1439656478`, '_blank')}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              window.open(`https://podcasts.apple.com/podcast/future-dance-anthems-with-mario/id1439656478`, '_blank');
+                            }}
                           >
                             <ExternalLink className="w-4 h-4" />
                             Apple Podcasts
@@ -549,14 +551,34 @@ const Shows = () => {
                             variant="ghost" 
                             size="sm"
                             className="w-full text-xs text-muted-foreground hover:text-primary"
-                            onClick={() => handleShareEpisode(episode, index)}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleShareEpisode(episode, index);
+                            }}
                           >
                             Share Episode
                           </Button>
                         </div>
                       </div>
-                    </Card>
-                  ))}
+                    );
+
+                    return hasDedicatedPage ? (
+                      <Link 
+                        key={episode.guid || index} 
+                        to={`/episode/${episode.episodeNumber}`}
+                        className="block"
+                      >
+                        <Card className="card-cyber p-8 hover:scale-[1.01] transition-all duration-300 group cursor-pointer hover:border-neon/50">
+                          {cardContent}
+                        </Card>
+                      </Link>
+                    ) : (
+                      <Card key={episode.guid || index} className="card-cyber p-8 hover:scale-[1.01] transition-all duration-300 group">
+                        {cardContent}
+                      </Card>
+                    );
+                  })}
                 </div>
               )}
             </div>
