@@ -37,7 +37,9 @@ const Episode403 = () => {
   const episodeNumber = 403;
   const episodeTitle = "Future Dance Anthems with Mario 403";
   // TODO: Update audio URL from RSS feed once episode 403 is published
-  const audioUrl = "https://media.blubrry.com/biggest_tunes_with_mario_135/mc.blubrry.com/biggest_tunes_with_mario_135/Biggest-Tunes-with-Mario-403-streamed.mp3";
+  // Episode 403 is not yet published on the RSS feed — placeholder URL below will not work
+  const audioUrl = "";
+  const isEpisodeAvailable = audioUrl.length > 0;
   const episodeDate = "February 7, 2026";
   
   const { 
@@ -164,8 +166,8 @@ const Episode403 = () => {
                         <Button 
                           variant="ghost"
                           className="w-12 h-12 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full flex items-center justify-center hover:from-neon/30 hover:to-neon-purple/30 transition-all duration-200 p-0"
-                          onClick={handlePlayPause}
-                          disabled={isLoading}
+                          onClick={isEpisodeAvailable ? handlePlayPause : undefined}
+                          disabled={!isEpisodeAvailable || isLoading}
                         >
                           {isLoading ? (
                             <div className="w-4 h-4 border-2 border-neon border-t-transparent rounded-full animate-spin" />
@@ -177,31 +179,46 @@ const Episode403 = () => {
                         </Button>
                         <div className="flex-1">
                           <h3 className="font-semibold text-primary">Future Dance Anthems with Mario</h3>
-                          <p className="text-sm text-muted-foreground">Episode {episodeNumber} - Anthems of the week</p>
+                          <p className="text-sm text-muted-foreground">
+                            {isEpisodeAvailable 
+                              ? `Episode ${episodeNumber} - Anthems of the week`
+                              : `Episode ${episodeNumber} - Coming soon to streaming`
+                            }
+                          </p>
                         </div>
                       </div>
 
-                      <div className="space-y-2">
-                        <div 
-                          className="h-2 bg-primary/40 border border-primary/50 rounded-full cursor-pointer group/progress hover:bg-primary/50 transition-colors"
-                          onClick={onSeekClick}
-                        >
+                        <div className="space-y-2">
                           <div 
-                            className="h-full bg-neon-purple rounded-full transition-all duration-150 relative"
-                            style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                            className={`h-2 bg-primary/40 border border-primary/50 rounded-full group/progress transition-colors ${isEpisodeAvailable ? 'cursor-pointer hover:bg-primary/50' : 'opacity-50'}`}
+                            onClick={isEpisodeAvailable ? onSeekClick : undefined}
                           >
-                            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-neon-purple rounded-full shadow-lg shadow-neon-purple/50 opacity-0 group-hover/progress:opacity-100 transition-opacity border-2 border-background" />
+                            <div 
+                              className="h-full bg-neon-purple rounded-full transition-all duration-150 relative"
+                              style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                            >
+                              {isEpisodeAvailable && (
+                                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-neon-purple rounded-full shadow-lg shadow-neon-purple/50 opacity-0 group-hover/progress:opacity-100 transition-opacity border-2 border-background" />
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex justify-between text-sm text-primary font-medium">
+                            <span>{formatTime(currentTime)}</span>
+                            <span>{duration > 0 ? formatTime(duration) : '1:10:27'}</span>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs text-muted-foreground">Duration</p>
+                            <p className="text-sm font-medium text-neon-purple">{duration > 0 ? formatTime(duration) : '1:10:27'}</p>
                           </div>
                         </div>
-                        <div className="flex justify-between text-sm text-primary font-medium">
-                          <span>{formatTime(currentTime)}</span>
-                          <span>{duration > 0 ? formatTime(duration) : '1:10:27'}</span>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-xs text-muted-foreground">Duration</p>
-                          <p className="text-sm font-medium text-neon-purple">{duration > 0 ? formatTime(duration) : '1:10:27'}</p>
-                        </div>
-                      </div>
+                        
+                        {!isEpisodeAvailable && (
+                          <div className="mt-4 p-3 bg-neon-purple/10 border border-neon-purple/30 rounded-lg">
+                            <p className="text-sm text-neon-purple text-center font-medium">
+                              🎧 This episode hasn't been published to the podcast feed yet. Check back soon!
+                            </p>
+                          </div>
+                        )}
                       
                       {!user && (
                         <div className="mt-6">
