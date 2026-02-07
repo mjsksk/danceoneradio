@@ -45,7 +45,7 @@ const STREAM_URLS = [
 ];
 
 // Available episode numbers with pages (sorted descending)
-const AVAILABLE_EPISODES = [402, 401, 400, 399, 398, 397, 396, 395, 394, 393, 392, 391, 390, 389];
+const AVAILABLE_EPISODES = [403, 402, 401, 400, 399, 398, 397, 396, 395, 394, 393, 392, 391, 390, 389];
 
 export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
