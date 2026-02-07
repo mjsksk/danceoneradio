@@ -29,6 +29,7 @@ import Episode399 from '@/pages/Episode399';
 import Episode400 from '@/pages/Episode400';
 import Episode401 from '@/pages/Episode401';
 import Episode402 from '@/pages/Episode402';
+import Episode403 from '@/pages/Episode403';
 import News from '@/pages/News';
 import NewsTopStories from '@/pages/NewsTopStories';
 import NewsArtistsReleases from '@/pages/NewsArtistsReleases';
@@ -74,6 +75,7 @@ export function AnimatedRoutes() {
         <Route path="/episode/400" element={<PageTransition><Episode400 /></PageTransition>} />
         <Route path="/episode/401" element={<PageTransition><Episode401 /></PageTransition>} />
         <Route path="/episode/402" element={<PageTransition><Episode402 /></PageTransition>} />
+        <Route path="/episode/403" element={<PageTransition><Episode403 /></PageTransition>} />
         <Route path="/news" element={<PageTransition><News /></PageTransition>} />
         <Route path="/news/top-stories" element={<PageTransition><NewsTopStories /></PageTransition>} />
         <Route path="/news/artists-releases" element={<PageTransition><NewsArtistsReleases /></PageTransition>} />

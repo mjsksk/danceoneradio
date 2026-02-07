@@ -5,7 +5,7 @@ import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import stationLogo from '@/assets/dance-one-logo.png';
 
 // Available episode numbers (must match AudioPlayerContext)
-const AVAILABLE_EPISODES = [402, 401, 400, 399, 398, 397, 396, 395, 394, 393, 392, 391, 390, 389];
+const AVAILABLE_EPISODES = [403, 402, 401, 400, 399, 398, 397, 396, 395, 394, 393, 392, 391, 390, 389];
 
 const FloatingPlayer = () => {
   const {
