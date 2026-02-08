@@ -40,26 +40,16 @@ const NewsletterCampaign = () => {
         return;
       }
 
-      const response = await fetch(
-        'https://upbwlnpycrbhxahjztrf.supabase.co/functions/v1/newsletter-campaign',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            subject: subject.trim(),
-            content: content.trim(),
-            sent_by: session.user.email,
-          }),
-        }
-      );
+      const { data, error: fnError } = await supabase.functions.invoke('newsletter-campaign', {
+        body: {
+          subject: subject.trim(),
+          content: content.trim(),
+          sent_by: session.user.email,
+        },
+      });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to send campaign');
+      if (fnError) {
+        throw new Error(fnError.message || 'Failed to send campaign');
       }
 
       setLastResult({ sent: data.sent_count, total: data.total_subscribers });

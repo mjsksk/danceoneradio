@@ -5,7 +5,7 @@ import * as ammonia from "https://deno.land/x/ammonia@0.3.1/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 interface CampaignRequest {
@@ -220,7 +220,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send emails to all subscribers using SANITIZED content
     const emailPromises = subscribers.map(async (subscriber) => {
-      const unsubscribeUrl = `https://your-domain.com/unsubscribe?token=${subscriber.unsubscribe_token}`;
+      const unsubscribeUrl = `https://danceoneradio.com/unsubscribe?token=${subscriber.unsubscribe_token}`;
       
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -235,7 +235,7 @@ const handler = async (req: Request): Promise<Response> => {
           <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
           
           <div style="text-align: center;">
-            <a href="https://your-domain.com" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin-bottom: 20px;">
+            <a href="https://danceoneradio.com" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin-bottom: 20px;">
               Visit Dance One Radio
             </a>
           </div>
@@ -243,7 +243,7 @@ const handler = async (req: Request): Promise<Response> => {
           <p style="color: #999; font-size: 12px; text-align: center;">
             You're receiving this because you subscribed to Dance One Radio newsletter.<br>
             <a href="${unsubscribeUrl}" style="color: #007bff;">Unsubscribe</a> | 
-            <a href="https://your-domain.com" style="color: #007bff;">Visit our website</a>
+            <a href="https://danceoneradio.com" style="color: #007bff;">Visit our website</a>
           </p>
         </div>
       `;
