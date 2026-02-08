@@ -12,6 +12,7 @@ interface CampaignRequest {
   subject: string;
   content: string;
   sent_by?: string;
+  test_email?: string; // If provided, send only to this email (test mode)
 }
 
 // Server-side HTML sanitization configuration
@@ -156,7 +157,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Newsletter campaign requested by admin: ${user.id} (${user.email})`);
 
-    const { subject, content, sent_by }: CampaignRequest = await req.json();
+    const { subject, content, sent_by, test_email }: CampaignRequest = await req.json();
 
     if (!subject || !content) {
       return new Response(
@@ -188,39 +189,54 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    const isTestMode = !!test_email;
+    
+    if (isTestMode) {
+      console.log(`🧪 TEST MODE: Sending newsletter only to ${test_email}`);
+    }
+
     // Initialize Supabase client
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Get all active subscribers
-    const { data: subscribers, error: fetchError } = await supabase
-      .from("newsletter_subscribers")
-      .select("email, unsubscribe_token")
-      .eq("is_active", true);
+    // Determine recipients
+    let recipients: { email: string; unsubscribe_token: string }[];
 
-    if (fetchError) {
-      console.error("Error fetching subscribers:", fetchError);
-      throw fetchError;
-    }
+    if (isTestMode) {
+      // Test mode: send only to the specified email
+      recipients = [{ email: test_email!, unsubscribe_token: 'test-token' }];
+    } else {
+      // Production mode: get all active subscribers
+      const { data: subscribers, error: fetchError } = await supabase
+        .from("newsletter_subscribers")
+        .select("email, unsubscribe_token")
+        .eq("is_active", true);
 
-    if (!subscribers || subscribers.length === 0) {
-      return new Response(
-        JSON.stringify({ message: "No active subscribers found" }),
-        {
-          status: 200,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        }
-      );
+      if (fetchError) {
+        console.error("Error fetching subscribers:", fetchError);
+        throw fetchError;
+      }
+
+      if (!subscribers || subscribers.length === 0) {
+        return new Response(
+          JSON.stringify({ message: "No active subscribers found" }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
+      }
+      recipients = subscribers;
     }
 
     // Initialize Resend
     const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
-    // Send emails to all subscribers using SANITIZED content
-    const emailPromises = subscribers.map(async (subscriber) => {
-      const unsubscribeUrl = `https://danceoneradio.com/unsubscribe?token=${subscriber.unsubscribe_token}`;
+    // Send emails to recipients using SANITIZED content
+    const emailPromises = recipients.map(async (recipient) => {
+      const unsubscribeUrl = `https://danceoneradio.com/unsubscribe?token=${recipient.unsubscribe_token}`;
       
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -251,14 +267,14 @@ const handler = async (req: Request): Promise<Response> => {
       try {
         await resend.emails.send({
           from: "Dance One Radio <noreply@resend.dev>",
-          to: [subscriber.email],
-          subject: sanitizedSubject,
+          to: [recipient.email],
+          subject: isTestMode ? `[TEST] ${sanitizedSubject}` : sanitizedSubject,
           html: emailContent,
         });
-        return { email: subscriber.email, status: "sent" };
+        return { email: recipient.email, status: "sent" };
       } catch (error) {
-        console.error(`Failed to send email to ${subscriber.email}:`, error);
-        return { email: subscriber.email, status: "failed", error: error.message };
+        console.error(`Failed to send email to ${recipient.email}:`, error);
+        return { email: recipient.email, status: "failed", error: error.message };
       }
     });
 
@@ -268,27 +284,33 @@ const handler = async (req: Request): Promise<Response> => {
       result.status === "fulfilled" && result.value.status === "sent"
     ).length;
 
-    // Save campaign to database with sanitized content
-    const { error: campaignError } = await supabase
-      .from("newsletter_campaigns")
-      .insert({
-        subject: sanitizedSubject,
-        content: sanitizedContent,
-        sent_by: sent_by || "system",
-        recipient_count: successCount,
-      });
+    // Only save campaign to database for real sends (not test)
+    if (!isTestMode) {
+      const { error: campaignError } = await supabase
+        .from("newsletter_campaigns")
+        .insert({
+          subject: sanitizedSubject,
+          content: sanitizedContent,
+          sent_by: sent_by || "system",
+          recipient_count: successCount,
+        });
 
-    if (campaignError) {
-      console.error("Error saving campaign:", campaignError);
+      if (campaignError) {
+        console.error("Error saving campaign:", campaignError);
+      }
     }
 
-    console.log(`✅ Newsletter campaign sent to ${successCount}/${subscribers.length} subscribers`);
+    const modeLabel = isTestMode ? "test" : "campaign";
+    console.log(`✅ Newsletter ${modeLabel} sent to ${successCount}/${recipients.length} recipients`);
 
     return new Response(
       JSON.stringify({ 
-        message: `Newsletter sent successfully to ${successCount} out of ${subscribers.length} subscribers`,
+        message: isTestMode 
+          ? `Test email sent to ${test_email}`
+          : `Newsletter sent successfully to ${successCount} out of ${recipients.length} subscribers`,
         sent_count: successCount,
-        total_subscribers: subscribers.length,
+        total_subscribers: recipients.length,
+        is_test: isTestMode,
         results: results.map(result => 
           result.status === "fulfilled" ? result.value : { status: "failed" }
         )

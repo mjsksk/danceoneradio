@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Send, Mail, Eye, EyeOff, Loader2, CheckCircle, Users } from 'lucide-react';
+import { Send, Mail, Eye, EyeOff, Loader2, CheckCircle, Users, FlaskConical } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { toast } from 'sonner';
 import NewsletterTemplateGallery from './NewsletterTemplateGallery';
@@ -15,6 +15,7 @@ const NewsletterCampaign = () => {
   const [content, setContent] = useState('');
   const [showPreview, setShowPreview] = useState(false);
   const [sending, setSending] = useState(false);
+  const [sendingTest, setSendingTest] = useState(false);
   const [lastResult, setLastResult] = useState<{ sent: number; total: number } | null>(null);
 
   const handleSend = async () => {
@@ -64,6 +65,44 @@ const NewsletterCampaign = () => {
       toast.error(error.message || 'Failed to send newsletter campaign');
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleSendTest = async () => {
+    if (!subject.trim() || !content.trim()) {
+      toast.error('Please fill in both subject and content');
+      return;
+    }
+
+    setSendingTest(true);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token || !session.user.email) {
+        toast.error('You must be logged in to send test emails');
+        return;
+      }
+
+      const { data, error: fnError } = await supabase.functions.invoke('newsletter-campaign', {
+        body: {
+          subject: subject.trim(),
+          content: content.trim(),
+          sent_by: session.user.email,
+          test_email: session.user.email,
+        },
+      });
+
+      if (fnError) {
+        throw new Error(fnError.message || 'Failed to send test email');
+      }
+
+      toast.success(`Test email sent to ${session.user.email}!`);
+    } catch (error: any) {
+      console.error('Error sending test email:', error);
+      toast.error(error.message || 'Failed to send test email');
+    } finally {
+      setSendingTest(false);
     }
   };
 
@@ -199,23 +238,43 @@ const NewsletterCampaign = () => {
             <Users className="w-4 h-4" />
             <span>Will be sent to all active subscribers</span>
           </div>
-          <Button
-            onClick={handleSend}
-            disabled={sending || !subject.trim() || !content.trim()}
-            className="gap-2"
-          >
-            {sending ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Sending...
-              </>
-            ) : (
-              <>
-                <Mail className="w-4 h-4" />
-                Send Campaign
-              </>
-            )}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={handleSendTest}
+              disabled={sendingTest || sending || !subject.trim() || !content.trim()}
+              className="gap-2"
+            >
+              {sendingTest ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Sending Test...
+                </>
+              ) : (
+                <>
+                  <FlaskConical className="w-4 h-4" />
+                  Send Test Email
+                </>
+              )}
+            </Button>
+            <Button
+              onClick={handleSend}
+              disabled={sending || sendingTest || !subject.trim() || !content.trim()}
+              className="gap-2"
+            >
+              {sending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                <>
+                  <Mail className="w-4 h-4" />
+                  Send Campaign
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     </Card>
