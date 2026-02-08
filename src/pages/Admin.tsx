@@ -5,6 +5,7 @@ import CSVTrackImporter from "@/components/admin/CSVTrackImporter";
 import NewsletterSubscribers from "@/components/admin/NewsletterSubscribers";
 import SubscriberGrowthChart from "@/components/admin/SubscriberGrowthChart";
 import NewsletterCampaign from "@/components/admin/NewsletterCampaign";
+import ManualSubscriberAdd from "@/components/admin/ManualSubscriberAdd";
 import { Card } from "@/components/ui/card";
 
 const Admin = () => {
@@ -54,6 +55,8 @@ const Admin = () => {
             <SubscriberGrowthChart />
 
             <NewsletterCampaign />
+
+            <ManualSubscriberAdd />
 
             <NewsletterSubscribers />
 
