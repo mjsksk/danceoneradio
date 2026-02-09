@@ -6,6 +6,7 @@ import NewsletterSubscribers from "@/components/admin/NewsletterSubscribers";
 import SubscriberGrowthChart from "@/components/admin/SubscriberGrowthChart";
 import NewsletterCampaign from "@/components/admin/NewsletterCampaign";
 import ManualSubscriberAdd from "@/components/admin/ManualSubscriberAdd";
+import ListenerAnalytics from "@/components/admin/ListenerAnalytics";
 import { Card } from "@/components/ui/card";
 
 const Admin = () => {
@@ -51,6 +52,8 @@ const Admin = () => {
                 </div>
               </div>
             </Card>
+
+            <ListenerAnalytics />
 
             <SubscriberGrowthChart />
 
