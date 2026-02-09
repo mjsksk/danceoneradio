@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
@@ -10,6 +11,14 @@ import ListenerAnalytics from "@/components/admin/ListenerAnalytics";
 import { Card } from "@/components/ui/card";
 
 const Admin = () => {
+  // Hide Google AdSense auto-ads on the admin page
+  useEffect(() => {
+    document.body.setAttribute('data-no-ads', 'true');
+    return () => {
+      document.body.removeAttribute('data-no-ads');
+    };
+  }, []);
+
   return (
     <>
       <SEO 
