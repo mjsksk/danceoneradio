@@ -300,3 +300,18 @@
     100% { background-position: 200% 0; }
   }
 }
+
+/* Hide Google AdSense auto-ads on admin pages */
+body[data-no-ads] .adsbygoogle,
+body[data-no-ads] ins.adsbygoogle,
+body[data-no-ads] [id^="google_ads"],
+body[data-no-ads] [id^="aswift_"],
+body[data-no-ads] iframe[id^="aswift_"],
+body[data-no-ads] iframe[src*="googlesyndication"],
+body[data-no-ads] iframe[src*="doubleclick"] {
+  display: none !important;
+  height: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  visibility: hidden !important;
+}
