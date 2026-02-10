@@ -444,27 +444,50 @@ export type Database = {
       cleanup_old_request_logs: { Args: never; Returns: undefined }
       cleanup_old_subscriber_tracking_data: { Args: never; Returns: undefined }
       cleanup_old_unsubscribe_attempts: { Args: never; Returns: undefined }
-      get_listener_analytics: {
-        Args: never
-        Returns: {
-          avg_progress: number
-          completions: number
-          episode_number: number
-          episode_title: string
-          last_activity: string
-          total_time_played: number
-          unique_listeners: number
-        }[]
-      }
-      get_listener_summary: {
-        Args: never
-        Returns: {
-          total_completions: number
-          total_episodes_played: number
-          total_listening_hours: number
-          total_unique_listeners: number
-        }[]
-      }
+      get_listener_analytics:
+        | {
+            Args: never
+            Returns: {
+              avg_progress: number
+              completions: number
+              episode_number: number
+              episode_title: string
+              last_activity: string
+              total_time_played: number
+              unique_listeners: number
+            }[]
+          }
+        | {
+            Args: { end_date?: string; start_date?: string }
+            Returns: {
+              avg_progress: number
+              completions: number
+              episode_number: number
+              episode_title: string
+              last_activity: string
+              total_time_played: number
+              unique_listeners: number
+            }[]
+          }
+      get_listener_summary:
+        | {
+            Args: never
+            Returns: {
+              total_completions: number
+              total_episodes_played: number
+              total_listening_hours: number
+              total_unique_listeners: number
+            }[]
+          }
+        | {
+            Args: { end_date?: string; start_date?: string }
+            Returns: {
+              total_completions: number
+              total_episodes_played: number
+              total_listening_hours: number
+              total_unique_listeners: number
+            }[]
+          }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
