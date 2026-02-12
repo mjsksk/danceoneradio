@@ -13,6 +13,12 @@ import { BackToTop } from "@/components/BackToTop";
 import { ReadingProgressBar } from "@/components/ReadingProgressBar";
 import { AnimatedRoutes } from "@/components/AnimatedRoutes";
 import NewYearBanner from "@/components/NewYearBanner";
+import { useVisitorTracking } from "@/hooks/useVisitorTracking";
+
+const VisitorTracker = () => {
+  useVisitorTracking();
+  return null;
+};
 
 const queryClient = new QueryClient();
 
@@ -28,6 +34,7 @@ const App = () => (
             <ErrorBoundary>
               <ReadingProgressBar />
               <ScrollToTop />
+              <VisitorTracker />
               <NewYearBanner />
               <div className="pb-20">
                 <AnimatedRoutes />

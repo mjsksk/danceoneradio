@@ -8,6 +8,7 @@ import SubscriberGrowthChart from "@/components/admin/SubscriberGrowthChart";
 import NewsletterCampaign from "@/components/admin/NewsletterCampaign";
 import ManualSubscriberAdd from "@/components/admin/ManualSubscriberAdd";
 import ListenerAnalytics from "@/components/admin/ListenerAnalytics";
+import VisitorAnalytics from "@/components/admin/VisitorAnalytics";
 import { Card } from "@/components/ui/card";
 
 const Admin = () => {
@@ -61,6 +62,8 @@ const Admin = () => {
                 </div>
               </div>
             </Card>
+
+            <VisitorAnalytics />
 
             <ListenerAnalytics />
 

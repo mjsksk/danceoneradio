@@ -356,6 +356,36 @@ export type Database = {
         }
         Relationships: []
       }
+      site_visits: {
+        Row: {
+          country: string | null
+          country_code: string | null
+          id: string
+          is_returning: boolean
+          page_path: string
+          visited_at: string
+          visitor_hash: string
+        }
+        Insert: {
+          country?: string | null
+          country_code?: string | null
+          id?: string
+          is_returning?: boolean
+          page_path: string
+          visited_at?: string
+          visitor_hash: string
+        }
+        Update: {
+          country?: string | null
+          country_code?: string | null
+          id?: string
+          is_returning?: boolean
+          page_path?: string
+          visited_at?: string
+          visitor_hash?: string
+        }
+        Relationships: []
+      }
       unsubscribe_attempts: {
         Row: {
           attempted_at: string
@@ -488,6 +518,25 @@ export type Database = {
               total_unique_listeners: number
             }[]
           }
+      get_visitor_analytics: {
+        Args: { end_date?: string; start_date?: string }
+        Returns: {
+          country: string
+          country_code: string
+          returning_visitors: number
+          total_visits: number
+          unique_visitors: number
+        }[]
+      }
+      get_visitor_summary: {
+        Args: { end_date?: string; start_date?: string }
+        Returns: {
+          returning_visitors: number
+          top_country: string
+          total_visits: number
+          unique_visitors: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
