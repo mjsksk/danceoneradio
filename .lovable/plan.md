@@ -1,89 +1,74 @@
 
-## Listener Analytics for Admin Dashboard
 
-### Overview
-Add a new admin section showing how many users are playing episodes, which episodes are most popular, and how much listening time each episode has received.
+# Visitor Analytics for Admin Dashboard
 
-### Approach
+## Overview
+Add a visitor tracking system that logs every page visit with the visitor's country (detected server-side via IP geolocation) and a fingerprint-based returning visitor flag. The data is displayed as a new section on the admin dashboard.
 
-Since the `episode_listening_progress` table has RLS restricting users to their own data, a **database function with SECURITY DEFINER** will be created to allow admins to query aggregate listening stats without exposing individual user data directly.
+## How It Works
 
-### Steps
+1. **Visitor hits any page** -- the frontend sends a lightweight request to a new edge function
+2. **Edge function** detects the visitor's country from their IP address using a free geolocation API, generates a visitor fingerprint hash, and stores the visit in a new `site_visits` table
+3. **Admin dashboard** shows a summary card and a country breakdown table, with new/returning visitor counts
 
-1. **Create a database function** `get_listener_analytics()` that:
-   - Requires the caller to have the `admin` role
-   - Returns aggregate stats: unique listeners per episode, total listening time per episode, completion rates, and overall stats
-   - Runs as SECURITY DEFINER to bypass RLS
+## Technical Details
 
-2. **Create a new component** `src/components/admin/ListenerAnalytics.tsx` that:
-   - Calls the database function via `supabase.rpc()`
-   - Shows summary cards: total unique listeners (non-admin), total listening hours, most popular episode
-   - Shows a table of episodes with columns: Episode Number, Title, Unique Listeners, Total Time Played, Avg Progress %, Completions
-   - Sorted by most recent activity
-   - Styled consistently with existing admin components (Orbitron headings, Rajdhani body, card style)
+### 1. Database -- new `site_visits` table
 
-3. **Add the component to Admin.tsx** above the subscriber growth chart
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| visitor_hash | text | SHA-256 of IP + User-Agent (privacy-safe, no raw IP stored) |
+| country | text | Country name from geolocation |
+| country_code | text | ISO country code (e.g., "US") |
+| page_path | text | Which page was visited |
+| is_returning | boolean | True if visitor_hash already exists |
+| visited_at | timestamptz | Defaults to now() |
 
-### Technical Details
+RLS: No public SELECT (admin-only via a database function, similar to listener analytics).
 
-**Database function SQL:**
-```sql
-CREATE OR REPLACE FUNCTION get_listener_analytics()
-RETURNS TABLE (
-  episode_number int,
-  episode_title text,
-  unique_listeners bigint,
-  total_time_played numeric,
-  avg_progress numeric,
-  completions bigint,
-  last_activity timestamptz
-)
-LANGUAGE sql
-STABLE
-SECURITY DEFINER
-SET search_path = ''
-AS $$
-  SELECT 
-    elp.episode_number,
-    elp.episode_title,
-    COUNT(DISTINCT elp.user_id) as unique_listeners,
-    SUM(elp.playback_position) as total_time_played,
-    AVG(CASE WHEN elp.duration > 0 THEN (elp.playback_position / elp.duration) * 100 ELSE 0 END) as avg_progress,
-    COUNT(*) FILTER (WHERE elp.completed = true) as completions,
-    MAX(elp.last_listened_at) as last_activity
-  FROM public.episode_listening_progress elp
-  WHERE public.has_role(auth.uid(), 'admin')
-  GROUP BY elp.episode_number, elp.episode_title
-  ORDER BY last_activity DESC;
-$$;
-```
+### 2. Database functions (admin-only)
 
-**Also a summary function:**
-```sql
-CREATE OR REPLACE FUNCTION get_listener_summary()
-RETURNS TABLE (
-  total_unique_listeners bigint,
-  total_listening_hours numeric,
-  total_episodes_played bigint,
-  total_completions bigint
-)
-LANGUAGE sql
-STABLE
-SECURITY DEFINER
-SET search_path = ''
-AS $$
-  SELECT
-    COUNT(DISTINCT user_id),
-    ROUND(SUM(playback_position) / 3600, 1),
-    COUNT(DISTINCT episode_number),
-    COUNT(*) FILTER (WHERE completed = true)
-  FROM public.episode_listening_progress
-  WHERE public.has_role(auth.uid(), 'admin');
-$$;
-```
+- `get_visitor_analytics(start_date, end_date)` -- returns country, total visits, unique visitors, returning visitors, grouped by country
+- `get_visitor_summary(start_date, end_date)` -- returns total visits, unique visitors, returning visitors, top country
 
-**Component features:**
-- Summary stat cards (total unique listeners, total hours listened, episodes played, completions)
-- Sortable table with per-episode breakdown
-- Time formatting (seconds to hours:minutes)
-- Consistent admin styling with existing components
+### 3. Edge Function: `track-visit`
+
+- Receives `{ page_path }` from the frontend
+- Extracts IP from request headers (`x-forwarded-for` / `x-real-ip`)
+- Calls a free IP geolocation API (e.g., `ip-api.com`) to get country
+- Computes a SHA-256 hash of IP + User-Agent for visitor fingerprinting
+- Checks if this hash already exists in the table to set `is_returning`
+- Inserts the record using the service role client
+- No JWT required (public endpoint, fires on every page load)
+
+### 4. Frontend: `useVisitorTracking` hook
+
+- Called once on app mount (in `App.tsx` or a layout component)
+- Sends `POST` to the `track-visit` edge function with the current page path
+- Fires only once per session (uses `sessionStorage` flag to avoid duplicates)
+
+### 5. Frontend: `VisitorAnalytics` admin component
+
+- New component at `src/components/admin/VisitorAnalytics.tsx`
+- Summary cards: Total Visits, Unique Visitors, Returning Visitors, Top Country
+- Country breakdown table with columns: Country, Visits, Unique Visitors, Returning, percentage bar
+- Same date range filter pattern as the existing `ListenerAnalytics` component (preset + custom range)
+- Added to the Admin page alongside the existing analytics sections
+
+### 6. Config
+
+- Add `track-visit` to `supabase/config.toml` with `verify_jwt = false`
+
+### Files to create/modify
+
+| Action | File |
+|---|---|
+| Create | `supabase/functions/track-visit/index.ts` |
+| Create | `src/components/admin/VisitorAnalytics.tsx` |
+| Create | `src/hooks/useVisitorTracking.tsx` |
+| Modify | `src/App.tsx` -- add the tracking hook |
+| Modify | `src/pages/Admin.tsx` -- add VisitorAnalytics component |
+| Modify | `supabase/config.toml` -- add track-visit config |
+| Migration | New table `site_visits` + RLS + two database functions |
+
