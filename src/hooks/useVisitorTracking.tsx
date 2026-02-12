@@ -1,12 +1,17 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { useUserRole } from "@/hooks/useUserRole";
 
 const SUPABASE_URL = "https://upbwlnpycrbhxahjztrf.supabase.co";
 
 export const useVisitorTracking = () => {
   const location = useLocation();
+  const { isAdmin, loading } = useUserRole();
 
   useEffect(() => {
+    if (loading) return;
+    if (isAdmin) return;
+
     const key = `visited_${location.pathname}`;
     if (sessionStorage.getItem(key)) return;
     sessionStorage.setItem(key, "1");
@@ -18,5 +23,5 @@ export const useVisitorTracking = () => {
     }).catch(() => {
       // silently fail - visitor tracking is non-critical
     });
-  }, [location.pathname]);
+  }, [location.pathname, isAdmin, loading]);
 };

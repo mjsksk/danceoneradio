@@ -537,6 +537,14 @@ export type Database = {
           unique_visitors: number
         }[]
       }
+      get_visitor_trend: {
+        Args: { end_date?: string; granularity?: string; start_date?: string }
+        Returns: {
+          period: string
+          total_visits: number
+          unique_visitors: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
