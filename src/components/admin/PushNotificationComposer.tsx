@@ -291,25 +291,31 @@ export const PushNotificationComposer = () => {
         </div>
 
         {scheduleMode === "scheduled" && (
-          <div className="flex gap-3 p-4 bg-background/50 rounded-lg border border-border/50">
-            <div className="flex-1">
-              <Label className="font-['Rajdhani']">Date</Label>
-              <Input
-                type="date"
-                value={scheduledDate}
-                onChange={(e) => setScheduledDate(e.target.value)}
-                min={format(new Date(), "yyyy-MM-dd")}
-                className="font-['Rajdhani']"
-              />
+          <div className="space-y-3 p-4 bg-background/50 rounded-lg border border-border/50">
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <Label className="font-['Rajdhani']">Date</Label>
+                <Input
+                  type="date"
+                  value={scheduledDate}
+                  onChange={(e) => setScheduledDate(e.target.value)}
+                  min={format(new Date(), "yyyy-MM-dd")}
+                  className="font-['Rajdhani']"
+                />
+              </div>
+              <div className="flex-1">
+                <Label className="font-['Rajdhani']">Time</Label>
+                <Input
+                  type="time"
+                  value={scheduledTime}
+                  onChange={(e) => setScheduledTime(e.target.value)}
+                  className="font-['Rajdhani']"
+                />
+              </div>
             </div>
-            <div className="flex-1">
-              <Label className="font-['Rajdhani']">Time</Label>
-              <Input
-                type="time"
-                value={scheduledTime}
-                onChange={(e) => setScheduledTime(e.target.value)}
-                className="font-['Rajdhani']"
-              />
+            <div className="text-sm text-muted-foreground font-['Rajdhani'] flex items-center gap-1">
+              <Clock className="w-4 h-4" />
+              Timezone: {Intl.DateTimeFormat().resolvedOptions().timeZone}
             </div>
           </div>
         )}
