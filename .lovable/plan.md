@@ -1,38 +1,49 @@
 
+# Notification History Log and Database Cleanup
 
-# Generate VAPID Keys via Edge Function
+## What We're Building
 
-## What This Does
-Create a simple edge function that generates a VAPID key pair using the Web Crypto API built into Deno. You'll call it once to get your keys, then add them as secrets.
+1. **Notification History UI** -- A new admin panel section showing all sent push notifications with title, message, recipient count, and timestamp.
 
-## Implementation
+2. **Automated Cleanup** -- A cron job to delete old notification records (push_notifications and scheduled_notifications) after 90 days to prevent database bloat.
 
-### 1. Create `supabase/functions/generate-vapid-keys/index.ts`
+---
 
-- Uses the Web Crypto API to generate an ECDSA P-256 key pair
-- Exports the public key as a URL-safe base64 string (the format Web Push requires)
-- Exports the private key in the same format
-- No authentication required (one-time use, will be deleted after)
+## Implementation Steps
 
-### 2. Add to `supabase/config.toml`
+### 1. Create NotificationHistory Component
 
-```toml
-[functions.generate-vapid-keys]
-verify_jwt = false
+A new component `src/components/admin/NotificationHistory.tsx` that:
+- Fetches from the existing `push_notifications` table (already has admin SELECT RLS policy)
+- Displays a table with columns: Title, Message, Recipients, Sent At
+- Shows a badge with total count
+- Includes a refresh button
+- Limits display to most recent 50 entries
+- Uses the project's existing Orbitron/Rajdhani font styling
+
+### 2. Add Component to Admin Page
+
+Insert `<NotificationHistory />` into `src/pages/Admin.tsx` right after the `PushNotificationComposer`.
+
+### 3. Database Cleanup Cron Job
+
+Add a scheduled SQL job (via Supabase insert tool) that runs weekly at 3 AM UTC on Sundays:
+- Deletes rows from `push_notifications` older than 90 days
+- Deletes rows from `scheduled_notifications` with status "sent" or "cancelled" older than 90 days
+
+---
+
+## Technical Details
+
+**Existing infrastructure used:**
+- `push_notifications` table already exists with columns: id, title, body, image_url, sent_by, sent_at, recipient_count
+- RLS policy "Admins can view push notification log" already grants admin SELECT access
+- No new tables or migrations needed
+
+**Cleanup SQL (cron job):**
+```sql
+DELETE FROM public.push_notifications WHERE sent_at < NOW() - INTERVAL '90 days';
+DELETE FROM public.scheduled_notifications WHERE status IN ('sent', 'cancelled') AND scheduled_at < NOW() - INTERVAL '90 days';
 ```
 
-### 3. Usage Flow
-
-1. Deploy the function
-2. Call it once via the browser or curl to get your keys
-3. Add the keys as Supabase secrets (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_EMAIL`)
-4. Delete the function (no longer needed)
-5. Continue with the rest of the push notification implementation
-
-### Files to Create/Modify
-
-| Action | File |
-|---|---|
-| Create | `supabase/functions/generate-vapid-keys/index.ts` |
-| Modify | `supabase/config.toml` -- add function config |
-
+**Schedule:** Weekly on Sundays at 3 AM UTC (same pattern as existing cleanup jobs)
