@@ -48,14 +48,15 @@ self.addEventListener('push', (event) => {
   let data = { title: 'Dance One Radio', body: 'New update available!' };
 
   if (event.data) {
+    let rawText = '';
     try {
-      const rawText = event.data.text();
+      rawText = event.data.text();
       console.log('🔔 Push raw data:', rawText);
       data = JSON.parse(rawText);
       console.log('🔔 Push parsed data:', JSON.stringify(data));
     } catch (e) {
       console.error('🔔 Push parse error:', e);
-      data.body = event.data.text();
+      data.body = rawText || 'New update available!';
     }
   } else {
     console.log('🔔 Push event has no data');
