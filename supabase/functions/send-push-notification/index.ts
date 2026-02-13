@@ -85,8 +85,14 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Ensure mailto: prefix for VAPID subject
+    const vapidSubject = vapidEmail.startsWith("mailto:") ? vapidEmail : `mailto:${vapidEmail}`;
+    console.log(`🔔 VAPID subject: ${vapidSubject}`);
+    console.log(`🔔 VAPID public key (first 20): ${vapidPublicKey.substring(0, 20)}...`);
+    console.log(`🔔 Subscription count: ${subscriptions.length}`);
+
     const vapid: VapidKeys = {
-      subject: vapidEmail,
+      subject: vapidSubject,
       publicKey: vapidPublicKey,
       privateKey: vapidPrivateKey,
     };
