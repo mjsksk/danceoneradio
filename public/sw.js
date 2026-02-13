@@ -1,4 +1,5 @@
-const CACHE_NAME = 'dance-one-radio-v5';
+const CACHE_NAME = 'dance-one-radio-v6';
+console.log('🔔 Service Worker loaded: v6');
 const STATIC_ASSETS = [
   '/assets/dance-one-logo-DP6h_tTr.png',
   '/assets/hero-bg-B-ZqE77g.jpg',
