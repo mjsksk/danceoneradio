@@ -410,6 +410,45 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_notifications: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string | null
+          icon_url: string | null
+          id: string
+          recipient_count: number | null
+          scheduled_at: string
+          sent_at: string | null
+          status: string
+          title: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          created_by?: string | null
+          icon_url?: string | null
+          id?: string
+          recipient_count?: number | null
+          scheduled_at: string
+          sent_at?: string | null
+          status?: string
+          title: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          icon_url?: string | null
+          id?: string
+          recipient_count?: number | null
+          scheduled_at?: string
+          sent_at?: string | null
+          status?: string
+          title?: string
+        }
+        Relationships: []
+      }
       site_visits: {
         Row: {
           country: string | null
