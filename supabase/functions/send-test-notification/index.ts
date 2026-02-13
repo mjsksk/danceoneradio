@@ -41,6 +41,8 @@ Deno.serve(async (req) => {
   }
 
   try {
+    console.log("send-test-notification: received request");
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY")!;
@@ -48,6 +50,7 @@ Deno.serve(async (req) => {
     const vapidEmail = Deno.env.get("VAPID_EMAIL")!;
 
     if (!supabaseUrl || !supabaseServiceKey || !vapidPublicKey || !vapidPrivateKey || !vapidEmail) {
+      console.error("send-test-notification: missing configuration");
       throw new Error("Missing configuration");
     }
 
@@ -56,6 +59,7 @@ Deno.serve(async (req) => {
     // Verify admin role
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
+      console.log("send-test-notification: no auth header");
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -70,6 +74,7 @@ Deno.serve(async (req) => {
     ).auth.getClaims(token);
 
     if (claimsError || !claimsData?.claims) {
+      console.error("send-test-notification: claims error", claimsError);
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -77,6 +82,7 @@ Deno.serve(async (req) => {
     }
 
     const userId = claimsData.claims.sub as string;
+    console.log("send-test-notification: authenticated user", userId);
 
     const { data: userRole } = await supabase
       .from("user_roles")
@@ -86,6 +92,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (!userRole) {
+      console.log("send-test-notification: user is not admin");
       return new Response(JSON.stringify({ error: "Admin access required" }), {
         status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -108,6 +115,8 @@ Deno.serve(async (req) => {
       });
     }
 
+    console.log("send-test-notification: looking up subscription for endpoint", endpoint.substring(0, 60) + "...");
+
     // Get the subscription for this endpoint
     const { data: subscription, error: subError } = await supabase
       .from("push_subscriptions")
@@ -116,11 +125,14 @@ Deno.serve(async (req) => {
       .single();
 
     if (subError || !subscription) {
+      console.error("send-test-notification: subscription not found", subError?.message);
       return new Response(
         JSON.stringify({ error: "Subscription not found", details: subError?.message }),
         { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    console.log("send-test-notification: found subscription, building push request");
 
     const privateJWK = buildPrivateJWK(vapidPublicKey, vapidPrivateKey);
 
@@ -148,40 +160,44 @@ Deno.serve(async (req) => {
         },
       });
 
+      console.log("send-test-notification: sending to push service", pushEndpoint.substring(0, 60) + "...");
+
       const response = await fetch(pushEndpoint, {
         method: "POST",
         headers,
         body,
       });
 
+      const respText = await response.text();
+      console.log(`send-test-notification: push service responded ${response.status}: ${respText}`);
+
       if (response.status === 201 || response.status === 200) {
         return new Response(
-          JSON.stringify({ success: true, message: "Test notification sent" }),
+          JSON.stringify({ success: true, message: "Test notification sent", pushStatus: response.status }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       } else if (response.status === 410 || response.status === 404) {
         await supabase.from("push_subscriptions").delete().eq("endpoint", subscription.endpoint);
         return new Response(
-          JSON.stringify({ error: "Subscription expired or invalid" }),
+          JSON.stringify({ error: "Subscription expired or invalid. It has been removed. Please re-enable notifications and try again." }),
           { status: 410, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       } else {
-        const respText = await response.text();
-        console.error(`Push failed ${response.status}: ${respText}`);
+        console.error(`send-test-notification: push failed ${response.status}: ${respText}`);
         return new Response(
-          JSON.stringify({ error: `Push service returned ${response.status}` }),
+          JSON.stringify({ error: `Push service returned ${response.status}`, details: respText }),
           { status: response.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
     } catch (error) {
-      console.error("Push error:", error);
+      console.error("send-test-notification: push error:", error);
       return new Response(
         JSON.stringify({ error: error.message }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
   } catch (error) {
-    console.error("Error:", error);
+    console.error("send-test-notification: error:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
