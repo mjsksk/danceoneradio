@@ -564,6 +564,7 @@ export type Database = {
       }
     }
     Functions: {
+      cleanup_old_notifications: { Args: never; Returns: undefined }
       cleanup_old_request_logs: { Args: never; Returns: undefined }
       cleanup_old_site_visits: { Args: never; Returns: undefined }
       cleanup_old_subscriber_tracking_data: { Args: never; Returns: undefined }
