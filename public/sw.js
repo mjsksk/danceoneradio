@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dance-one-radio-v4';
+const CACHE_NAME = 'dance-one-radio-v5';
 const STATIC_ASSETS = [
   '/assets/dance-one-logo-DP6h_tTr.png',
   '/assets/hero-bg-B-ZqE77g.jpg',
@@ -54,20 +54,24 @@ self.addEventListener('push', (event) => {
   let url = '/';
 
   if (event.data) {
-    let rawText = '';
     try {
-      rawText = event.data.text();
-      console.log('🔔 Push raw data:', rawText);
-      const parsed = JSON.parse(rawText);
-      console.log('🔔 Push parsed data:', JSON.stringify(parsed));
+      // Use json() - most reliable for encrypted push payloads
+      const parsed = event.data.json();
+      console.log('🔔 Push parsed via json():', JSON.stringify(parsed));
       title = parsed.title || defaultTitle;
       body = parsed.body || parsed.message || defaultBody;
       icon = parsed.icon || icon;
       badge = parsed.badge || badge;
       url = parsed.url || url;
     } catch (e) {
-      console.error('🔔 Push parse error:', e);
-      body = rawText || defaultBody;
+      console.error('🔔 Push json() failed:', e);
+      try {
+        const rawText = event.data.text();
+        console.log('🔔 Push text fallback:', rawText);
+        body = rawText || defaultBody;
+      } catch (e2) {
+        console.error('🔔 Push text() also failed:', e2);
+      }
     }
   } else {
     console.log('🔔 Push event has no data');
@@ -78,6 +82,7 @@ self.addEventListener('push', (event) => {
     icon: icon,
     badge: badge,
     tag: 'dance-one-notification-' + Date.now(),
+    requireInteraction: true,
     data: { url: url },
   };
 
