@@ -1,32 +1,11 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.54.0";
-import { buildPushHTTPRequest } from "npm:@pushforge/builder";
+import {
+  buildPushPayload,
+  type VapidKeys,
+  type PushSubscription as WebPushSubscription,
+  type PushMessage,
+} from "npm:@block65/webcrypto-web-push";
 import { corsHeaders } from "../_shared/corsHeaders.ts";
-
-function base64UrlDecode(str: string): Uint8Array {
-  const padding = "=".repeat((4 - (str.length % 4)) % 4);
-  const base64 = (str + padding).replace(/-/g, "+").replace(/_/g, "/");
-  const binary = atob(base64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  return bytes;
-}
-
-function base64UrlEncode(data: Uint8Array): string {
-  let binary = "";
-  for (const byte of data) {
-    binary += String.fromCharCode(byte);
-  }
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-function buildPrivateJWK(publicKeyBase64: string, privateKeyBase64: string) {
-  const publicKeyBytes = base64UrlDecode(publicKeyBase64);
-  const x = base64UrlEncode(publicKeyBytes.slice(1, 33));
-  const y = base64UrlEncode(publicKeyBytes.slice(33, 65));
-  return { kty: "EC", crv: "P-256", d: privateKeyBase64, x, y };
-}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -50,26 +29,24 @@ Deno.serve(async (req) => {
 
     // Allow service role key (from pg_cron) or validate as admin user
     if (token !== supabaseServiceKey) {
-      // Not service role - check if it's an admin user
-      const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2.54.0");
-      const anonClient = createClient(
+      const { createClient: createAnonClient } = await import("https://esm.sh/@supabase/supabase-js@2.54.0");
+      const anonClient = createAnonClient(
         supabaseUrl,
         Deno.env.get("SUPABASE_ANON_KEY")!,
         { global: { headers: { Authorization: authHeader } } }
       );
-      const { data: claimsData, error: claimsError } = await anonClient.auth.getClaims(token);
-      if (claimsError || !claimsData?.claims) {
+      const { data: { user }, error: userError } = await anonClient.auth.getUser(token);
+      if (userError || !user) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), {
           status: 401,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      const userId = claimsData.claims.sub as string;
       const supabase = createClient(supabaseUrl, supabaseServiceKey);
       const { data: userRole } = await supabase
         .from("user_roles")
         .select("role")
-        .eq("user_id", userId)
+        .eq("user_id", user.id)
         .eq("role", "admin")
         .single();
       if (!userRole) {
@@ -79,6 +56,7 @@ Deno.serve(async (req) => {
         });
       }
     }
+
     const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY")!;
     const vapidPrivateKey = Deno.env.get("VAPID_PRIVATE_KEY")!;
     const vapidEmail = Deno.env.get("VAPID_EMAIL")!;
@@ -110,7 +88,6 @@ Deno.serve(async (req) => {
       .select("*");
 
     if (!subscriptions?.length) {
-      // Mark all as sent with 0 recipients
       for (const notif of pendingNotifications) {
         await supabase.from("scheduled_notifications").update({
           status: "sent",
@@ -124,35 +101,40 @@ Deno.serve(async (req) => {
       );
     }
 
-    const privateJWK = buildPrivateJWK(vapidPublicKey, vapidPrivateKey);
+    const vapid: VapidKeys = {
+      subject: vapidEmail,
+      publicKey: vapidPublicKey,
+      privateKey: vapidPrivateKey,
+    };
+
     let totalProcessed = 0;
 
     for (const notif of pendingNotifications) {
-      const pushPayload = {
+      const pushPayloadStr = JSON.stringify({
         title: notif.title,
         body: notif.body,
         icon: notif.icon_url || "/favicon.png",
         badge: "/favicon.png",
         url: "/",
-      };
+      });
 
       let sentCount = 0;
 
       for (const sub of subscriptions) {
         try {
-          const { endpoint, headers, body } = await buildPushHTTPRequest({
-            privateJWK,
-            subscription: {
-              endpoint: sub.endpoint,
-              keys: { p256dh: sub.p256dh, auth: sub.auth },
-            },
-            message: {
-              payload: JSON.stringify(pushPayload),
-              adminContact: vapidEmail,
-            },
-          });
+          const subscription: WebPushSubscription = {
+            endpoint: sub.endpoint,
+            expirationTime: null,
+            keys: { p256dh: sub.p256dh, auth: sub.auth },
+          };
 
-          const response = await fetch(endpoint, { method: "POST", headers, body });
+          const pushMessage: PushMessage = {
+            data: pushPayloadStr,
+            options: { ttl: 60 },
+          };
+
+          const payload = await buildPushPayload(pushMessage, subscription, vapid);
+          const response = await fetch(subscription.endpoint, payload);
 
           if (response.status === 201 || response.status === 200) {
             sentCount++;
