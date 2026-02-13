@@ -43,27 +43,39 @@ self.addEventListener('activate', (event) => {
 
 // Push event - handle incoming push notifications
 self.addEventListener('push', (event) => {
+  console.log('🔔 Push event received!', event);
+  
   let data = { title: 'Dance One Radio', body: 'New update available!' };
 
   if (event.data) {
     try {
-      data = event.data.json();
+      const rawText = event.data.text();
+      console.log('🔔 Push raw data:', rawText);
+      data = JSON.parse(rawText);
+      console.log('🔔 Push parsed data:', JSON.stringify(data));
     } catch (e) {
+      console.error('🔔 Push parse error:', e);
       data.body = event.data.text();
     }
+  } else {
+    console.log('🔔 Push event has no data');
   }
 
   const options = {
     body: data.body,
     icon: data.icon || '/favicon.png',
     badge: data.badge || '/favicon.png',
-    tag: data.tag || 'dance-one-notification',
+    tag: data.tag || 'dance-one-notification-' + Date.now(),
     requireInteraction: data.requireInteraction || false,
     data: { url: data.url || '/' },
   };
 
+  console.log('🔔 Showing notification:', data.title, JSON.stringify(options));
+
   event.waitUntil(
     self.registration.showNotification(data.title, options)
+      .then(() => console.log('🔔 Notification shown successfully'))
+      .catch((err) => console.error('🔔 showNotification failed:', err))
   );
 });
 
