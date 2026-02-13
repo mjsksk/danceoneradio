@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Bell, Send } from "lucide-react";
+import { Bell, Send, TestTube } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -14,6 +14,7 @@ export const PushNotificationComposer = () => {
   const [body, setBody] = useState("");
   const [icon, setIcon] = useState("");
   const [loading, setLoading] = useState(false);
+  const [testLoading, setTestLoading] = useState(false);
   const [sentCount, setSentCount] = useState(0);
 
   const handleSend = async () => {
@@ -83,6 +84,78 @@ export const PushNotificationComposer = () => {
     }
   };
 
+  const handleSendTest = async () => {
+    if (!title.trim() || !body.trim()) {
+      toast({
+        title: "Error",
+        description: "Title and body are required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setTestLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("You must be logged in");
+      }
+
+      // Get the user's subscriptions
+      const { data: subscriptions, error: subError } = await supabase
+        .from("push_subscriptions")
+        .select("endpoint")
+        .limit(1);
+
+      if (subError || !subscriptions?.length) {
+        throw new Error("No subscription found. Please enable notifications first.");
+      }
+
+      const response = await fetch(
+        "https://upbwlnpycrbhxahjztrf.supabase.co/functions/v1/send-test-notification",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+            apikey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwYndsbnB5Y3JiaHhhaGp6dHJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODQ3MzQsImV4cCI6MjA3MDM2MDczNH0.3N7hPJIiHokZvHZQSnQqZl1xu2POj4FrNyVPMQxF55U",
+          },
+          body: JSON.stringify({
+            message: {
+              title,
+              body,
+              icon: icon || undefined,
+            },
+            endpoint: subscriptions[0].endpoint,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to send test notification");
+      }
+
+      toast({
+        title: "Success",
+        description: "Test notification sent to you!",
+      });
+    } catch (error) {
+      console.error("Error sending test notification:", error);
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to send test notification",
+        variant: "destructive",
+      });
+    } finally {
+      setTestLoading(false);
+    }
+  };
+
   return (
     <Card className="p-8 bg-card/50 backdrop-blur-sm border-border/50">
       <div className="flex items-center gap-2 mb-6">
@@ -140,7 +213,16 @@ export const PushNotificationComposer = () => {
             className="bg-neon hover:bg-neon/90 text-black font-['Rajdhani']"
           >
             <Send className="w-4 h-4 mr-2" />
-            {loading ? "Sending..." : "Send Notification"}
+            {loading ? "Sending..." : "Send to All"}
+          </Button>
+          <Button
+            onClick={handleSendTest}
+            disabled={testLoading || !title.trim() || !body.trim()}
+            variant="outline"
+            className="font-['Rajdhani']"
+          >
+            <TestTube className="w-4 h-4 mr-2" />
+            {testLoading ? "Sending..." : "Send Test"}
           </Button>
         </div>
 
