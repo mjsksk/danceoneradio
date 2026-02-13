@@ -129,6 +129,8 @@ Deno.serve(async (req) => {
 
     for (const sub of subscriptions) {
       try {
+        console.log(`🔔 Sending to endpoint: ${sub.endpoint.substring(0, 60)}...`);
+        
         const { endpoint, headers, body } = await buildPushHTTPRequest({
           privateJWK,
           subscription: {
@@ -144,27 +146,30 @@ Deno.serve(async (req) => {
           },
         });
 
+        console.log(`🔔 Push request built. Endpoint: ${endpoint}`);
+        console.log(`🔔 Payload being sent: ${JSON.stringify(pushPayload)}`);
+
         const response = await fetch(endpoint, {
           method: "POST",
           headers,
           body,
         });
 
+        const responseBody = await response.text();
+        console.log(`🔔 Push response: status=${response.status}, body=${responseBody}`);
+
         if (response.status === 201 || response.status === 200) {
           sentCount++;
         } else if (response.status === 410 || response.status === 404) {
+          console.log(`🔔 Subscription expired, removing: ${sub.endpoint.substring(0, 60)}`);
           await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
           failedCount++;
         } else {
-          const respText = await response.text();
-          console.error(`Push failed ${response.status}: ${respText}`);
+          console.error(`🔔 Push failed ${response.status}: ${responseBody}`);
           failedCount++;
-          continue;
         }
-
-        await response.text().catch(() => {});
       } catch (error) {
-        console.error("Push error:", error);
+        console.error("🔔 Push error:", error);
         failedCount++;
       }
     }
