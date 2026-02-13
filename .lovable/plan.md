@@ -1,74 +1,108 @@
 
-
-# Visitor Analytics for Admin Dashboard
+# Web Push Notifications System
 
 ## Overview
-Add a visitor tracking system that logs every page visit with the visitor's country (detected server-side via IP geolocation) and a fingerprint-based returning visitor flag. The data is displayed as a new section on the admin dashboard.
+Add a browser push notification system where visitors can opt in to receive notifications, and admins can compose and send notifications (with optional image) from the admin dashboard.
 
 ## How It Works
 
-1. **Visitor hits any page** -- the frontend sends a lightweight request to a new edge function
-2. **Edge function** detects the visitor's country from their IP address using a free geolocation API, generates a visitor fingerprint hash, and stores the visit in a new `site_visits` table
-3. **Admin dashboard** shows a summary card and a country breakdown table, with new/returning visitor counts
+1. **Visitor lands on the site** -- after a short delay, a styled in-app prompt asks if they want to enable notifications
+2. **If accepted** -- the browser's native permission dialog appears, and their subscription is stored in the database
+3. **Admin creates a notification** -- fills in title, body, optional image URL, and clicks send
+4. **Edge function** loops through all stored subscriptions and delivers the push notification via the Web Push API
 
 ## Technical Details
 
-### 1. Database -- new `site_visits` table
+### 1. Service Worker Update (`public/sw.js`)
+
+Add push event and notification click handlers to the existing service worker:
+- Listen for `push` events and display the notification with title, body, icon, and optional image
+- Handle `notificationclick` to open the site when tapped
+
+### 2. Database -- new `push_subscriptions` table
 
 | Column | Type | Notes |
 |---|---|---|
 | id | uuid | Primary key |
-| visitor_hash | text | SHA-256 of IP + User-Agent (privacy-safe, no raw IP stored) |
-| country | text | Country name from geolocation |
-| country_code | text | ISO country code (e.g., "US") |
-| page_path | text | Which page was visited |
-| is_returning | boolean | True if visitor_hash already exists |
-| visited_at | timestamptz | Defaults to now() |
+| endpoint | text | Unique, the push service URL |
+| p256dh | text | Public key for encryption |
+| auth | text | Auth secret for encryption |
+| created_at | timestamptz | When subscribed |
 
-RLS: No public SELECT (admin-only via a database function, similar to listener analytics).
+RLS: insert allowed for anon (public subscribe), select/delete restricted to service role. A cleanup policy removes stale subscriptions on failed delivery.
 
-### 2. Database functions (admin-only)
+### 3. Database -- new `push_notifications` table (log)
 
-- `get_visitor_analytics(start_date, end_date)` -- returns country, total visits, unique visitors, returning visitors, grouped by country
-- `get_visitor_summary(start_date, end_date)` -- returns total visits, unique visitors, returning visitors, top country
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| title | text | Notification title |
+| body | text | Notification body text |
+| image_url | text | Optional image URL |
+| sent_by | text | Admin email |
+| sent_at | timestamptz | When sent |
+| recipient_count | integer | How many were sent to |
 
-### 3. Edge Function: `track-visit`
+RLS: admin-only select, service role insert.
 
-- Receives `{ page_path }` from the frontend
-- Extracts IP from request headers (`x-forwarded-for` / `x-real-ip`)
-- Calls a free IP geolocation API (e.g., `ip-api.com`) to get country
-- Computes a SHA-256 hash of IP + User-Agent for visitor fingerprinting
-- Checks if this hash already exists in the table to set `is_returning`
-- Inserts the record using the service role client
-- No JWT required (public endpoint, fires on every page load)
+### 4. VAPID Keys
 
-### 4. Frontend: `useVisitorTracking` hook
+Web Push requires VAPID (Voluntary Application Server Identification) key pair. You will need to:
+- Generate a VAPID key pair (one-time setup)
+- Store the private key as a Supabase secret (`VAPID_PRIVATE_KEY`)
+- Store the public key as a Supabase secret (`VAPID_PUBLIC_KEY`) and also hardcode it in the frontend for subscription
+- Store a contact email as `VAPID_EMAIL` secret (or reuse ADMIN_EMAIL)
 
-- Called once on app mount (in `App.tsx` or a layout component)
-- Sends `POST` to the `track-visit` edge function with the current page path
-- Fires only once per session (uses `sessionStorage` flag to avoid duplicates)
+### 5. Edge Function: `send-push-notification`
 
-### 5. Frontend: `VisitorAnalytics` admin component
+- Requires JWT (admin only)
+- Receives `{ title, body, image_url? }` 
+- Fetches all subscriptions from `push_subscriptions`
+- Sends each notification using the `web-push` protocol (manual implementation using Web Crypto API since Deno doesn't have the npm `web-push` library)
+- Removes subscriptions that return 410 Gone (unsubscribed)
+- Logs the notification in `push_notifications`
 
-- New component at `src/components/admin/VisitorAnalytics.tsx`
-- Summary cards: Total Visits, Unique Visitors, Returning Visitors, Top Country
-- Country breakdown table with columns: Country, Visits, Unique Visitors, Returning, percentage bar
-- Same date range filter pattern as the existing `ListenerAnalytics` component (preset + custom range)
-- Added to the Admin page alongside the existing analytics sections
+### 6. Edge Function: `subscribe-push`
 
-### 6. Config
+- No JWT required (public endpoint)
+- Receives `{ endpoint, keys: { p256dh, auth } }`
+- Upserts into `push_subscriptions` (on conflict with endpoint, update keys)
 
-- Add `track-visit` to `supabase/config.toml` with `verify_jwt = false`
+### 7. Frontend: `NotificationPrompt` component
+
+- Shows a styled banner/card after 5 seconds on first visit (checks localStorage flag)
+- Two buttons: "Enable Notifications" and "No Thanks"
+- On accept: calls `Notification.requestPermission()`, then `serviceWorkerRegistration.pushManager.subscribe()` with the VAPID public key, then POSTs the subscription to `subscribe-push`
+- On dismiss: sets localStorage flag, doesn't ask again for 30 days
+- Does not show if browser doesn't support push or if already subscribed
+
+### 8. Frontend: `PushNotificationComposer` admin component
+
+- Title input, body textarea, optional image URL input
+- "Send Test" button (sends only to admin's own subscription)
+- "Send to All" button with confirmation dialog
+- Shows last notification stats (recipient count, timestamp)
+- Added to Admin.tsx
+
+### 9. Configuration
+
+- Add `send-push-notification` to `supabase/config.toml` with `verify_jwt = true`
+- Add `subscribe-push` to `supabase/config.toml` with `verify_jwt = false`
 
 ### Files to create/modify
 
 | Action | File |
 |---|---|
-| Create | `supabase/functions/track-visit/index.ts` |
-| Create | `src/components/admin/VisitorAnalytics.tsx` |
-| Create | `src/hooks/useVisitorTracking.tsx` |
-| Modify | `src/App.tsx` -- add the tracking hook |
-| Modify | `src/pages/Admin.tsx` -- add VisitorAnalytics component |
-| Modify | `supabase/config.toml` -- add track-visit config |
-| Migration | New table `site_visits` + RLS + two database functions |
+| Create | `supabase/functions/subscribe-push/index.ts` |
+| Create | `supabase/functions/send-push-notification/index.ts` |
+| Create | `src/components/NotificationPrompt.tsx` |
+| Create | `src/components/admin/PushNotificationComposer.tsx` |
+| Modify | `public/sw.js` -- add push event handlers |
+| Modify | `src/App.tsx` -- add NotificationPrompt component |
+| Modify | `src/pages/Admin.tsx` -- add PushNotificationComposer |
+| Modify | `supabase/config.toml` -- add new edge functions |
+| Migration | New tables `push_subscriptions` + `push_notifications` + RLS |
 
+### Setup Required From You
+
+After implementation, you will need to generate VAPID keys and add them as Supabase secrets. I will provide instructions and a simple generation method when we get to that step.
