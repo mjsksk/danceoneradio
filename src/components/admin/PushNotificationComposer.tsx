@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Bell, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export const PushNotificationComposer = () => {
   const { toast } = useToast();
@@ -27,13 +28,19 @@ export const PushNotificationComposer = () => {
 
     setLoading(true);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("You must be logged in");
+      }
+
       const response = await fetch(
         "https://upbwlnpycrbhxahjztrf.supabase.co/functions/v1/send-push-notification",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            // In real implementation, would use actual auth token
+            Authorization: `Bearer ${session.access_token}`,
+            apikey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwYndsbnB5Y3JiaHhhaGp6dHJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3ODQ3MzQsImV4cCI6MjA3MDM2MDczNH0.3N7hPJIiHokZvHZQSnQqZl1xu2POj4FrNyVPMQxF55U",
           },
           body: JSON.stringify({
             message: {
@@ -138,8 +145,8 @@ export const PushNotificationComposer = () => {
         </div>
 
         {sentCount > 0 && (
-          <div className="mt-4 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-            <p className="text-sm text-green-500 font-['Rajdhani']">
+          <div className="mt-4 p-4 bg-primary/10 border border-primary/30 rounded-lg">
+            <p className="text-sm text-primary font-['Rajdhani']">
               ✓ Notification sent to {sentCount} subscribers
             </p>
           </div>
