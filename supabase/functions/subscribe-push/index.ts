@@ -15,65 +15,42 @@ Deno.serve(async (req) => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
     const { subscription } = await req.json();
 
     if (!subscription || !subscription.endpoint) {
       return new Response(
         JSON.stringify({ error: "Invalid subscription data" }),
-        { status: 400, headers: corsHeaders }
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Get the user ID from the JWT
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: corsHeaders }
-      );
-    }
-
-    // Decode JWT to get user ID
-    const token = authHeader.replace("Bearer ", "");
-    const parts = token.split(".");
-    if (parts.length !== 3) {
-      return new Response(
-        JSON.stringify({ error: "Invalid token" }),
-        { status: 401, headers: corsHeaders }
-      );
-    }
-
-    const decoded = JSON.parse(atob(parts[1]));
-    const userId = decoded.sub;
-
-    // Save subscription to database
-    const { error } = await supabase.from("push_subscriptions").insert([
+    // Upsert subscription (endpoint is unique)
+    const { error } = await supabase.from("push_subscriptions").upsert(
       {
         endpoint: subscription.endpoint,
         p256dh: subscription.keys.p256dh,
         auth: subscription.keys.auth,
-        user_id: userId,
       },
-    ]);
+      { onConflict: "endpoint" }
+    );
 
     if (error) {
       console.error("Error saving subscription:", error);
       return new Response(
         JSON.stringify({ error: "Failed to save subscription" }),
-        { status: 500, headers: corsHeaders }
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     return new Response(
-      JSON.stringify({ success: true, message: "Subscription saved" }),
+      JSON.stringify({ success: true }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
     console.error("Error:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { status: 500, headers: corsHeaders }
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });

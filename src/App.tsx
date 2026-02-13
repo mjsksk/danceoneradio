@@ -12,6 +12,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { BackToTop } from "@/components/BackToTop";
 import { ReadingProgressBar } from "@/components/ReadingProgressBar";
 import { AnimatedRoutes } from "@/components/AnimatedRoutes";
+import { NotificationPrompt } from "@/components/NotificationPrompt";
 import NewYearBanner from "@/components/NewYearBanner";
 import { useVisitorTracking } from "@/hooks/useVisitorTracking";
 
@@ -40,6 +41,7 @@ const App = () => (
                 <AnimatedRoutes />
               </div>
               <BackToTop />
+              <NotificationPrompt />
               <FloatingPlayer />
             </ErrorBoundary>
           </BrowserRouter>

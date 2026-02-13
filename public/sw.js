@@ -21,7 +21,6 @@ self.addEventListener('install', (event) => {
         console.log('Cache install failed:', error);
       })
   );
-  // Force immediate activation
   self.skipWaiting();
 });
 
@@ -39,16 +38,58 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
-  // Force immediate control
   return self.clients.claim();
+});
+
+// Push event - handle incoming push notifications
+self.addEventListener('push', (event) => {
+  let data = { title: 'Dance One Radio', body: 'New update available!' };
+
+  if (event.data) {
+    try {
+      data = event.data.json();
+    } catch (e) {
+      data.body = event.data.text();
+    }
+  }
+
+  const options = {
+    body: data.body,
+    icon: data.icon || '/favicon.png',
+    badge: data.badge || '/favicon.png',
+    tag: data.tag || 'dance-one-notification',
+    requireInteraction: data.requireInteraction || false,
+    data: { url: data.url || '/' },
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
+
+// Notification click - open the app
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  const url = event.notification.data?.url || '/';
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.navigate(url);
+          return client.focus();
+        }
+      }
+      return self.clients.openWindow(url);
+    })
+  );
 });
 
 // Fetch event - serve from cache with fallback to network
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests
   if (event.request.method !== 'GET') return;
   
-  // Skip radio streams and external APIs
   if (event.request.url.includes('myradiostream.com') || 
       event.request.url.includes('api.allorigins.win') ||
       event.request.url.includes('supabase.co/storage') ||
@@ -56,12 +97,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Always fetch fresh HTML documents (SPA routes)
   if (event.request.destination === 'document' || 
       event.request.headers.get('accept')?.includes('text/html')) {
     event.respondWith(
       fetch(event.request).catch(() => {
-        // Fallback to cached index.html for SPA routing
         return caches.match('/index.html') || caches.match('/');
       })
     );
@@ -71,20 +110,14 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
-        // Return cached version if available
-        if (response) {
-          return response;
-        }
+        if (response) return response;
         
-        // Otherwise fetch from network and cache for future use
         return fetch(event.request)
           .then((response) => {
-            // Don't cache non-successful responses
             if (!response || response.status !== 200 || response.type !== 'basic') {
               return response;
             }
             
-            // Cache static assets only
             if (event.request.url.includes('/assets/') || 
                 event.request.url.includes('/lovable-uploads/') ||
                 event.request.url.includes('.css') ||
@@ -103,7 +136,6 @@ self.addEventListener('fetch', (event) => {
             return response;
           })
           .catch(() => {
-            // Fallback for offline scenarios
             if (event.request.destination === 'image') {
               return new Response('', { status: 204 });
             }
