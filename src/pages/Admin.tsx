@@ -9,6 +9,7 @@ import NewsletterCampaign from "@/components/admin/NewsletterCampaign";
 import ManualSubscriberAdd from "@/components/admin/ManualSubscriberAdd";
 import ListenerAnalytics from "@/components/admin/ListenerAnalytics";
 import VisitorAnalytics from "@/components/admin/VisitorAnalytics";
+import { PushNotificationComposer } from "@/components/admin/PushNotificationComposer";
 import { Card } from "@/components/ui/card";
 
 const Admin = () => {
@@ -62,6 +63,8 @@ const Admin = () => {
                 </div>
               </div>
             </Card>
+
+            <PushNotificationComposer />
 
             <VisitorAnalytics />
 
