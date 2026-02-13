@@ -323,6 +323,60 @@ export type Database = {
         }
         Relationships: []
       }
+      push_notifications: {
+        Row: {
+          body: string
+          id: string
+          image_url: string | null
+          recipient_count: number
+          sent_at: string
+          sent_by: string | null
+          title: string
+        }
+        Insert: {
+          body: string
+          id?: string
+          image_url?: string | null
+          recipient_count?: number
+          sent_at?: string
+          sent_by?: string | null
+          title: string
+        }
+        Update: {
+          body?: string
+          id?: string
+          image_url?: string | null
+          recipient_count?: number
+          sent_at?: string
+          sent_by?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+        }
+        Relationships: []
+      }
       radio_track_history: {
         Row: {
           artist: string
