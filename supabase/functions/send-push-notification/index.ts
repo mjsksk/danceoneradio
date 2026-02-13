@@ -1,40 +1,11 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.54.0";
-import { buildPushHTTPRequest } from "npm:@pushforge/builder";
+import {
+  buildPushPayload,
+  type VapidKeys,
+  type PushSubscription as WebPushSubscription,
+  type PushMessage,
+} from "npm:@block65/webcrypto-web-push";
 import { corsHeaders } from "../_shared/corsHeaders.ts";
-
-function base64UrlDecode(str: string): Uint8Array {
-  const padding = "=".repeat((4 - (str.length % 4)) % 4);
-  const base64 = (str + padding).replace(/-/g, "+").replace(/_/g, "/");
-  const binary = atob(base64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  return bytes;
-}
-
-function base64UrlEncode(data: Uint8Array): string {
-  let binary = "";
-  for (const byte of data) {
-    binary += String.fromCharCode(byte);
-  }
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-function buildPrivateJWK(publicKeyBase64: string, privateKeyBase64: string) {
-  // Raw public key is 65 bytes: 0x04 + 32 bytes x + 32 bytes y
-  const publicKeyBytes = base64UrlDecode(publicKeyBase64);
-  const x = base64UrlEncode(publicKeyBytes.slice(1, 33));
-  const y = base64UrlEncode(publicKeyBytes.slice(33, 65));
-
-  return {
-    kty: "EC",
-    crv: "P-256",
-    d: privateKeyBase64,
-    x,
-    y,
-  };
-}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -64,20 +35,20 @@ Deno.serve(async (req) => {
     }
 
     const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await createClient(
+    const { data: { user }, error: userError } = await createClient(
       supabaseUrl,
       Deno.env.get("SUPABASE_ANON_KEY")!,
       { global: { headers: { Authorization: authHeader } } }
-    ).auth.getClaims(token);
+    ).auth.getUser(token);
 
-    if (claimsError || !claimsData?.claims) {
+    if (userError || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const userId = claimsData.claims.sub as string;
+    const userId = user.id;
 
     const { data: userRole } = await supabase
       .from("user_roles")
@@ -114,54 +85,52 @@ Deno.serve(async (req) => {
       );
     }
 
-    const privateJWK = buildPrivateJWK(vapidPublicKey, vapidPrivateKey);
+    const vapid: VapidKeys = {
+      subject: vapidEmail,
+      publicKey: vapidPublicKey,
+      privateKey: vapidPrivateKey,
+    };
 
-    const pushPayload = {
+    const pushPayload = JSON.stringify({
       title: message.title,
       body: message.body,
       icon: message.icon || "/favicon.png",
       badge: "/favicon.png",
       url: message.url || "/",
-    };
+    });
 
     let sentCount = 0;
     let failedCount = 0;
 
     for (const sub of subscriptions) {
       try {
-        console.log(`🔔 Sending to endpoint: ${sub.endpoint.substring(0, 60)}...`);
-        
-        const { endpoint, headers, body } = await buildPushHTTPRequest({
-          privateJWK,
-          subscription: {
-            endpoint: sub.endpoint,
-            keys: {
-              p256dh: sub.p256dh,
-              auth: sub.auth,
-            },
+        const subscription: WebPushSubscription = {
+          endpoint: sub.endpoint,
+          expirationTime: null,
+          keys: {
+            p256dh: sub.p256dh,
+            auth: sub.auth,
           },
-          message: {
-            payload: JSON.stringify(pushPayload),
-            adminContact: vapidEmail,
-          },
-        });
+        };
 
-        console.log(`🔔 Push request built. Endpoint: ${endpoint}`);
-        console.log(`🔔 Payload being sent: ${JSON.stringify(pushPayload)}`);
+        const pushMessage: PushMessage = {
+          data: pushPayload,
+          options: { ttl: 60 },
+        };
 
-        const response = await fetch(endpoint, {
-          method: "POST",
-          headers,
-          body,
-        });
+        console.log(`🔔 Sending to: ${sub.endpoint.substring(0, 60)}...`);
+        console.log(`🔔 Payload: ${pushPayload}`);
 
+        const payload = await buildPushPayload(pushMessage, subscription, vapid);
+
+        const response = await fetch(subscription.endpoint, payload);
         const responseBody = await response.text();
-        console.log(`🔔 Push response: status=${response.status}, body=${responseBody}`);
+        console.log(`🔔 Response: status=${response.status}, body=${responseBody}`);
 
         if (response.status === 201 || response.status === 200) {
           sentCount++;
         } else if (response.status === 410 || response.status === 404) {
-          console.log(`🔔 Subscription expired, removing: ${sub.endpoint.substring(0, 60)}`);
+          console.log(`🔔 Subscription expired, removing`);
           await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
           failedCount++;
         } else {
