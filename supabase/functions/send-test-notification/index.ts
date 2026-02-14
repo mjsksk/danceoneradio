@@ -1,6 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.54.0";
 import * as webpush from "jsr:@negrel/webpush";
 import { corsHeaders } from "../_shared/corsHeaders.ts";
+import { importVapidKeysFromBase64 } from "../_shared/vapidHelper.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -96,11 +97,8 @@ Deno.serve(async (req) => {
     const cleanEmail = vapidEmail.replace(/[<>\s]/g, '').replace(/^mailto:/, '');
     const contactInfo = `mailto:${cleanEmail}`;
 
-    // Import VAPID keys using @negrel/webpush
-    const vapidKeys = await webpush.importVapidKeys({
-      publicKey: vapidPublicKey,
-      privateKey: vapidPrivateKey,
-    }, { extractable: false });
+    // Import VAPID keys from base64url format
+    const vapidKeys = await importVapidKeysFromBase64(vapidPublicKey, vapidPrivateKey);
 
     const appServer = new webpush.ApplicationServer(vapidKeys, contactInfo);
 
