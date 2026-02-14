@@ -1,10 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.54.0";
-import {
-  buildPushPayload,
-  type VapidKeys,
-  type PushSubscription as WebPushSubscription,
-  type PushMessage,
-} from "npm:@block65/webcrypto-web-push";
+import * as webpush from "jsr:@negrel/webpush";
 import { corsHeaders } from "../_shared/corsHeaders.ts";
 
 Deno.serve(async (req) => {
@@ -16,7 +11,7 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Validate that the request is from an authorized source (pg_cron or admin)
+    // Validate authorization
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -29,8 +24,7 @@ Deno.serve(async (req) => {
 
     // Allow service role key (from pg_cron) or validate as admin user
     if (token !== supabaseServiceKey) {
-      const { createClient: createAnonClient } = await import("https://esm.sh/@supabase/supabase-js@2.54.0");
-      const anonClient = createAnonClient(
+      const anonClient = createClient(
         supabaseUrl,
         Deno.env.get("SUPABASE_ANON_KEY")!,
         { global: { headers: { Authorization: authHeader } } }
@@ -101,13 +95,17 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Sanitize VAPID email
     const cleanEmail = vapidEmail.replace(/[<>\s]/g, '').replace(/^mailto:/, '');
-    const vapidSubject = `mailto:${cleanEmail}`;
-    const vapid: VapidKeys = {
-      subject: vapidSubject,
+    const contactInfo = `mailto:${cleanEmail}`;
+
+    // Import VAPID keys using @negrel/webpush
+    const vapidKeys = await webpush.importVapidKeys({
       publicKey: vapidPublicKey,
       privateKey: vapidPrivateKey,
-    };
+    }, { extractable: false });
+
+    const appServer = new webpush.ApplicationServer(vapidKeys, contactInfo);
 
     let totalProcessed = 0;
 
@@ -124,21 +122,18 @@ Deno.serve(async (req) => {
 
       for (const sub of subscriptions) {
         try {
-          const subscription: WebPushSubscription = {
+          const pushSub: webpush.PushSubscription = {
             endpoint: sub.endpoint,
-            expirationTime: null,
-            keys: { p256dh: sub.p256dh, auth: sub.auth },
+            keys: {
+              p256dh: sub.p256dh,
+              auth: sub.auth,
+            },
           };
 
-          const pushMessage: PushMessage = {
-            data: pushPayloadStr,
-            options: { ttl: 60 },
-          };
+          const subscriber = appServer.subscribe(pushSub);
+          const response = await subscriber.pushTextMessage(pushPayloadStr, { ttl: 60 });
 
-          const payload = await buildPushPayload(pushMessage, subscription, vapid);
-          const response = await fetch(subscription.endpoint, payload);
-
-          if (response.status === 201 || response.status === 200) {
+          if (response.ok || response.status === 201 || response.status === 200) {
             sentCount++;
           } else if (response.status === 410 || response.status === 404) {
             await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);

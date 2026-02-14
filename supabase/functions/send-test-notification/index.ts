@@ -1,10 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.54.0";
-import {
-  buildPushPayload,
-  type VapidKeys,
-  type PushSubscription as WebPushSubscription,
-  type PushMessage,
-} from "npm:@block65/webcrypto-web-push";
+import * as webpush from "jsr:@negrel/webpush";
 import { corsHeaders } from "../_shared/corsHeaders.ts";
 
 Deno.serve(async (req) => {
@@ -97,13 +92,17 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Sanitize VAPID email
     const cleanEmail = vapidEmail.replace(/[<>\s]/g, '').replace(/^mailto:/, '');
-    const vapidSubject = `mailto:${cleanEmail}`;
-    const vapid: VapidKeys = {
-      subject: vapidSubject,
+    const contactInfo = `mailto:${cleanEmail}`;
+
+    // Import VAPID keys using @negrel/webpush
+    const vapidKeys = await webpush.importVapidKeys({
       publicKey: vapidPublicKey,
       privateKey: vapidPrivateKey,
-    };
+    }, { extractable: false });
+
+    const appServer = new webpush.ApplicationServer(vapidKeys, contactInfo);
 
     const pushPayload = JSON.stringify({
       title: message.title,
@@ -113,28 +112,21 @@ Deno.serve(async (req) => {
       url: message.url || "/",
     });
 
-    const webPushSub: WebPushSubscription = {
+    const pushSub: webpush.PushSubscription = {
       endpoint: subscription.endpoint,
-      expirationTime: null,
       keys: {
         p256dh: subscription.p256dh,
         auth: subscription.auth,
       },
     };
 
-    const pushMessage: PushMessage = {
-      data: pushPayload,
-      options: { ttl: 60 },
-    };
-
     console.log(`send-test-notification: sending to ${subscription.endpoint.substring(0, 60)}...`);
 
-    const payload = await buildPushPayload(pushMessage, webPushSub, vapid);
-    const response = await fetch(subscription.endpoint, payload);
-    const respText = await response.text();
-    console.log(`send-test-notification: response status=${response.status}, body=${respText}`);
+    const subscriber = appServer.subscribe(pushSub);
+    const response = await subscriber.pushTextMessage(pushPayload, { ttl: 60 });
+    console.log(`send-test-notification: response status=${response.status}`);
 
-    if (response.status === 201 || response.status === 200) {
+    if (response.ok || response.status === 201 || response.status === 200) {
       return new Response(
         JSON.stringify({ success: true, message: "Test notification sent", pushStatus: response.status }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -146,6 +138,7 @@ Deno.serve(async (req) => {
         { status: 410, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     } else {
+      const respText = await response.text().catch(() => "");
       return new Response(
         JSON.stringify({ error: `Push service returned ${response.status}`, details: respText }),
         { status: response.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
