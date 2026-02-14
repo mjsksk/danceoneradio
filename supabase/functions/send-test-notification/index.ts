@@ -1,7 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.54.0";
-import * as webpush from "jsr:@negrel/webpush";
 import { corsHeaders } from "../_shared/corsHeaders.ts";
-import { importVapidKeysFromBase64 } from "../_shared/vapidHelper.ts";
+import { sendWebPush } from "../_shared/webpush.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -9,8 +8,6 @@ Deno.serve(async (req) => {
   }
 
   try {
-    console.log("send-test-notification: received request");
-
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY")!;
@@ -18,7 +15,6 @@ Deno.serve(async (req) => {
     const vapidEmail = Deno.env.get("VAPID_EMAIL")!;
 
     if (!supabaseUrl || !supabaseServiceKey || !vapidPublicKey || !vapidPrivateKey || !vapidEmail) {
-      console.error("send-test-notification: missing configuration");
       throw new Error("Missing configuration");
     }
 
@@ -93,14 +89,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Sanitize VAPID email
     const cleanEmail = vapidEmail.replace(/[<>\s]/g, '').replace(/^mailto:/, '');
-    const contactInfo = `mailto:${cleanEmail}`;
-
-    // Import VAPID keys from base64url format
-    const vapidKeys = await importVapidKeysFromBase64(vapidPublicKey, vapidPrivateKey);
-
-    const appServer = await webpush.ApplicationServer.new({ contactInformation: contactInfo, vapidKeys });
 
     const pushPayload = JSON.stringify({
       title: message.title,
@@ -110,24 +99,35 @@ Deno.serve(async (req) => {
       url: message.url || "/",
     });
 
-    const pushSub: webpush.PushSubscription = {
-      endpoint: subscription.endpoint,
-      keys: {
-        p256dh: subscription.p256dh,
-        auth: subscription.auth,
-      },
-    };
-
     console.log(`send-test-notification: sending to ${subscription.endpoint.substring(0, 60)}...`);
 
-    const subscriber = appServer.subscribe(pushSub);
-    await subscriber.pushTextMessage(pushPayload, { ttl: 60 });
-    console.log(`send-test-notification: push sent successfully`);
-
-    return new Response(
-      JSON.stringify({ success: true, message: "Test notification sent" }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    const result = await sendWebPush(
+      { endpoint: subscription.endpoint, p256dh: subscription.p256dh, auth: subscription.auth },
+      pushPayload,
+      vapidPublicKey,
+      vapidPrivateKey,
+      cleanEmail,
     );
+
+    console.log(`send-test-notification: result ${result.status} ${result.statusText} ${result.body}`);
+
+    if (result.success) {
+      return new Response(
+        JSON.stringify({ success: true, message: "Test notification sent", pushStatus: result.status }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    } else if (result.status === 410 || result.status === 404) {
+      await supabase.from("push_subscriptions").delete().eq("endpoint", subscription.endpoint);
+      return new Response(
+        JSON.stringify({ error: "Subscription expired. Please re-enable notifications." }),
+        { status: 410, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    } else {
+      return new Response(
+        JSON.stringify({ error: `Push service returned ${result.status}`, details: result.body }),
+        { status: result.status || 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
   } catch (error) {
     console.error("send-test-notification: error:", error);
     return new Response(

@@ -1,7 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.54.0";
-import * as webpush from "jsr:@negrel/webpush";
 import { corsHeaders } from "../_shared/corsHeaders.ts";
-import { importVapidKeysFromBase64 } from "../_shared/vapidHelper.ts";
+import { sendWebPush } from "../_shared/webpush.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -81,17 +80,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Sanitize VAPID email
     const cleanEmail = vapidEmail.replace(/[<>\s]/g, '').replace(/^mailto:/, '');
-    const contactInfo = `mailto:${cleanEmail}`;
-    console.log(`🔔 VAPID contact: ${contactInfo}`);
-    console.log(`🔔 Subscription count: ${subscriptions.length}`);
-
-    // Import VAPID keys from base64url format
-    const vapidKeys = await importVapidKeysFromBase64(vapidPublicKey, vapidPrivateKey);
-
-    // Create application server
-    const appServer = await webpush.ApplicationServer.new({ contactInformation: contactInfo, vapidKeys });
+    console.log(`🔔 Sending to ${subscriptions.length} subscribers`);
 
     const pushPayload = JSON.stringify({
       title: message.title,
@@ -108,18 +98,26 @@ Deno.serve(async (req) => {
       try {
         console.log(`🔔 Sending to: ${sub.endpoint.substring(0, 60)}...`);
 
-        const pushSub: webpush.PushSubscription = {
-          endpoint: sub.endpoint,
-          keys: {
-            p256dh: sub.p256dh,
-            auth: sub.auth,
-          },
-        };
+        const result = await sendWebPush(
+          { endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth },
+          pushPayload,
+          vapidPublicKey,
+          vapidPrivateKey,
+          cleanEmail,
+        );
 
-        const subscriber = appServer.subscribe(pushSub);
-        await subscriber.pushTextMessage(pushPayload, { ttl: 60 });
-        console.log(`🔔 Push sent successfully`);
-        sentCount++;
+        console.log(`🔔 Result: ${result.status} ${result.statusText} ${result.body}`);
+
+        if (result.success) {
+          sentCount++;
+        } else if (result.status === 410 || result.status === 404) {
+          console.log(`🔔 Subscription expired, removing`);
+          await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
+          failedCount++;
+        } else {
+          console.error(`🔔 Push failed ${result.status}: ${result.body}`);
+          failedCount++;
+        }
       } catch (error) {
         console.error("🔔 Push error:", error);
         failedCount++;
