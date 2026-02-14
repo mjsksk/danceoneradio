@@ -157,11 +157,11 @@ async function encryptPayload(
   // Derive content encryption key: HKDF(salt, ikm, "Content-Encoding: aes128gcm" || 0x01, 16)
   const salt = crypto.getRandomValues(new Uint8Array(16));
 
-  const cekInfo = concatBuffers(encoder.encode("Content-Encoding: aes128gcm\0"), new Uint8Array([0x01]));
+  const cekInfo = encoder.encode("Content-Encoding: aes128gcm\0");
   const cek = await hkdfDerive(prk, salt.buffer, cekInfo, 16);
 
-  // Derive nonce: HKDF(salt, ikm, "Content-Encoding: nonce" || 0x01, 12)
-  const nonceInfo = concatBuffers(encoder.encode("Content-Encoding: nonce\0"), new Uint8Array([0x01]));
+  // Derive nonce: HKDF(salt, ikm, "Content-Encoding: nonce\0", 12)
+  const nonceInfo = encoder.encode("Content-Encoding: nonce\0");
   const nonce = await hkdfDerive(prk, salt.buffer, nonceInfo, 12);
 
   // Add padding delimiter (0x02 for final record)
