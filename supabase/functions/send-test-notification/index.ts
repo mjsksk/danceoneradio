@@ -121,27 +121,13 @@ Deno.serve(async (req) => {
     console.log(`send-test-notification: sending to ${subscription.endpoint.substring(0, 60)}...`);
 
     const subscriber = appServer.subscribe(pushSub);
-    const response = await subscriber.pushTextMessage(pushPayload, { ttl: 60 });
-    console.log(`send-test-notification: response status=${response.status}`);
+    await subscriber.pushTextMessage(pushPayload, { ttl: 60 });
+    console.log(`send-test-notification: push sent successfully`);
 
-    if (response.ok || response.status === 201 || response.status === 200) {
-      return new Response(
-        JSON.stringify({ success: true, message: "Test notification sent", pushStatus: response.status }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    } else if (response.status === 410 || response.status === 404) {
-      await supabase.from("push_subscriptions").delete().eq("endpoint", subscription.endpoint);
-      return new Response(
-        JSON.stringify({ error: "Subscription expired. Please re-enable notifications." }),
-        { status: 410, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    } else {
-      const respText = await response.text().catch(() => "");
-      return new Response(
-        JSON.stringify({ error: `Push service returned ${response.status}`, details: respText }),
-        { status: response.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    return new Response(
+      JSON.stringify({ success: true, message: "Test notification sent" }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   } catch (error) {
     console.error("send-test-notification: error:", error);
     return new Response(

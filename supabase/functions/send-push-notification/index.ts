@@ -117,21 +117,9 @@ Deno.serve(async (req) => {
         };
 
         const subscriber = appServer.subscribe(pushSub);
-        const resp = await subscriber.pushTextMessage(pushPayload, { ttl: 60 });
-        
-        console.log(`🔔 Response status: ${resp.status}`);
-
-        if (resp.ok || resp.status === 201 || resp.status === 200) {
-          sentCount++;
-        } else if (resp.status === 410 || resp.status === 404) {
-          console.log(`🔔 Subscription expired, removing`);
-          await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
-          failedCount++;
-        } else {
-          const body = await resp.text().catch(() => "");
-          console.error(`🔔 Push failed ${resp.status}: ${body}`);
-          failedCount++;
-        }
+        await subscriber.pushTextMessage(pushPayload, { ttl: 60 });
+        console.log(`🔔 Push sent successfully`);
+        sentCount++;
       } catch (error) {
         console.error("🔔 Push error:", error);
         failedCount++;
