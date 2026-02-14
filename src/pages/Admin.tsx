@@ -10,6 +10,7 @@ import ManualSubscriberAdd from "@/components/admin/ManualSubscriberAdd";
 import ListenerAnalytics from "@/components/admin/ListenerAnalytics";
 import VisitorAnalytics from "@/components/admin/VisitorAnalytics";
 import { PushNotificationComposer } from "@/components/admin/PushNotificationComposer";
+import { PushDiagnostics } from "@/components/admin/PushDiagnostics";
 import NotificationHistory from "@/components/admin/NotificationHistory";
 import { PushSubscriberManager } from "@/components/admin/PushSubscriberManager";
 import { Card } from "@/components/ui/card";
@@ -65,6 +66,8 @@ const Admin = () => {
                 </div>
               </div>
             </Card>
+
+            <PushDiagnostics />
 
             <PushNotificationComposer />
 
