@@ -129,14 +129,8 @@ Deno.serve(async (req) => {
           };
 
           const subscriber = appServer.subscribe(pushSub);
-          const response = await subscriber.pushTextMessage(pushPayloadStr, { ttl: 60 });
-
-          if (response.ok || response.status === 201 || response.status === 200) {
-            sentCount++;
-          } else if (response.status === 410 || response.status === 404) {
-            await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
-          }
-          await response.text().catch(() => {});
+          await subscriber.pushTextMessage(pushPayloadStr, { ttl: 60 });
+          sentCount++;
         } catch (error) {
           console.error("Push error for subscription:", error);
         }
