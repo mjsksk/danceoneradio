@@ -1,7 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.54.0";
-import * as webpush from "jsr:@negrel/webpush";
 import { corsHeaders } from "../_shared/corsHeaders.ts";
-import { importVapidKeysFromBase64 } from "../_shared/vapidHelper.ts";
+import { sendWebPush } from "../_shared/webpush.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -96,15 +95,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Sanitize VAPID email
     const cleanEmail = vapidEmail.replace(/[<>\s]/g, '').replace(/^mailto:/, '');
-    const contactInfo = `mailto:${cleanEmail}`;
-
-    // Import VAPID keys from base64url format
-    const vapidKeys = await importVapidKeysFromBase64(vapidPublicKey, vapidPrivateKey);
-
-    const appServer = await webpush.ApplicationServer.new({ contactInformation: contactInfo, vapidKeys });
-
     let totalProcessed = 0;
 
     for (const notif of pendingNotifications) {
@@ -120,17 +111,19 @@ Deno.serve(async (req) => {
 
       for (const sub of subscriptions) {
         try {
-          const pushSub: webpush.PushSubscription = {
-            endpoint: sub.endpoint,
-            keys: {
-              p256dh: sub.p256dh,
-              auth: sub.auth,
-            },
-          };
+          const result = await sendWebPush(
+            { endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth },
+            pushPayloadStr,
+            vapidPublicKey,
+            vapidPrivateKey,
+            cleanEmail,
+          );
 
-          const subscriber = appServer.subscribe(pushSub);
-          await subscriber.pushTextMessage(pushPayloadStr, { ttl: 60 });
-          sentCount++;
+          if (result.success) {
+            sentCount++;
+          } else if (result.status === 410 || result.status === 404) {
+            await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
+          }
         } catch (error) {
           console.error("Push error for subscription:", error);
         }
