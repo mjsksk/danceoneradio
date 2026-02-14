@@ -126,13 +126,21 @@ Deno.serve(async (req) => {
         };
 
         console.log(`🔔 Sending to: ${sub.endpoint.substring(0, 60)}...`);
-        console.log(`🔔 Payload: ${pushPayload}`);
 
         const payload = await buildPushPayload(pushMessage, subscription, vapid);
+        
+        // Log the actual request details
+        const payloadHeaders = payload.headers instanceof Headers 
+          ? Object.fromEntries(payload.headers.entries()) 
+          : payload.headers;
+        console.log(`🔔 Payload headers:`, JSON.stringify(payloadHeaders));
+        console.log(`🔔 Payload method: ${payload.method}`);
+        console.log(`🔔 Payload body type: ${payload.body?.constructor?.name}, byteLength: ${payload.body instanceof ArrayBuffer ? payload.body.byteLength : payload.body instanceof Uint8Array ? payload.body.byteLength : 'unknown'}`);
 
         const response = await fetch(subscription.endpoint, payload);
         const responseBody = await response.text();
-        console.log(`🔔 Response: status=${response.status}, body=${responseBody}`);
+        const respHeaders = Object.fromEntries(response.headers.entries());
+        console.log(`🔔 Response: status=${response.status}, headers=${JSON.stringify(respHeaders)}, body=${responseBody}`);
 
         if (response.status === 201 || response.status === 200) {
           sentCount++;
