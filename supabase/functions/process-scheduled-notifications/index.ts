@@ -103,7 +103,7 @@ Deno.serve(async (req) => {
     // Import VAPID keys from base64url format
     const vapidKeys = await importVapidKeysFromBase64(vapidPublicKey, vapidPrivateKey);
 
-    const appServer = new webpush.ApplicationServer(vapidKeys, contactInfo);
+    const appServer = await webpush.ApplicationServer.new({ contactInformation: contactInfo, vapidKeys });
 
     let totalProcessed = 0;
 

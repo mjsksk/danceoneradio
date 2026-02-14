@@ -91,7 +91,7 @@ Deno.serve(async (req) => {
     const vapidKeys = await importVapidKeysFromBase64(vapidPublicKey, vapidPrivateKey);
 
     // Create application server
-    const appServer = new webpush.ApplicationServer(vapidKeys, contactInfo);
+    const appServer = await webpush.ApplicationServer.new({ contactInformation: contactInfo, vapidKeys });
 
     const pushPayload = JSON.stringify({
       title: message.title,
