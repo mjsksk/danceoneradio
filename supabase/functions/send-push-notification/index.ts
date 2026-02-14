@@ -85,8 +85,9 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Ensure mailto: prefix for VAPID subject
-    const vapidSubject = vapidEmail.startsWith("mailto:") ? vapidEmail : `mailto:${vapidEmail}`;
+    // Sanitize VAPID email: strip angle brackets, spaces, and ensure mailto: prefix
+    const cleanEmail = vapidEmail.replace(/[<>\s]/g, '').replace(/^mailto:/, '');
+    const vapidSubject = `mailto:${cleanEmail}`;
     console.log(`🔔 VAPID subject: ${vapidSubject}`);
     console.log(`🔔 VAPID public key (first 20): ${vapidPublicKey.substring(0, 20)}...`);
     console.log(`🔔 Subscription count: ${subscriptions.length}`);

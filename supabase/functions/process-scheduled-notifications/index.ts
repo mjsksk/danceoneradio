@@ -101,7 +101,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    const vapidSubject = vapidEmail.startsWith("mailto:") ? vapidEmail : `mailto:${vapidEmail}`;
+    const cleanEmail = vapidEmail.replace(/[<>\s]/g, '').replace(/^mailto:/, '');
+    const vapidSubject = `mailto:${cleanEmail}`;
     const vapid: VapidKeys = {
       subject: vapidSubject,
       publicKey: vapidPublicKey,
