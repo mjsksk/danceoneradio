@@ -44,7 +44,9 @@ self.addEventListener('activate', (event) => {
 
 // Push event - handle incoming push notifications
 self.addEventListener('push', (event) => {
-  console.log('🔔 Push event received!', event);
+  console.log('🔔 Push event received!');
+  console.log('🔔 Has data:', !!event.data);
+  console.log('🔔 Notification permission:', self.Notification?.permission || 'unknown');
   
   const defaultTitle = 'Dance One Radio';
   const defaultBody = 'New update available!';
@@ -56,11 +58,10 @@ self.addEventListener('push', (event) => {
 
   if (event.data) {
     try {
-      // Read as text first to avoid stream consumption issues
       const rawText = event.data.text();
-      console.log('🔔 Push raw text:', rawText);
+      console.log('🔔 Push raw text length:', rawText?.length, 'content:', rawText?.substring(0, 200));
       
-      if (rawText) {
+      if (rawText && rawText.length > 0) {
         try {
           const parsed = JSON.parse(rawText);
           console.log('🔔 Push parsed JSON:', JSON.stringify(parsed));
@@ -70,15 +71,17 @@ self.addEventListener('push', (event) => {
           badge = parsed.badge || badge;
           url = parsed.url || url;
         } catch (jsonErr) {
-          console.log('🔔 Not JSON, using as plain text');
+          console.log('🔔 Not JSON, using as plain text body');
           body = rawText;
         }
+      } else {
+        console.log('🔔 Push data is empty, using defaults');
       }
     } catch (e) {
-      console.error('🔔 Push data read failed:', e);
+      console.error('🔔 Push data read failed:', e.message || e);
     }
   } else {
-    console.log('🔔 Push event has no data');
+    console.log('🔔 Push event has no data, using defaults');
   }
 
   const options = {
@@ -90,12 +93,12 @@ self.addEventListener('push', (event) => {
     data: { url: url },
   };
 
-  console.log('🔔 Showing notification:', title, JSON.stringify(options));
+  console.log('🔔 Calling showNotification with title:', title);
 
   event.waitUntil(
     self.registration.showNotification(title, options)
       .then(() => console.log('🔔 Notification shown successfully'))
-      .catch((err) => console.error('🔔 showNotification failed:', err))
+      .catch((err) => console.error('🔔 showNotification FAILED:', err.message || err))
   );
 });
 
