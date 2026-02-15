@@ -49,7 +49,16 @@ export async function sendWebPush(
     },
   };
 
+  console.log(`webpush: vapid publicKey first 20 chars: ${vapidPublicKeyB64.substring(0, 20)}`);
+  console.log(`webpush: endpoint: ${subscription.endpoint.substring(0, 60)}`);
+  console.log(`webpush: p256dh first 20 chars: ${subscription.p256dh.substring(0, 20)}`);
+  console.log(`webpush: auth length: ${subscription.auth.length}`);
+
   const init = await buildPushPayload(message, pushSub, vapid);
+
+  console.log(`webpush: init keys: ${Object.keys(init).join(', ')}`);
+  console.log(`webpush: init.method: ${init.method}`);
+  console.log(`webpush: init.headers keys: ${init.headers ? Object.keys(init.headers).join(', ') : 'none'}`);
 
   const response = await fetch(subscription.endpoint, init);
   const body = await response.text().catch(() => "");
