@@ -106,7 +106,7 @@ Deno.serve(async (req) => {
           cleanEmail,
         );
 
-        console.log(`🔔 Result: ${result.status} ${result.statusText} ${result.body}`);
+        console.log(`🔔 Result: ${result.status} ${result.statusText} body: ${result.body}`);
 
         if (result.success) {
           sentCount++;
