@@ -49,13 +49,9 @@ export async function sendWebPush(
     },
   };
 
-  const pushRequest = await buildPushPayload(message, pushSub, vapid);
+  const init = await buildPushPayload(message, pushSub, vapid);
 
-  const response = await fetch(pushRequest.url, {
-    method: pushRequest.method,
-    headers: pushRequest.headers,
-    body: pushRequest.body,
-  });
+  const response = await fetch(subscription.endpoint, init);
   const body = await response.text().catch(() => "");
 
   return {
