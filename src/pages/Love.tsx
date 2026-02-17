@@ -98,14 +98,8 @@ const Love = () => {
                   Show your love for Dance One Radio with our exclusive merchandise collection. From stylish apparel to unique accessories, 
                   each item is designed with our signature aesthetic to help you represent the electronic music lifestyle wherever you go.
                 </p>
-                <Button asChild className="btn-cyber">
-                  <a 
-                    href="https://www.cafepress.com/shop/danceone/products?designId=91970401" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                  >
-                    Shop Merchandise
-                  </a>
+                <Button className="btn-cyber opacity-60 cursor-not-allowed" disabled>
+                  Shop Merchandise — Coming Soon
                 </Button>
               </section>
 
