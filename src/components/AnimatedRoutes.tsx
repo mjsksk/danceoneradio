@@ -42,6 +42,7 @@ import DesktopPlayer from '@/pages/DesktopPlayer';
 import Auth from '@/pages/Auth';
 import Account from '@/pages/Account';
 import ResetPassword from '@/pages/ResetPassword';
+import Merch from '@/pages/Merch';
 import NotFound from '@/pages/NotFound';
 
 export function AnimatedRoutes() {
@@ -88,6 +89,7 @@ export function AnimatedRoutes() {
         <Route path="/auth" element={<PageTransition><Auth /></PageTransition>} />
         <Route path="/account" element={<PageTransition><ProtectedRoute><Account /></ProtectedRoute></PageTransition>} />
         <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
+        <Route path="/merch" element={<PageTransition><Merch /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
