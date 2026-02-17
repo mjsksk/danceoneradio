@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
@@ -98,8 +99,8 @@ const Love = () => {
                   Show your love for Dance One Radio with our exclusive merchandise collection. From stylish apparel to unique accessories, 
                   each item is designed with our signature aesthetic to help you represent the electronic music lifestyle wherever you go.
                 </p>
-                <Button className="btn-cyber opacity-60 cursor-not-allowed" disabled>
-                  Shop Merchandise — Coming Soon
+                <Button asChild className="btn-cyber">
+                  <Link to="/merch">Shop Merchandise</Link>
                 </Button>
               </section>
 
