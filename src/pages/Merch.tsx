@@ -4,19 +4,28 @@ import SEO from '@/components/SEO';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ShoppingBag, Store } from 'lucide-react';
+import poweredByHouseMusicTee from '@/assets/merch-powered-by-house-music-tee.jpg';
 
-// Placeholder merch items — replace with real products + Stripe price IDs later
+// Merch items — add Stripe price IDs to enable purchasing
 const merchItems = [
   {
     id: 1,
-    name: 'Dance One Logo Tee',
-    description: 'Classic logo t-shirt in premium cotton.',
-    price: '$29.99',
-    image: null, // Will be replaced with uploaded image
-    priceId: null, // Stripe price_id to be added
+    name: 'Powered By House Music Tee',
+    description: 'Rep the culture with this bold statement tee.',
+    price: '$46.79',
+    image: poweredByHouseMusicTee,
+    priceId: null, // TODO: Add Stripe price_id
   },
   {
     id: 2,
+    name: 'Dance One Logo Tee',
+    description: 'Classic logo t-shirt in premium cotton.',
+    price: '$29.99',
+    image: null,
+    priceId: null,
+  },
+  {
+    id: 3,
     name: 'Dance One Hoodie',
     description: 'Stay warm with our signature hoodie.',
     price: '$54.99',
@@ -24,7 +33,7 @@ const merchItems = [
     priceId: null,
   },
   {
-    id: 3,
+    id: 4,
     name: 'Dance One Cap',
     description: 'Snapback cap with embroidered logo.',
     price: '$24.99',
@@ -32,7 +41,7 @@ const merchItems = [
     priceId: null,
   },
   {
-    id: 4,
+    id: 5,
     name: 'Dance One Sticker Pack',
     description: 'Set of 5 vinyl stickers.',
     price: '$9.99',
