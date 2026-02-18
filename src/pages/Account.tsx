@@ -10,7 +10,8 @@ import { Separator } from '@/components/ui/separator';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
-import { Clock, Music, LogOut, Trash2 } from 'lucide-react';
+import { Clock, Music, LogOut, Trash2, Bell } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 interface EpisodeProgress {
@@ -34,6 +35,9 @@ export default function Account() {
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [listeningHistory, setListeningHistory] = useState<EpisodeProgress[]>([]);
   const [stats, setStats] = useState({ totalEpisodes: 0, totalHours: 0 });
+  const [trackNotifications, setTrackNotifications] = useState(
+    localStorage.getItem('track-change-notifications') !== 'false'
+  );
 
   useEffect(() => {
     if (profile) {
@@ -98,6 +102,11 @@ export default function Account() {
     setNewPassword('');
     setConfirmPassword('');
     setIsUpdatingPassword(false);
+  };
+
+  const handleTrackNotificationToggle = (checked: boolean) => {
+    setTrackNotifications(checked);
+    localStorage.setItem('track-change-notifications', checked ? 'true' : 'false');
   };
 
   const handleSignOut = async () => {
@@ -258,6 +267,31 @@ export default function Account() {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Notification Preferences */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Bell className="h-5 w-5" />
+                  Notification Preferences
+                </CardTitle>
+                <CardDescription>Control which notifications you receive</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-sm">Track Change Notifications</p>
+                    <p className="text-xs text-muted-foreground">
+                      Show a notification when the currently playing song changes on the live radio stream
+                    </p>
+                  </div>
+                  <Switch
+                    checked={trackNotifications}
+                    onCheckedChange={handleTrackNotificationToggle}
+                  />
+                </div>
               </CardContent>
             </Card>
 
