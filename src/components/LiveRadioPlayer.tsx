@@ -222,9 +222,10 @@ const LiveRadioPlayer = ({
     };
   }, [currentStreamTitle]);
 
-  // Desktop notification for track changes
+  // Desktop notification for track changes (respects user preference)
   useEffect(() => {
-    if (isPlaying && displayStreamTitle && !displayStreamTitle.includes('Dance One Radio - The Future')) {
+    const trackNotificationsEnabled = localStorage.getItem('track-change-notifications') !== 'false';
+    if (isPlaying && displayStreamTitle && !displayStreamTitle.includes('Dance One Radio - The Future') && trackNotificationsEnabled) {
       const cleanedTitle = cleanTrackForSearch(displayStreamTitle);
       if (cleanedTitle) {
         showNotification('Now Playing', cleanedTitle);
