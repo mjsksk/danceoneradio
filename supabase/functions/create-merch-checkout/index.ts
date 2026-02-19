@@ -19,8 +19,18 @@ serve(async (req) => {
   );
 
   try {
-    const { priceId, quantity = 1 } = await req.json();
-    if (!priceId) throw new Error("priceId is required");
+    const body = await req.json();
+
+    // Support both single item (legacy) and multiple line items
+    let lineItems: { price: string; quantity: number }[];
+    if (body.lineItems && Array.isArray(body.lineItems)) {
+      if (body.lineItems.length === 0) throw new Error("lineItems cannot be empty");
+      lineItems = body.lineItems;
+    } else if (body.priceId) {
+      lineItems = [{ price: body.priceId, quantity: body.quantity ?? 1 }];
+    } else {
+      throw new Error("Either lineItems or priceId is required");
+    }
 
     // Optionally authenticate user (guest checkout supported)
     let customerEmail: string | undefined;
@@ -49,7 +59,7 @@ serve(async (req) => {
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : customerEmail,
-      line_items: [{ price: priceId, quantity }],
+      line_items: lineItems,
       mode: "payment",
       success_url: `${req.headers.get("origin")}/merch?success=true`,
       cancel_url: `${req.headers.get("origin")}/merch`,
