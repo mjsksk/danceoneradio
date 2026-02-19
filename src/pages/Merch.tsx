@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
@@ -78,10 +78,44 @@ interface CartItem {
   quantity: number;
 }
 
+const CART_STORAGE_KEY = 'dance-one-merch-cart';
+const CART_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+function loadCartFromStorage(): CartItem[] {
+  try {
+    const raw = localStorage.getItem(CART_STORAGE_KEY);
+    if (!raw) return [];
+    const { items, expiresAt } = JSON.parse(raw);
+    if (Date.now() > expiresAt) {
+      localStorage.removeItem(CART_STORAGE_KEY);
+      return [];
+    }
+    return items as CartItem[];
+  } catch {
+    return [];
+  }
+}
+
+function saveCartToStorage(items: CartItem[]) {
+  if (items.length === 0) {
+    localStorage.removeItem(CART_STORAGE_KEY);
+  } else {
+    localStorage.setItem(
+      CART_STORAGE_KEY,
+      JSON.stringify({ items, expiresAt: Date.now() + CART_TTL_MS })
+    );
+  }
+}
+
 const Merch = () => {
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cart, setCart] = useState<CartItem[]>(loadCartFromStorage);
   const [cartOpen, setCartOpen] = useState(false);
   const [checkingOut, setCheckingOut] = useState(false);
+
+  // Persist cart to localStorage whenever it changes
+  useEffect(() => {
+    saveCartToStorage(cart);
+  }, [cart]);
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const cartTotal = cart.reduce((sum, item) => sum + item.priceAmount * item.quantity, 0);
