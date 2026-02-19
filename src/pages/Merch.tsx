@@ -126,24 +126,15 @@ const Merch = () => {
   const handleCheckout = async () => {
     if (cart.length === 0) return;
 
-    // For now: checkout the first item in cart (Stripe Checkout handles one line item at a time per session)
-    // We process the first cart item; multi-item carts can be extended with quantity param
-    const firstItem = cart[0];
-
     setCheckingOut(true);
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData?.session?.access_token;
-
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      };
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
+      const lineItems = cart.map((item) => ({
+        price: item.priceId,
+        quantity: item.quantity,
+      }));
 
       const { data, error } = await supabase.functions.invoke('create-merch-checkout', {
-        body: { priceId: firstItem.priceId, quantity: firstItem.quantity },
+        body: { lineItems },
       });
 
       if (error || !data?.url) {
