@@ -35,8 +35,8 @@ const merchItems = [
     price: '$59.87',
     priceAmount: 59.87,
     image: whiteHat,
-    priceId: null,
-    available: false,
+    priceId: 'price_1T2zfiGFAEKGp8KzYM9DJjoU',
+    available: true,
   },
   {
     id: 3,
@@ -45,8 +45,8 @@ const merchItems = [
     price: '$59.87',
     priceAmount: 59.87,
     image: blackHat,
-    priceId: null,
-    available: false,
+    priceId: 'price_1T2zlSGFAEKGp8KzUFCpExls',
+    available: true,
   },
   {
     id: 4,
