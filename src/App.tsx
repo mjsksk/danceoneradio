@@ -7,7 +7,9 @@ import { CookieConsent } from "@/components/CookieConsent";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
+import { CartProvider } from "@/contexts/CartContext";
 import FloatingPlayer from "@/components/FloatingPlayer";
+import FloatingCartButton from "@/components/FloatingCartButton";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { BackToTop } from "@/components/BackToTop";
 import { ReadingProgressBar } from "@/components/ReadingProgressBar";
@@ -28,23 +30,26 @@ const App = () => (
     <TooltipProvider>
       <AuthProvider>
         <AudioPlayerProvider>
-          <Toaster />
-          <Sonner />
-          <CookieConsent />
-          <BrowserRouter>
-            <ErrorBoundary>
-              <ReadingProgressBar />
-              <ScrollToTop />
-              <VisitorTracker />
-              <NewYearBanner />
-              <div className="pb-20">
-                <AnimatedRoutes />
-              </div>
-              <BackToTop />
-              <NotificationPrompt />
-              <FloatingPlayer />
-            </ErrorBoundary>
-          </BrowserRouter>
+          <CartProvider>
+            <Toaster />
+            <Sonner />
+            <CookieConsent />
+            <BrowserRouter>
+              <ErrorBoundary>
+                <ReadingProgressBar />
+                <ScrollToTop />
+                <VisitorTracker />
+                <NewYearBanner />
+                <div className="pb-20">
+                  <AnimatedRoutes />
+                </div>
+                <BackToTop />
+                <NotificationPrompt />
+                <FloatingPlayer />
+                <FloatingCartButton />
+              </ErrorBoundary>
+            </BrowserRouter>
+          </CartProvider>
         </AudioPlayerProvider>
       </AuthProvider>
     </TooltipProvider>
