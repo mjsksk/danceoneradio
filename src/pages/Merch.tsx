@@ -11,6 +11,8 @@ import { ShoppingBag, Store, Plus, Minus, Trash2, ShoppingCart, Loader2, Externa
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import poweredByHouseMusicTee from '@/assets/merch-powered-by-house-music-tee.jpg';
+import whiteHat from '@/assets/merch-white-hat.png';
+import blackHat from '@/assets/merch-black-hat.png';
 
 const POWERED_BY_HOUSE_MUSIC_PRICE_ID = 'price_1T21CHGFAEKGp8KzxXkemnMb';
 
@@ -28,6 +30,26 @@ const merchItems = [
   },
   {
     id: 2,
+    name: 'White High Quality Curved 5 Panel Hat',
+    description: 'Premium curved 5 panel hat in crisp white with embroidered logo.',
+    price: '$59.87',
+    priceAmount: 59.87,
+    image: whiteHat,
+    priceId: null,
+    available: false,
+  },
+  {
+    id: 3,
+    name: 'Black High Quality Curved 5 Panel Hat',
+    description: 'Premium curved 5 panel hat in sleek black with embroidered logo.',
+    price: '$59.87',
+    priceAmount: 59.87,
+    image: blackHat,
+    priceId: null,
+    available: false,
+  },
+  {
+    id: 4,
     name: 'Dance One Logo Tee',
     description: 'Classic logo t-shirt in premium cotton.',
     price: '$29.99',
@@ -37,7 +59,7 @@ const merchItems = [
     available: false,
   },
   {
-    id: 3,
+    id: 5,
     name: 'Dance One Hoodie',
     description: 'Stay warm with our signature hoodie.',
     price: '$54.99',
@@ -47,7 +69,7 @@ const merchItems = [
     available: false,
   },
   {
-    id: 4,
+    id: 6,
     name: 'Dance One Cap',
     description: 'Snapback cap with embroidered logo.',
     price: '$24.99',
@@ -57,7 +79,7 @@ const merchItems = [
     available: false,
   },
   {
-    id: 5,
+    id: 7,
     name: 'Dance One Sticker Pack',
     description: 'Set of 5 vinyl stickers.',
     price: '$9.99',
