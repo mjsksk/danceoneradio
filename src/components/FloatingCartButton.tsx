@@ -16,7 +16,7 @@ const FloatingCartButton = () => {
 
   return (
     <>
-      {/* Floating button — bottom-right, above the back-to-top button */}
+      {/* Floating button */}
       <AnimatePresence>
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
@@ -59,38 +59,44 @@ const FloatingCartButton = () => {
           ) : (
             <>
               <div className="flex-1 overflow-y-auto py-4 space-y-4">
-                {cart.map((item) => (
-                  <div key={item.id} className="flex gap-3 items-start">
-                    <div className="w-16 h-16 rounded-md bg-muted overflow-hidden shrink-0">
-                      {item.image ? (
-                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <ShoppingBag className="w-6 h-6 text-muted-foreground/30" />
+                {cart.map((item) => {
+                  const variantLabel = [item.color, item.size].filter(Boolean).join(' / ');
+                  return (
+                    <div key={`${item.id}-${item.color}-${item.size}`} className="flex gap-3 items-start">
+                      <div className="w-16 h-16 rounded-md bg-muted overflow-hidden shrink-0">
+                        {item.image ? (
+                          <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <ShoppingBag className="w-6 h-6 text-muted-foreground/30" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm leading-tight">{item.name}</p>
+                        {variantLabel && (
+                          <p className="text-xs text-muted-foreground mt-0.5">{variantLabel}</p>
+                        )}
+                        <p className="text-primary font-bold text-sm mt-0.5">{item.price}</p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.id, -1, item.color, item.size)}>
+                            <Minus className="w-3 h-3" />
+                          </Button>
+                          <span className="text-sm font-medium w-4 text-center">{item.quantity}</span>
+                          <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.id, 1, item.color, item.size)}>
+                            <Plus className="w-3 h-3" />
+                          </Button>
                         </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm leading-tight">{item.name}</p>
-                      <p className="text-primary font-bold text-sm mt-0.5">{item.price}</p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.id, -1)}>
-                          <Minus className="w-3 h-3" />
-                        </Button>
-                        <span className="text-sm font-medium w-4 text-center">{item.quantity}</span>
-                        <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.id, 1)}>
-                          <Plus className="w-3 h-3" />
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-sm font-semibold">${(item.priceAmount * item.quantity).toFixed(2)}</p>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 mt-1 text-muted-foreground hover:text-destructive" onClick={() => removeFromCart(item.id, item.color, item.size)}>
+                          <Trash2 className="w-3 h-3" />
                         </Button>
                       </div>
                     </div>
-                    <div className="text-right shrink-0">
-                      <p className="text-sm font-semibold">${(item.priceAmount * item.quantity).toFixed(2)}</p>
-                      <Button variant="ghost" size="icon" className="h-6 w-6 mt-1 text-muted-foreground hover:text-destructive" onClick={() => removeFromCart(item.id)}>
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <Separator />
