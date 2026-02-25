@@ -2,10 +2,17 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from '
 import { toast } from '@/hooks/use-toast';
 
 import poweredByHouseMusicTee from '@/assets/merch-powered-by-house-music-tee.jpg';
-import whiteHat from '@/assets/merch-white-hat.png';
-import blackHat from '@/assets/merch-black-hat.png';
+import inHouseWeTrustTee from '@/assets/merch-in-house-we-trust-tee.png';
+import blackHat from '@/assets/merch-black-hat-v2.png';
+import merchVideo1 from '@/assets/merch-video-1.mp4';
+import merchVideo2 from '@/assets/merch-video-2.mp4';
 
 const POWERED_BY_HOUSE_MUSIC_PRICE_ID = 'price_1T21CHGFAEKGp8KzxXkemnMb';
+
+export const AVAILABLE_COLORS = ['White', 'Black', 'Navy', 'Grey', 'Red'] as const;
+export const AVAILABLE_SIZES = ['S', 'M', 'L', 'XL'] as const;
+export type TeeColor = typeof AVAILABLE_COLORS[number];
+export type TeeSize = typeof AVAILABLE_SIZES[number];
 
 export interface MerchItem {
   id: number;
@@ -16,6 +23,9 @@ export interface MerchItem {
   image: string | null;
   priceId: string | null;
   available: boolean;
+  colors?: readonly string[];
+  sizes?: readonly string[];
+  videos?: string[];
 }
 
 export const merchItems: MerchItem[] = [
@@ -28,16 +38,22 @@ export const merchItems: MerchItem[] = [
     image: poweredByHouseMusicTee,
     priceId: POWERED_BY_HOUSE_MUSIC_PRICE_ID,
     available: true,
+    colors: AVAILABLE_COLORS,
+    sizes: AVAILABLE_SIZES,
+    videos: [merchVideo1, merchVideo2],
   },
   {
-    id: 2,
-    name: 'White High Quality Curved 5 Panel Hat',
-    description: 'Premium curved 5 panel hat in crisp white with embroidered logo.',
-    price: '$59.87',
-    priceAmount: 59.87,
-    image: whiteHat,
-    priceId: 'price_1T2zfiGFAEKGp8KzYM9DJjoU',
+    id: 4,
+    name: 'In House We Trust Tee',
+    description: 'Dance One — In House We Trust. 4/4 Since Forever.',
+    price: '$46.79',
+    priceAmount: 46.79,
+    image: inHouseWeTrustTee,
+    priceId: POWERED_BY_HOUSE_MUSIC_PRICE_ID,
     available: true,
+    colors: AVAILABLE_COLORS,
+    sizes: AVAILABLE_SIZES,
+    videos: [merchVideo1, merchVideo2],
   },
   {
     id: 3,
@@ -59,6 +75,8 @@ export interface CartItem {
   image: string | null;
   priceId: string;
   quantity: number;
+  color?: string;
+  size?: string;
 }
 
 const CART_STORAGE_KEY = 'dance-one-merch-cart';
@@ -90,15 +108,20 @@ function saveCartToStorage(items: CartItem[]) {
   }
 }
 
+/** Unique key for cart deduplication (id + color + size) */
+function cartItemKey(id: number, color?: string, size?: string) {
+  return `${id}-${color ?? ''}-${size ?? ''}`;
+}
+
 interface CartContextValue {
   cart: CartItem[];
   cartCount: number;
   cartTotal: number;
   cartOpen: boolean;
   setCartOpen: (open: boolean) => void;
-  addToCart: (item: MerchItem) => void;
-  updateQuantity: (id: number, delta: number) => void;
-  removeFromCart: (id: number) => void;
+  addToCart: (item: MerchItem, color?: string, size?: string) => void;
+  updateQuantity: (id: number, delta: number, color?: string, size?: string) => void;
+  removeFromCart: (id: number, color?: string, size?: string) => void;
   checkingOut: boolean;
   handleCheckout: () => Promise<void>;
 }
@@ -123,13 +146,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const cartTotal = cart.reduce((sum, item) => sum + item.priceAmount * item.quantity, 0);
 
-  const addToCart = (item: MerchItem) => {
+  const addToCart = (item: MerchItem, color?: string, size?: string) => {
     if (!item.priceId) return;
+    const key = cartItemKey(item.id, color, size);
     setCart((prev) => {
-      const existing = prev.find((c) => c.id === item.id);
+      const existing = prev.find((c) => cartItemKey(c.id, c.color, c.size) === key);
       if (existing) {
         return prev.map((c) =>
-          c.id === item.id ? { ...c, quantity: c.quantity + 1 } : c
+          cartItemKey(c.id, c.color, c.size) === key ? { ...c, quantity: c.quantity + 1 } : c
         );
       }
       return [
@@ -142,22 +166,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
           image: item.image,
           priceId: item.priceId!,
           quantity: 1,
+          color,
+          size,
         },
       ];
     });
-    toast({ title: 'Added to cart', description: item.name });
+    const variantLabel = [color, size].filter(Boolean).join(' / ');
+    toast({ title: 'Added to cart', description: `${item.name}${variantLabel ? ` — ${variantLabel}` : ''}` });
   };
 
-  const updateQuantity = (id: number, delta: number) => {
+  const updateQuantity = (id: number, delta: number, color?: string, size?: string) => {
+    const key = cartItemKey(id, color, size);
     setCart((prev) =>
       prev
-        .map((c) => (c.id === id ? { ...c, quantity: c.quantity + delta } : c))
+        .map((c) => (cartItemKey(c.id, c.color, c.size) === key ? { ...c, quantity: c.quantity + delta } : c))
         .filter((c) => c.quantity > 0)
     );
   };
 
-  const removeFromCart = (id: number) => {
-    setCart((prev) => prev.filter((c) => c.id !== id));
+  const removeFromCart = (id: number, color?: string, size?: string) => {
+    const key = cartItemKey(id, color, size);
+    setCart((prev) => prev.filter((c) => cartItemKey(c.id, c.color, c.size) !== key));
   };
 
   const handleCheckout = async () => {
