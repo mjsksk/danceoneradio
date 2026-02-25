@@ -40,7 +40,6 @@ export const merchItems: MerchItem[] = [
     available: true,
     colors: AVAILABLE_COLORS,
     sizes: AVAILABLE_SIZES,
-    videos: [merchVideo1, merchVideo2],
   },
   {
     id: 4,
@@ -53,7 +52,7 @@ export const merchItems: MerchItem[] = [
     available: true,
     colors: AVAILABLE_COLORS,
     sizes: AVAILABLE_SIZES,
-    videos: [merchVideo1, merchVideo2],
+    videos: [merchVideo2],
   },
   {
     id: 3,
@@ -64,6 +63,7 @@ export const merchItems: MerchItem[] = [
     image: blackHat,
     priceId: 'price_1T2zlSGFAEKGp8KzUFCpExls',
     available: true,
+    videos: [merchVideo1],
   },
 ];
 
