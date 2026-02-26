@@ -1,49 +1,19 @@
 
-# Notification History Log and Database Cleanup
 
-## What We're Building
+## Move Hat Image Lower in Product Card
 
-1. **Notification History UI** -- A new admin panel section showing all sent push notifications with title, message, recipient count, and timestamp.
+**Problem**: The hat product image is cropped at the top because the square container uses `object-cover` with default centering, cutting off the top of the hat.
 
-2. **Automated Cleanup** -- A cron job to delete old notification records (push_notifications and scheduled_notifications) after 90 days to prevent database bloat.
+**Solution**: Add a custom `object-position` style to the hat image so it shifts downward, making the full hat visible. This needs to be applied in two places:
 
----
+1. **Merch page grid card** (`src/pages/Merch.tsx`) — the product card thumbnail uses `object-cover` in the `aspect-square` container. We'll add conditional `object-position: bottom` (or a specific value like `center 70%`) when rendering the hat item, so the image shifts to reveal the top of the hat.
 
-## Implementation Steps
+2. **Product preview dialog** (`src/components/ProductPreview.tsx`) — the full-size preview also uses `object-cover` in an `aspect-square` container. Same adjustment needed here.
 
-### 1. Create NotificationHistory Component
+**Approach**: Add an optional `imagePosition` field to the product data in `CartContext.tsx` (e.g., `"bottom"` for the hat), then use it as `style={{ objectPosition }}` on the `<img>` tags in both the Merch page and ProductPreview. This keeps it data-driven and reusable for future products.
 
-A new component `src/components/admin/NotificationHistory.tsx` that:
-- Fetches from the existing `push_notifications` table (already has admin SELECT RLS policy)
-- Displays a table with columns: Title, Message, Recipients, Sent At
-- Shows a badge with total count
-- Includes a refresh button
-- Limits display to most recent 50 entries
-- Uses the project's existing Orbitron/Rajdhani font styling
+**Changes**:
+- `src/contexts/CartContext.tsx` — add `imagePosition?: string` to the `MerchItem` type and set `imagePosition: "bottom"` on the hat product (ID 3)
+- `src/pages/Merch.tsx` — apply `style={{ objectPosition: item.imagePosition }}` on the card image
+- `src/components/ProductPreview.tsx` — apply the same on the preview image
 
-### 2. Add Component to Admin Page
-
-Insert `<NotificationHistory />` into `src/pages/Admin.tsx` right after the `PushNotificationComposer`.
-
-### 3. Database Cleanup Cron Job
-
-Add a scheduled SQL job (via Supabase insert tool) that runs weekly at 3 AM UTC on Sundays:
-- Deletes rows from `push_notifications` older than 90 days
-- Deletes rows from `scheduled_notifications` with status "sent" or "cancelled" older than 90 days
-
----
-
-## Technical Details
-
-**Existing infrastructure used:**
-- `push_notifications` table already exists with columns: id, title, body, image_url, sent_by, sent_at, recipient_count
-- RLS policy "Admins can view push notification log" already grants admin SELECT access
-- No new tables or migrations needed
-
-**Cleanup SQL (cron job):**
-```sql
-DELETE FROM public.push_notifications WHERE sent_at < NOW() - INTERVAL '90 days';
-DELETE FROM public.scheduled_notifications WHERE status IN ('sent', 'cancelled') AND scheduled_at < NOW() - INTERVAL '90 days';
-```
-
-**Schedule:** Weekly on Sundays at 3 AM UTC (same pattern as existing cleanup jobs)
