@@ -62,7 +62,7 @@ export const merchItems: MerchItem[] = [
     price: '$59.87',
     priceAmount: 59.87,
     image: blackHat,
-    imagePosition: 'bottom',
+    imagePosition: 'top',
     priceId: 'price_1T2zlSGFAEKGp8KzUFCpExls',
     available: true,
     videos: [merchVideo1],
