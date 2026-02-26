@@ -57,6 +57,7 @@ const Merch = () => {
                       src={item.image}
                       alt={item.name}
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      style={{ objectPosition: item.imagePosition || 'center' }}
                     />
                   ) : (
                     <ShoppingBag className="w-16 h-16 text-muted-foreground/30" />

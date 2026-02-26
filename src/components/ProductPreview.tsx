@@ -55,7 +55,7 @@ const ProductPreview = ({ item, open, onOpenChange }: ProductPreviewProps) => {
         <div className="aspect-square bg-muted flex items-center justify-center relative">
           {activeView === 'image' ? (
             item.image ? (
-              <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+              <img src={item.image} alt={item.name} className="w-full h-full object-cover" style={{ objectPosition: item.imagePosition || 'center' }} />
             ) : (
               <ShoppingBag className="w-24 h-24 text-muted-foreground/20" />
             )

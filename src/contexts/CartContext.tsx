@@ -21,6 +21,7 @@ export interface MerchItem {
   price: string;
   priceAmount: number;
   image: string | null;
+  imagePosition?: string;
   priceId: string | null;
   available: boolean;
   colors?: readonly string[];
@@ -61,6 +62,7 @@ export const merchItems: MerchItem[] = [
     price: '$59.87',
     priceAmount: 59.87,
     image: blackHat,
+    imagePosition: 'bottom',
     priceId: 'price_1T2zlSGFAEKGp8KzUFCpExls',
     available: true,
     videos: [merchVideo1],
