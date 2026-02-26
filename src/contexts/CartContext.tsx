@@ -44,7 +44,7 @@ export const merchItems: MerchItem[] = [
     available: true,
     colors: AVAILABLE_COLORS,
     sizes: AVAILABLE_SIZES,
-    colorImages: { White: poweredByHouseMusicTeeWhite, Black: poweredByHouseMusicTeeColors, Navy: poweredByHouseMusicTeeColors, Grey: poweredByHouseMusicTeeColors, Red: poweredByHouseMusicTeeColors },
+    colorImages: { White: poweredByHouseMusicTeeWhite, Navy: poweredByHouseMusicTeeColors, Grey: poweredByHouseMusicTeeColors, Red: poweredByHouseMusicTeeColors },
   },
   {
     id: 4,
