@@ -54,11 +54,14 @@ const ProductPreview = ({ item, open, onOpenChange }: ProductPreviewProps) => {
         {/* Media area */}
         <div className="aspect-square bg-muted flex items-center justify-center relative">
           {activeView === 'image' ? (
-            item.image ? (
-              <img src={item.image} alt={item.name} className="w-full h-full object-cover" style={{ objectPosition: item.imagePosition || 'center' }} />
-            ) : (
-              <ShoppingBag className="w-24 h-24 text-muted-foreground/20" />
-            )
+            (() => {
+              const displayImage = (selectedColor && item.colorImages?.[selectedColor]) || item.image;
+              return displayImage ? (
+                <img src={displayImage} alt={item.name} className="w-full h-full object-cover" style={{ objectPosition: item.imagePosition || 'center' }} />
+              ) : (
+                <ShoppingBag className="w-24 h-24 text-muted-foreground/20" />
+              );
+            })()
           ) : (
             <video
               src={item.videos?.[activeView]}

@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from '
 import { toast } from '@/hooks/use-toast';
 
 import poweredByHouseMusicTee from '@/assets/merch-powered-by-house-music-tee.jpg';
+import poweredByHouseMusicTeeWhite from '@/assets/merch-powered-by-house-music-tee-white.jpg';
 import inHouseWeTrustTee from '@/assets/merch-in-house-we-trust-tee.png';
 import blackHat from '@/assets/merch-black-hat-v2.png';
 import merchVideo1 from '@/assets/merch-video-1.mp4';
@@ -27,6 +28,7 @@ export interface MerchItem {
   colors?: readonly string[];
   sizes?: readonly string[];
   videos?: string[];
+  colorImages?: Record<string, string>;
 }
 
 export const merchItems: MerchItem[] = [
@@ -41,6 +43,7 @@ export const merchItems: MerchItem[] = [
     available: true,
     colors: AVAILABLE_COLORS,
     sizes: AVAILABLE_SIZES,
+    colorImages: { White: poweredByHouseMusicTeeWhite },
   },
   {
     id: 4,
