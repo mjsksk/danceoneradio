@@ -25,6 +25,7 @@ const Navigation = () => {
     { name: 'Gallery', href: '/gallery' },
     { name: 'Downloads', href: '/downloads' },
     { name: 'Privacy', href: '/privacy' },
+    { name: 'Merch', href: '/merch' },
     { name: 'Love', href: '/love' },
     { name: 'Contact', href: '/contact' }
   ];
