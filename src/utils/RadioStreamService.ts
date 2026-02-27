@@ -251,7 +251,7 @@ export class RadioStreamService {
         .from('radio_track_history')
         .select('*')
         .order('played_at', { ascending: false })
-        .limit(20);
+        .limit(100);
 
       if (error) {
         console.error('❌ Error fetching track history from database:', error);
@@ -275,8 +275,8 @@ export class RadioStreamService {
 
       console.log('✅ Unique tracks after deduplication:', uniqueTracks.length);
 
-      // Convert database records to Track interface
-      const historyTracks: Track[] = uniqueTracks.map((track, index) => ({
+      // Convert database records to Track interface, limit to 10
+      const historyTracks: Track[] = uniqueTracks.slice(0, 10).map((track, index) => ({
         id: index + 1,
         title: track.title,
         artist: track.artist,
