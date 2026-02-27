@@ -5,6 +5,7 @@ import poweredByHouseMusicTee from '@/assets/merch-powered-by-house-music-tee.jp
 import poweredByHouseMusicTeeWhite from '@/assets/merch-powered-by-house-music-tee-white.jpg';
 import poweredByHouseMusicTeeColors from '@/assets/merch-powered-by-house-music-tee-colors.jpg';
 import inHouseWeTrustTee from '@/assets/merch-in-house-we-trust-tee.png';
+import inHouseWeTrustTeeColors from '@/assets/merch-in-house-we-trust-tee-colors.jpg';
 import blackHat from '@/assets/merch-black-hat-v2.png';
 import merchVideo1 from '@/assets/merch-video-1.mp4';
 import merchVideo2 from '@/assets/merch-video-2.mp4';
@@ -57,6 +58,7 @@ export const merchItems: MerchItem[] = [
     available: true,
     colors: AVAILABLE_COLORS,
     sizes: AVAILABLE_SIZES,
+    colorImages: { Black: inHouseWeTrustTeeColors, Navy: inHouseWeTrustTeeColors, Grey: inHouseWeTrustTeeColors, Red: inHouseWeTrustTeeColors },
     videos: [merchVideo2],
   },
   {
