@@ -86,8 +86,9 @@ serve(async (req) => {
     if (data.results && data.results.length > 0) {
       const track = data.results[0]
       const artworkUrl = track.artworkUrl100?.replace('100x100', '600x600')
+      const previewUrl = track.previewUrl || null
       return new Response(
-        JSON.stringify({ imageUrl: artworkUrl }),
+        JSON.stringify({ imageUrl: artworkUrl, previewUrl }),
         { 
           headers: { 
             ...corsHeaders, 

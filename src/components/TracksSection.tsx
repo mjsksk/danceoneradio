@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Download, Heart, Share2, Clock, RefreshCw, Radio } from 'lucide-react';
 import { RadioStreamService } from '@/utils/RadioStreamService';
-import { AlbumArtService } from '@/utils/AlbumArtService';
-import { AppleMusicService } from '@/utils/AppleMusicService';
 import { supabase } from '@/integrations/supabase/client';
 import stationLogo from '/lovable-uploads/72d04e54-23af-4f4a-bf39-efcc6c6b2150.png';
 
@@ -31,7 +29,7 @@ const TracksSection = () => {
   const [previewErrors, setPreviewErrors] = useState<{[key: number]: string}>({});
   const [audioRef, setAudioRef] = useState<HTMLAudioElement | null>(null);
   const [likedTracks, setLikedTracks] = useState<Set<number>>(new Set());
-  const fetchingPreviewsRef = useRef(false);
+  
 
   // Initialize audio element and load liked tracks
   useEffect(() => {
@@ -86,37 +84,42 @@ const TracksSection = () => {
     return `${cleanArtist} ${cleanTitle}`;
   };
 
-  // Fetch album art when tracks change - batched and parallelized
+  // Fetch album art AND preview URLs when tracks change - batched and parallelized
   useEffect(() => {
     const fetchAlbumArtBatched = async () => {
-      const tracksNeedingArt = tracks.filter(track => !albumArt[track.id]);
+      const tracksNeedingArt = tracks.filter(track => albumArt[track.id] === undefined);
       if (tracksNeedingArt.length === 0) return;
 
-      console.log(`🎵 Fetching album art for ${tracksNeedingArt.length} tracks in parallel`);
+      console.log(`🎵 Fetching album art + previews for ${tracksNeedingArt.length} tracks`);
       
-      // Fetch all album art in parallel with concurrency limit
       const CONCURRENCY = 5;
-      const results: Record<number, string | null> = {};
+      const artResults: Record<number, string | null> = {};
+      const previewResults: Record<number, string | null> = {};
       
       for (let i = 0; i < tracksNeedingArt.length; i += CONCURRENCY) {
         const batch = tracksNeedingArt.slice(i, i + CONCURRENCY);
         await Promise.all(batch.map(async (track) => {
           try {
             const cleanedQuery = cleanTrackForSearch(track.artist, track.title);
-            const result = await AlbumArtService.getAlbumArt(cleanedQuery);
-            if (result.imageUrl && !result.error) {
-              results[track.id] = result.imageUrl;
+            const { data, error } = await supabase.functions.invoke('album-art-search', {
+              body: { query: cleanedQuery }
+            });
+            if (!error && data) {
+              if (data.imageUrl) artResults[track.id] = data.imageUrl;
+              if (data.previewUrl) previewResults[track.id] = data.previewUrl;
             }
           } catch (error) {
-            console.error(`🎵 Failed to fetch album art for ${track.artist}:`, error);
+            console.error(`🎵 Failed to fetch art for ${track.artist}:`, error);
           }
         }));
       }
       
-      // Single state update with all results
-      if (Object.keys(results).length > 0) {
-        setAlbumArt(prev => ({ ...prev, ...results }));
-        console.log(`🎵 Updated album art for ${Object.keys(results).length} tracks`);
+      if (Object.keys(artResults).length > 0) {
+        setAlbumArt(prev => ({ ...prev, ...artResults }));
+      }
+      if (Object.keys(previewResults).length > 0) {
+        setPreviewUrls(prev => ({ ...prev, ...previewResults }));
+        console.log(`🎵 ✅ Found ${Object.keys(previewResults).length} iTunes previews`);
       }
     };
 
@@ -125,70 +128,6 @@ const TracksSection = () => {
     }
   }, [tracks]);
 
-  // Fetch Apple Music previews - batched and parallelized
-  useEffect(() => {
-    const fetchPreviewsBatched = async () => {
-      if (fetchingPreviewsRef.current || tracks.length === 0) return;
-      
-      const tracksNeedingPreviews = tracks.filter(
-        track => !previewUrls[track.id] && !previewErrors[track.id]
-      );
-      if (tracksNeedingPreviews.length === 0) return;
-      
-      fetchingPreviewsRef.current = true;
-      console.log(`🎵 Fetching Apple Music previews for ${tracksNeedingPreviews.length} tracks in parallel`);
-      
-      // Mark all as loading in single update
-      const loadingState = tracksNeedingPreviews.reduce((acc, track) => {
-        acc[track.id] = true;
-        return acc;
-      }, {} as Record<number, boolean>);
-      setLoadingPreviews(prev => ({ ...prev, ...loadingState }));
-      
-      // Fetch all previews in parallel with concurrency limit
-      const CONCURRENCY = 5;
-      const urlResults: Record<number, string> = {};
-      const errorResults: Record<number, string> = {};
-      
-      for (let i = 0; i < tracksNeedingPreviews.length; i += CONCURRENCY) {
-        const batch = tracksNeedingPreviews.slice(i, i + CONCURRENCY);
-        await Promise.all(batch.map(async (track) => {
-          try {
-            const previewUrl = await AppleMusicService.getTrackPreview(track.id, track.artist, track.title);
-            if (previewUrl) {
-              urlResults[track.id] = previewUrl;
-            } else {
-              errorResults[track.id] = 'No preview available';
-            }
-          } catch (error: any) {
-            errorResults[track.id] = error.message || 'Failed to fetch preview';
-          }
-        }));
-      }
-      
-      // Single state updates for all results
-      if (Object.keys(urlResults).length > 0) {
-        setPreviewUrls(prev => ({ ...prev, ...urlResults }));
-        console.log(`🎵 ✅ Found ${Object.keys(urlResults).length} Apple Music previews`);
-      }
-      if (Object.keys(errorResults).length > 0) {
-        setPreviewErrors(prev => ({ ...prev, ...errorResults }));
-      }
-      
-      // Clear all loading states
-      const clearedLoading = tracksNeedingPreviews.reduce((acc, track) => {
-        acc[track.id] = false;
-        return acc;
-      }, {} as Record<number, boolean>);
-      setLoadingPreviews(prev => ({ ...prev, ...clearedLoading }));
-      
-      fetchingPreviewsRef.current = false;
-    };
-
-    if (tracks.length > 0) {
-      fetchPreviewsBatched();
-    }
-  }, [tracks]);
 
   useEffect(() => {
     const fetchRecentTracks = async () => {
