@@ -25,7 +25,7 @@ serve(async (req) => {
       supabase,
       {
         endpoint: 'album-art-search',
-        maxRequests: 50,
+        maxRequests: 200,
         windowMs: 60000
       },
       clientId,
