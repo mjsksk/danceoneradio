@@ -61,6 +61,33 @@ serve(async (req) => {
       customer_email: customerId ? undefined : customerEmail,
       line_items: lineItems,
       mode: "payment",
+      shipping_address_collection: {
+        allowed_countries: ["US", "CA", "GB", "AU", "DE", "FR", "NL", "BE", "IE", "ES", "IT", "PT", "AT", "CH", "SE", "DK", "NO", "FI", "NZ", "JP"],
+      },
+      shipping_options: [
+        {
+          shipping_rate_data: {
+            type: "fixed_amount",
+            fixed_amount: { amount: 1197, currency: "usd" },
+            display_name: "Ground Shipping",
+            delivery_estimate: {
+              minimum: { unit: "business_day", value: 5 },
+              maximum: { unit: "business_day", value: 10 },
+            },
+          },
+        },
+        {
+          shipping_rate_data: {
+            type: "fixed_amount",
+            fixed_amount: { amount: 2897, currency: "usd" },
+            display_name: "Expedited Shipping",
+            delivery_estimate: {
+              minimum: { unit: "business_day", value: 2 },
+              maximum: { unit: "business_day", value: 4 },
+            },
+          },
+        },
+      ],
       success_url: `${req.headers.get("origin")}/merch?success=true`,
       cancel_url: `${req.headers.get("origin")}/merch`,
     });
