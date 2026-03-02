@@ -6,12 +6,11 @@ const ScrollingBanner = memo(() => {
   return (
     <div className="overflow-hidden bg-gradient-to-r from-neon/20 to-neon-purple/20 border-y border-neon/30 mb-12">
       <div className="flex animate-scroll-smooth whitespace-nowrap py-4">
-        <span className="text-lg font-audiowide font-bold text-neon-purple px-8">
-          {message}
-        </span>
-        <span className="text-lg font-audiowide font-bold text-neon-purple px-8">
-          {message}
-        </span>
+        {[...Array(4)].map((_, i) => (
+          <span key={i} className="text-lg font-audiowide font-bold text-neon-purple px-8 shrink-0">
+            {message}
+          </span>
+        ))}
       </div>
     </div>
   );
