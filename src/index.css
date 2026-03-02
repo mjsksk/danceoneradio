@@ -220,7 +220,7 @@
   
   /* Scrolling text animation */
   .animate-scroll-smooth {
-    animation: scroll-smooth 40s linear infinite;
+    animation: scroll-smooth 25s linear infinite;
     display: flex;
   }
   
