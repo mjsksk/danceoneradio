@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, ShoppingBag, Play } from 'lucide-react';
+import { Plus, ShoppingBag, Play, X } from 'lucide-react';
 import { useCart, type MerchItem } from '@/contexts/CartContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -224,7 +224,14 @@ const ProductPreview = ({ item, open, onOpenChange }: ProductPreviewProps) => {
       <Drawer open={open} onOpenChange={handleOpenChange}>
         <DrawerContent className="max-h-[85vh]">
           <DrawerTitle className="sr-only">{item.name}</DrawerTitle>
-          <div className="overflow-y-auto">
+          <div className="overflow-y-auto relative">
+            <button
+              onClick={() => handleOpenChange(false)}
+              className="absolute top-3 left-3 z-10 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm border border-border flex items-center justify-center"
+              aria-label="Close preview"
+            >
+              <X className="w-4 h-4 text-foreground" />
+            </button>
             <ProductPreviewContent {...contentProps} />
           </div>
         </DrawerContent>
