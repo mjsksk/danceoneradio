@@ -24,26 +24,26 @@ const Merch = () => {
       <Navigation />
 
       <main className="pt-20 pb-16">
-        <div className="container mx-auto px-4 max-w-6xl">
+        <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
 
           {/* Hero */}
-          <div className="text-center mb-12">
-            <Store className="w-16 h-16 text-primary mx-auto mb-4" />
-            <h1 className="text-4xl font-['Orbitron'] font-bold text-primary mb-4">
+          <div className="text-center mb-8 sm:mb-12">
+            <Store className="w-12 h-12 sm:w-16 sm:h-16 text-primary mx-auto mb-3 sm:mb-4" />
+            <h1 className="text-2xl sm:text-4xl font-['Orbitron'] font-bold text-primary mb-3 sm:mb-4">
               Merch Store
             </h1>
-            <p className="text-lg text-muted-foreground font-['Rajdhani'] max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-muted-foreground font-['Rajdhani'] max-w-2xl mx-auto px-2">
               Represent the electronic music lifestyle with exclusive Dance One Radio gear.
               All proceeds help keep the station running commercial-free.
             </p>
           </div>
 
           {/* Product Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8 justify-items-center max-w-5xl mx-auto">
             {merchItems.map((item) => (
               <Card
                 key={item.id}
-                className={`overflow-hidden transition-all cursor-pointer group ${
+                className={`overflow-hidden transition-all cursor-pointer group w-full ${
                   item.available
                     ? 'border-primary/20 hover:border-primary/50 hover:shadow-md hover:shadow-primary/10'
                     : 'border-primary/10 opacity-70'
@@ -60,18 +60,18 @@ const Merch = () => {
                       style={{ objectPosition: item.imagePosition || 'center' }}
                     />
                   ) : (
-                    <ShoppingBag className="w-16 h-16 text-muted-foreground/30" />
+                    <ShoppingBag className="w-12 h-12 sm:w-16 sm:h-16 text-muted-foreground/30" />
                   )}
                   {item.available && (
-                    <Badge className="absolute top-2 right-2 text-xs">Available</Badge>
+                    <Badge className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 text-[10px] sm:text-xs">Available</Badge>
                   )}
                 </div>
 
-                <CardContent className="p-4">
-                  <h3 className="font-semibold text-foreground mb-1 leading-tight">{item.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{item.description}</p>
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-primary font-bold">{item.price}</span>
+                <CardContent className="p-2.5 sm:p-4">
+                  <h3 className="font-semibold text-foreground mb-0.5 sm:mb-1 leading-tight text-xs sm:text-base">{item.name}</h3>
+                  <p className="text-[11px] sm:text-sm text-muted-foreground mb-2 sm:mb-3 line-clamp-2">{item.description}</p>
+                  <div className="flex items-center justify-between gap-1 sm:gap-2">
+                    <span className="text-primary font-bold text-sm sm:text-base">{item.price}</span>
                     {item.available ? (
                       <Button
                         size="sm"
@@ -79,14 +79,15 @@ const Merch = () => {
                           e.stopPropagation();
                           addToCart(item);
                         }}
-                        className="gap-1 shrink-0"
+                        className="gap-1 shrink-0 text-[11px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                       >
                         <Plus className="w-3 h-3" />
-                        Add to Cart
+                        <span className="hidden sm:inline">Add to Cart</span>
+                        <span className="sm:hidden">Add</span>
                       </Button>
                     ) : (
-                      <Button size="sm" disabled className="opacity-40 cursor-not-allowed shrink-0">
-                        Coming Soon
+                      <Button size="sm" disabled className="opacity-40 cursor-not-allowed shrink-0 text-[11px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3">
+                        Soon
                       </Button>
                     )}
                   </div>
