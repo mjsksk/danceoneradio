@@ -301,6 +301,16 @@
   }
 }
 
+/* Ensure Google Auto Ads never cover the navigation */
+iframe[id^="aswift_"],
+iframe[src*="googlesyndication"],
+iframe[src*="doubleclick"],
+[id^="google_ads"],
+div[id^="google_ads"],
+ins.adsbygoogle[data-ad-status] {
+  z-index: 9998 !important;
+}
+
 /* Hide Google AdSense auto-ads on admin pages */
 body[data-no-ads] .adsbygoogle,
 body[data-no-ads] ins.adsbygoogle,
