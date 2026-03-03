@@ -11,8 +11,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { RefreshCw, Bell } from "lucide-react";
+import { RefreshCw, Bell, Trash2 } from "lucide-react";
 import { format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface PushNotification {
   id: string;
@@ -27,7 +39,8 @@ const NotificationHistory = () => {
   const [notifications, setNotifications] = useState<PushNotification[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-
+  const [clearing, setClearing] = useState(false);
+  const { toast } = useToast();
   const fetchNotifications = async () => {
     const { data, error } = await supabase
       .from("push_notifications")
@@ -51,6 +64,25 @@ const NotificationHistory = () => {
     fetchNotifications();
   };
 
+  const handleClearAll = async () => {
+    setClearing(true);
+    try {
+      const { error } = await supabase
+        .from("push_notifications")
+        .delete()
+        .neq("id", "00000000-0000-0000-0000-000000000000");
+
+      if (error) throw error;
+
+      setNotifications([]);
+      toast({ title: "Notification history cleared" });
+    } catch (error: any) {
+      toast({ title: "Failed to clear history", description: error.message, variant: "destructive" });
+    } finally {
+      setClearing(false);
+    }
+  };
+
   return (
     <Card className="p-6 bg-card/50 backdrop-blur-sm border-border/50">
       <div className="flex items-center justify-between mb-4">
@@ -61,15 +93,39 @@ const NotificationHistory = () => {
           </h2>
           <Badge variant="secondary">{notifications.length}</Badge>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleRefresh}
-          disabled={refreshing}
-        >
-          <RefreshCw className={`h-4 w-4 mr-1 ${refreshing ? "animate-spin" : ""}`} />
-          Refresh
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={refreshing}
+          >
+            <RefreshCw className={`h-4 w-4 mr-1 ${refreshing ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+          {notifications.length > 0 && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm" disabled={clearing}>
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Clear All
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Clear notification history?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete all {notifications.length} notification records. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleClearAll}>Clear All</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+        </div>
       </div>
 
       {loading ? (
