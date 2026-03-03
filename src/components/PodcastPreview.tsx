@@ -141,7 +141,8 @@ const PodcastPreview = () => {
       <div className="space-y-4 mb-6">
         {episodes.map((episode, index) => (
           <StaggeredItem key={episode.guid || index} index={index}>
-            <Card className="bg-transparent border-primary/20 p-4 hover:bg-primary/5 transition-all duration-300 group">
+            <Link to={`/episode/${episode.episodeNumber}`}>
+            <Card className="bg-transparent border-primary/20 p-4 hover:bg-primary/5 transition-all duration-300 group cursor-pointer hover:border-neon/40">
             <div className="flex items-start gap-4">
               <div className="bg-gradient-to-br from-neon to-neon-purple text-background rounded-lg w-10 h-10 flex items-center justify-center font-['Orbitron'] font-bold text-sm flex-shrink-0">
                 #{episode.episodeNumber}
@@ -206,6 +207,7 @@ const PodcastPreview = () => {
               </Button>
             </div>
           </Card>
+          </Link>
           </StaggeredItem>
         ))}
       </div>
