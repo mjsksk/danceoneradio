@@ -28,7 +28,7 @@ import { format } from 'date-fns';
 
 interface Subscriber {
   id: string;
-  masked_email: string;  // Email is now masked for privacy (e.g., "j***@example.com")
+  email: string;
   is_active: boolean;
   subscribed_at: string;
   country: string | null;
@@ -64,16 +64,13 @@ const NewsletterSubscribers = () => {
       const from = (currentPage - 1) * ITEMS_PER_PAGE;
       const to = from + ITEMS_PER_PAGE - 1;
 
-      // Use the admin view which masks email addresses for privacy protection
-      // This prevents email harvesting even if admin account is compromised
       let query = supabase
-        .from('newsletter_subscribers_admin' as any)
-        .select('id, masked_email, is_active, subscribed_at, country, city, region, browser, os, device_type', { count: 'exact' })
+        .from('newsletter_subscribers')
+        .select('id, email, is_active, subscribed_at, country, city, region, browser, os, device_type', { count: 'exact' })
         .order('subscribed_at', { ascending: false });
 
       if (debouncedSearch) {
-        // Search by masked email domain or country (can't search by full email anymore for privacy)
-        query = query.or(`masked_email.ilike.%${debouncedSearch}%,country.ilike.%${debouncedSearch}%`);
+        query = query.or(`email.ilike.%${debouncedSearch}%,country.ilike.%${debouncedSearch}%`);
       }
 
       const { data, error, count } = await query.range(from, to);
@@ -83,7 +80,7 @@ const NewsletterSubscribers = () => {
         return;
       }
 
-      setSubscribers((data as unknown as Subscriber[]) || []);
+      setSubscribers((data as Subscriber[]) || []);
       setTotalCount(count || 0);
     } catch (err) {
       console.error('Error:', err);
@@ -137,7 +134,7 @@ const NewsletterSubscribers = () => {
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
-          placeholder="Search by domain or country..."
+          placeholder="Search by email or country..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10 font-['Rajdhani']"
@@ -149,7 +146,7 @@ const NewsletterSubscribers = () => {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30">
-              <TableHead className="font-['Orbitron'] text-xs">Email (Masked)</TableHead>
+              <TableHead className="font-['Orbitron'] text-xs">Email</TableHead>
               <TableHead className="font-['Orbitron'] text-xs">
                 <div className="flex items-center gap-1">
                   <Calendar className="w-3 h-3" /> Date
@@ -188,7 +185,7 @@ const NewsletterSubscribers = () => {
             ) : (
               subscribers.map((subscriber) => (
                 <TableRow key={subscriber.id} className="font-['Rajdhani']">
-                  <TableCell className="font-medium">{subscriber.masked_email}</TableCell>
+                  <TableCell className="font-medium">{subscriber.email}</TableCell>
                   <TableCell className="text-muted-foreground text-sm">
                     {format(new Date(subscriber.subscribed_at), 'MMM d, yyyy')}
                     <br />
