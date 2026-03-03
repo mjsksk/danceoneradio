@@ -1,8 +1,7 @@
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { PageTransition } from './PageTransition';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
-import { AdminRoute } from '@/components/AdminRoute';
 
 import Index from '@/pages/Index';
 import Shows from '@/pages/Shows';
@@ -38,7 +37,7 @@ import NewsArtistsReleases from '@/pages/NewsArtistsReleases';
 import NewsFestivalsEvents from '@/pages/NewsFestivalsEvents';
 import NewsIndustryCulture from '@/pages/NewsIndustryCulture';
 import About from '@/pages/About';
-import Admin from '@/pages/Admin';
+
 import DesktopPlayer from '@/pages/DesktopPlayer';
 import Auth from '@/pages/Auth';
 import Account from '@/pages/Account';
@@ -86,7 +85,7 @@ export function AnimatedRoutes() {
         <Route path="/news/artists-releases" element={<PageTransition><NewsArtistsReleases /></PageTransition>} />
         <Route path="/news/festivals-events" element={<PageTransition><NewsFestivalsEvents /></PageTransition>} />
         <Route path="/news/industry-culture" element={<PageTransition><NewsIndustryCulture /></PageTransition>} />
-        <Route path="/admin" element={<PageTransition><AdminRoute requiredRole="admin"><Admin /></AdminRoute></PageTransition>} />
+        <Route path="/admin" element={<Navigate to="/account" replace />} />
         <Route path="/desktop" element={<PageTransition><DesktopPlayer /></PageTransition>} />
         <Route path="/auth" element={<PageTransition><Auth /></PageTransition>} />
         <Route path="/account" element={<PageTransition><ProtectedRoute><Account /></ProtectedRoute></PageTransition>} />
