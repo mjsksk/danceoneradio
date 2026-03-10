@@ -447,7 +447,7 @@ const Shows = () => {
           </div>
         </section>
 
-        <GoogleAds key="shows-ad" slot="6777392184" />
+        <GoogleAds key="shows-ad" slot={AD_SLOTS.HEADER} format="horizontal" />
 
         {/* Episodes List */}
         <section className="py-16 relative">

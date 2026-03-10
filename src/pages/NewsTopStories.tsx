@@ -42,6 +42,8 @@ const NewsTopStories = () => {
             <NewsFeaturedHero article={featuredArticle || null} isLoading={featuredLoading} />
           </section>
 
+          <GoogleAds key="news-top-stories-ad" slot={AD_SLOTS.NEWS} />
+
           <section>
             <div className="flex items-center gap-2 mb-6">
               <TrendingUp className="w-5 h-5 text-primary" />

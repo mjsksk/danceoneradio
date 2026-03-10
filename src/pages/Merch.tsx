@@ -40,6 +40,8 @@ const Merch = () => {
             </p>
           </div>
 
+          <GoogleAds key="merch-ad" slot={AD_SLOTS.SIDEBAR} />
+
           {/* Product Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8 justify-items-center max-w-5xl mx-auto">
             {merchItems.map((item) => (

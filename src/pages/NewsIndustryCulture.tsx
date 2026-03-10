@@ -55,6 +55,8 @@ const NewsIndustryCulture = () => {
             </div>
           </div>
 
+          <GoogleAds key="news-industry-ad" slot={AD_SLOTS.NEWS} />
+
           <section>
             <NewsGrid 
               articles={industryNews || []} 

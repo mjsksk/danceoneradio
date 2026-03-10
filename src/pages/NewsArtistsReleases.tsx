@@ -43,6 +43,8 @@ const NewsArtistsReleases = () => {
             />
           </section>
 
+          <GoogleAds key="news-artists-ad" slot={AD_SLOTS.NEWS} />
+
           <section>
             <div className="flex items-center gap-2 mb-6">
               <Users className="w-5 h-5 text-blue-400" />

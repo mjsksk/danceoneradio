@@ -55,6 +55,8 @@ const NewsFestivalsEvents = () => {
             </div>
           </div>
 
+          <GoogleAds key="news-festivals-ad" slot={AD_SLOTS.NEWS} />
+
           <section>
             <NewsGrid 
               articles={events || []} 

@@ -97,6 +97,8 @@ const News = () => {
             <NewsFeaturedHero article={featuredArticle || null} isLoading={featuredLoading} />
           </section>
 
+          <GoogleAds key="news-in-content" slot={AD_SLOTS.NEWS} />
+
           {/* Category Tabs for Mobile */}
           <Tabs defaultValue="all" className="mb-8">
             <TabsList className="w-full md:w-auto flex flex-wrap h-auto gap-1 bg-transparent p-0 mb-6">
