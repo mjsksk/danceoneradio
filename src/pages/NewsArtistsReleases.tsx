@@ -2,6 +2,8 @@ import { Music, Users, Disc3 } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import GoogleAds from '@/components/GoogleAds';
+import { AD_SLOTS } from '@/config/adSlots';
 import { NewsGrid } from '@/components/news/NewsGrid';
 import { useNewsArticles } from '@/hooks/useNewsArticles';
 
@@ -40,6 +42,8 @@ const NewsArtistsReleases = () => {
               columns={3}
             />
           </section>
+
+          <GoogleAds key="news-artists-ad" slot={AD_SLOTS.NEWS} />
 
           <section>
             <div className="flex items-center gap-2 mb-6">

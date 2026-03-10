@@ -6,6 +6,8 @@ import Footer from '@/components/Footer';
 import SocialShare from '@/components/SocialShare';
 import SEO from '@/components/SEO';
 import GoogleAds from '@/components/GoogleAds';
+import { AD_SLOTS } from '@/config/adSlots';
+import TrackAffiliateLinks from '@/components/TrackAffiliateLinks';
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 
@@ -339,7 +341,7 @@ const Episode389 = () => {
           </div>
         </section>
 
-        <GoogleAds key="episode389-ad" slot="6777392184" />
+        <GoogleAds key="episode389-ad" slot={AD_SLOTS.IN_CONTENT} />
 
         {/* Track Listing */}
         <section className="py-12">
@@ -372,11 +374,8 @@ const Episode389 = () => {
                           {track.artist}
                         </p>
                       </div>
-                      
-                      {/* Music Icon */}
-                      <div className="w-8 h-8 flex items-center justify-center text-muted-foreground group-hover:text-neon-purple transition-colors">
-                        <Music className="w-4 h-4" />
-                      </div>
+                      {/* Affiliate Links */}
+                      <TrackAffiliateLinks title={track.title} artist={track.artist} />
                     </div>
                   </Card>
                 ))}
@@ -419,6 +418,7 @@ const Episode389 = () => {
             </div>
           </div>
         </section>
+        <GoogleAds key="episode389-tracklist-ad" slot={AD_SLOTS.AFTER_TRACKLIST} format="rectangle" />
       </main>
 
       <Footer />

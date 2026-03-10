@@ -2,6 +2,8 @@ import { TrendingUp, Building2, Radio, Globe } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import GoogleAds from '@/components/GoogleAds';
+import { AD_SLOTS } from '@/config/adSlots';
 import { NewsGrid } from '@/components/news/NewsGrid';
 import { useNewsArticles } from '@/hooks/useNewsArticles';
 
@@ -52,6 +54,8 @@ const NewsIndustryCulture = () => {
               <p className="text-sm text-muted-foreground">Community news and cultural shifts</p>
             </div>
           </div>
+
+          <GoogleAds key="news-industry-ad" slot={AD_SLOTS.NEWS} />
 
           <section>
             <NewsGrid 

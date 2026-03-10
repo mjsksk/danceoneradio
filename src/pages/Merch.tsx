@@ -2,6 +2,8 @@ import { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import GoogleAds from '@/components/GoogleAds';
+import { AD_SLOTS } from '@/config/adSlots';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -37,6 +39,8 @@ const Merch = () => {
               All proceeds help keep the station running commercial-free.
             </p>
           </div>
+
+          <GoogleAds key="merch-ad" slot={AD_SLOTS.SIDEBAR} />
 
           {/* Product Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8 justify-items-center max-w-5xl mx-auto">

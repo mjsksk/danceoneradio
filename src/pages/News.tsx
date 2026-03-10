@@ -4,6 +4,8 @@ import { Newspaper, Music, CalendarDays, Users, TrendingUp, RefreshCw } from 'lu
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import GoogleAds from '@/components/GoogleAds';
+import { AD_SLOTS } from '@/config/adSlots';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { NewsFeaturedHero } from '@/components/news/NewsFeaturedHero';
@@ -94,6 +96,8 @@ const News = () => {
           <section className="mb-12">
             <NewsFeaturedHero article={featuredArticle || null} isLoading={featuredLoading} />
           </section>
+
+          <GoogleAds key="news-in-content" slot={AD_SLOTS.NEWS} />
 
           {/* Category Tabs for Mobile */}
           <Tabs defaultValue="all" className="mb-8">

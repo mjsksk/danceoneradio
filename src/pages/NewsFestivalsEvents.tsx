@@ -2,6 +2,8 @@ import { CalendarDays, MapPin, Ticket } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import GoogleAds from '@/components/GoogleAds';
+import { AD_SLOTS } from '@/config/adSlots';
 import { NewsGrid } from '@/components/news/NewsGrid';
 import { useNewsArticles } from '@/hooks/useNewsArticles';
 
@@ -52,6 +54,8 @@ const NewsFestivalsEvents = () => {
               <p className="text-sm text-muted-foreground">On-sale dates and ticket availability</p>
             </div>
           </div>
+
+          <GoogleAds key="news-festivals-ad" slot={AD_SLOTS.NEWS} />
 
           <section>
             <NewsGrid 
