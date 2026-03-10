@@ -95,7 +95,7 @@ const Contact = () => {
             />
           </div>
           
-          <GoogleAds key="contact-ad" slot="6777392184" />
+          <GoogleAds key="contact-ad" slot={AD_SLOTS.SIDEBAR} />
           
           {/* Contact Form */}
           <div className="bg-card/50 backdrop-blur-sm border border-border rounded-lg p-6">

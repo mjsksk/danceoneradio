@@ -30,7 +30,7 @@ const Privacy = () => {
               />
             </div>
             
-            <GoogleAds key="privacy-ad" slot="6777392184" />
+            <GoogleAds key="privacy-ad" slot={AD_SLOTS.SIDEBAR} />
             
             <div className="space-y-8 font-['Rajdhani'] text-lg">
               <section>

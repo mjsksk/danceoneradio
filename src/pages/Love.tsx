@@ -72,7 +72,7 @@ const Love = () => {
                </div>
              </div>
              
-              <GoogleAds key="love-ad" slot="6777392184" />
+              <GoogleAds key="love-ad" slot={AD_SLOTS.SIDEBAR} />
               
               <div className="space-y-12 font-['Rajdhani'] text-lg">
               <section className="text-center">

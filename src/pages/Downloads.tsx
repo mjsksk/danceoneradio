@@ -84,7 +84,7 @@ const Downloads = () => {
           </div>
         </section>
 
-        <GoogleAds key="downloads-ad" slot="6777392184" />
+        <GoogleAds key="downloads-ad" slot={AD_SLOTS.SIDEBAR} />
 
         {/* Features Section */}
         <section className="py-20">

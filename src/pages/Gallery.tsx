@@ -39,7 +39,7 @@ const Gallery = () => {
             </div>
           </div>
 
-          <GoogleAds key="gallery-ad" slot="6777392184" />
+          <GoogleAds key="gallery-ad" slot={AD_SLOTS.SIDEBAR} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <Link to="/gallery/love-parade-2005">

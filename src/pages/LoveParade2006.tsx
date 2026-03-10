@@ -179,7 +179,7 @@ const LoveParade2006 = () => {
             </div>
           </div>
 
-          <GoogleAds key="loveparade2006-ad" slot="6777392184" />
+          <GoogleAds key="loveparade2006-ad" slot={AD_SLOTS.SIDEBAR} />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {ALL_IMAGES.map((image, index) => (
