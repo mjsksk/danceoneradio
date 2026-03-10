@@ -3,6 +3,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import GoogleAds from '@/components/GoogleAds';
+import { AD_SLOTS } from '@/config/adSlots';
 import SocialShare from '@/components/SocialShare';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
