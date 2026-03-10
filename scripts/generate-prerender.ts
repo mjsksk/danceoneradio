@@ -83,16 +83,28 @@ const staticRoutes = [
     image: '/assets/love-parade-2006.png'
   },
   {
-    path: '/love-parade-2005',
+    path: '/gallery/love-parade-2005',
     title: 'Love Parade 2005 Photo Gallery - Dance One Radio',
     description: 'View photos from Love Parade 2005, celebrating electronic dance music culture and the spirit of peace, love, and unity.',
     image: '/assets/love-parade-2005.jpg'
   },
   {
-    path: '/love-parade-2006',
+    path: '/gallery/love-parade-2006',
     title: 'Love Parade 2006 Photo Gallery - Dance One Radio',
     description: 'View photos from Love Parade 2006 in San Francisco, one of the last major Love Parade events celebrating electronic music.',
     image: '/assets/love-parade-2006.png'
+  },
+  {
+    path: '/merch',
+    title: 'Merch Store - Dance One Radio',
+    description: 'Shop official Dance One Radio merchandise. T-shirts, hoodies, and accessories for electronic music lovers.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  {
+    path: '/desktop',
+    title: 'Desktop Player - Dance One Radio',
+    description: 'Listen to Dance One Radio with our dedicated desktop player experience.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
   },
   // News pages
   {
