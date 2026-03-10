@@ -346,11 +346,8 @@ const Episode391 = () => {
                           {track.artist}
                         </p>
                       </div>
-                      
-                      {/* Music Icon */}
-                      <div className="w-8 h-8 flex items-center justify-center text-muted-foreground group-hover:text-neon-purple transition-colors">
-                        <Music className="w-4 h-4" />
-                      </div>
+                      {/* Affiliate Links */}
+                      <TrackAffiliateLinks title={track.title} artist={track.artist} />
                     </div>
                   </Card>
                 ))}
