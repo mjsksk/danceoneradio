@@ -2,6 +2,8 @@ import { Newspaper, TrendingUp } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import GoogleAds from '@/components/GoogleAds';
+import { AD_SLOTS } from '@/config/adSlots';
 import { NewsFeaturedHero } from '@/components/news/NewsFeaturedHero';
 import { NewsGrid } from '@/components/news/NewsGrid';
 import { useFeaturedArticle, useTodayTopStories, useNewsArticles } from '@/hooks/useNewsArticles';
