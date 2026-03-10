@@ -563,7 +563,7 @@ const Shows = () => {
                       </div>
                     );
 
-                    return hasDedicatedPage ? (
+                    const episodeCard = hasDedicatedPage ? (
                       <Link 
                         key={episode.guid || index} 
                         to={`/episode/${episode.episodeNumber}`}
@@ -577,6 +577,17 @@ const Shows = () => {
                       <Card key={episode.guid || index} className="card-cyber p-8 hover:scale-[1.01] transition-all duration-300 group">
                         {cardContent}
                       </Card>
+                    );
+
+                    return (
+                      <div key={episode.guid || index}>
+                        {episodeCard}
+                        {(index + 1) % 5 === 0 && index < episodes.length - 1 && (
+                          <div className="mt-8">
+                            <GoogleAds key={`shows-between-${index}`} slot={AD_SLOTS.BETWEEN_EPISODES} format="fluid" layout="in-article" />
+                          </div>
+                        )}
+                      </div>
                     );
                   })}
                 </div>
