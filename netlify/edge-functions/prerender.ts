@@ -51,6 +51,16 @@ const ROUTE_METADATA: Record<string, { title: string; description: string; image
     description: 'Browse photo galleries from historic Love Parade events in San Francisco and Berlin. Relive the magic of electronic music culture.',
     image: '/assets/love-parade-2006.png'
   },
+  '/gallery/love-parade-2005': {
+    title: 'Love Parade 2005 Photo Gallery - Dance One Radio',
+    description: 'View photos from Love Parade 2005, celebrating electronic dance music culture and the spirit of peace, love, and unity.',
+    image: '/assets/love-parade-2005.jpg'
+  },
+  '/gallery/love-parade-2006': {
+    title: 'Love Parade 2006 Photo Gallery - Dance One Radio',
+    description: 'View photos from Love Parade 2006 in San Francisco, one of the last major Love Parade events celebrating electronic music.',
+    image: '/assets/love-parade-2006.png'
+  },
   '/about': {
     title: 'About Dance One Radio - Electronic Dance Music Station',
     description: 'Learn about Dance One Radio\'s history, mission, and the passionate team behind your favorite electronic dance music station.',
@@ -66,9 +76,44 @@ const ROUTE_METADATA: Record<string, { title: string; description: string; image
     description: 'Listen live to Dance One Radio streaming the newest electronic and dance music 24/7.',
     image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
   },
+  '/downloads': {
+    title: 'Download Dance One Radio Apps - Desktop & Mobile',
+    description: 'Download Dance One Radio desktop apps for Windows, Mac, and Linux. Listen to live electronic dance music streams on your favorite device.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  '/love': {
+    title: 'About Love Parade - Dance One Radio',
+    description: 'Learn about the history of Love Parade, the iconic electronic music festival that celebrated peace, love, and electronic dance music.',
+    image: '/assets/love-parade-2006.png'
+  },
+  '/merch': {
+    title: 'Merch Store - Dance One Radio',
+    description: 'Shop official Dance One Radio merchandise. T-shirts, hoodies, and accessories for electronic music lovers.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
   '/news': {
     title: 'EDM News & Updates - Dance One Radio',
     description: 'Stay updated with the latest electronic dance music news, artist announcements, festival updates, and industry insights.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  '/news/top-stories': {
+    title: 'Top Stories - EDM News | Dance One Radio',
+    description: 'Breaking news and top stories from the electronic dance music world.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  '/news/artists-releases': {
+    title: 'Artist News & New Releases - Dance One Radio',
+    description: 'Discover new music releases, artist announcements, and exclusive tracks from top electronic dance music producers.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  '/news/festivals-events': {
+    title: 'Festivals & Events - EDM News | Dance One Radio',
+    description: 'Get the latest updates on electronic music festivals, concerts, and events happening around the world.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  '/news/industry-culture': {
+    title: 'Industry & Culture - EDM News | Dance One Radio',
+    description: 'Explore the business and culture of electronic dance music. Industry insights, trends, and cultural commentary.',
     image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
   },
 };
