@@ -315,7 +315,7 @@ const Episode390 = () => {
           </div>
         </section>
 
-        <GoogleAds key="episode390-ad" slot="6777392184" />
+        <GoogleAds key="episode390-ad" slot={AD_SLOTS.IN_CONTENT} />
 
         {/* Track Listing */}
         <section className="py-12">
