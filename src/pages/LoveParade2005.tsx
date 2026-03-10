@@ -3,6 +3,7 @@ import SEO from "@/components/SEO";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import GoogleAds from "@/components/GoogleAds";
+import { AD_SLOTS } from "@/config/adSlots";
 import SocialShare from "@/components/SocialShare";
 import GalleryImage from "@/components/gallery/GalleryImage";
 import GalleryLightbox from "@/components/gallery/GalleryLightbox";
@@ -167,7 +168,7 @@ const LoveParade2005 = () => {
             </div>
           </div>
 
-          <GoogleAds key="loveparade2005-ad" slot="6777392184" />
+          <GoogleAds key="loveparade2005-ad" slot={AD_SLOTS.SIDEBAR} />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {ALL_IMAGES.map((image, index) => (

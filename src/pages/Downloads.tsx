@@ -2,6 +2,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import GoogleAds from '@/components/GoogleAds';
+import { AD_SLOTS } from '@/config/adSlots';
 import SocialShare from '@/components/SocialShare';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -83,7 +84,7 @@ const Downloads = () => {
           </div>
         </section>
 
-        <GoogleAds key="downloads-ad" slot="6777392184" />
+        <GoogleAds key="downloads-ad" slot={AD_SLOTS.SIDEBAR} />
 
         {/* Features Section */}
         <section className="py-20">

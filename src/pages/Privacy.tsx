@@ -2,6 +2,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import GoogleAds from '@/components/GoogleAds';
+import { AD_SLOTS } from '@/config/adSlots';
 import SocialShare from '@/components/SocialShare';
 import { Link } from 'react-router-dom';
 
@@ -29,7 +30,7 @@ const Privacy = () => {
               />
             </div>
             
-            <GoogleAds key="privacy-ad" slot="6777392184" />
+            <GoogleAds key="privacy-ad" slot={AD_SLOTS.SIDEBAR} />
             
             <div className="space-y-8 font-['Rajdhani'] text-lg">
               <section>
