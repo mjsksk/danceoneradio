@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import SocialShare from '@/components/SocialShare';
 import SEO from '@/components/SEO';
 import GoogleAds from '@/components/GoogleAds';
+import { AD_SLOTS } from '@/config/adSlots';
 import { Link } from 'react-router-dom';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { useAuth } from '@/contexts/AuthContext';
