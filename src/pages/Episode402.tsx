@@ -277,7 +277,7 @@ const Episode402 = () => {
           </div>
         </section>
 
-        <GoogleAds key={`episode${episodeNumber}-ad`} slot="6777392184" />
+        <GoogleAds key={`episode${episodeNumber}-ad`} slot={AD_SLOTS.IN_CONTENT} />
 
         {tracks.length > 0 && (
           <section className="py-12">
