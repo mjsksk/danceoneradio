@@ -3,6 +3,7 @@ import SEO from "@/components/SEO";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import GoogleAds from "@/components/GoogleAds";
+import { AD_SLOTS } from "@/config/adSlots";
 import SocialShare from "@/components/SocialShare";
 import GalleryImage from "@/components/gallery/GalleryImage";
 import GalleryLightbox from "@/components/gallery/GalleryLightbox";
