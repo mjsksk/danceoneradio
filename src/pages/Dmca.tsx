@@ -2,6 +2,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import GoogleAds from '@/components/GoogleAds';
+import { AD_SLOTS } from '@/config/adSlots';
 import SocialShare from '@/components/SocialShare';
 const Dmca = () => {
   return <div className="min-h-screen bg-background">
