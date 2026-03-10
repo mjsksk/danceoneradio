@@ -383,6 +383,7 @@ const Episode394 = () => {
             </div>
           </div>
         </section>
+        <GoogleAds key="episode394-tracklist-ad" slot={AD_SLOTS.AFTER_TRACKLIST} format="rectangle" />
       </main>
       
       <Footer />
