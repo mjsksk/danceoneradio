@@ -7,6 +7,7 @@ import NewsPreview from '@/components/NewsPreview';
 import GoogleAds from '@/components/GoogleAds';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import { AD_SLOTS } from '@/config/adSlots';
 import { useTrackHistoryUpdater } from '@/hooks/useTrackHistoryUpdater';
 
 const Index = () => {
@@ -22,8 +23,8 @@ const Index = () => {
         <ContinueListening />
         <ShowsSection />
         <NewsPreview />
-        <GoogleAds slot="6777392184" format="auto" />
-        <GoogleAds slot="6777392184" format="fluid" layout="in-article" />
+        <GoogleAds slot={AD_SLOTS.HEADER} format="auto" />
+        <GoogleAds slot={AD_SLOTS.IN_CONTENT} format="fluid" layout="in-article" />
         <TracksSection />
       </main>
       <Footer />
