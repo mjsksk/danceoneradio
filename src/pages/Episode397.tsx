@@ -292,6 +292,9 @@ const Episode397 = () => {
                           <p className="text-xs sm:text-sm text-muted-foreground break-words sm:truncate">
                             {track.artist}
                           </p>
+                          <div className="sm:hidden">
+                            <TrackAffiliateLinks title={track.title} artist={track.artist} variant="mobile" />
+                          </div>
                         </div>
                         
                         <div className="hidden sm:block">
