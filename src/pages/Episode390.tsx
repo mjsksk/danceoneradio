@@ -327,10 +327,10 @@ const Episode390 = () => {
               
               <div className="grid gap-3">
                 {tracks.map((track) => (
-                  <Card key={track.position} className="card-cyber p-4 hover:scale-[1.01] transition-all duration-200 group">
-                    <div className="flex items-center gap-4">
+                  <Card key={track.position} className="card-cyber p-2 sm:p-4 hover:scale-[1.01] transition-all duration-200 group">
+                    <div className="flex items-center gap-2 sm:gap-4">
                       {/* Track Number */}
-                      <div className="w-12 h-12 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full flex items-center justify-center text-neon font-['Orbitron'] font-bold text-sm">
+                      <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full flex items-center justify-center text-neon font-['Orbitron'] font-bold text-xs sm:text-sm shrink-0">
                         {track.position}
                       </div>
                       
