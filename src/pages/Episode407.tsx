@@ -117,7 +117,7 @@ const Episode407 = () => {
         <Navigation />
       
       <main className="pt-16">
-        <section className="py-12 relative">
+        <section className="py-6 sm:py-12 relative">
           <div className="container mx-auto px-4">
             <div className="mb-8">
               <Link to="/shows">
