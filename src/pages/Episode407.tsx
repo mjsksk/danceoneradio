@@ -275,10 +275,10 @@ const Episode407 = () => {
         <GoogleAds key={`episode${episodeNumber}-ad`} slot={AD_SLOTS.IN_CONTENT} />
 
         {tracks.length > 0 && (
-          <section className="py-12">
+          <section className="py-6 sm:py-12">
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto">
-                <h2 className="text-2xl md:text-3xl font-['Orbitron'] font-bold mb-8 text-center">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-['Orbitron'] font-bold mb-4 sm:mb-8 text-center">
                   <span className="text-neon-purple">Track Listing</span>
                 </h2>
                 
