@@ -260,7 +260,7 @@ const Episode390 = () => {
                         </div>
                       </div>
                       
-                      <div className="bg-background/50 rounded-lg p-4 border border-neon/20">
+                      <div className="bg-background/50 rounded-lg p-2 sm:p-4 border border-neon/20">
                         <div className="text-center mb-4">
                           <p className="text-muted-foreground mb-2">
                             This episode is available on our podcast platforms
