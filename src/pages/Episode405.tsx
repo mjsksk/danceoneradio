@@ -134,8 +134,8 @@ const Episode405 = () => {
                 <span className="text-neon-purple">{episodeNumber}</span>
               </h1>
               
-              <Card className="card-cyber p-6 mb-8">
-                <div className="flex flex-wrap items-center justify-center gap-6 text-muted-foreground">
+               <Card className="card-cyber p-3 sm:p-6 mb-8">
+                <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-muted-foreground text-sm sm:text-base">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-neon" />
                     <span>{episodeDate}</span>
