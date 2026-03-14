@@ -117,7 +117,7 @@ const Episode407 = () => {
         <Navigation />
       
       <main className="pt-16">
-        <section className="py-12 relative">
+        <section className="py-6 sm:py-12 relative">
           <div className="container mx-auto px-4">
             <div className="mb-8">
               <Link to="/shows">
@@ -134,8 +134,8 @@ const Episode407 = () => {
                 <span className="text-neon-purple">{episodeNumber}</span>
               </h1>
               
-              <Card className="card-cyber p-6 mb-8">
-                <div className="flex flex-wrap items-center justify-center gap-6 text-muted-foreground">
+               <Card className="card-cyber p-3 sm:p-6 mb-8">
+                <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-muted-foreground text-sm sm:text-base">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-neon" />
                     <span>{episodeDate}</span>
@@ -159,8 +159,8 @@ const Episode407 = () => {
                   </p>
                   
                   <div className="w-full max-w-2xl mx-auto">
-                    <div className="card-cyber p-6 bg-gradient-to-br from-background/80 to-background/60 backdrop-blur-sm">
-                      <div className="flex items-center gap-4 mb-4">
+                    <div className="card-cyber p-3 sm:p-6 bg-gradient-to-br from-background/80 to-background/60 backdrop-blur-sm">
+                      <div className="flex items-center gap-2 sm:gap-4 mb-4">
                         <Button 
                           variant="ghost"
                           className="w-12 h-12 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full flex items-center justify-center hover:from-neon/30 hover:to-neon-purple/30 transition-all duration-200 p-0"
@@ -217,12 +217,12 @@ const Episode407 = () => {
                         </div>
                       )}
                       
-                      <div className="bg-background/50 rounded-lg p-4 border border-neon/20 mt-4">
+                      <div className="bg-background/50 rounded-lg p-2 sm:p-4 border border-neon/20 mt-4">
                         <div className="text-center mb-4">
                           <p className="text-muted-foreground mb-2">
                             This episode is available on our podcast platforms
                           </p>
-                          <div className="flex justify-center gap-4">
+                          <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-4">
                             <Button 
                               asChild 
                               className="bg-gradient-to-r from-neon/20 to-neon-purple/20 border-neon/30 hover:from-neon/30 hover:to-neon-purple/30"
@@ -275,18 +275,18 @@ const Episode407 = () => {
         <GoogleAds key={`episode${episodeNumber}-ad`} slot={AD_SLOTS.IN_CONTENT} />
 
         {tracks.length > 0 && (
-          <section className="py-12">
+          <section className="py-6 sm:py-12">
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto">
-                <h2 className="text-2xl md:text-3xl font-['Orbitron'] font-bold mb-8 text-center">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-['Orbitron'] font-bold mb-4 sm:mb-8 text-center">
                   <span className="text-neon-purple">Track Listing</span>
                 </h2>
                 
                 <div className="grid gap-3">
                   {tracks.map((track) => (
-                    <Card key={track.position} className="card-cyber p-4 hover:scale-[1.01] transition-all duration-200 group">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full flex items-center justify-center text-neon font-['Orbitron'] font-bold text-sm">
+                    <Card key={track.position} className="card-cyber p-2 sm:p-4 hover:scale-[1.01] transition-all duration-200 group">
+                      <div className="flex items-center gap-2 sm:gap-4">
+                        <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full flex items-center justify-center text-neon font-['Orbitron'] font-bold text-xs sm:text-sm shrink-0">
                           {track.position}
                         </div>
                         

@@ -30,7 +30,7 @@ const TrackAffiliateLinks = ({ title, artist }: TrackAffiliateLinksProps) => {
   ];
 
   return (
-    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+    <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
       {links.map((link) => (
         <a
           key={link.label}
