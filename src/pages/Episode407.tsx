@@ -291,20 +291,22 @@ const Episode407 = () => {
                         </div>
                         
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-primary group-hover:text-neon transition-colors truncate">
+                          <h3 className="text-xs sm:text-sm font-semibold text-primary group-hover:text-neon transition-colors break-words sm:truncate">
                             {track.title}
                             {track.isUnreleased && (
-                              <span className="ml-2 px-2 py-1 bg-neon/20 text-neon text-xs rounded-full">
+                              <span className="ml-2 px-2 py-0.5 bg-neon/20 text-neon text-[10px] sm:text-xs rounded-full">
                                 UNRELEASED
                               </span>
                             )}
                           </h3>
-                          <p className="text-sm text-muted-foreground truncate">
+                          <p className="text-xs sm:text-sm text-muted-foreground break-words sm:truncate">
                             {track.artist}
                           </p>
                         </div>
                         
-                        <TrackAffiliateLinks title={track.title} artist={track.artist} />
+                        <div className="hidden sm:block">
+                          <TrackAffiliateLinks title={track.title} artist={track.artist} />
+                        </div>
                       </div>
                     </Card>
                   ))}
