@@ -356,7 +356,7 @@ const Episode390 = () => {
               </div>
               
               {/* Stats Summary */}
-              <Card className="card-cyber p-6 mt-8">
+              <Card className="card-cyber p-3 sm:p-6 mt-8">
                 <div className="text-center">
                   <h3 className="text-xl font-['Orbitron'] font-bold mb-4 text-neon-purple">
                     Episode Statistics
