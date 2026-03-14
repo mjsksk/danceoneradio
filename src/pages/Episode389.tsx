@@ -291,7 +291,7 @@ const Episode389 = () => {
                           <p className="text-muted-foreground mb-2">
                             This episode is available on our podcast platforms
                           </p>
-                          <div className="flex justify-center gap-4">
+                          <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-4">
                             <Button 
                               asChild 
                               className="bg-gradient-to-r from-neon/20 to-neon-purple/20 border-neon/30 hover:from-neon/30 hover:to-neon-purple/30"
