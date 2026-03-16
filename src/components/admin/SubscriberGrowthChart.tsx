@@ -47,23 +47,18 @@ const SubscriberGrowthChart = () => {
       const days = getDaysForRange(timeRange);
       const startDate = startOfDay(subDays(new Date(), days));
       
-      // Fetch all subscribers within the time range
+      // Fetch subscribers via server-side RPC (no PII exposed)
       const { data: subscribers, error } = await supabase
-        .from('newsletter_subscribers')
-        .select('subscribed_at, is_active')
-        .gte('subscribed_at', startDate.toISOString())
-        .order('subscribed_at', { ascending: true });
+        .rpc('get_subscriber_growth', { start_date: startDate.toISOString() });
 
       if (error) {
         console.error('Error fetching subscriber data:', error);
         return;
       }
 
-      // Fetch total count
-      const { count: total } = await supabase
-        .from('newsletter_subscribers')
-        .select('id', { count: 'exact', head: true })
-        .eq('is_active', true);
+      // Fetch total active count via RPC
+      const { data: total } = await supabase
+        .rpc('get_subscriber_count');
 
       setTotalSubscribers(total || 0);
 
@@ -87,12 +82,9 @@ const SubscriberGrowthChart = () => {
       });
 
       // Build chart data with cumulative count
-      // Get base count (subscribers before the start date)
-      const { count: baseCount } = await supabase
-        .from('newsletter_subscribers')
-        .select('id', { count: 'exact', head: true })
-        .lt('subscribed_at', startDate.toISOString())
-        .eq('is_active', true);
+      // Get base count (subscribers before the start date) via RPC
+      const { data: baseCount } = await supabase
+        .rpc('get_subscriber_count', { before_date: startDate.toISOString() });
 
       let cumulative = baseCount || 0;
       const data: ChartDataPoint[] = dateRange.map(date => {

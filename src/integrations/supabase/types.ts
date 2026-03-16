@@ -613,6 +613,14 @@ export type Database = {
               total_unique_listeners: number
             }[]
           }
+      get_subscriber_count: { Args: { before_date?: string }; Returns: number }
+      get_subscriber_growth: {
+        Args: { start_date: string }
+        Returns: {
+          is_active: boolean
+          subscribed_at: string
+        }[]
+      }
       get_visitor_analytics: {
         Args: { end_date?: string; start_date?: string }
         Returns: {
