@@ -62,7 +62,7 @@ serve(async (req) => {
       line_items: lineItems,
       mode: "payment",
       shipping_address_collection: {
-        allowed_countries: ["US", "CA", "GB", "AU", "DE", "FR", "NL", "BE", "IE", "ES", "IT", "PT", "AT", "CH", "SE", "DK", "NO", "FI", "NZ", "JP"],
+        allowed_countries: ["US", "CA", "GB", "AU", "NZ", "JP", "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "CH", "NO"],
       },
       shipping_options: [
         {
