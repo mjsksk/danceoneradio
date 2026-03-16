@@ -87,6 +87,17 @@ serve(async (req) => {
             },
           },
         },
+        {
+          shipping_rate_data: {
+            type: "fixed_amount",
+            fixed_amount: { amount: 3487, currency: "usd" },
+            display_name: "International Shipping",
+            delivery_estimate: {
+              minimum: { unit: "business_day", value: 7 },
+              maximum: { unit: "business_day", value: 21 },
+            },
+          },
+        },
       ],
       success_url: `${req.headers.get("origin")}/merch?success=true`,
       cancel_url: `${req.headers.get("origin")}/merch`,
