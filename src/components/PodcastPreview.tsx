@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Play, Pause, ExternalLink, Calendar, ArrowRight } from 'lucide-react';
+import { Play, Pause, ExternalLink, Calendar, ArrowRight, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { StaggeredItem } from '@/components/ui/staggered-animation';
+import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 
 interface Episode {
   title: string;
@@ -21,8 +22,7 @@ interface Episode {
 const PodcastPreview = () => {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState(true);
-  const [playingIndex, setPlayingIndex] = useState<number | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioPlayer = useAudioPlayer();
 
   useEffect(() => {
     const fetchEpisodes = async (retryCount = 0) => {
