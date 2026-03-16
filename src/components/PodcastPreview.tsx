@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Play, Pause, ExternalLink, Calendar, ArrowRight } from 'lucide-react';
+import { Play, Pause, ExternalLink, Calendar, ArrowRight, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { StaggeredItem } from '@/components/ui/staggered-animation';
+import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 
 interface Episode {
   title: string;
@@ -21,8 +22,7 @@ interface Episode {
 const PodcastPreview = () => {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState(true);
-  const [playingIndex, setPlayingIndex] = useState<number | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioPlayer = useAudioPlayer();
 
   useEffect(() => {
     const fetchEpisodes = async (retryCount = 0) => {
@@ -176,30 +176,25 @@ const PodcastPreview = () => {
                   e.preventDefault();
                   e.stopPropagation();
                   
-                  if (playingIndex === index) {
-                    // Pause current episode
-                    audioRef.current?.pause();
-                    setPlayingIndex(null);
-                  } else {
-                    // Stop any currently playing audio
-                    if (audioRef.current) {
-                      audioRef.current.pause();
-                      audioRef.current = null;
-                    }
-                    
-                    // Play new episode
-                    if (episode.enclosure.url) {
-                      const audio = new Audio(episode.enclosure.url);
-                      audioRef.current = audio;
-                      audio.play();
-                      audio.onended = () => setPlayingIndex(null);
-                      audio.onerror = () => setPlayingIndex(null);
-                      setPlayingIndex(index);
-                    }
+                  const isThisEpisode = audioPlayer.source === 'episode' && audioPlayer.episodeInfo?.number === episode.episodeNumber;
+                  
+                  if (isThisEpisode && audioPlayer.isPlaying) {
+                    audioPlayer.pause();
+                  } else if (isThisEpisode) {
+                    audioPlayer.resume();
+                  } else if (episode.enclosure.url) {
+                    audioPlayer.playEpisode({
+                      number: episode.episodeNumber,
+                      title: episode.title,
+                      audioUrl: episode.enclosure.url,
+                    });
                   }
                 }}
+                disabled={audioPlayer.source === 'episode' && audioPlayer.episodeInfo?.number === episode.episodeNumber && audioPlayer.isLoading}
               >
-                {playingIndex === index ? (
+                {audioPlayer.source === 'episode' && audioPlayer.episodeInfo?.number === episode.episodeNumber && audioPlayer.isLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : audioPlayer.source === 'episode' && audioPlayer.episodeInfo?.number === episode.episodeNumber && audioPlayer.isPlaying ? (
                   <Pause className="w-4 h-4" />
                 ) : (
                   <Play className="w-4 h-4" />
