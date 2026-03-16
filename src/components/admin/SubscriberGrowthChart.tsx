@@ -82,12 +82,9 @@ const SubscriberGrowthChart = () => {
       });
 
       // Build chart data with cumulative count
-      // Get base count (subscribers before the start date)
-      const { count: baseCount } = await supabase
-        .from('newsletter_subscribers')
-        .select('id', { count: 'exact', head: true })
-        .lt('subscribed_at', startDate.toISOString())
-        .eq('is_active', true);
+      // Get base count (subscribers before the start date) via RPC
+      const { data: baseCount } = await supabase
+        .rpc('get_subscriber_count', { before_date: startDate.toISOString() });
 
       let cumulative = baseCount || 0;
       const data: ChartDataPoint[] = dateRange.map(date => {
