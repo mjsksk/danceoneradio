@@ -473,6 +473,14 @@ const TracksSection = () => {
                          <TrackAffiliateLinks title={track.title} artist={track.artist} variant="desktop" />
                        </div>
                      </div>
+                     <a
+                       href={`https://www.amazon.com/s?k=${encodeURIComponent(`${track.artist} ${track.title}`)}&tag=danceone-20`}
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       className="inline-flex items-center gap-1.5 mt-1.5 px-3 py-1 rounded-full text-xs font-semibold font-['Rajdhani'] bg-orange-500/15 text-orange-400 hover:bg-orange-500/25 hover:text-orange-300 transition-colors border border-orange-500/20"
+                     >
+                       🛒 Buy on Amazon
+                     </a>
                      <div className="sm:hidden">
                        <TrackAffiliateLinks title={track.title} artist={track.artist} variant="mobile" />
                      </div>
