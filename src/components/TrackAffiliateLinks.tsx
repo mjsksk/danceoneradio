@@ -27,7 +27,7 @@ const TrackAffiliateLinks = ({ title, artist, variant = 'desktop' }: TrackAffili
     {
       label: 'Amazon Music',
       short: 'AZ',
-      url: `https://music.amazon.com/search/${query}`,
+      url: `https://www.amazon.com/s?k=${query}&tag=danceone-20`,
       color: 'hover:text-yellow-400',
       mobileColor: 'text-yellow-400/70',
     },
