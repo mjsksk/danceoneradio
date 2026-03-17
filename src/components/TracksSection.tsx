@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
+import TrackAffiliateLinks from '@/components/TrackAffiliateLinks';
 import { Play, Pause, Download, Heart, Share2, Clock, RefreshCw, Radio } from 'lucide-react';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import { supabase } from '@/integrations/supabase/client';
@@ -467,6 +468,13 @@ const TracksSection = () => {
                        </div>
                        <span>•</span>
                        <span>{new Date(track.playedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                       <span className="hidden sm:inline">•</span>
+                       <div className="hidden sm:flex">
+                         <TrackAffiliateLinks title={track.title} artist={track.artist} variant="desktop" />
+                       </div>
+                     </div>
+                     <div className="sm:hidden">
+                       <TrackAffiliateLinks title={track.title} artist={track.artist} variant="mobile" />
                      </div>
                    </div>
                 </div>
