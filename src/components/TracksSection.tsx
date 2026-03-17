@@ -374,7 +374,7 @@ const TracksSection = () => {
             tracks.filter(track => !track.title.includes("Dance One Radio") && !track.artist.includes("Dance One Radio")).map((track, index) => (
             <div
               key={track.id}
-              className="card-cyber p-6 animate-fade-in"
+              className="card-cyber p-6 animate-fade-in group"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
