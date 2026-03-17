@@ -480,7 +480,15 @@ const TracksSection = () => {
                        className="inline-flex items-center gap-1.5 mt-1.5 px-3 py-1 rounded-full text-xs font-semibold font-['Rajdhani'] bg-orange-500/15 text-orange-400 hover:bg-orange-500/25 hover:text-orange-300 transition-colors border border-orange-500/20"
                      >
                        🛒 Buy on Amazon
-                     </a>
+                      </a>
+                      <a
+                        href={`https://www.beatport.com/search?q=${encodeURIComponent(`${track.artist} ${track.title}`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 mt-1.5 ml-2 px-3 py-1 rounded-full text-xs font-semibold font-['Rajdhani'] bg-green-500/15 text-green-400 hover:bg-green-500/25 hover:text-green-300 transition-colors border border-green-500/20"
+                      >
+                        🎵 View on Beatport
+                      </a>
                      <div className="sm:hidden">
                        <TrackAffiliateLinks title={track.title} artist={track.artist} variant="mobile" />
                      </div>
