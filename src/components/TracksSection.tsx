@@ -468,6 +468,13 @@ const TracksSection = () => {
                        </div>
                        <span>•</span>
                        <span>{new Date(track.playedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                       <span className="hidden sm:inline">•</span>
+                       <div className="hidden sm:flex">
+                         <TrackAffiliateLinks title={track.title} artist={track.artist} variant="desktop" />
+                       </div>
+                     </div>
+                     <div className="sm:hidden">
+                       <TrackAffiliateLinks title={track.title} artist={track.artist} variant="mobile" />
                      </div>
                    </div>
                 </div>
