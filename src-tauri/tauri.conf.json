@@ -1,0 +1,56 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "Dance One Radio",
+  "version": "1.0.0",
+  "identifier": "com.danceoneradio.app",
+  "build": {
+    "frontendDist": "../desktop-app/app-dist",
+    "devUrl": "http://localhost:8080/desktop.html",
+    "beforeDevCommand": "npm run dev -- --host",
+    "beforeBuildCommand": "npm run desktop:build"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Dance One Radio",
+        "width": 1120,
+        "height": 820,
+        "minWidth": 960,
+        "minHeight": 700,
+        "center": true,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "nsis",
+    "createUpdaterArtifacts": true,
+    "icon": [
+      "icons/icon.png",
+      "icons/icon.ico"
+    ],
+    "publisher": "Dance One Radio",
+    "windows": {
+      "webviewInstallMode": {
+        "type": "embedBootstrapper",
+        "silent": true
+      },
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "headerImage": null,
+        "sidebarImage": null
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "active": false
+    }
+  }
+}

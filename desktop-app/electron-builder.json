@@ -1,13 +1,34 @@
 {
   "appId": "com.danceoneradio.app",
-  "productName": "DanceOneRadio",
+  "productName": "Dance One Radio",
+  "compression": "maximum",
+  "electronLanguages": [
+    "en-US"
+  ],
   "files": [
     "main.js",
     "preload.js",
-    "dist/**/*"
+    "assets/**/*",
+    "app-dist/**/*"
   ],
   "win": {
-    "target": "portable"
+    "icon": "assets/icon.ico",
+    "signAndEditExecutable": false,
+    "target": [
+      "nsis"
+    ]
+  },
+  "nsis": {
+    "artifactName": "${productName}-Setup-${version}-${arch}.${ext}",
+    "oneClick": false,
+    "perMachine": true,
+    "allowToChangeInstallationDirectory": true,
+    "installerIcon": "assets/icon.ico",
+    "uninstallerIcon": "assets/icon.ico",
+    "installerHeaderIcon": "assets/icon.ico",
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Dance One Radio"
   },
   "directories": {
     "output": "dist"

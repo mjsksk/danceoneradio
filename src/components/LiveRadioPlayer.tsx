@@ -21,7 +21,7 @@ const LiveRadioPlayer = ({
   streamTitle: initialStreamTitle,
   hidePopupButton = false
 }: LiveRadioPlayerProps) => {
-  const { isPlaying, isLoading, handlePlayPause, streamTitle: globalStreamTitle, albumArt: globalAlbumArt } = useLiveRadioPlayer();
+  const { isPlaying, isLoading, handlePlayPause, primeLiveStream, streamTitle: globalStreamTitle, albumArt: globalAlbumArt } = useLiveRadioPlayer(streamUrls);
   
   const [localAlbumArt, setLocalAlbumArt] = useState<string | null>(null);
   const [isLoadingArt, setIsLoadingArt] = useState(false);
@@ -30,9 +30,11 @@ const LiveRadioPlayer = ({
   const [animationActive, setAnimationActive] = useState(false);
   const [currentStreamTitle, setCurrentStreamTitle] = useState(initialStreamTitle);
   const [isStreamLive, setIsStreamLive] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(() => localStorage.getItem('track-change-notifications') === 'true');
 
   const { showNotification } = useDesktopIntegration();
   const animationRef = useRef<number | null>(null);
+  const lastNotifiedTrackRef = useRef<string | null>(null);
 
   // Use global stream title and album art when available
   const displayStreamTitle = globalStreamTitle || currentStreamTitle;
@@ -63,6 +65,10 @@ const LiveRadioPlayer = ({
       stopAnimation();
     }
   }, [isPlaying]);
+
+  useEffect(() => {
+    primeLiveStream();
+  }, [primeLiveStream]);
 
   const startFallbackAnimation = () => {
     console.log('🎵 Starting FREQUENCY-BASED animation');
@@ -224,14 +230,26 @@ const LiveRadioPlayer = ({
 
   // Desktop notification for track changes (respects user preference)
   useEffect(() => {
-    const trackNotificationsEnabled = localStorage.getItem('track-change-notifications') !== 'false';
-    if (isPlaying && displayStreamTitle && !displayStreamTitle.includes('Dance One Radio - The Future') && trackNotificationsEnabled) {
-      const cleanedTitle = cleanTrackForSearch(displayStreamTitle);
-      if (cleanedTitle) {
-        showNotification('Now Playing', cleanedTitle);
-      }
+    if (!notificationsEnabled || !isPlaying || !displayStreamTitle || displayStreamTitle.includes('Dance One Radio - The Future')) {
+      return;
     }
-  }, [displayStreamTitle, isPlaying, showNotification]);
+
+    const cleanedTitle = cleanTrackForSearch(displayStreamTitle);
+    if (!cleanedTitle || cleanedTitle === lastNotifiedTrackRef.current) {
+      return;
+    }
+
+    lastNotifiedTrackRef.current = cleanedTitle;
+    showNotification('Now Playing', cleanedTitle);
+  }, [displayStreamTitle, isPlaying, notificationsEnabled, showNotification]);
+
+  const handleNotificationsChange = (enabled: boolean) => {
+    setNotificationsEnabled(enabled);
+    localStorage.setItem('track-change-notifications', String(enabled));
+    if (!enabled) {
+      lastNotifiedTrackRef.current = null;
+    }
+  };
 
   // Cleanup on unmount
   useEffect(() => {
@@ -385,6 +403,8 @@ const LiveRadioPlayer = ({
               title: cleanTrackForSearch(displayStreamTitle),
               artist: 'Dance One Radio'
             }}
+            notificationsEnabled={notificationsEnabled}
+            onNotificationsChange={handleNotificationsChange}
           />
         </div>
       </div>

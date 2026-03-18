@@ -1,59 +1,45 @@
-# Build Instructions for Desktop App
+# Desktop Build Instructions
 
-## The Issue
-The download buttons are working, but the actual executable files haven't been built yet. The desktop app structure was created but needs to be compiled into Windows executables.
+## What this build produces
 
-## To Build the Desktop App:
+The desktop app is an Electron wrapper around the dedicated `desktop.html` renderer. The renderer bundle is written to `desktop-app/app-dist`, and packaging produces a standard Windows installer (`nsis`) in `desktop-app/dist`.
 
-### Prerequisites
-1. Node.js 18 or later installed
-2. Windows machine (for building Windows executables)
+## Prerequisites
 
-### Build Steps
+1. Node.js 18 or later
+2. Dependencies installed in both locations:
+   - repo root
+   - `desktop-app`
 
-1. **Navigate to desktop app folder:**
-   ```bash
-   cd desktop-app
-   ```
+## Install dependencies
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+From the repository root:
 
-3. **Build the React web app first (from root directory):**
-   ```bash
-   cd ..
-   npm run build
-   cd desktop-app
-   ```
+```bash
+npm install
+npm --prefix desktop-app install
+```
 
-4. **Generate assets (copy your logo files):**
-   - Copy your logo to `desktop-app/assets/icon.png` (256x256)
-   - Convert to ICO: `desktop-app/assets/icon.ico`
-   - Create tray icons: `desktop-app/assets/tray-icon.png` (16x16)
+## Build and package
 
-5. **Run the build script:**
-   ```bash
-   node build-script.js
-   ```
+From the repository root:
 
-6. **Copy built files to web directory:**
-   ```bash
-   cp dist/*.exe ../public/downloads/
-   ```
+```bash
+npm run desktop:package
+```
 
-### Expected Output
-- `Dance-One-Radio-Setup-1.0.0.exe` (Full installer ~50MB)
-- `Dance-One-Radio-Portable-1.0.0.exe` (Portable version ~45MB)
+On Windows you can also run:
 
-### Alternative: Use Placeholder During Development
-For now, the download buttons will show an informative message when files aren't available instead of attempting to download non-existent files.
+```bash
+build-desktop.bat
+```
 
-### Troubleshooting Build Issues
-- Ensure all dependencies are installed
-- Check that Node.js version is 18+
-- Verify the React build completed successfully
-- Make sure you have proper icons in the assets folder
+## Output
 
-Once built, the download buttons will work correctly and serve the actual Windows executables.
+Look in `desktop-app/dist` for the generated `.exe` files.
+
+## Notes
+
+- The Electron main process loads `desktop.html` in development and the built `dist/desktop.html` file in production.
+- The installer and portable builds share the same renderer bundle from `vite.config.desktop.ts`.
+- If you want a custom Windows icon, replace `desktop-app/assets/icon.png` and `desktop-app/assets/tray-icon.png`.

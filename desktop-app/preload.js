@@ -33,6 +33,26 @@ contextBridge.exposeInMainWorld('electronAPI', {
   showNotification: (options) => {
     ipcRenderer.send('show-notification', options);
   },
+
+  hideWindow: () => {
+    ipcRenderer.send('hide-window');
+  },
+
+  showWindow: () => {
+    ipcRenderer.send('show-window');
+  },
+
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+
+  downloadUpdate: () => ipcRenderer.invoke('download-update'),
+
+  getUpdateStatus: () => ipcRenderer.invoke('get-update-status'),
+
+  installUpdate: () => ipcRenderer.invoke('install-update'),
+
+  onUpdateStatus: (callback) => {
+    ipcRenderer.on('update-status', (_event, payload) => callback(payload));
+  },
   
   // Platform detection
   platform: process.platform,

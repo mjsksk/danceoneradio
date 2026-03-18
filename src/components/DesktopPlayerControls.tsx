@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
+import { Monitor } from 'lucide-react';
 import { useDesktopIntegration } from '@/hooks/useDesktopIntegration';
-import { Button } from '@/components/ui/button';
-import { Monitor, Minimize2, X } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 
 interface DesktopPlayerControlsProps {
   isPlaying: boolean;
@@ -10,89 +10,79 @@ interface DesktopPlayerControlsProps {
     title?: string;
     artist?: string;
   };
+  notificationsEnabled: boolean;
+  onNotificationsChange: (enabled: boolean) => void;
 }
 
-export const DesktopPlayerControls = ({ 
-  isPlaying, 
-  onTogglePlayback, 
-  currentTrack 
+export const DesktopPlayerControls = ({
+  isPlaying,
+  onTogglePlayback,
+  currentTrack,
+  notificationsEnabled,
+  onNotificationsChange,
 }: DesktopPlayerControlsProps) => {
-  const { 
-    isDesktop, 
-    updatePlaybackState, 
-    updateTrackInfo, 
+  const {
+    isDesktop,
+    updatePlaybackState,
+    updateTrackInfo,
     registerMediaKeyHandlers,
-    getAppVersion 
+    getAppVersion,
   } = useDesktopIntegration();
-  
+
   const [appVersion, setAppVersion] = useState<string | null>(null);
 
-  // Update desktop integration when playback state changes
   useEffect(() => {
     if (isDesktop) {
       updatePlaybackState(isPlaying);
     }
-  }, [isPlaying, updatePlaybackState, isDesktop]);
+  }, [isDesktop, isPlaying, updatePlaybackState]);
 
-  // Update track info in desktop tray
   useEffect(() => {
     if (isDesktop && currentTrack) {
       updateTrackInfo(currentTrack);
     }
-  }, [currentTrack, updateTrackInfo, isDesktop]);
+  }, [currentTrack, isDesktop, updateTrackInfo]);
 
-  // Register media key handlers
   useEffect(() => {
     if (isDesktop) {
       const cleanup = registerMediaKeyHandlers(onTogglePlayback);
       return cleanup;
     }
-  }, [isDesktop, registerMediaKeyHandlers, onTogglePlayback]);
+  }, [isDesktop, onTogglePlayback, registerMediaKeyHandlers]);
 
-  // Get app version on mount
   useEffect(() => {
     if (isDesktop) {
       getAppVersion().then(setAppVersion);
     }
-  }, [isDesktop, getAppVersion]);
+  }, [getAppVersion, isDesktop]);
 
   if (!isDesktop) {
     return null;
   }
 
-  const minimizeToTray = () => {
-    if (typeof window !== 'undefined' && window.electronAPI) {
-      // The main process will handle minimizing to tray when window is closed
-      window.close();
-    }
-  };
-
   return (
     <div className="desktop-controls">
-      {/* Desktop-specific status indicator */}
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <Monitor className="h-3 w-3" />
         <span>Desktop App</span>
         {appVersion && <span>v{appVersion}</span>}
       </div>
 
-      {/* Desktop window controls */}
-      <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6"
-          onClick={minimizeToTray}
-          title="Minimize to system tray"
-        >
-          <Minimize2 className="h-3 w-3" />
-        </Button>
+      <div className="text-xs text-muted-foreground">
+        <div>Shortcuts: Ctrl+Shift+P (Play/Pause) | Ctrl+M (Hide)</div>
+        <div>Media keys supported | Tray icon restores the app</div>
       </div>
 
-      {/* Keyboard shortcuts info */}
-      <div className="text-xs text-muted-foreground">
-        <div>Shortcuts: Ctrl+Shift+P (Play/Pause) • Ctrl+M (Minimize)</div>
-        <div>Media keys supported • Double-click tray to restore</div>
+      <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/10 px-3 py-2 text-xs text-muted-foreground">
+        <div>
+          <div className="font-medium text-foreground">Track notifications</div>
+          <div>Off by default. Turn on to get native now-playing alerts.</div>
+        </div>
+        <Switch
+          checked={notificationsEnabled}
+          onCheckedChange={onNotificationsChange}
+          className="data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-slate-600"
+        />
       </div>
     </div>
   );

@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import TrackAffiliateLinks from '@/components/TrackAffiliateLinks';
-import { Play, Pause, Download, Heart, Share2, Clock, RefreshCw, Radio } from 'lucide-react';
+import { Play, Pause, Heart, Share2, Clock, RefreshCw, Radio } from 'lucide-react';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import { supabase } from '@/integrations/supabase/client';
-import stationLogo from '/lovable-uploads/72d04e54-23af-4f4a-bf39-efcc6c6b2150.png';
+import stationLogo from '@/assets/dance-one-logo.png';
+import { cn } from '@/lib/utils';
 
 interface Track {
   id: number;
@@ -18,7 +19,17 @@ interface Track {
   downloads: number;
 }
 
-const TracksSection = () => {
+interface TracksSectionProps {
+  title?: string;
+  subtitle?: string;
+  compact?: boolean;
+}
+
+const TracksSection = ({
+  title = 'LATEST PLAYED TRACKS',
+  subtitle,
+  compact = false,
+}: TracksSectionProps) => {
   const [playingTrack, setPlayingTrack] = useState<number | null>(null);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(true);
@@ -268,17 +279,10 @@ const TracksSection = () => {
       min-width: 300px;
     `;
     
-    // Helper function to safely escape HTML
-    const escapeHtml = (text: string) => {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    };
-    
     // Create elements safely using DOM methods instead of innerHTML
-    const title = document.createElement('h3');
-    title.style.cssText = 'margin: 0 0 15px 0; color: hsl(var(--foreground)); font-family: "Orbitron", sans-serif;';
-    title.textContent = 'Share Track';
+    const popupTitle = document.createElement('h3');
+    popupTitle.style.cssText = 'margin: 0 0 15px 0; color: hsl(var(--foreground)); font-family: "Orbitron", sans-serif;';
+    popupTitle.textContent = 'Share Track';
     
     const trackInfo = document.createElement('p');
     trackInfo.style.cssText = 'margin: 0 0 15px 0; color: hsl(var(--muted-foreground)); font-size: 14px;';
@@ -307,7 +311,7 @@ const TracksSection = () => {
     buttonsContainer.appendChild(cancelButton);
     
     // Append all elements safely
-    popup.appendChild(title);
+    popup.appendChild(popupTitle);
     popup.appendChild(trackInfo);
     popup.appendChild(buttonsContainer);
     
@@ -348,13 +352,19 @@ const TracksSection = () => {
   };
 
   return (
-    <section id="tracks" className="py-20 relative">
+    <section id="tracks" className={cn('relative', compact ? 'py-8' : 'py-20')}>
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16 animate-fade-in">
-          <h2 className="text-4xl md:text-6xl font-['Orbitron'] font-bold mb-6">
-            <span className="text-neon">LATEST PLAYED</span>{" "}
-            <span className="text-neon-purple">TRACKS</span>
-          </h2>
+        <div className={cn('animate-fade-in', compact ? 'mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between' : 'mb-16 text-center')}>
+          <div>
+            <h2 className={cn("font-['Orbitron'] font-bold", compact ? 'text-3xl md:text-4xl' : 'text-4xl md:text-6xl')}>
+              <span className="text-neon">{title}</span>
+            </h2>
+            {subtitle ? (
+              <p className={cn('mt-3 max-w-2xl text-sm text-muted-foreground', compact ? '' : 'mx-auto')}>
+                {subtitle}
+              </p>
+            ) : null}
+          </div>
           <Button 
             onClick={handleManualRefresh}
             disabled={refreshing}
@@ -374,7 +384,7 @@ const TracksSection = () => {
             tracks.filter(track => !track.title.includes("Dance One Radio") && !track.artist.includes("Dance One Radio")).map((track, index) => (
             <div
               key={track.id}
-              className="card-cyber p-6 animate-fade-in group"
+              className={cn('card-cyber animate-fade-in group', compact ? 'p-5' : 'p-6')}
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">

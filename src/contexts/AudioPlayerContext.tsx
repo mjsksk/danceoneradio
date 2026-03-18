@@ -1,7 +1,9 @@
 import { createContext, useContext, useState, useRef, useCallback, useEffect, ReactNode } from 'react';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import { AlbumArtService } from '@/utils/AlbumArtService';
+import { LIVE_STREAM_FALLBACK_TIMEOUT_MS, LIVE_STREAM_URLS } from '@/constants/liveStream';
 import { toast } from 'sonner';
+import stationLogo from '@/assets/dance-one-logo.png';
 
 interface EpisodeInfo {
   number: number;
@@ -25,6 +27,7 @@ interface AudioPlayerState {
 
 interface AudioPlayerContextType extends AudioPlayerState {
   playLiveStream: (streamUrls: string[]) => void;
+  primeLiveStream: (streamUrls?: string[]) => void;
   playEpisode: (info: EpisodeInfo) => void;
   pause: () => void;
   resume: () => void;
@@ -37,18 +40,14 @@ interface AudioPlayerContextType extends AudioPlayerState {
 
 const AudioPlayerContext = createContext<AudioPlayerContextType | null>(null);
 
-const STREAM_URLS = [
-  "http://s9.myradiostream.com:14296/;", 
-  "http://s9.myradiostream.com:14296/stream", 
-  "http://s9.myradiostream.com:14296", 
-  "https://live-radio-stream.online/dance-one-radio.mp3"
-];
-
 // Available episode numbers with pages (sorted descending)
 const AVAILABLE_EPISODES = [403, 402, 401, 400, 399, 398, 397, 396, 395, 394, 393, 392, 391, 390, 389];
 
 export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const currentUrlIndexRef = useRef(0);
+  const streamUrlsRef = useRef<string[]>(LIVE_STREAM_URLS);
+  const liveAttemptTimeoutRef = useRef<number | null>(null);
   
   // Load autoplay preference from localStorage
   const [autoplayEnabled, setAutoplayEnabled] = useState(() => {
@@ -76,7 +75,15 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
   }, [autoplayEnabled]);
 
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
-  const [streamUrls, setStreamUrls] = useState<string[]>(STREAM_URLS);
+  const [streamUrls, setStreamUrls] = useState<string[]>(LIVE_STREAM_URLS);
+
+  useEffect(() => {
+    currentUrlIndexRef.current = currentUrlIndex;
+  }, [currentUrlIndex]);
+
+  useEffect(() => {
+    streamUrlsRef.current = streamUrls;
+  }, [streamUrls]);
 
   // Fetch stream metadata for live stream
   useEffect(() => {
@@ -105,16 +112,51 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     return () => clearInterval(interval);
   }, [state.source]);
 
-  const tryNextUrl = useCallback(() => {
-    if (currentUrlIndex < streamUrls.length - 1) {
-      setCurrentUrlIndex(prev => prev + 1);
-      return true;
+  const clearLiveAttemptTimeout = useCallback(() => {
+    if (liveAttemptTimeoutRef.current !== null) {
+      window.clearTimeout(liveAttemptTimeoutRef.current);
+      liveAttemptTimeoutRef.current = null;
     }
-    return false;
-  }, [currentUrlIndex, streamUrls.length]);
+  }, []);
+
+  const tryStreamAtIndex = useCallback((index: number, urls: string[]) => {
+    const audio = audioRef.current;
+    if (!audio || !urls[index]) return false;
+
+    clearLiveAttemptTimeout();
+    currentUrlIndexRef.current = index;
+    setCurrentUrlIndex(index);
+
+    audio.src = urls[index];
+    audio.load();
+
+    liveAttemptTimeoutRef.current = window.setTimeout(() => {
+      if (!audioRef.current || currentUrlIndexRef.current !== index) return;
+      if (audioRef.current.currentTime > 0 || audioRef.current.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) return;
+
+      if (index < urls.length - 1) {
+        tryStreamAtIndex(index + 1, urls);
+      } else {
+        setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
+      }
+    }, LIVE_STREAM_FALLBACK_TIMEOUT_MS);
+
+    audio.play().catch(err => {
+      console.error(`Error playing live stream URL ${index + 1}:`, err);
+      if (index < urls.length - 1) {
+        tryStreamAtIndex(index + 1, urls);
+      } else {
+        clearLiveAttemptTimeout();
+        setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
+      }
+    });
+
+    return true;
+  }, [clearLiveAttemptTimeout]);
 
   const playLiveStream = useCallback((urls: string[]) => {
-    if (!audioRef.current) return;
+    const audio = audioRef.current;
+    if (!audio) return;
     
     setStreamUrls(urls);
     setCurrentUrlIndex(0);
@@ -128,20 +170,41 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       albumArt: null,
     }));
 
-    audioRef.current.src = urls[0];
-    audioRef.current.load();
-    audioRef.current.play().catch(err => {
-      console.error('Error playing live stream:', err);
-      if (tryNextUrl()) {
-        audioRef.current!.src = urls[currentUrlIndex + 1];
-        audioRef.current!.load();
-        audioRef.current!.play();
-      }
-    });
-  }, [tryNextUrl, currentUrlIndex]);
+    const primaryUrl = new URL(urls[0], window.location.href).href;
+    if (audio.src === primaryUrl && audio.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      clearLiveAttemptTimeout();
+      audio.play().catch(err => {
+        console.error('Error resuming primed live stream:', err);
+        tryStreamAtIndex(0, urls);
+      });
+      return;
+    }
+
+    tryStreamAtIndex(0, urls);
+  }, [clearLiveAttemptTimeout, tryStreamAtIndex]);
+
+  const primeLiveStream = useCallback((urls: string[] = LIVE_STREAM_URLS) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (state.source === 'episode' || state.isPlaying) return;
+
+    setStreamUrls(urls);
+    streamUrlsRef.current = urls;
+    currentUrlIndexRef.current = 0;
+    setCurrentUrlIndex(0);
+
+    const primaryUrl = new URL(urls[0], window.location.href).href;
+    if (audio.src === primaryUrl) return;
+
+    clearLiveAttemptTimeout();
+    audio.src = urls[0];
+    audio.load();
+  }, [clearLiveAttemptTimeout, state.isPlaying, state.source]);
 
   const playEpisode = useCallback((info: EpisodeInfo) => {
     if (!audioRef.current) return;
+
+    clearLiveAttemptTimeout();
     
     setState(prev => ({
       ...prev,
@@ -150,7 +213,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       isVisible: true,
       episodeInfo: info,
       streamTitle: info.title,
-      albumArt: '/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png',
+      albumArt: stationLogo,
     }));
 
     audioRef.current.src = info.audioUrl;
@@ -159,7 +222,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error playing episode:', err);
       setState(prev => ({ ...prev, isLoading: false }));
     });
-  }, []);
+  }, [clearLiveAttemptTimeout]);
 
   const pause = useCallback(() => {
     if (!audioRef.current) return;
@@ -188,6 +251,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     if (!audioRef.current) return;
     audioRef.current.pause();
     audioRef.current.src = '';
+    clearLiveAttemptTimeout();
     setState(prev => ({
       ...prev,
       source: null,
@@ -197,7 +261,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       duration: 0,
       episodeInfo: null,
     }));
-  }, []);
+  }, [clearLiveAttemptTimeout]);
 
   const toggleAutoplay = useCallback(() => {
     setAutoplayEnabled(prev => {
@@ -256,13 +320,27 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const handlePlay = () => setState(prev => ({ ...prev, isPlaying: true, isLoading: false }));
+    audio.crossOrigin = 'anonymous';
+    audio.muted = false;
+    audio.volume = 1;
+
+    const handlePlay = () => setState(prev => ({ ...prev, isPlaying: true }));
+    const handlePlaying = () => {
+      clearLiveAttemptTimeout();
+      setState(prev => ({ ...prev, isPlaying: true, isLoading: false }));
+    };
     const handlePause = () => setState(prev => ({ ...prev, isPlaying: false }));
+    const handleWaiting = () => setState(prev => prev.source === 'live' ? { ...prev, isLoading: true } : prev);
     const handleTimeUpdate = () => setState(prev => ({ ...prev, currentTime: audio.currentTime }));
     const handleLoadedMetadata = () => {
       const nextDuration = Number.isFinite(audio.duration) ? audio.duration : 0;
-      setState(prev => ({ ...prev, duration: nextDuration, isLoading: false }));
+      setState(prev => ({ ...prev, duration: nextDuration }));
     };
+    const handleCanPlay = () => {
+      clearLiveAttemptTimeout();
+      setState(prev => prev.source === 'live' ? { ...prev, isLoading: false } : prev);
+    };
+    const handleStalled = () => setState(prev => prev.source === 'live' ? { ...prev, isLoading: true } : prev);
     
     const handleEnded = async () => {
       setState(prev => ({ ...prev, isPlaying: false }));
@@ -311,31 +389,39 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     
     const handleError = () => {
       console.error('Audio error, trying next URL');
-      if (state.source === 'live' && tryNextUrl()) {
-        audio.src = streamUrls[currentUrlIndex + 1];
-        audio.load();
-        audio.play();
+      clearLiveAttemptTimeout();
+      if (state.source === 'live' && currentUrlIndexRef.current < streamUrlsRef.current.length - 1) {
+        tryStreamAtIndex(currentUrlIndexRef.current + 1, streamUrlsRef.current);
       } else {
-        setState(prev => ({ ...prev, isLoading: false }));
+        setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
       }
     };
 
     audio.addEventListener('play', handlePlay);
+    audio.addEventListener('canplay', handleCanPlay);
+    audio.addEventListener('playing', handlePlaying);
     audio.addEventListener('pause', handlePause);
+    audio.addEventListener('stalled', handleStalled);
+    audio.addEventListener('waiting', handleWaiting);
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('error', handleError);
 
     return () => {
+      clearLiveAttemptTimeout();
       audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('canplay', handleCanPlay);
+      audio.removeEventListener('playing', handlePlaying);
       audio.removeEventListener('pause', handlePause);
+      audio.removeEventListener('stalled', handleStalled);
+      audio.removeEventListener('waiting', handleWaiting);
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
     };
-  }, [state.source, state.episodeInfo, autoplayEnabled, tryNextUrl, streamUrls, currentUrlIndex, getNextEpisode, fetchEpisodeUrl, playEpisode]);
+  }, [autoplayEnabled, clearLiveAttemptTimeout, fetchEpisodeUrl, getNextEpisode, playEpisode, state.episodeInfo, state.source, tryStreamAtIndex]);
 
   // Some browsers can throttle `timeupdate`; keep episode progress in sync while playing.
   useEffect(() => {
@@ -367,6 +453,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       value={{
         ...state,
         playLiveStream,
+        primeLiveStream,
         playEpisode,
         pause,
         resume,
@@ -378,7 +465,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       }}
     >
       {children}
-      <audio ref={audioRef} preload="metadata" />
+      <audio ref={audioRef} preload="auto" />
     </AudioPlayerContext.Provider>
   );
 };

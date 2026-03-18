@@ -1,9 +1,12 @@
 @echo off
-REM Build optimized desktop app
+setlocal
 
-echo Building optimized desktop app...
-call npx vite build --config vite.config.desktop.ts
+echo Building desktop renderer...
+call npm run desktop:build
+if errorlevel 1 exit /b 1
 
-echo Desktop build complete! Now building Electron app...
-cd desktop-app
-call npm run build:win
+echo Packaging Windows app...
+call npx tauri build --bundles nsis
+if errorlevel 1 exit /b 1
+
+echo Done. Installer build is in src-tauri\target\release\bundle\nsis
