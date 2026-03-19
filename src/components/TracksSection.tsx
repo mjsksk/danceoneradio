@@ -4,7 +4,7 @@ import TrackAffiliateLinks from '@/components/TrackAffiliateLinks';
 import { Play, Pause, Download, Heart, Share2, Clock, RefreshCw, Radio } from 'lucide-react';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import { supabase } from '@/integrations/supabase/client';
-import stationLogo from '/lovable-uploads/72d04e54-23af-4f4a-bf39-efcc6c6b2150.png';
+import stationLogo from '@/assets/dance-one-logo.png';
 
 interface Track {
   id: number;

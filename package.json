@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:desktop:portable": "node scripts/build-desktop-app.mjs portable",
+    "build:desktop:win": "npm run build:desktop:portable",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview"

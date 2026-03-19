@@ -11,6 +11,9 @@ node_modules
 dist
 dist-ssr
 *.local
+desktop-app/app
+desktop-app/release/*
+!desktop-app/release/*.exe
 
 # Editor directories and files
 .vscode/*

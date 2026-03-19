@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useRef, useCallback, useEffect, ReactNode } from 'react';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import { AlbumArtService } from '@/utils/AlbumArtService';
+import { PRIMARY_STREAM_URLS } from '@/config/streamUrls';
 import { toast } from 'sonner';
 
 interface EpisodeInfo {
@@ -37,12 +38,8 @@ interface AudioPlayerContextType extends AudioPlayerState {
 
 const AudioPlayerContext = createContext<AudioPlayerContextType | null>(null);
 
-const STREAM_URLS = [
-  "http://s9.myradiostream.com:14296/;", 
-  "http://s9.myradiostream.com:14296/stream", 
-  "http://s9.myradiostream.com:14296", 
-  "https://live-radio-stream.online/dance-one-radio.mp3"
-];
+const STREAM_URLS = [...PRIMARY_STREAM_URLS];
+const STREAM_START_TIMEOUT_MS = 4500;
 
 // Available episode numbers with pages (sorted descending)
 const AVAILABLE_EPISODES = [403, 402, 401, 400, 399, 398, 397, 396, 395, 394, 393, 392, 391, 390, 389];
@@ -77,6 +74,20 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
 
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
   const [streamUrls, setStreamUrls] = useState<string[]>(STREAM_URLS);
+  const streamAttemptTokenRef = useRef(0);
+  const streamStartTimeoutRef = useRef<number | null>(null);
+
+  const clearStreamStartTimeout = useCallback(() => {
+    if (streamStartTimeoutRef.current !== null) {
+      window.clearTimeout(streamStartTimeoutRef.current);
+      streamStartTimeoutRef.current = null;
+    }
+  }, []);
+
+  const cancelStreamAttempts = useCallback(() => {
+    streamAttemptTokenRef.current += 1;
+    clearStreamStartTimeout();
+  }, [clearStreamStartTimeout]);
 
   // Fetch stream metadata for live stream
   useEffect(() => {
@@ -105,18 +116,54 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     return () => clearInterval(interval);
   }, [state.source]);
 
-  const tryNextUrl = useCallback(() => {
-    if (currentUrlIndex < streamUrls.length - 1) {
-      setCurrentUrlIndex(prev => prev + 1);
-      return true;
+  const attemptLiveStream = useCallback((urls: string[], urlIndex: number, attemptToken: number) => {
+    const audio = audioRef.current;
+    if (!audio || streamAttemptTokenRef.current !== attemptToken) return;
+
+    if (urlIndex >= urls.length) {
+      clearStreamStartTimeout();
+      setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
+      return;
     }
-    return false;
-  }, [currentUrlIndex, streamUrls.length]);
+
+    setCurrentUrlIndex(urlIndex);
+    clearStreamStartTimeout();
+
+    audio.pause();
+    audio.src = urls[urlIndex];
+    audio.load();
+
+    streamStartTimeoutRef.current = window.setTimeout(() => {
+      if (streamAttemptTokenRef.current !== attemptToken) return;
+
+      const playbackStarted =
+        !audio.paused ||
+        audio.currentTime > 0 ||
+        audio.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA;
+
+      if (!playbackStarted) {
+        console.warn(`Stream startup timed out for URL ${urlIndex + 1}, trying next source`);
+        attemptLiveStream(urls, urlIndex + 1, attemptToken);
+      }
+    }, STREAM_START_TIMEOUT_MS);
+
+    audio.play().catch(err => {
+      if (streamAttemptTokenRef.current !== attemptToken) return;
+
+      clearStreamStartTimeout();
+      console.error(`Error playing live stream URL ${urlIndex + 1}:`, err);
+      attemptLiveStream(urls, urlIndex + 1, attemptToken);
+    });
+  }, [clearStreamStartTimeout]);
 
   const playLiveStream = useCallback((urls: string[]) => {
     if (!audioRef.current) return;
-    
-    setStreamUrls(urls);
+
+    const nextStreamUrls = urls.length > 0 ? urls : [...PRIMARY_STREAM_URLS];
+    const attemptToken = streamAttemptTokenRef.current + 1;
+    streamAttemptTokenRef.current = attemptToken;
+
+    setStreamUrls(nextStreamUrls);
     setCurrentUrlIndex(0);
     
     setState(prev => ({
@@ -128,20 +175,13 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       albumArt: null,
     }));
 
-    audioRef.current.src = urls[0];
-    audioRef.current.load();
-    audioRef.current.play().catch(err => {
-      console.error('Error playing live stream:', err);
-      if (tryNextUrl()) {
-        audioRef.current!.src = urls[currentUrlIndex + 1];
-        audioRef.current!.load();
-        audioRef.current!.play();
-      }
-    });
-  }, [tryNextUrl, currentUrlIndex]);
+    attemptLiveStream(nextStreamUrls, 0, attemptToken);
+  }, [attemptLiveStream]);
 
   const playEpisode = useCallback((info: EpisodeInfo) => {
     if (!audioRef.current) return;
+
+    cancelStreamAttempts();
     
     setState(prev => ({
       ...prev,
@@ -159,18 +199,20 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error playing episode:', err);
       setState(prev => ({ ...prev, isLoading: false }));
     });
-  }, []);
+  }, [cancelStreamAttempts]);
 
   const pause = useCallback(() => {
     if (!audioRef.current) return;
+    cancelStreamAttempts();
     audioRef.current.pause();
     setState(prev => ({ ...prev, isPlaying: false }));
-  }, []);
+  }, [cancelStreamAttempts]);
 
   const resume = useCallback(() => {
     if (!audioRef.current) return;
+    clearStreamStartTimeout();
     audioRef.current.play().catch(err => console.error('Error resuming:', err));
-  }, []);
+  }, [clearStreamStartTimeout]);
 
   const seek = useCallback((time: number) => {
     if (!audioRef.current) return;
@@ -186,6 +228,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
 
   const closePlayer = useCallback(() => {
     if (!audioRef.current) return;
+    cancelStreamAttempts();
     audioRef.current.pause();
     audioRef.current.src = '';
     setState(prev => ({
@@ -197,7 +240,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       duration: 0,
       episodeInfo: null,
     }));
-  }, []);
+  }, [cancelStreamAttempts]);
 
   const toggleAutoplay = useCallback(() => {
     setAutoplayEnabled(prev => {
@@ -256,10 +299,18 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const handlePlay = () => setState(prev => ({ ...prev, isPlaying: true, isLoading: false }));
+    const handlePlay = () => {
+      clearStreamStartTimeout();
+      setState(prev => ({ ...prev, isPlaying: true, isLoading: false }));
+    };
+    const handlePlaying = () => {
+      clearStreamStartTimeout();
+      setState(prev => ({ ...prev, isPlaying: true, isLoading: false }));
+    };
     const handlePause = () => setState(prev => ({ ...prev, isPlaying: false }));
     const handleTimeUpdate = () => setState(prev => ({ ...prev, currentTime: audio.currentTime }));
     const handleLoadedMetadata = () => {
+      clearStreamStartTimeout();
       const nextDuration = Number.isFinite(audio.duration) ? audio.duration : 0;
       setState(prev => ({ ...prev, duration: nextDuration, isLoading: false }));
     };
@@ -311,16 +362,23 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     
     const handleError = () => {
       console.error('Audio error, trying next URL');
-      if (state.source === 'live' && tryNextUrl()) {
-        audio.src = streamUrls[currentUrlIndex + 1];
-        audio.load();
-        audio.play();
+      if (state.source === 'live') {
+        const nextUrlIndex = currentUrlIndex + 1;
+        const attemptToken = streamAttemptTokenRef.current;
+        clearStreamStartTimeout();
+
+        if (nextUrlIndex < streamUrls.length) {
+          attemptLiveStream(streamUrls, nextUrlIndex, attemptToken);
+        } else {
+          setState(prev => ({ ...prev, isLoading: false }));
+        }
       } else {
         setState(prev => ({ ...prev, isLoading: false }));
       }
     };
 
     audio.addEventListener('play', handlePlay);
+    audio.addEventListener('playing', handlePlaying);
     audio.addEventListener('pause', handlePause);
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
@@ -329,13 +387,20 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
 
     return () => {
       audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('playing', handlePlaying);
       audio.removeEventListener('pause', handlePause);
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
     };
-  }, [state.source, state.episodeInfo, autoplayEnabled, tryNextUrl, streamUrls, currentUrlIndex, getNextEpisode, fetchEpisodeUrl, playEpisode]);
+  }, [state.source, state.episodeInfo, autoplayEnabled, streamUrls, currentUrlIndex, getNextEpisode, fetchEpisodeUrl, playEpisode, attemptLiveStream, clearStreamStartTimeout]);
+
+  useEffect(() => {
+    return () => {
+      cancelStreamAttempts();
+    };
+  }, [cancelStreamAttempts]);
 
   // Some browsers can throttle `timeupdate`; keep episode progress in sync while playing.
   useEffect(() => {
@@ -378,7 +443,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       }}
     >
       {children}
-      <audio ref={audioRef} preload="metadata" />
+      <audio ref={audioRef} preload="none" />
     </AudioPlayerContext.Provider>
   );
 };

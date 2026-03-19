@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import SocialShare from '@/components/SocialShare';
 import LiveRadioPlayer from './LiveRadioPlayer';
+import { PRIMARY_STREAM_URLS } from '@/config/streamUrls';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import { ParticleTextEffect } from '@/components/ui/particle-text-effect';
 
@@ -112,7 +113,7 @@ const HeroSection = () => {
 
         {/* Live Player */}
         <div className="mb-8 animate-slide-up">
-          <LiveRadioPlayer streamUrls={["http://s9.myradiostream.com:14296/;", "http://s9.myradiostream.com:14296/stream", "http://s9.myradiostream.com:14296", "https://live-radio-stream.online/dance-one-radio.mp3"]} streamTitle={streamTitle} />
+          <LiveRadioPlayer streamUrls={[...PRIMARY_STREAM_URLS]} streamTitle={streamTitle} />
           
           {/* Social Share */}
           <div className="mt-6 flex justify-center">

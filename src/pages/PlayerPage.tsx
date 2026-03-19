@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import LiveRadioPlayer from '@/components/LiveRadioPlayer';
+import { PRIMARY_STREAM_URLS } from '@/config/streamUrls';
 import SEO from '@/components/SEO';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import stationLogo from '@/assets/dance-one-logo.png';
@@ -56,12 +57,7 @@ const PlayerPage = () => {
       <main className="flex-1 p-3 flex flex-col justify-center overflow-hidden">
         <div className="w-full">
           <LiveRadioPlayer 
-            streamUrls={[
-              "http://s9.myradiostream.com:14296/;", 
-              "http://s9.myradiostream.com:14296/stream", 
-              "http://s9.myradiostream.com:14296", 
-              "https://live-radio-stream.online/dance-one-radio.mp3"
-            ]} 
+            streamUrls={[...PRIMARY_STREAM_URLS]} 
             streamTitle={streamTitle}
             hidePopupButton={true}
           />

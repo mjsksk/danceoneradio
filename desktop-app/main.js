@@ -1,4 +1,5 @@
 const { app, BrowserWindow, Menu, Tray, globalShortcut, ipcMain, shell } = require('electron');
+const fs = require('fs');
 const path = require('path');
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -23,11 +24,11 @@ function createWindow() {
     show: false
   });
 
-  const startUrl = isDev 
-    ? 'http://localhost:8080/#/desktop' 
-    : `file://${path.join(__dirname, 'dist/index.html')}#/desktop`;
-  
-  mainWindow.loadURL(startUrl);
+  if (isDev) {
+    mainWindow.loadURL('http://localhost:8080/desktop.html');
+  } else {
+    mainWindow.loadFile(path.join(__dirname, 'app', 'desktop.html'));
+  }
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
@@ -45,7 +46,7 @@ function createWindow() {
 
   // Prevent window from closing, minimize to tray instead
   mainWindow.on('close', (event) => {
-    if (!app.isQuiting) {
+    if (tray && !app.isQuiting) {
       event.preventDefault();
       mainWindow.hide();
       return false;
@@ -60,11 +61,16 @@ function createWindow() {
 }
 
 function createTray() {
-  // Skip tray icon for now to avoid build issues
-  // const trayIconPath = path.join(__dirname, 'assets/tray-icon.png');
-  // tray = new Tray(trayIconPath);
-  return; // Temporarily disable tray
-  
+  const trayIconPath = path.join(__dirname, 'assets', 'tray-icon.png');
+
+  if (!fs.existsSync(trayIconPath)) {
+    console.warn('Tray icon not found, continuing without tray support.');
+    tray = null;
+    return;
+  }
+
+  tray = new Tray(trayIconPath);
+
   const contextMenu = Menu.buildFromTemplate([
     {
       label: 'Show Dance One Radio',

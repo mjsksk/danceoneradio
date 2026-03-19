@@ -6,49 +6,46 @@ A Windows desktop application for Dance One Radio built with Electron and React.
 
 1. **Prerequisites**:
    - Node.js 18 or later
-   - npm or yarn package manager
+   - npm package manager
 
 2. **Setup**:
    ```bash
-   # Install desktop app dependencies
-   cd desktop-app
+   # Install root dependencies
    npm install
-   
-   # Build the React web app first
-   cd ..
-   npm run build
-   
-   # Return to desktop app and build
-   cd desktop-app
-   npm run build:win
+
+   # Install desktop app dependencies
+   npm --prefix desktop-app install
+
+   # Build the portable Windows app
+   npm run build:desktop:portable
    ```
 
-3. **Development**:
+3. **Output**:
    ```bash
-   # Start the web app in development mode
-   npm run dev  # In root directory
-   
-   # Start the desktop app in development mode (in another terminal)
-   cd desktop-app
+   desktop-app/release/
+   ```
+
+## 🚀 Development
+
+1. **Run the web app**:
+   ```bash
    npm run dev
+   ```
+
+2. **Run Electron in a second terminal**:
+   ```bash
+   npm --prefix desktop-app run dev
    ```
 
 ## 📦 Building for Distribution
 
-1. **Generate Assets**:
-   - Copy your logo to `desktop-app/assets/icon.png` (256x256)
-   - Convert to ICO format and save as `desktop-app/assets/icon.ico`
-   - Create tray icons: `tray-icon.png` (16x16) and `tray-icon@2x.png` (32x32)
+Use the root build command:
 
-2. **Build**:
-   ```bash
-   cd desktop-app
-   node build-script.js
-   ```
+```bash
+npm run build:desktop:portable
+```
 
-3. **Output**:
-   - `dist/Dance One Radio-Setup-1.0.0.exe` - Full installer
-   - `dist/Dance One Radio-Portable-1.0.0.exe` - Portable version
+This creates a fresh renderer bundle in `desktop-app/app/` and writes the packaged Windows artifact to `desktop-app/release/`.
 
 ## ✨ Features
 
@@ -91,8 +88,10 @@ desktop-app/
 ├── main.js              # Electron main process
 ├── preload.js           # Security bridge between main and renderer
 ├── package.json         # Desktop app configuration
-├── build-script.js      # Automated build script
-├── installer-config.nsh # NSIS installer customization
+├── app/                 # Bundled web renderer copied from root dist/
+├── release/             # Packaged Windows artifacts
+├── build-script.js      # Wrapper for the root desktop build command
+├── installer-config.nsh # Legacy NSIS customization
 └── assets/              # App icons and resources
     ├── icon.png         # Main app icon (256x256)
     ├── icon.ico         # Windows icon
@@ -112,14 +111,14 @@ desktop-app/
 ### Common Issues
 
 1. **Build Fails**:
-   - Ensure React app is built first: `npm run build`
+   - Use the root build command: `npm run build:desktop:portable`
    - Check Node.js version (18+ required)
    - Clear node_modules and reinstall
 
 2. **Icons Missing**:
    - Check `desktop-app/assets/` folder
    - Icons must be proper sizes (see assets/README.md)
-   - ICO file required for Windows
+   - The tray icon is required for tray support
 
 3. **Audio Issues**:
    - Desktop app uses same stream URLs as web version
@@ -142,8 +141,7 @@ npm run dev
 ## 📱 Distribution
 
 1. **Upload to Website**:
-   - Add download section to your website
-   - Provide both installer and portable versions
+   - Add the packaged `.exe` from `desktop-app/release/`
    - Include system requirements and screenshots
 
 2. **Code Signing** (Optional):
@@ -161,7 +159,7 @@ npm run dev
 1. **Test Thoroughly**:
    - Test on different Windows versions
    - Verify all features work as expected
-   - Test installer and uninstaller
+   - Test the portable executable on Windows
 
 2. **Customize**:
    - Update app metadata in package.json

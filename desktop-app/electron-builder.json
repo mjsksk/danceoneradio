@@ -1,15 +1,21 @@
 {
   "appId": "com.danceoneradio.app",
   "productName": "DanceOneRadio",
+  "asar": true,
+  "compression": "maximum",
+  "electronLanguages": [
+    "en-US"
+  ],
   "files": [
     "main.js",
     "preload.js",
-    "dist/**/*"
+    "app/**/*",
+    "assets/**/*"
   ],
   "win": {
     "target": "portable"
   },
   "directories": {
-    "output": "dist"
+    "output": "release"
   }
 }

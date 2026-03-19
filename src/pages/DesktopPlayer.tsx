@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import LiveRadioPlayer from '@/components/LiveRadioPlayer';
-import TracksSection from '@/components/TracksSection';
+import { PRIMARY_STREAM_URLS } from '@/config/streamUrls';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import { useTrackHistoryUpdater } from '@/hooks/useTrackHistoryUpdater';
+
+const TracksSection = lazy(() => import('@/components/TracksSection'));
 
 const DesktopPlayer = () => {
   const [streamTitle, setStreamTitle] = useState('🎵 Dance One Radio - Live Stream 🎵');
@@ -34,12 +36,7 @@ const DesktopPlayer = () => {
       <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-primary/20">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <LiveRadioPlayer 
-            streamUrls={[
-              "http://s9.myradiostream.com:14296/;", 
-              "http://s9.myradiostream.com:14296/stream", 
-              "http://s9.myradiostream.com:14296", 
-              "https://live-radio-stream.online/dance-one-radio.mp3"
-            ]} 
+            streamUrls={[...PRIMARY_STREAM_URLS]} 
             streamTitle={streamTitle}
             hidePopupButton={true}
           />
@@ -47,7 +44,9 @@ const DesktopPlayer = () => {
       </div>
 
       <main className="max-w-4xl mx-auto px-4 py-6">
-        <TracksSection />
+        <Suspense fallback={<div className="py-8 text-center text-sm text-muted-foreground">Loading recent tracks...</div>}>
+          <TracksSection />
+        </Suspense>
       </main>
     </div>
   );

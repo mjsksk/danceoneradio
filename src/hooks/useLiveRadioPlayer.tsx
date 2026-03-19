@@ -1,13 +1,7 @@
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
+import { PRIMARY_STREAM_URLS } from '@/config/streamUrls';
 
-const STREAM_URLS = [
-  "http://s9.myradiostream.com:14296/;", 
-  "http://s9.myradiostream.com:14296/stream", 
-  "http://s9.myradiostream.com:14296", 
-  "https://live-radio-stream.online/dance-one-radio.mp3"
-];
-
-export const useLiveRadioPlayer = () => {
+export const useLiveRadioPlayer = (streamUrls: string[] = [...PRIMARY_STREAM_URLS]) => {
   const audioPlayer = useAudioPlayer();
 
   const isLive = audioPlayer.source === 'live';
@@ -22,7 +16,7 @@ export const useLiveRadioPlayer = () => {
         audioPlayer.resume();
       }
     } else {
-      audioPlayer.playLiveStream(STREAM_URLS);
+      audioPlayer.playLiveStream(streamUrls);
     }
   };
 

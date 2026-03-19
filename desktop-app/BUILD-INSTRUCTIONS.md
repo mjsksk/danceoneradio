@@ -1,59 +1,46 @@
 # Build Instructions for Desktop App
 
-## The Issue
-The download buttons are working, but the actual executable files haven't been built yet. The desktop app structure was created but needs to be compiled into Windows executables.
+## Portable Windows Build
 
-## To Build the Desktop App:
+This desktop app packages the existing web app into an Electron shell and produces a portable Windows `.exe`.
 
 ### Prerequisites
-1. Node.js 18 or later installed
-2. Windows machine (for building Windows executables)
+1. Node.js 18 or later
+2. Root dependencies installed
+3. Desktop dependencies installed in `desktop-app/`
 
-### Build Steps
+### One-Time Setup
 
-1. **Navigate to desktop app folder:**
-   ```bash
-   cd desktop-app
-   ```
+From the repository root:
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+npm --prefix desktop-app install
+```
 
-3. **Build the React web app first (from root directory):**
-   ```bash
-   cd ..
-   npm run build
-   cd desktop-app
-   ```
+### Build Command
 
-4. **Generate assets (copy your logo files):**
-   - Copy your logo to `desktop-app/assets/icon.png` (256x256)
-   - Convert to ICO: `desktop-app/assets/icon.ico`
-   - Create tray icons: `desktop-app/assets/tray-icon.png` (16x16)
+From the repository root:
 
-5. **Run the build script:**
-   ```bash
-   node build-script.js
-   ```
+```bash
+npm run build:desktop:portable
+```
 
-6. **Copy built files to web directory:**
-   ```bash
-   cp dist/*.exe ../public/downloads/
-   ```
+That command will:
+1. Build the main web app into `dist/`
+2. Copy the renderer bundle into `desktop-app/app/`
+3. Package the Electron shell into a Windows portable executable
 
-### Expected Output
-- `Dance-One-Radio-Setup-1.0.0.exe` (Full installer ~50MB)
-- `Dance-One-Radio-Portable-1.0.0.exe` (Portable version ~45MB)
+### Output
 
-### Alternative: Use Placeholder During Development
-For now, the download buttons will show an informative message when files aren't available instead of attempting to download non-existent files.
+The packaged Windows app is written to:
 
-### Troubleshooting Build Issues
-- Ensure all dependencies are installed
-- Check that Node.js version is 18+
-- Verify the React build completed successfully
-- Make sure you have proper icons in the assets folder
+```bash
+desktop-app/release/
+```
 
-Once built, the download buttons will work correctly and serve the actual Windows executables.
+### Troubleshooting
+
+- If `electron-builder` is missing, run `npm --prefix desktop-app install`
+- If the renderer is stale, rerun `npm run build:desktop:portable`
+- If Windows Defender blocks the final `.exe`, build on a different machine or sign the app before distribution

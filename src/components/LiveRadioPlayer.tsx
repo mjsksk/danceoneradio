@@ -21,7 +21,7 @@ const LiveRadioPlayer = ({
   streamTitle: initialStreamTitle,
   hidePopupButton = false
 }: LiveRadioPlayerProps) => {
-  const { isPlaying, isLoading, handlePlayPause, streamTitle: globalStreamTitle, albumArt: globalAlbumArt } = useLiveRadioPlayer();
+  const { isPlaying, isLoading, handlePlayPause, streamTitle: globalStreamTitle, albumArt: globalAlbumArt } = useLiveRadioPlayer(streamUrls);
   
   const [localAlbumArt, setLocalAlbumArt] = useState<string | null>(null);
   const [isLoadingArt, setIsLoadingArt] = useState(false);

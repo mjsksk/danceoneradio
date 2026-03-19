@@ -7,9 +7,10 @@
   "license": "MIT",
   "homepage": "https://www.danceoneradio.com",
   "scripts": {
+    "dev": "electron .",
     "start": "electron .",
-    "clean": "rmdir /s /q dist",
-    "build:win": "electron-builder --config electron-builder.json"
+    "build:portable": "electron-builder --config electron-builder.json --win portable --x64",
+    "build:win": "npm run build:portable"
   },
   "devDependencies": {
     "electron": "^28.0.0",

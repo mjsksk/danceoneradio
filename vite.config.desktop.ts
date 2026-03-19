@@ -3,6 +3,8 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 export default defineConfig({
+  base: "./",
+  publicDir: false,
   plugins: [react()],
   resolve: {
     alias: {
@@ -10,22 +12,20 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: "desktop-app/dist",
+    target: "chrome120",
+    outDir: "desktop-app/app",
     emptyOutDir: true,
-    minify: "terser",
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-      },
+    minify: "esbuild",
+    sourcemap: false,
+    esbuild: {
+      drop: ["console", "debugger"],
+      legalComments: "none",
     },
     rollupOptions: {
-      input: {
-        main: path.resolve(__dirname, "desktop.html"),
-      },
+      input: path.resolve(__dirname, "desktop.html"),
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom'],
+          vendor: ['react', 'react-dom', '@tanstack/react-query', '@supabase/supabase-js'],
           ui: ['lucide-react'],
         },
       },
