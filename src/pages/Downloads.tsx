@@ -10,7 +10,11 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Download, Monitor, Check, Shield, Zap, Settings, Bell, Headphones, Clock, Sparkles } from 'lucide-react';
 
 const Downloads = () => {
-  const isComingSoon = true; // Toggle this to enable downloads later
+  const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.6/dance-one-radio-setup-1.0.6-x64.exe';
+
+  const handleDownload = () => {
+    window.open(downloadUrl, '_blank');
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -26,50 +30,46 @@ const Downloads = () => {
         <section className="py-20 bg-gradient-to-br from-background via-background to-primary/5">
           <div className="container mx-auto px-4 text-center">
             <div className="max-w-3xl mx-auto">
-              {/* Coming Soon Badge */}
               <div className="mb-6">
                 <Badge className="gap-2 mb-4 bg-primary/20 text-primary border-primary/30 hover:bg-primary/30">
                   <Sparkles className="w-4 h-4" />
-                  Coming Soon
+                  New Release
                 </Badge>
                 <h1 className="text-4xl md:text-6xl font-bold gradient-text mb-6">
                   Download Dance One Radio
                 </h1>
                 <p className="text-xl text-muted-foreground mb-8">
-                  Our portable Windows desktop application is almost ready! Stay tuned for the ultimate listening experience.
+                  Get the ultimate listening experience with our Windows desktop application featuring enhanced audio quality, system tray controls, and global hotkeys.
                 </p>
               </div>
               
-              {/* Coming Soon Card */}
+              {/* Download Card */}
               <div className="max-w-md mx-auto mb-8">
                 <div className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-background to-primary/5 border border-primary/20 rounded-2xl p-8">
-                  {/* Animated glow effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent animate-pulse" />
-                  
                   <div className="relative z-10">
                     <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Clock className="w-8 h-8 text-primary animate-pulse" />
+                      <Download className="w-8 h-8 text-primary" />
                     </div>
                     
-                    <h3 className="text-xl font-semibold mb-2">Under Development</h3>
+                    <h3 className="text-xl font-semibold mb-2">Available Now</h3>
                     <p className="text-muted-foreground mb-6">
-                      We're putting the finishing touches on our desktop app. It will be available for download very soon!
+                      Download and install in minutes. Enjoy uninterrupted electronic music streaming right from your desktop.
                     </p>
                     
                     <Button 
                       size="lg"
-                      disabled
-                      className="gap-2 text-lg px-8 py-6 opacity-60 cursor-not-allowed"
+                      onClick={handleDownload}
+                      className="gap-2 text-lg px-8 py-6"
                     >
                       <Download className="w-5 h-5" />
-                      Download Coming Soon
+                      Download for Windows
                     </Button>
                   </div>
                 </div>
               </div>
 
               <div className="text-sm text-muted-foreground mb-6">
-                Version 1.0.0 • Windows 10+ (64-bit) • Free Download
+                Version 1.0.6 • Windows 10+ (64-bit) • Free Download
               </div>
               
               <div className="flex justify-center">
