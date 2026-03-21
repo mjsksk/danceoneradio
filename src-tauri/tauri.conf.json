@@ -4,8 +4,8 @@
   "version": "1.0.6",
   "identifier": "com.danceoneradio.desktop",
   "build": {
-    "frontendDist": "../desktop-dist",
-    "devUrl": "http://localhost:8080/desktop.html",
+    "frontendDist": "desktop-dist",
+    "devUrl": "http://localhost:8080/desktop-shell/index.html",
     "beforeDevCommand": "npm run dev -- --host",
     "beforeBuildCommand": "C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -Command \"npm run desktop:build\""
   },

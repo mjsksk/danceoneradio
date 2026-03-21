@@ -13,6 +13,7 @@ dist
 dist-ssr
 *.local
 desktop-dist
+src-tauri/desktop-dist
 src-tauri/target
 
 # Editor directories and files
