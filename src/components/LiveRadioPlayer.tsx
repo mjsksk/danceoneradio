@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
+import type { CSSProperties } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Play, Pause, Radio } from 'lucide-react';
+import { Play, Pause } from 'lucide-react';
 import { AlbumArtService } from '@/utils/AlbumArtService';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import { useDesktopIntegration } from '@/hooks/useDesktopIntegration';
+import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { DesktopPlayerControls } from './DesktopPlayerControls';
 import PopupPlayerButton from './PopupPlayerButton';
 import { useLiveRadioPlayer } from '@/hooks/useLiveRadioPlayer';
@@ -16,164 +18,229 @@ interface LiveRadioPlayerProps {
   hidePopupButton?: boolean;
 }
 
+const EQ_BAR_COUNT = 64;
+const EQ_MIN_HEIGHT = 12;
+const EQ_MAX_HEIGHT = 70;
+const NOTIFICATION_PREF_KEY = 'desktop-track-change-notifications';
+const createIdleFrequencyData = () => new Array(EQ_BAR_COUNT).fill(EQ_MIN_HEIGHT);
+
+let sharedAudioContext: AudioContext | null = null;
+let sharedAnalyser: AnalyserNode | null = null;
+let sharedSourceNode: MediaElementAudioSourceNode | null = null;
+let sharedAnalyserAudio: HTMLAudioElement | null = null;
+let sharedFrequencyBins: Uint8Array | null = null;
+
+const stripDecorativeSymbols = (value: string) => value
+  .replace(/[\u{1F3B5}\u{1F3B6}\u{1F4FB}\u{1F50A}\u{1F3A7}]/gu, ' ')
+  .replace(/\s+/g, ' ')
+  .trim();
+
+const sanitizeDisplayTitle = (value: string) => stripDecorativeSymbols(
+  value
+    .replace(/Frequency\s*&\s*/gi, '')
+    .replace(/&amp;/g, '&')
+    .replace(/amp;/g, '')
+);
+
 const LiveRadioPlayer = ({
   streamUrls,
   streamTitle: initialStreamTitle,
   hidePopupButton = false
 }: LiveRadioPlayerProps) => {
-  const { isPlaying, isLoading, handlePlayPause, streamTitle: globalStreamTitle, albumArt: globalAlbumArt } = useLiveRadioPlayer(streamUrls);
-  
+  const audioPlayer = useAudioPlayer();
+  const { isPlaying, isLoading, handlePlayPause, primeLiveStream, streamTitle: globalStreamTitle, albumArt: globalAlbumArt } = useLiveRadioPlayer(streamUrls);
+
   const [localAlbumArt, setLocalAlbumArt] = useState<string | null>(null);
-  const [isLoadingArt, setIsLoadingArt] = useState(false);
-  const [frequencyData, setFrequencyData] = useState<number[]>(new Array(64).fill(20));
-  const [debugInfo, setDebugInfo] = useState<string>('Waiting...');
   const [animationActive, setAnimationActive] = useState(false);
+  const [frequencyData, setFrequencyData] = useState<number[]>(createIdleFrequencyData);
   const [currentStreamTitle, setCurrentStreamTitle] = useState(initialStreamTitle);
   const [isStreamLive, setIsStreamLive] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(() => localStorage.getItem(NOTIFICATION_PREF_KEY) === 'true');
+  const [shouldScrollTitle, setShouldScrollTitle] = useState(false);
+  const [titleScrollDuration, setTitleScrollDuration] = useState(18);
+  const [titleScrollDistance, setTitleScrollDistance] = useState(0);
 
-  const { showNotification } = useDesktopIntegration();
+  const { showNotification, isElectronDesktop, ensureNotificationPermission } = useDesktopIntegration();
   const animationRef = useRef<number | null>(null);
+  const lastNotifiedTrackRef = useRef<string | null>(null);
+  const smoothedBarsRef = useRef<number[]>(createIdleFrequencyData());
+  const titleContainerRef = useRef<HTMLDivElement | null>(null);
+  const titleMeasureRef = useRef<HTMLSpanElement | null>(null);
 
-  // Use global stream title and album art when available
   const displayStreamTitle = globalStreamTitle || currentStreamTitle;
   const albumArt = globalAlbumArt || localAlbumArt;
+  const cleanedDisplayTitle = sanitizeDisplayTitle(displayStreamTitle);
 
-  // Clean and format track info for better album art search
   const cleanTrackForSearch = (streamTitle: string): string => {
-    const songMatch = streamTitle.match(/🎵+\s*(.*?)\s*🎵+/);
-    const songTitle = songMatch ? songMatch[1] : streamTitle;
+    const songTitle = stripDecorativeSymbols(streamTitle);
+
     return songTitle.replace(/&amp;/g, '&').replace(/&apos;/g, "'").replace(/\(.*?extended.*?\)/gi, '')
-    .replace(/\(.*?remix.*?\)/gi, '')
-    .replace(/\(.*?edit.*?\)/gi, '')
-    .replace(/\(.*?mix.*?\)/gi, '')
-    .replace(/\[.*?\]/g, '')
-    .replace(/feat\..*$/gi, '')
-    .replace(/ft\..*$/gi, '')
-    .replace(/vs\..*$/gi, '')
-    .replace(/\d{4}$/, '')
-    .replace(/[^\w\s&'-]/g, '').replace(/Dance One Radio.*$/gi, '')
-    .trim();
+      .replace(/\(.*?remix.*?\)/gi, '')
+      .replace(/\(.*?edit.*?\)/gi, '')
+      .replace(/\(.*?mix.*?\)/gi, '')
+      .replace(/\[.*?\]/g, '')
+      .replace(/feat\..*$/gi, '')
+      .replace(/ft\..*$/gi, '')
+      .replace(/vs\..*$/gi, '')
+      .replace(/\d{4}$/, '')
+      .replace(/[^\w\s&'-]/g, '').replace(/Dance One Radio.*$/gi, '')
+      .trim();
   };
 
-  // Start/stop animation based on playing state
   useEffect(() => {
     if (isPlaying) {
-      startFallbackAnimation();
+      setAnimationActive(true);
     } else {
-      stopAnimation();
+      setAnimationActive(false);
     }
   }, [isPlaying]);
 
-  const startFallbackAnimation = () => {
-    console.log('🎵 Starting FREQUENCY-BASED animation');
-    setDebugInfo('Using frequency-based EQ simulation');
-    setAnimationActive(true);
+  useEffect(() => {
+    primeLiveStream().catch((error) => {
+      console.error('Failed to prime live stream:', error);
+    });
+  }, [primeLiveStream]);
 
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
+  useEffect(() => {
+    if (!animationActive) {
+      smoothedBarsRef.current = createIdleFrequencyData();
+      setFrequencyData(createIdleFrequencyData());
+      return;
     }
-    
-    let time = 0;
-    
-    const bassOscillators = Array.from({ length: 16 }, (_, i) => ({
-      frequency: 0.3 + i * 0.05,
-      amplitude: 2.0 + Math.random() * 1.5,
-      phase: Math.random() * Math.PI * 2
-    }));
-    
-    const midOscillators = Array.from({ length: 32 }, (_, i) => ({
-      frequency: 0.8 + i * 0.1,
-      amplitude: 1.2 + Math.random() * 1.0,
-      phase: Math.random() * Math.PI * 2
-    }));
-    
-    const trebleOscillators = Array.from({ length: 16 }, (_, i) => ({
-      frequency: 2.0 + i * 0.3,
-      amplitude: 0.8 + Math.random() * 0.7,
-      phase: Math.random() * Math.PI * 2
-    }));
-    
-    const animateFallback = () => {
-      time += 0.05;
 
-      const bars = Array.from({ length: 64 }, (_, i) => {
-        let height = 25;
-        
-        if (i < 16) {
-          const osc = bassOscillators[i];
-          const bassResponse = Math.sin(time * osc.frequency + osc.phase) * osc.amplitude;
-          const kickPattern = Math.pow(Math.sin(time * 0.5), 6) * 20;
-          height += bassResponse * 15 + kickPattern * (16 - i) / 16;
-        }
-        else if (i < 48) {
-          const midIndex = i - 16;
-          const osc = midOscillators[midIndex];
-          const midResponse = Math.sin(time * osc.frequency + osc.phase) * osc.amplitude;
-          const snarePattern = Math.pow(Math.sin(time * 1.3 + Math.PI/3), 4) * 12;
-          const vocalPattern = Math.sin(time * 0.7 + midIndex * 0.1) * 8;
-          height += midResponse * 12 + snarePattern * (midIndex > 8 && midIndex < 24 ? 1 : 0.3) + vocalPattern;
-        }
-        else {
-          const trebleIndex = i - 48;
-          const osc = trebleOscillators[trebleIndex];
-          const trebleResponse = Math.sin(time * osc.frequency + osc.phase) * osc.amplitude;
-          const hihatPattern = Math.pow(Math.sin(time * 4 + trebleIndex * 0.5), 3) * 6;
-          const sparklePattern = Math.sin(time * 2.5 + trebleIndex * 0.8) * 4;
-          height += trebleResponse * 8 + hihatPattern + sparklePattern;
-        }
-        
-        const envelope = Math.exp(-Math.abs(Math.sin(time * 1.5 + i * 0.1)) * 0.3) * 5;
-        height += envelope;
-        
-        const randomNoise = (Math.random() - 0.5) * 3;
-        height += randomNoise;
-        
-        return Math.max(20, Math.min(70, height));
-      });
+    if (isElectronDesktop) {
+      let time = 0;
 
-      setFrequencyData(bars);
-      animationRef.current = requestAnimationFrame(animateFallback);
+      const animate = () => {
+        time += 0.05;
+        const bars = Array.from({ length: EQ_BAR_COUNT }, (_, i) => {
+          const base = 25 + Math.sin(time * (0.3 + i * 0.03) + i) * 18;
+          return Math.max(EQ_MIN_HEIGHT, Math.min(EQ_MAX_HEIGHT, base + (Math.random() - 0.5) * 6));
+        });
+
+        smoothedBarsRef.current = bars;
+        setFrequencyData(bars);
+        animationRef.current = requestAnimationFrame(animate);
+      };
+
+      animate();
+      return () => {
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current);
+          animationRef.current = null;
+        }
+      };
+    }
+
+    const audio = audioPlayer.audioRef.current;
+    const AudioContextCtor = window.AudioContext || (window as Window & typeof globalThis & {
+      webkitAudioContext?: typeof AudioContext;
+    }).webkitAudioContext;
+
+    if (!audio || !AudioContextCtor) {
+      return;
+    }
+
+    let isCancelled = false;
+
+    const setupAnalyser = async () => {
+      try {
+        let context = sharedAudioContext;
+        if (!context || context.state === 'closed') {
+          context = new AudioContextCtor();
+          sharedAudioContext = context;
+        }
+
+        if (context.state === 'suspended') {
+          await context.resume();
+        }
+
+        if (!sharedAnalyser || sharedAnalyserAudio !== audio) {
+          sharedSourceNode?.disconnect();
+          sharedAnalyser?.disconnect();
+
+          const sourceNode = context.createMediaElementSource(audio);
+          const analyser = context.createAnalyser();
+          analyser.fftSize = 256;
+          analyser.minDecibels = -95;
+          analyser.maxDecibels = -20;
+          analyser.smoothingTimeConstant = 0.82;
+
+          sourceNode.connect(analyser);
+          analyser.connect(context.destination);
+
+          sharedSourceNode = sourceNode;
+          sharedAnalyser = analyser;
+          sharedAnalyserAudio = audio;
+          sharedFrequencyBins = new Uint8Array(analyser.frequencyBinCount);
+        }
+
+        const animate = () => {
+          if (isCancelled || !sharedAnalyser || !sharedFrequencyBins) {
+            return;
+          }
+
+          sharedAnalyser.getByteFrequencyData(sharedFrequencyBins);
+
+          const nextBars = Array.from({ length: EQ_BAR_COUNT }, (_, index) => {
+            const start = Math.floor((index / EQ_BAR_COUNT) * sharedFrequencyBins.length);
+            const end = Math.max(start + 1, Math.floor(((index + 1) / EQ_BAR_COUNT) * sharedFrequencyBins.length));
+
+            let total = 0;
+            for (let i = start; i < end; i += 1) {
+              total += sharedFrequencyBins[i];
+            }
+
+            const average = total / (end - start) / 255;
+            const emphasis = 1.15 - (index / EQ_BAR_COUNT) * 0.35;
+            const normalized = Math.min(1, average * emphasis * 1.4);
+            const targetHeight = EQ_MIN_HEIGHT + Math.pow(normalized, 1.35) * (EQ_MAX_HEIGHT - EQ_MIN_HEIGHT);
+            const previousHeight = smoothedBarsRef.current[index] ?? EQ_MIN_HEIGHT;
+            const smoothing = targetHeight > previousHeight ? 0.45 : 0.18;
+
+            return previousHeight + (targetHeight - previousHeight) * smoothing;
+          });
+
+          smoothedBarsRef.current = nextBars;
+          setFrequencyData(nextBars);
+          animationRef.current = requestAnimationFrame(animate);
+        };
+
+        animate();
+      } catch (error) {
+        console.error('Failed to initialize live EQ analyser:', error);
+      }
     };
-    
-    animateFallback();
-  };
 
-  const stopAnimation = () => {
-    setDebugInfo('EQ stopped');
-    setAnimationActive(false);
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
-      animationRef.current = null;
-    }
-    setFrequencyData(new Array(64).fill(20));
-  };
+    void setupAnalyser();
 
-  // Fetch album art when stream title changes (fallback for when global isn't available)
+    return () => {
+      isCancelled = true;
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+    };
+  }, [animationActive, audioPlayer.audioRef, isElectronDesktop]);
+
   useEffect(() => {
     const fetchAlbumArt = async () => {
       if (!displayStreamTitle || displayStreamTitle.includes('Dance One Radio - The Future')) return;
-      if (globalAlbumArt) return; // Don't fetch if global already has it
-      
-      setIsLoadingArt(true);
+      if (globalAlbumArt) return;
+
       try {
         const cleanedQuery = cleanTrackForSearch(displayStreamTitle);
         const result = await AlbumArtService.getAlbumArt(cleanedQuery);
-        if (result.imageUrl) {
-          setLocalAlbumArt(result.imageUrl);
-        } else {
-          setLocalAlbumArt(null);
-        }
+        setLocalAlbumArt(result.imageUrl || null);
       } catch (error) {
         console.error('Error fetching album art:', error);
         setLocalAlbumArt(null);
-      } finally {
-        setIsLoadingArt(false);
       }
     };
+
     fetchAlbumArt();
   }, [displayStreamTitle, globalAlbumArt]);
 
-  // Real-time stream metadata fetching (for visual display only, not controlling audio)
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     let isVisible = !document.hidden;
@@ -190,8 +257,8 @@ const LiveRadioPlayer = ({
       try {
         const metadata = await RadioStreamService.getStreamMetadata();
         const streamIsLive = metadata && metadata.title && !metadata.title.includes('Dance One Radio - The Future');
-        setIsStreamLive(streamIsLive);
-        
+        setIsStreamLive(Boolean(streamIsLive));
+
         const formattedTitle = RadioStreamService.formatTitle(metadata);
         if (formattedTitle !== currentStreamTitle) {
           setCurrentStreamTitle(formattedTitle);
@@ -208,12 +275,8 @@ const LiveRadioPlayer = ({
       }, 10000);
     };
 
-    if (isVisible) {
-      fetchStreamMetadata().then(scheduleNext);
-    } else {
-      scheduleNext();
-    }
-    
+    fetchStreamMetadata().then(scheduleNext);
+
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       if (timeoutId) {
@@ -222,34 +285,86 @@ const LiveRadioPlayer = ({
     };
   }, [currentStreamTitle]);
 
-  // Desktop notification for track changes (respects user preference)
   useEffect(() => {
-    const trackNotificationsEnabled = localStorage.getItem('track-change-notifications') !== 'false';
-    if (isPlaying && displayStreamTitle && !displayStreamTitle.includes('Dance One Radio - The Future') && trackNotificationsEnabled) {
-      const cleanedTitle = cleanTrackForSearch(displayStreamTitle);
-      if (cleanedTitle) {
-        showNotification('Now Playing', cleanedTitle);
+    if (!notificationsEnabled || !isPlaying || !displayStreamTitle || displayStreamTitle.includes('Dance One Radio - The Future')) {
+      return;
+    }
+
+    const cleanedTitle = cleanTrackForSearch(displayStreamTitle);
+    if (!cleanedTitle || cleanedTitle === lastNotifiedTrackRef.current) {
+      return;
+    }
+
+    lastNotifiedTrackRef.current = cleanedTitle;
+    showNotification('Now Playing', cleanedTitle);
+  }, [displayStreamTitle, isPlaying, notificationsEnabled, showNotification]);
+
+  useEffect(() => {
+    const updateTitleOverflow = () => {
+      const containerWidth = titleContainerRef.current?.clientWidth ?? 0;
+      const titleWidth = titleMeasureRef.current?.scrollWidth ?? 0;
+      const overflowWidth = titleWidth - containerWidth;
+
+      if (overflowWidth > 8) {
+        setShouldScrollTitle(true);
+        setTitleScrollDistance(titleWidth + 40);
+        setTitleScrollDuration(Math.max(12, (titleWidth + 40) / 32));
+        return;
+      }
+
+      setShouldScrollTitle(false);
+      setTitleScrollDistance(0);
+      setTitleScrollDuration(18);
+    };
+
+    updateTitleOverflow();
+
+    if (typeof ResizeObserver !== 'undefined') {
+      const observer = new ResizeObserver(() => updateTitleOverflow());
+
+      if (titleContainerRef.current) {
+        observer.observe(titleContainerRef.current);
+      }
+
+      if (titleMeasureRef.current) {
+        observer.observe(titleMeasureRef.current);
+      }
+
+      return () => observer.disconnect();
+    }
+
+    window.addEventListener('resize', updateTitleOverflow);
+    return () => window.removeEventListener('resize', updateTitleOverflow);
+  }, [cleanedDisplayTitle]);
+
+  const handleNotificationsChange = async (enabled: boolean) => {
+    if (enabled) {
+      const permissionGranted = await ensureNotificationPermission();
+      if (!permissionGranted) {
+        setNotificationsEnabled(false);
+        localStorage.setItem(NOTIFICATION_PREF_KEY, 'false');
+        return;
       }
     }
-  }, [displayStreamTitle, isPlaying, showNotification]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      stopAnimation();
-    };
-  }, []);
+    setNotificationsEnabled(enabled);
+    localStorage.setItem(NOTIFICATION_PREF_KEY, String(enabled));
+    if (enabled) {
+      showNotification('Track notifications enabled', 'You will now receive now-playing alerts.');
+    }
+    if (!enabled) {
+      lastNotifiedTrackRef.current = null;
+    }
+  };
 
   return (
     <div className="card-cyber p-8 max-w-md mx-auto relative overflow-hidden">
-      {/* Blurred background from album art or station logo */}
       {albumArt ? (
         <div className="absolute inset-0 bg-cover bg-center opacity-20 blur-xl scale-110" style={{ backgroundImage: `url(${albumArt})` }} />
       ) : (
         <div className="absolute inset-0 bg-cover bg-center opacity-10 blur-xl scale-110" style={{ backgroundImage: `url(${stationLogo})` }} />
       )}
-      
-      {/* Content overlay */}
+
       <div className="relative z-10">
         <div className="flex items-center justify-center mb-6">
           <div className="relative">
@@ -265,7 +380,7 @@ const LiveRadioPlayer = ({
             </div>
           </div>
         </div>
-        
+
         <div className="text-center mb-6">
           <div className="flex items-center justify-center gap-2 mb-2">
             <h3 className="text-lg font-['Orbitron'] font-semibold text-primary">NOW PLAYING</h3>
@@ -279,79 +394,52 @@ const LiveRadioPlayer = ({
               </Badge>
             )}
           </div>
-          <div className="relative overflow-hidden bg-background/20 rounded-md p-2 mb-2">
-            <div className="animate-scroll whitespace-nowrap">
-              <span className="text-sm text-foreground font-inter font-medium">
-                {displayStreamTitle.replace(/Frequency\s*&\s*/gi, '')
-                .replace(/&amp;/g, '&')
-                .replace(/amp;/g, '')
-                .replace(/🎵/g, '')
-                .replace(/[📻🔊🎶🎧]/g, '')
-                .replace(/\s+/g, ' ')
-                .trim()}
-              </span>
-            </div>
+          <div ref={titleContainerRef} className="relative overflow-hidden bg-background/20 rounded-md p-2 mb-2">
+            <span ref={titleMeasureRef} className="pointer-events-none absolute left-0 top-0 whitespace-nowrap opacity-0">
+              {cleanedDisplayTitle}
+            </span>
+            {shouldScrollTitle ? (
+              <div
+                className="track-marquee"
+                style={{
+                  '--track-scroll-duration': `${titleScrollDuration}s`,
+                  '--track-scroll-distance': `${titleScrollDistance}px`,
+                } as CSSProperties}
+              >
+                <span className="track-marquee__label text-sm text-foreground font-inter font-medium">
+                  {cleanedDisplayTitle}
+                </span>
+                <span aria-hidden="true" className="track-marquee__divider">|</span>
+                <span aria-hidden="true" className="track-marquee__label text-sm text-foreground font-inter font-medium">
+                  {cleanedDisplayTitle}
+                </span>
+              </div>
+            ) : (
+              <div className="flex justify-center">
+                <span className="whitespace-nowrap text-sm text-foreground font-inter font-medium">
+                  {cleanedDisplayTitle}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Enhanced Real-time Audio EQ Visualizer */}
         <div className="flex items-end justify-center space-x-0.5 mb-6 h-20 w-full px-4" data-eq-container>
-          {frequencyData.map((height, i) => {
-            const frequencyPosition = i / 63;
-            const normalizedHeight = Math.min(1, Math.max(0, (height - 20) / 50));
-            
-            let hue, saturation, lightness;
-            
-            if (frequencyPosition < 0.2) {
-              hue = 0 + frequencyPosition * 40;
-              saturation = 90 - normalizedHeight * 10;
-              lightness = 40 + normalizedHeight * 25;
-            } else if (frequencyPosition < 0.4) {
-              const local = (frequencyPosition - 0.2) / 0.2;
-              hue = 20 + local * 40;
-              saturation = 85 + normalizedHeight * 15;
-              lightness = 45 + normalizedHeight * 20;
-            } else if (frequencyPosition < 0.6) {
-              const local = (frequencyPosition - 0.4) / 0.2;
-              hue = 60 + local * 60;
-              saturation = 80 + normalizedHeight * 20;
-              lightness = 50 + normalizedHeight * 15;
-            } else if (frequencyPosition < 0.8) {
-              const local = (frequencyPosition - 0.6) / 0.2;
-              hue = 120 + local * 60;
-              saturation = 75 + normalizedHeight * 25;
-              lightness = 55 + normalizedHeight * 15;
-            } else {
-              const local = (frequencyPosition - 0.8) / 0.2;
-              hue = 180 + local * 120;
-              saturation = 70 + normalizedHeight * 30;
-              lightness = 60 + normalizedHeight * 20;
-            }
-            
-            const glowIntensity = normalizedHeight * 15 + 5;
-            const glowSpread = normalizedHeight * 8 + 2;
-            
-            return (
-              <div 
-                key={i} 
-                data-eq-bar 
-                className="rounded-full transition-none shadow-lg flex-shrink-0" 
-                style={{
-                  height: `${Math.max(20, Math.min(70, height))}px`,
-                  width: '3px',
-                  minWidth: '3px',
-                  maxWidth: '3px',
-                  backgroundColor: animationActive 
-                    ? `hsl(${hue}, ${saturation}%, ${lightness}%)` 
-                    : 'hsl(var(--muted))',
-                  boxShadow: animationActive 
-                    ? `0 0 ${glowSpread}px hsl(${hue}, ${saturation}%, ${lightness}%), 0 0 ${glowIntensity}px hsl(${hue}, 100%, 80%), inset 0 0 ${glowSpread/2}px hsl(${hue}, 100%, 90%)`
-                    : 'none',
-                  willChange: 'height, background-color, box-shadow, border-radius'
-                }} 
-              />
-            );
-          })}
+          {frequencyData.map((height, i) => (
+            <div
+              key={i}
+              data-eq-bar
+              className="rounded-full transition-none shadow-lg flex-shrink-0"
+              style={{
+                height: `${Math.max(20, Math.min(70, height))}px`,
+                width: '3px',
+                minWidth: '3px',
+                maxWidth: '3px',
+                backgroundColor: animationActive ? `hsl(${(i / 63) * 300}, 90%, 60%)` : 'hsl(var(--muted))',
+                boxShadow: animationActive ? `0 0 8px hsl(${(i / 63) * 300}, 90%, 60%)` : 'none',
+              }}
+            />
+          ))}
         </div>
 
         <div className="space-y-3">
@@ -377,14 +465,15 @@ const LiveRadioPlayer = ({
             {!hidePopupButton && <PopupPlayerButton variant="outline" size="lg" />}
           </div>
 
-          {/* Desktop Controls */}
-          <DesktopPlayerControls 
+          <DesktopPlayerControls
             isPlaying={isPlaying}
             onTogglePlayback={handlePlayPause}
             currentTrack={{
               title: cleanTrackForSearch(displayStreamTitle),
               artist: 'Dance One Radio'
             }}
+            notificationsEnabled={notificationsEnabled}
+            onNotificationsChange={handleNotificationsChange}
           />
         </div>
       </div>

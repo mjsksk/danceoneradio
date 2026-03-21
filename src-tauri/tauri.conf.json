@@ -1,0 +1,66 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "Dance One Radio",
+  "version": "1.0.6",
+  "identifier": "com.danceoneradio.desktop",
+  "build": {
+    "frontendDist": "../desktop-dist",
+    "devUrl": "http://localhost:8080/desktop.html",
+    "beforeDevCommand": "npm run dev -- --host",
+    "beforeBuildCommand": "cmd /c npm exec -- vite build --config vite.config.desktop.ts"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Dance One Radio",
+        "width": 1080,
+        "height": 900,
+        "minWidth": 980,
+        "minHeight": 820,
+        "center": true,
+        "resizable": true,
+        "fullscreen": false,
+        "useHttpsScheme": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "nsis",
+    "publisher": "Dance One Radio",
+    "createUpdaterArtifacts": true,
+    "useLocalToolsDir": true,
+    "windows": {
+      "webviewInstallMode": {
+        "silent": true,
+        "type": "offlineInstaller"
+      },
+      "nsis": {
+        "displayLanguageSelector": false,
+        "installerHooks": "windows-installer-hooks.nsh",
+        "installMode": "both",
+        "startMenuFolder": "Dance One Radio"
+      }
+    },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico"
+    ]
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://www.danceoneradio.com/updates/latest.json"
+      ],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdGQ0IzRDkzMTI2NkYyODcKUldTSDhtWVNrejNMZitHM08ycmovRjYxSTdhNnE2RlNSV1dKcUcyZGtMd2x6WGNQMVcydFd2bDUK",
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  }
+}

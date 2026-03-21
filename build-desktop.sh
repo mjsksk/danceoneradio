@@ -1,3 +1,3 @@
 #!/bin/bash
 
-npm run build:desktop:portable
+npm run build:desktop:win
