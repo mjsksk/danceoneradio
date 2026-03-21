@@ -251,20 +251,19 @@ const Downloads = () => {
 
               <div className="max-w-2xl mx-auto">
                 <div className="bg-card p-8 rounded-lg border">
-                  <h3 className="text-xl font-semibold mb-6">Quick Start Guide</h3>
-                  <ol className="space-y-4 list-decimal list-inside text-left">
-                    <li>Download the DanceOneRadio.exe file</li>
-                    <li>Save it to your preferred location (Desktop, Downloads, or USB drive)</li>
-                    <li>Double-click the .exe file to launch (no installation required)</li>
-                    <li>Optionally pin to taskbar for quick access</li>
-                    <li>Enjoy uninterrupted electronic music streaming!</li>
-                  </ol>
-                  <div className="mt-6 p-4 bg-primary/10 rounded-lg">
-                    <p className="text-sm">
-                      <strong>Perfect for:</strong> USB drives, portable use, or when you don't have admin privileges. No installation or registry changes required!
-                    </p>
-                  </div>
-                </div>
+                   <h3 className="text-xl font-semibold mb-6">Quick Start Guide</h3>
+                   <ol className="space-y-4 list-decimal list-inside text-left">
+                     <li>Download the installer (.exe) file</li>
+                     <li>Double-click the installer and follow the setup wizard</li>
+                     <li>Launch Dance One Radio from your Start Menu or Desktop shortcut</li>
+                     <li>Enjoy uninterrupted electronic music streaming!</li>
+                   </ol>
+                   <div className="mt-6 p-4 bg-primary/10 rounded-lg">
+                     <p className="text-sm">
+                       <strong>Tip:</strong> The installer creates Start Menu and Desktop shortcuts automatically. You can also enable auto-launch on Windows startup from the app settings.
+                     </p>
+                   </div>
+                 </div>
               </div>
             </div>
           </div>

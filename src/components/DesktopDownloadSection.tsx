@@ -144,7 +144,7 @@ export const QuickDownloadButton = () => {
   const handleQuickDownload = () => {
     setIsDownloading(true);
     
-    const downloadUrl = 'https://upbwlnpycrbhxahjztrf.supabase.co/storage/v1/object/public/Software/Dance%20One%20Radio-Setup-1.0.0.exe';
+    const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.6/dance-one-radio-setup-1.0.6-x64.exe';
     window.open(downloadUrl, '_blank');
     
     setTimeout(() => setIsDownloading(false), 2000);

@@ -180,7 +180,7 @@ const LiveRadioPlayer = ({
             return;
           }
 
-          sharedAnalyser.getByteFrequencyData(sharedFrequencyBins);
+          sharedAnalyser.getByteFrequencyData(sharedFrequencyBins as unknown as Uint8Array<ArrayBuffer>);
 
           const nextBars = Array.from({ length: EQ_BAR_COUNT }, (_, index) => {
             const start = Math.floor((index / EQ_BAR_COUNT) * sharedFrequencyBins.length);
