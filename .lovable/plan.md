@@ -1,19 +1,29 @@
 
 
-## Move Hat Image Lower in Product Card
+## Plan: Enable Downloads Page with Live Download Link
 
-**Problem**: The hat product image is cropped at the top because the square container uses `object-cover` with default centering, cutting off the top of the hat.
+### What changes
 
-**Solution**: Add a custom `object-position` style to the hat image so it shifts downward, making the full hat visible. This needs to be applied in two places:
+1. **Downloads page (`src/pages/Downloads.tsx`)**
+   - Set `isComingSoon = false` (or remove the flag entirely)
+   - Replace the "Coming Soon" badge with a "New Release" or "Available Now" badge
+   - Replace the disabled button and "Under Development" card with an active download button pointing to: `https://github.com/mjsksk/danceoneradio/releases/download/v1.0.6/dance-one-radio-setup-1.0.6-x64.exe`
+   - Update version text from `1.0.0` to `1.0.6`
+   - Update the installation guide section to reflect the installer workflow (not portable)
 
-1. **Merch page grid card** (`src/pages/Merch.tsx`) — the product card thumbnail uses `object-cover` in the `aspect-square` container. We'll add conditional `object-position: bottom` (or a specific value like `center 70%`) when rendering the hat item, so the image shifts to reveal the top of the hat.
+2. **DesktopDownloadSection component (`src/components/DesktopDownloadSection.tsx`)**
+   - Update the installer URL to the new GitHub releases link
+   - Update version references from `1.0.0` to `1.0.6`
 
-2. **Product preview dialog** (`src/components/ProductPreview.tsx`) — the full-size preview also uses `object-cover` in an `aspect-square` container. Same adjustment needed here.
+### Technical details
 
-**Approach**: Add an optional `imagePosition` field to the product data in `CartContext.tsx` (e.g., `"bottom"` for the hat), then use it as `style={{ objectPosition }}` on the `<img>` tags in both the Merch page and ProductPreview. This keeps it data-driven and reusable for future products.
+- The hero section will show a prominent download button that triggers `window.open()` to the GitHub releases URL
+- The "Coming Soon" placeholder (animated glow, Clock icon, disabled button) will be replaced with an active download card
+- Both the Downloads page and the DesktopDownloadSection dialog will use the same GitHub URL for consistency
 
-**Changes**:
-- `src/contexts/CartContext.tsx` — add `imagePosition?: string` to the `MerchItem` type and set `imagePosition: "bottom"` on the hat product (ID 3)
-- `src/pages/Merch.tsx` — apply `style={{ objectPosition: item.imagePosition }}` on the card image
-- `src/components/ProductPreview.tsx` — apply the same on the preview image
+### Build errors
+
+Will also fix the two existing build errors:
+- `LiveRadioPlayer.tsx` line 183: Cast `Uint8Array` to fix the `ArrayBufferLike` type mismatch
+- `newsletter-campaign/index.ts`: Add resend dependency or adjust import (Deno edge function issue — will investigate)
 
