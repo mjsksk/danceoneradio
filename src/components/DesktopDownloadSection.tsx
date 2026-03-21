@@ -12,8 +12,8 @@ export const DesktopDownloadSection = () => {
     setDownloadStarted(true);
     
     const downloadUrl = type === 'installer' 
-      ? 'https://upbwlnpycrbhxahjztrf.supabase.co/storage/v1/object/public/Software/Dance%20One%20Radio-Setup-1.0.0.exe'
-      : 'https://upbwlnpycrbhxahjztrf.supabase.co/storage/v1/object/public/Software/Dance%20One%20Radio-Portable-1.0.0.exe';
+      ? 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.6/dance-one-radio-setup-1.0.6-x64.exe'
+      : 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.6/dance-one-radio-setup-1.0.6-x64.exe';
     
     window.open(downloadUrl, '_blank');
     
@@ -125,7 +125,7 @@ export const DesktopDownloadSection = () => {
           {/* Additional Info */}
           <div className="border-t pt-4">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Version 1.0.0 • ~50 MB</span>
+              <span className="text-muted-foreground">Version 1.0.6</span>
               <Badge variant="secondary" className="gap-1">
                 <Smartphone className="w-3 h-3" />
                 Windows Only
@@ -144,7 +144,7 @@ export const QuickDownloadButton = () => {
   const handleQuickDownload = () => {
     setIsDownloading(true);
     
-    const downloadUrl = 'https://upbwlnpycrbhxahjztrf.supabase.co/storage/v1/object/public/Software/Dance%20One%20Radio-Setup-1.0.0.exe';
+    const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.6/dance-one-radio-setup-1.0.6-x64.exe';
     window.open(downloadUrl, '_blank');
     
     setTimeout(() => setIsDownloading(false), 2000);
