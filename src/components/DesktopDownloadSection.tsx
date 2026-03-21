@@ -125,7 +125,7 @@ export const DesktopDownloadSection = () => {
           {/* Additional Info */}
           <div className="border-t pt-4">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Version 1.0.0 • ~50 MB</span>
+              <span className="text-muted-foreground">Version 1.0.6</span>
               <Badge variant="secondary" className="gap-1">
                 <Smartphone className="w-3 h-3" />
                 Windows Only
