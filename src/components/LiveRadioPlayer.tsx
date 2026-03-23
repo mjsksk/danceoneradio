@@ -192,9 +192,9 @@ const LiveRadioPlayer = ({
             }
 
             const average = total / (end - start) / 255;
-            const emphasis = 1.0;
-            const normalized = Math.min(1, average * emphasis * 1.6);
-            const targetHeight = EQ_MIN_HEIGHT + Math.pow(normalized, 1.2) * (EQ_MAX_HEIGHT - EQ_MIN_HEIGHT);
+            const emphasis = 1.15 - (index / EQ_BAR_COUNT) * 0.35;
+            const normalized = Math.min(1, average * emphasis * 1.4);
+            const targetHeight = EQ_MIN_HEIGHT + Math.pow(normalized, 1.35) * (EQ_MAX_HEIGHT - EQ_MIN_HEIGHT);
             const previousHeight = smoothedBarsRef.current[index] ?? EQ_MIN_HEIGHT;
             const smoothing = targetHeight > previousHeight ? 0.45 : 0.18;
 
