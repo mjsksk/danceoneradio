@@ -156,23 +156,33 @@ const LiveRadioPlayer = ({
         }
 
         if (!sharedAnalyser || sharedAnalyserAudio !== audio) {
-          sharedSourceNode?.disconnect();
-          sharedAnalyser?.disconnect();
+          // If a source node already exists for a different audio element,
+          // disconnect it. But never call createMediaElementSource twice
+          // on the same HTMLMediaElement — that throws InvalidStateError.
+          if (sharedSourceNode && sharedAnalyserAudio !== audio) {
+            sharedSourceNode.disconnect();
+            sharedAnalyser?.disconnect();
+            sharedSourceNode = null;
+            sharedAnalyser = null;
+            sharedAnalyserAudio = null;
+          }
 
-          const sourceNode = context.createMediaElementSource(audio);
-          const analyser = context.createAnalyser();
-          analyser.fftSize = 256;
-          analyser.minDecibels = -95;
-          analyser.maxDecibels = -20;
-          analyser.smoothingTimeConstant = 0.82;
+          if (!sharedSourceNode) {
+            const sourceNode = context.createMediaElementSource(audio);
+            const analyser = context.createAnalyser();
+            analyser.fftSize = 256;
+            analyser.minDecibels = -95;
+            analyser.maxDecibels = -20;
+            analyser.smoothingTimeConstant = 0.82;
 
-          sourceNode.connect(analyser);
-          analyser.connect(context.destination);
+            sourceNode.connect(analyser);
+            analyser.connect(context.destination);
 
-          sharedSourceNode = sourceNode;
-          sharedAnalyser = analyser;
-          sharedAnalyserAudio = audio;
-          sharedFrequencyBins = new Uint8Array(analyser.frequencyBinCount);
+            sharedSourceNode = sourceNode;
+            sharedAnalyser = analyser;
+            sharedAnalyserAudio = audio;
+            sharedFrequencyBins = new Uint8Array(analyser.frequencyBinCount);
+          }
         }
 
         const animate = () => {
