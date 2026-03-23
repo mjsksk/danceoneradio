@@ -1,11 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Send, Mail, Eye, EyeOff, Loader2, CheckCircle, Users, FlaskConical } from 'lucide-react';
+import { Send, Mail, Eye, EyeOff, Loader2, CheckCircle, Users, FlaskConical, Upload, FileCode, X } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { toast } from 'sonner';
 import NewsletterTemplateGallery from './NewsletterTemplateGallery';
@@ -17,6 +17,60 @@ const NewsletterCampaign = () => {
   const [sending, setSending] = useState(false);
   const [sendingTest, setSendingTest] = useState(false);
   const [lastResult, setLastResult] = useState<{ sent: number; total: number } | null>(null);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ['text/html', 'text/rtf', 'application/rtf', 'text/plain'];
+    const allowedExtensions = ['.html', '.htm', '.rtf', '.txt'];
+    const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+
+    if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(ext)) {
+      toast.error('Please upload an HTML, RTF, or text file');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('File size must be under 2MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      let htmlContent = event.target?.result as string;
+
+      // Extract body content if it's a full HTML document
+      const bodyMatch = htmlContent.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+      if (bodyMatch) {
+        htmlContent = bodyMatch[1].trim();
+      }
+
+      // Remove head, meta, doctype etc. if no body tag was found but html tag exists
+      const htmlTagMatch = htmlContent.match(/<html[^>]*>([\s\S]*)<\/html>/i);
+      if (htmlTagMatch && !bodyMatch) {
+        htmlContent = htmlTagMatch[1].replace(/<head[^>]*>[\s\S]*?<\/head>/gi, '').trim();
+      }
+
+      setContent(htmlContent);
+      setUploadedFileName(file.name);
+      setShowPreview(true);
+      toast.success(`Loaded "${file.name}" — review content below`);
+    };
+    reader.onerror = () => toast.error('Failed to read file');
+    reader.readAsText(file);
+
+    // Reset input so same file can be re-uploaded
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const clearUploadedFile = () => {
+    setUploadedFileName(null);
+    setContent('');
+    setShowPreview(false);
+  };
 
   const handleSend = async () => {
     if (!subject.trim() || !content.trim()) {
@@ -183,13 +237,49 @@ const NewsletterCampaign = () => {
           currentContent={content}
         />
 
+        {/* HTML File Upload */}
+        <div className="flex items-center gap-3">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".html,.htm,.rtf,.txt"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={sending}
+          >
+            <Upload className="w-4 h-4" />
+            Upload HTML File
+          </Button>
+          {uploadedFileName && (
+            <Badge variant="secondary" className="gap-1.5 font-['Rajdhani']">
+              <FileCode className="w-3 h-3" />
+              {uploadedFileName}
+              <button
+                onClick={clearUploadedFile}
+                className="ml-1 hover:text-destructive transition-colors"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </Badge>
+          )}
+          <span className="text-xs text-muted-foreground font-['Rajdhani']">
+            Supports .html, .htm, .rtf, .txt (max 2MB)
+          </span>
+        </div>
+
         {/* Content */}
         <div>
           <label className="block text-sm font-['Orbitron'] mb-2 text-muted-foreground">
             Email Content (HTML supported)
           </label>
           <Textarea
-            placeholder="Enter your newsletter content or select a template above..."
+            placeholder="Enter your newsletter content, select a template, or upload an HTML file..."
             value={content}
             onChange={(e) => setContent(e.target.value)}
             className="font-['Rajdhani'] min-h-[200px]"
