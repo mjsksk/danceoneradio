@@ -1,11 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Send, Mail, Eye, EyeOff, Loader2, CheckCircle, Users, FlaskConical } from 'lucide-react';
+import { Send, Mail, Eye, EyeOff, Loader2, CheckCircle, Users, FlaskConical, Upload, FileCode, X } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { toast } from 'sonner';
 import NewsletterTemplateGallery from './NewsletterTemplateGallery';
