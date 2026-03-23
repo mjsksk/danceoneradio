@@ -1,6 +1,6 @@
 [package]
 name = "dance-one-radio"
-version = "1.0.7"
+version = "1.0.8"
 description = "Dance One Radio desktop app"
 authors = ["Dance One Radio"]
 license = ""

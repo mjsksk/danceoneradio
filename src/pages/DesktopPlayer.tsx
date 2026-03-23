@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect, useState } from 'react';
 import { Minimize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { DesktopUpdateActions } from '@/components/DesktopUpdateActions';
 import LiveRadioPlayer from '@/components/LiveRadioPlayer';
 import { useDesktopIntegration } from '@/hooks/useDesktopIntegration';
 import { useTrackHistoryUpdater } from '@/hooks/useTrackHistoryUpdater';
@@ -54,15 +55,18 @@ const DesktopPlayer = () => {
             </div>
           </div>
           {isDesktop ? (
-            <Button
-              variant="outline"
-              className="h-12 rounded-xl border-primary/30 bg-primary/10 px-4 text-sm font-medium text-primary hover:bg-primary/20 hover:text-primary"
-              onClick={hideWindow}
-              title="Hide to system tray"
-            >
-              <Minimize2 className="mr-2 h-4 w-4" />
-              Hide To Tray
-            </Button>
+            <div className="flex items-start gap-3">
+              <DesktopUpdateActions />
+              <Button
+                variant="outline"
+                className="h-12 rounded-xl border-primary/30 bg-primary/10 px-4 text-sm font-medium text-primary hover:bg-primary/20 hover:text-primary"
+                onClick={hideWindow}
+                title="Hide to system tray"
+              >
+                <Minimize2 className="mr-2 h-4 w-4" />
+                Hide To Tray
+              </Button>
+            </div>
           ) : null}
         </div>
       </div>

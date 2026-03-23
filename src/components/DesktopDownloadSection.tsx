@@ -1,22 +1,19 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Download, Monitor, Smartphone, Check, ExternalLink, AlertTriangle } from 'lucide-react';
+import { Download, Monitor, Smartphone, Check } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export const DesktopDownloadSection = () => {
   const [downloadStarted, setDownloadStarted] = useState(false);
 
-  const handleDownload = (type: 'installer' | 'portable') => {
+  const handleDownload = () => {
     setDownloadStarted(true);
-    
-    const downloadUrl = type === 'installer' 
-      ? 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.6/dance-one-radio-setup-1.0.6-x64.exe'
-      : 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.6/dance-one-radio-setup-1.0.6-x64.exe';
-    
+
+    const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.8/dance-one-radio-setup-1.0.8-x64.exe';
     window.open(downloadUrl, '_blank');
-    
+
     setTimeout(() => setDownloadStarted(false), 2000);
   };
 
@@ -82,46 +79,33 @@ export const DesktopDownloadSection = () => {
 
           {/* Download Options */}
           <div className="space-y-3">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button 
-                onClick={() => handleDownload('installer')}
-                className="flex-1 gap-2"
-                disabled={downloadStarted}
-              >
-                {downloadStarted ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Starting Download...
-                  </>
-                ) : (
-                  <>
-                    <Download className="w-4 h-4" />
-                    Full Installer (Recommended)
-                  </>
-                )}
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                onClick={() => handleDownload('portable')}
-                className="flex-1 gap-2"
-                disabled={downloadStarted}
-              >
-                <Download className="w-4 h-4" />
-                Portable Version
-              </Button>
-            </div>
-            
+            <Button
+              onClick={handleDownload}
+              className="w-full gap-2"
+              disabled={downloadStarted}
+            >
+              {downloadStarted ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Starting Download...
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4" />
+                  Download Windows Installer
+                </>
+              )}
+            </Button>
+
             <div className="text-xs text-muted-foreground text-center">
-              <strong>Full Installer:</strong> Creates shortcuts, includes uninstaller<br />
-              <strong>Portable:</strong> No installation required, run from anywhere
+              Includes desktop and Start Menu shortcuts, uninstaller, and in-app updates.
             </div>
           </div>
 
           {/* Additional Info */}
           <div className="border-t pt-4">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Version 1.0.6</span>
+              <span className="text-muted-foreground">Version 1.0.8</span>
               <Badge variant="secondary" className="gap-1">
                 <Smartphone className="w-3 h-3" />
                 Windows Only
@@ -139,10 +123,10 @@ export const QuickDownloadButton = () => {
 
   const handleQuickDownload = () => {
     setIsDownloading(true);
-    
-    const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.6/dance-one-radio-setup-1.0.6-x64.exe';
+
+    const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.8/dance-one-radio-setup-1.0.8-x64.exe';
     window.open(downloadUrl, '_blank');
-    
+
     setTimeout(() => setIsDownloading(false), 2000);
   };
 
