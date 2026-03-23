@@ -2,6 +2,6 @@
   "version": "1.0.8",
   "notes": "Move in-app update action into the header and publish version 1.0.8 for direct upgrades from 1.0.6.",
   "pub_date": "2026-03-23T15:29:27.146Z",
-  "url": "https://github.com/mjsksk/danceoneradio/releases/download/v1.0.8/dance-one-radio-setup-1.0.8-x64.exe",
+  "url": "https://github.com/mjsksk/danceoneradio/releases/download/v1.0.8/Dance.One.Radio_1.0.8_x64-setup.exe",
   "signature": "untrusted comment: signature from minisign secret key\nRUSH8mYSkz3Lf8V4E/JiSg5BCp0M5kTtoaNEfrxJv2BLs+4+7xhTyPH5D4rZYe3IkRX56eC3lDIpYE8ZhGGnu77vWQbUO+mPkQ8=\ntrusted comment: 1774279767\njn+OSiD4/MiDt8RjMAduUziDF6SGP4Vm/t2AMmXLmKsD336kquJJ71LQfGzE6k0TG4xIar5n3DfjP3ig3FbIAg=="
 }
