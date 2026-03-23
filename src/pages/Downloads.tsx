@@ -7,7 +7,7 @@ import SocialShare from '@/components/SocialShare';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Download, Monitor, Check, Shield, Zap, Settings, Bell, Headphones, Clock, Sparkles } from 'lucide-react';
+import { Download, Monitor, Check, Shield, Settings, Bell, Headphones, Clock, Sparkles } from 'lucide-react';
 
 const Downloads = () => {
   const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.6/dance-one-radio-setup-1.0.6-x64.exe';
@@ -112,11 +112,11 @@ const Downloads = () => {
               <div className="bg-card p-6 rounded-lg border">
                 <div className="mb-4">
                   <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                    <Zap className="w-6 h-6 text-primary" />
+                    <Clock className="w-6 h-6 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">Global Hotkeys</h3>
+                  <h3 className="text-xl font-semibold mb-2">Auto-Launch on Startup</h3>
                   <p className="text-muted-foreground">
-                    Use Ctrl+Shift+P to play/pause, Ctrl+M to minimize, and media keys for seamless control.
+                    Optionally start Dance One Radio automatically when Windows boots up for instant access.
                   </p>
                 </div>
               </div>
