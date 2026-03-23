@@ -156,23 +156,33 @@ const LiveRadioPlayer = ({
         }
 
         if (!sharedAnalyser || sharedAnalyserAudio !== audio) {
-          sharedSourceNode?.disconnect();
-          sharedAnalyser?.disconnect();
+          // If a source node already exists for a different audio element,
+          // disconnect it. But never call createMediaElementSource twice
+          // on the same HTMLMediaElement — that throws InvalidStateError.
+          if (sharedSourceNode && sharedAnalyserAudio !== audio) {
+            sharedSourceNode.disconnect();
+            sharedAnalyser?.disconnect();
+            sharedSourceNode = null;
+            sharedAnalyser = null;
+            sharedAnalyserAudio = null;
+          }
 
-          const sourceNode = context.createMediaElementSource(audio);
-          const analyser = context.createAnalyser();
-          analyser.fftSize = 256;
-          analyser.minDecibels = -95;
-          analyser.maxDecibels = -20;
-          analyser.smoothingTimeConstant = 0.82;
+          if (!sharedSourceNode) {
+            const sourceNode = context.createMediaElementSource(audio);
+            const analyser = context.createAnalyser();
+            analyser.fftSize = 256;
+            analyser.minDecibels = -95;
+            analyser.maxDecibels = -20;
+            analyser.smoothingTimeConstant = 0.82;
 
-          sourceNode.connect(analyser);
-          analyser.connect(context.destination);
+            sourceNode.connect(analyser);
+            analyser.connect(context.destination);
 
-          sharedSourceNode = sourceNode;
-          sharedAnalyser = analyser;
-          sharedAnalyserAudio = audio;
-          sharedFrequencyBins = new Uint8Array(analyser.frequencyBinCount);
+            sharedSourceNode = sourceNode;
+            sharedAnalyser = analyser;
+            sharedAnalyserAudio = audio;
+            sharedFrequencyBins = new Uint8Array(analyser.frequencyBinCount);
+          }
         }
 
         const animate = () => {
@@ -192,9 +202,9 @@ const LiveRadioPlayer = ({
             }
 
             const average = total / (end - start) / 255;
-            const emphasis = 1.15 - (index / EQ_BAR_COUNT) * 0.35;
-            const normalized = Math.min(1, average * emphasis * 1.4);
-            const targetHeight = EQ_MIN_HEIGHT + Math.pow(normalized, 1.35) * (EQ_MAX_HEIGHT - EQ_MIN_HEIGHT);
+            const emphasis = 1.0;
+            const normalized = Math.min(1, average * emphasis * 1.6);
+            const targetHeight = EQ_MIN_HEIGHT + Math.pow(normalized, 1.2) * (EQ_MAX_HEIGHT - EQ_MIN_HEIGHT);
             const previousHeight = smoothedBarsRef.current[index] ?? EQ_MIN_HEIGHT;
             const smoothing = targetHeight > previousHeight ? 0.45 : 0.18;
 
