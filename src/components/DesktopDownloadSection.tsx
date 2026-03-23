@@ -57,7 +57,7 @@ export const DesktopDownloadSection = () => {
             </div>
             <div className="flex items-center gap-2 text-sm">
               <Check className="w-4 h-4 text-primary" />
-              <span>Global hotkeys (Ctrl+Shift+P, Media keys)</span>
+              <span>Auto-launch on Windows startup (optional)</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <Check className="w-4 h-4 text-primary" />
