@@ -17,6 +17,60 @@ const NewsletterCampaign = () => {
   const [sending, setSending] = useState(false);
   const [sendingTest, setSendingTest] = useState(false);
   const [lastResult, setLastResult] = useState<{ sent: number; total: number } | null>(null);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ['text/html', 'text/rtf', 'application/rtf', 'text/plain'];
+    const allowedExtensions = ['.html', '.htm', '.rtf', '.txt'];
+    const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+
+    if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(ext)) {
+      toast.error('Please upload an HTML, RTF, or text file');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('File size must be under 2MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      let htmlContent = event.target?.result as string;
+
+      // Extract body content if it's a full HTML document
+      const bodyMatch = htmlContent.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+      if (bodyMatch) {
+        htmlContent = bodyMatch[1].trim();
+      }
+
+      // Remove head, meta, doctype etc. if no body tag was found but html tag exists
+      const htmlTagMatch = htmlContent.match(/<html[^>]*>([\s\S]*)<\/html>/i);
+      if (htmlTagMatch && !bodyMatch) {
+        htmlContent = htmlTagMatch[1].replace(/<head[^>]*>[\s\S]*?<\/head>/gi, '').trim();
+      }
+
+      setContent(htmlContent);
+      setUploadedFileName(file.name);
+      setShowPreview(true);
+      toast.success(`Loaded "${file.name}" — review content below`);
+    };
+    reader.onerror = () => toast.error('Failed to read file');
+    reader.readAsText(file);
+
+    // Reset input so same file can be re-uploaded
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const clearUploadedFile = () => {
+    setUploadedFileName(null);
+    setContent('');
+    setShowPreview(false);
+  };
 
   const handleSend = async () => {
     if (!subject.trim() || !content.trim()) {
