@@ -266,7 +266,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       try {
         await resend.emails.send({
-          from: "Dance One Radio <noreply@resend.dev>",
+          from: "Dance One Radio <noreply@danceoneradio.com>",
           to: [recipient.email],
           subject: isTestMode ? `[TEST] ${sanitizedSubject}` : sanitizedSubject,
           html: emailContent,
