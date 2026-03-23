@@ -1,0 +1,7 @@
+{
+  "version": "1.0.7",
+  "notes": "Signed desktop update release with working in-app updater metadata.",
+  "pub_date": "2026-03-23T15:05:10.595Z",
+  "url": "https://github.com/mjsksk/danceoneradio/releases/download/v1.0.7/dance-one-radio-setup-1.0.7-x64.exe",
+  "signature": "untrusted comment: signature from minisign secret key\nRUSH8mYSkz3LfyAwSb00nNvzKQPpDDCf4SZgcnLC1d8TufszII2XkEPdNSv136Nv93NJxsSH/IDm0sygNUgxZFko7+f8AAHvZQg=\ntrusted comment: 1774278310\ncKNPYZOo2vOi94rj+aP3zien7MpNhjWDjwuvfrRDOi3gSAaEsMaxQB/O8viYbt1bO66BdmH6mfZ/KtyWBhiZAw=="
+}
