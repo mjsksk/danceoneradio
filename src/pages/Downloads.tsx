@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Download, Monitor, Check, Shield, Settings, Bell, Headphones, Clock, Sparkles } from 'lucide-react';
 
 const Downloads = () => {
-  const downloadUrl = 'https://www.danceoneradio.com/downloads/dance-one-radio-setup-1.0.8-x64.exe';
+  const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.8/dance-one-radio-setup-1.0.8-x64.exe';
 
   const handleDownload = () => {
     window.open(downloadUrl, '_blank');

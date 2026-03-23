@@ -11,7 +11,7 @@ export const DesktopDownloadSection = () => {
   const handleDownload = () => {
     setDownloadStarted(true);
 
-    const downloadUrl = 'https://www.danceoneradio.com/downloads/dance-one-radio-setup-1.0.8-x64.exe';
+    const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.8/dance-one-radio-setup-1.0.8-x64.exe';
     window.open(downloadUrl, '_blank');
 
     setTimeout(() => setDownloadStarted(false), 2000);
@@ -124,7 +124,7 @@ export const QuickDownloadButton = () => {
   const handleQuickDownload = () => {
     setIsDownloading(true);
 
-    const downloadUrl = 'https://www.danceoneradio.com/downloads/dance-one-radio-setup-1.0.8-x64.exe';
+    const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.8/dance-one-radio-setup-1.0.8-x64.exe';
     window.open(downloadUrl, '_blank');
 
     setTimeout(() => setIsDownloading(false), 2000);
