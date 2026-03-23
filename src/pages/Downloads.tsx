@@ -7,7 +7,7 @@ import SocialShare from '@/components/SocialShare';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Download, Monitor, Check, Shield, Zap, Settings, Bell, Headphones, Clock, Sparkles } from 'lucide-react';
+import { Download, Monitor, Check, Shield, Settings, Bell, Headphones, Clock, Sparkles } from 'lucide-react';
 
 const Downloads = () => {
   const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.6/dance-one-radio-setup-1.0.6-x64.exe';
