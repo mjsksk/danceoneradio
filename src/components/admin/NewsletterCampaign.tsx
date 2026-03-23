@@ -237,13 +237,49 @@ const NewsletterCampaign = () => {
           currentContent={content}
         />
 
+        {/* HTML File Upload */}
+        <div className="flex items-center gap-3">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".html,.htm,.rtf,.txt"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={sending}
+          >
+            <Upload className="w-4 h-4" />
+            Upload HTML File
+          </Button>
+          {uploadedFileName && (
+            <Badge variant="secondary" className="gap-1.5 font-['Rajdhani']">
+              <FileCode className="w-3 h-3" />
+              {uploadedFileName}
+              <button
+                onClick={clearUploadedFile}
+                className="ml-1 hover:text-destructive transition-colors"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </Badge>
+          )}
+          <span className="text-xs text-muted-foreground font-['Rajdhani']">
+            Supports .html, .htm, .rtf, .txt (max 2MB)
+          </span>
+        </div>
+
         {/* Content */}
         <div>
           <label className="block text-sm font-['Orbitron'] mb-2 text-muted-foreground">
             Email Content (HTML supported)
           </label>
           <Textarea
-            placeholder="Enter your newsletter content or select a template above..."
+            placeholder="Enter your newsletter content, select a template, or upload an HTML file..."
             value={content}
             onChange={(e) => setContent(e.target.value)}
             className="font-['Rajdhani'] min-h-[200px]"
