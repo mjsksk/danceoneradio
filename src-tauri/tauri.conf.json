@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Dance One Radio",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "identifier": "com.danceoneradio.desktop",
   "build": {
     "frontendDist": "desktop-dist",
@@ -41,7 +41,7 @@
       "nsis": {
         "displayLanguageSelector": false,
         "installerHooks": "windows-installer-hooks.nsh",
-        "installMode": "both",
+        "installMode": "currentUser",
         "startMenuFolder": "Dance One Radio"
       }
     },

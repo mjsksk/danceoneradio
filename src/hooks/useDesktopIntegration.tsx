@@ -289,8 +289,10 @@ export const useDesktopIntegration = () => {
 
     await update.downloadAndInstall(onEvent);
 
-    const { relaunch } = await import('@tauri-apps/plugin-process');
-    await relaunch();
+    if (typeof navigator === 'undefined' || !navigator.userAgent.includes('Windows')) {
+      const { relaunch } = await import('@tauri-apps/plugin-process');
+      await relaunch();
+    }
   }, [isTauriDesktop]);
 
   return {

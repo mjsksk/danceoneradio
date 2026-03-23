@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Download, Monitor, Check, Shield, Settings, Bell, Headphones, Clock, Sparkles } from 'lucide-react';
 
 const Downloads = () => {
-  const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.8/Dance.One.Radio_1.0.8_x64-setup.exe';
+  const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.9/dance-one-radio-setup-1.0.9-x64.exe';
 
   const handleDownload = () => {
     window.open(downloadUrl, '_blank');
@@ -69,7 +69,7 @@ const Downloads = () => {
               </div>
 
               <div className="text-sm text-muted-foreground mb-6">
-                Version 1.0.8 • Windows 10+ (64-bit) • Free Download
+                Version 1.0.9 • Windows 10+ (64-bit) • Free Download
               </div>
               
               <div className="flex justify-center">
