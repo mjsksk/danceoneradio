@@ -93,13 +93,13 @@ const HeroSection = () => {
       backgroundFill="hsl(222.2, 84%, 4.9%)"
       containerClassName="min-h-screen"
     >
-      <div className="mx-auto flex min-h-screen max-w-4xl flex-col justify-center px-4 pt-24 md:pt-28">
-        <div className="mb-1 animate-fade-in">
+      <div className="mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center px-4 text-center">
+        <div className="mb-0 animate-fade-in">
           <div className="hero-logo flex justify-center">
             <img 
               src="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png" 
               alt="Dance One Radio" 
-              className="h-56 md:h-[23rem] w-auto object-contain animate-neon-flicker"
+              className="h-48 md:h-[20rem] w-auto object-contain animate-neon-flicker"
               loading="eager"
               fetchPriority="high"
               width="640"
