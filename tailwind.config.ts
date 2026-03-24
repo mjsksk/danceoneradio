@@ -137,8 +137,8 @@ export default {
 				'neon-flicker': 'neon-flicker 3s ease-in-out infinite',
 				'spin-slow': 'spin-slow 20s linear infinite',
 				'shimmer': 'shimmer 2s ease-in-out infinite',
-				'logo-foreground': 'logo-foreground 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-				'logo-glow-pulse': 'logo-glow-pulse 3s ease-in-out 1.2s infinite'
+				'logo-foreground': 'logo-foreground 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+				'logo-glow-pulse': 'logo-glow-pulse 4s ease-in-out 2.5s infinite'
 			}
 		}
 	},
