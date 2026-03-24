@@ -25,14 +25,14 @@ const NowPlayingBlock = ({ streamTitle }: { streamTitle: string }) => {
                 <span className="absolute inline-flex h-full w-full rounded-full bg-destructive opacity-70 animate-ping"></span>
                 <span className="relative inline-flex h-3 w-3 rounded-full bg-destructive"></span>
               </span>
-              <span className="font-['Rajdhani'] text-xs font-bold uppercase tracking-[0.35em] text-primary/80">
+              <span className="font-['Orbitron'] text-[11px] font-bold uppercase tracking-[0.35em] text-primary/80">
                 Now Playing Live
               </span>
             </div>
-            <p className="truncate font-['Rajdhani'] text-lg font-bold leading-tight text-foreground md:text-2xl">
+            <p className="truncate font-['Orbitron'] text-lg font-bold leading-tight text-foreground md:text-2xl">
               {title}
             </p>
-            <p className="truncate font-['Rajdhani'] text-sm text-muted-foreground md:text-base">
+            <p className="truncate font-['Orbitron'] text-sm text-muted-foreground md:text-base">
               {artist}
             </p>
           </div>
@@ -93,13 +93,13 @@ const HeroSection = () => {
       backgroundFill="hsl(222.2, 84%, 4.9%)"
       containerClassName="min-h-screen"
     >
-      <div className="mx-auto flex min-h-screen max-w-4xl flex-col justify-center px-4 pt-24 md:pt-28">
-        <div className="mb-1 animate-fade-in">
+      <div className="mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center px-4 text-center">
+        <div className="mb-0 animate-fade-in">
           <div className="hero-logo flex justify-center">
             <img 
               src="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png" 
               alt="Dance One Radio" 
-              className="h-56 md:h-[23rem] w-auto object-contain animate-neon-flicker"
+              className="h-48 md:h-[20rem] w-auto object-contain animate-neon-flicker"
               loading="eager"
               fetchPriority="high"
               width="640"
