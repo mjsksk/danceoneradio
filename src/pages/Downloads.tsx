@@ -6,7 +6,9 @@ import { AD_SLOTS } from '@/config/adSlots';
 import SocialShare from '@/components/SocialShare';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Download, Monitor, Check, Shield, Settings, Bell, Headphones, Clock, Sparkles, Smartphone, Apple, TabletSmartphone } from 'lucide-react';
+import { Download, Monitor, Check, Shield, Settings, Bell, Headphones, Clock, Sparkles, Smartphone, TabletSmartphone } from 'lucide-react';
+import appStoreBadge from '@/assets/app-store-badge-new.svg';
+import googlePlayBadge from '@/assets/google-play-badge-new.svg';
 
 const Downloads = () => {
   const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.10/dance-one-radio-setup-1.0.10-x64.exe';
