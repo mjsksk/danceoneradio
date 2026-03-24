@@ -116,6 +116,11 @@ export default {
 				'shimmer': {
 					'0%': { backgroundPosition: '200% 0' },
 					'100%': { backgroundPosition: '-200% 0' }
+				},
+				'logo-foreground': {
+					'0%': { transform: 'scale(0.3) translateZ(-200px)', opacity: '0', filter: 'blur(10px)' },
+					'60%': { transform: 'scale(1.05) translateZ(0)', opacity: '1', filter: 'blur(0px)' },
+					'100%': { transform: 'scale(1) translateZ(0)', opacity: '1', filter: 'blur(0px)' }
 				}
 			},
 			animation: {
@@ -127,7 +132,8 @@ export default {
 				'fade-in': 'fade-in 0.8s ease-out',
 				'neon-flicker': 'neon-flicker 3s ease-in-out infinite',
 				'spin-slow': 'spin-slow 20s linear infinite',
-				'shimmer': 'shimmer 2s ease-in-out infinite'
+				'shimmer': 'shimmer 2s ease-in-out infinite',
+				'logo-foreground': 'logo-foreground 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards'
 			}
 		}
 	},
