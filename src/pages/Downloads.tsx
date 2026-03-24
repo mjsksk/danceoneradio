@@ -88,7 +88,7 @@ const Downloads = () => {
                     rel="noopener noreferrer"
                   >
                     <img
-                      src="/lovable-uploads/app-store-badge.svg"
+                      src={appStoreBadge}
                       alt="Download on the App Store"
                       className="h-14 mx-auto hover:opacity-80 transition-opacity"
                       loading="lazy"
