@@ -80,19 +80,19 @@ const HeroSection = () => {
     setVideoKey(prev => prev + 1);
   }, []);
   return <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Particle Text Animation Background */}
-      <ParticleTextEffect words={["This is not your ordinary radio station", "This is your LifeStyle", "Brought to you", "By the Best in Music and Sound"]} />
-      <div className="absolute inset-0 bg-background/40 backdrop-blur-[1px]"></div>
-
-      {/* Animated Particles */}
-      <div className="absolute inset-0">
-        {[...Array(20)].map((_, i) => <div key={i} className="absolute w-2 h-2 bg-primary/30 rounded-full animate-float" style={{
-        left: `${Math.random() * 100}%`,
-        top: `${Math.random() * 100}%`,
-        animationDelay: `${Math.random() * 6}s`,
-        animationDuration: `${4 + Math.random() * 4}s`
-      }} />)}
-      </div>
+      {/* Vortex Background */}
+      <Vortex
+        particleCount={500}
+        baseHue={260}
+        baseSpeed={0.1}
+        rangeSpeed={1.5}
+        baseRadius={1}
+        rangeRadius={2}
+        rangeY={200}
+        backgroundColor="hsl(var(--background))"
+        containerClassName="absolute inset-0"
+        className="flex items-center justify-center h-full"
+      />
 
       {/* Hero Content */}
       <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
