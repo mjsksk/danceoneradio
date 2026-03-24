@@ -5,6 +5,7 @@ import GoogleAds from "@/components/GoogleAds";
 import SocialShare from "@/components/SocialShare";
 import { Card, CardContent } from "@/components/ui/card";
 import { Radio, Music, Users, Headphones, Globe, Heart, Calendar } from "lucide-react";
+import wh0Image from "@/assets/wh0-bad-intentions.jpg";
 
 const About = () => {
   return (
@@ -114,7 +115,7 @@ const About = () => {
             </div>
             
             {/* Team Cards Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
               {/* Mario */}
               <Card className="card-cyber border-primary/30 overflow-hidden text-center">
                 <CardContent className="p-6">
@@ -229,6 +230,34 @@ const About = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Wh0 */}
+              <Card className="card-cyber border-accent/30 overflow-hidden text-center">
+                <CardContent className="p-6">
+                  <div className="relative mb-6">
+                    <div className="mx-auto rounded-full overflow-hidden border-2 border-accent/50 hover:border-accent transition-all duration-300 w-32 h-32 flex items-center justify-center bg-background">
+                      <img 
+                        src={wh0Image}
+                        alt="Wh0"
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-accent rounded-full flex items-center justify-center animate-glow-pulse">
+                      <Music className="w-3 h-3 text-accent-foreground" />
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-['Orbitron'] font-bold text-accent mb-2">Wh0</h3>
+                  <p className="text-primary font-['Rajdhani'] font-medium mb-2">Who Plays Sessions</p>
+                  <p className="text-sm text-muted-foreground font-['Rajdhani'] mb-1">House • Disco House • Tech House</p>
+                  <div className="mb-4 p-3 bg-secondary/50 rounded-lg border border-accent/20">
+                    <div className="flex items-center justify-center text-xs text-muted-foreground">
+                      <Globe className="w-3 h-3 mr-1" />
+                      GRAMMY NOMINATED
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Detailed Bios */}
@@ -312,6 +341,27 @@ const About = () => {
                     <p className="text-accent font-['Rajdhani'] text-lg mb-4">Deep House Explorer</p>
                     <p className="text-foreground/80 font-['Rajdhani']">
                       DJ Cosmos invites you to explore the deeper side of electronic music through his carefully curated sonic voyages. Drawing inspiration from jazz, soul, and ambient music, Cosmos crafts immersive soundscapes that transcend the ordinary dance floor experience. His Sunday evening shows have become a ritual for listeners seeking smooth grooves and atmospheric textures. Known for his eclectic taste and seamless mixing, Cosmos brings together classic deep house with modern productions, creating a warm and inviting atmosphere that resonates with music lovers worldwide.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Wh0 Bio */}
+              <Card className="card-cyber border-accent/30 overflow-hidden md:col-span-2">
+                <CardContent className="p-0">
+                  <div className="aspect-video relative overflow-hidden">
+                    <img 
+                      src={wh0Image} 
+                      alt="Wh0 - Who Plays Sessions"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-2xl font-bold font-['Orbitron'] text-accent mb-2">Wh0</h3>
+                    <p className="text-primary font-['Rajdhani'] text-lg mb-4">Grammy-Nominated UK House Duo — "Who Plays Sessions"</p>
+                    <p className="text-foreground/80 font-['Rajdhani']">
+                      Wh0 is a Grammy-nominated UK house music production duo comprised of Robert Chetcuti and Tom Cross, who burst onto the scene in 2018 shrouded in mystery behind their signature black masks. Their philosophy is simple: it's all about the music, not what they look like. Since their debut, Wh0 have amassed over 70 million Spotify streams and topped the Music Week charts multiple times with their irresistible blend of groove-filled basslines, disco-infused hooks, and infectious house rhythms. Their "Who Plays Sessions" radio show on Dance One Radio brings together the finest in house, disco house, and tech house — showcasing both underground gems and dancefloor anthems. From intimate club sets to festival main stages, Wh0 continue to push the boundaries of modern house music while staying true to their roots of letting the music speak for itself.
                     </p>
                   </div>
                 </CardContent>
