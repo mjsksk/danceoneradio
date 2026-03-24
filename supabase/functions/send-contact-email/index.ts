@@ -170,6 +170,12 @@ const handler = async (req: Request): Promise<Response> => {
             <p><strong>Subject:</strong> ${subject}</p>
             <p><strong>Message:</strong><br>${message}</p>
           </div>
+
+          <div style="background-color: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 15px;">
+            <h3 style="margin: 0 0 10px; color: #2e7d32;">Consent & Preferences</h3>
+            <p style="margin: 5px 0;"><strong>Data Storage Consent:</strong> ${consentGiven ? '✅ Yes' : '❌ No'}</p>
+            <p style="margin: 5px 0;"><strong>Newsletter Opt-in:</strong> ${newsletterOptIn ? '✅ Yes' : '❌ No'}</p>
+          </div>
           
           <p style="margin-top: 20px;">
             Reply directly to this email to respond to ${name}.
