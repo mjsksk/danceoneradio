@@ -9,7 +9,7 @@ import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import { AD_SLOTS } from '@/config/adSlots';
 import { useTrackHistoryUpdater } from '@/hooks/useTrackHistoryUpdater';
-import { Vortex } from '@/components/ui/vortex';
+import { WavyBackground } from '@/components/ui/wavy-background';
 
 const Index = () => {
   useTrackHistoryUpdater();
