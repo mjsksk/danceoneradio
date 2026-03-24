@@ -55,6 +55,7 @@ export function AnimatedRoutes() {
   const location = useLocation();
 
   return (
+    <Suspense fallback={<div className="min-h-screen bg-background" />}>
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageTransition><Index /></PageTransition>} />
