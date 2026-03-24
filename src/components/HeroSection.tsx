@@ -29,7 +29,7 @@ const NowPlayingBlock = ({ streamTitle }: { streamTitle: string }) => {
                 Now Playing Live
               </span>
             </div>
-            <p className="truncate font-['Rajdhani'] text-lg font-bold leading-tight text-foreground md:text-2xl">
+            <p className="truncate font-['Orbitron'] text-lg font-bold leading-tight text-foreground md:text-2xl">
               {title}
             </p>
             <p className="truncate font-['Rajdhani'] text-sm text-muted-foreground md:text-base">
