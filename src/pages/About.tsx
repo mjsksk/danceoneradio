@@ -6,6 +6,7 @@ import SocialShare from "@/components/SocialShare";
 import { Card, CardContent } from "@/components/ui/card";
 import { Radio, Music, Users, Headphones, Globe, Heart, Calendar } from "lucide-react";
 import wh0Image from "@/assets/wh0-bad-intentions.jpg";
+import wh0BioImage from "@/assets/wh0-bio.jpg";
 
 const About = () => {
   return (
