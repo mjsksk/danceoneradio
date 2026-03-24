@@ -76,7 +76,7 @@ const Downloads = () => {
               <div className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-background to-primary/5 border border-primary/20 rounded-2xl p-8 text-center">
                 <div className="relative z-10">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/20 flex items-center justify-center">
-                    <Apple className="w-8 h-8 text-primary" />
+                    <Smartphone className="w-8 h-8 text-primary" />
                   </div>
                   <h3 className="text-xl font-semibold mb-2">iOS App</h3>
                   <p className="text-muted-foreground mb-6">
