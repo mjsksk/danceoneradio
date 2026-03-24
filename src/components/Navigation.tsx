@@ -23,7 +23,7 @@ const Navigation = () => {
     { name: 'About', href: '/about' },
     { name: 'Shows', href: '/shows' },
     { name: 'Gallery', href: '/gallery' },
-    { name: 'Downloads', href: '/downloads' },
+    { name: 'Apps', href: '/apps' },
     { name: 'Privacy', href: '/privacy' },
     { name: 'Merch', href: '/merch' },
     { name: 'Love', href: '/love' },
