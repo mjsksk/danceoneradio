@@ -25,14 +25,14 @@ const NowPlayingBlock = ({ streamTitle }: { streamTitle: string }) => {
                 <span className="absolute inline-flex h-full w-full rounded-full bg-destructive opacity-70 animate-ping"></span>
                 <span className="relative inline-flex h-3 w-3 rounded-full bg-destructive"></span>
               </span>
-              <span className="font-['Rajdhani'] text-xs font-bold uppercase tracking-[0.35em] text-primary/80">
+              <span className="font-['Orbitron'] text-[11px] font-bold uppercase tracking-[0.35em] text-primary/80">
                 Now Playing Live
               </span>
             </div>
-            <p className="truncate font-['Rajdhani'] text-lg font-bold leading-tight text-foreground md:text-2xl">
+            <p className="truncate font-['Orbitron'] text-lg font-bold leading-tight text-foreground md:text-2xl">
               {title}
             </p>
-            <p className="truncate font-['Rajdhani'] text-sm text-muted-foreground md:text-base">
+            <p className="truncate font-['Orbitron'] text-sm text-muted-foreground md:text-base">
               {artist}
             </p>
           </div>
