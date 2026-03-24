@@ -115,9 +115,11 @@ const handler = async (req: Request): Promise<Response> => {
     
     // Sanitize all inputs
     const name = sanitizeHtml(requestData.name.trim());
-    const email = requestData.email.trim(); // Email doesn't need HTML escaping but validate format
+    const email = requestData.email.trim();
     const subject = sanitizeHtml(requestData.subject.trim());
     const message = sanitizeHtml(requestData.message.trim()).replace(/\n/g, '<br>');
+    const consentGiven = requestData.consentGiven === true;
+    const newsletterOptIn = requestData.newsletterOptIn === true;
 
     console.log('Processing contact form submission', {
       timestamp: new Date().toISOString(),
