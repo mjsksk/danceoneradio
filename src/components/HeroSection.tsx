@@ -93,13 +93,13 @@ const HeroSection = () => {
       backgroundFill="hsl(222.2, 84%, 4.9%)"
       containerClassName="min-h-screen"
     >
-      <div className="text-center max-w-4xl mx-auto px-4 pt-16">
-        <div className="mb-4 animate-fade-in">
-          <div className="flex justify-center mb-2 hero-logo">
+      <div className="mx-auto flex min-h-screen max-w-4xl flex-col justify-center px-4 pt-24 md:pt-28">
+        <div className="mb-1 animate-fade-in">
+          <div className="hero-logo flex justify-center">
             <img 
               src="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png" 
               alt="Dance One Radio" 
-              className="h-64 md:h-[28rem] w-auto object-contain animate-neon-flicker"
+              className="h-56 md:h-[23rem] w-auto object-contain animate-neon-flicker"
               loading="eager"
               fetchPriority="high"
               width="640"
@@ -109,10 +109,8 @@ const HeroSection = () => {
           </div>
         </div>
 
-        {/* Now Playing Info */}
         <NowPlayingBlock streamTitle={streamTitle} />
 
-        {/* Live Player */}
         <div className="mb-8 animate-slide-up">
           <LiveRadioPlayer streamUrls={[...PRIMARY_STREAM_URLS]} streamTitle={streamTitle} />
           
