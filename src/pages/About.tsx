@@ -229,6 +229,34 @@ const About = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Wh0 */}
+              <Card className="card-cyber border-accent/30 overflow-hidden text-center">
+                <CardContent className="p-6">
+                  <div className="relative mb-6">
+                    <div className="mx-auto rounded-full overflow-hidden border-2 border-accent/50 hover:border-accent transition-all duration-300 w-32 h-32 flex items-center justify-center bg-background">
+                      <img 
+                        src="/assets/wh0-bad-intentions.jpg"
+                        alt="Wh0"
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-accent rounded-full flex items-center justify-center animate-glow-pulse">
+                      <Music className="w-3 h-3 text-accent-foreground" />
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-['Orbitron'] font-bold text-accent mb-2">Wh0</h3>
+                  <p className="text-primary font-['Rajdhani'] font-medium mb-2">Who Plays Sessions</p>
+                  <p className="text-sm text-muted-foreground font-['Rajdhani'] mb-1">House • Disco House • Tech House</p>
+                  <div className="mb-4 p-3 bg-secondary/50 rounded-lg border border-accent/20">
+                    <div className="flex items-center justify-center text-xs text-muted-foreground">
+                      <Globe className="w-3 h-3 mr-1" />
+                      GRAMMY NOMINATED
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Detailed Bios */}
