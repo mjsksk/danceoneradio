@@ -356,7 +356,7 @@ const About = () => {
                 <CardContent className="p-0">
                   <div className="aspect-video relative overflow-hidden">
                     <img 
-                      src={wh0Image} 
+                      src={wh0BioImage} 
                       alt="Wh0 - Who Plays Sessions"
                       className="w-full h-full object-cover"
                     />
