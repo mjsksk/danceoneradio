@@ -97,7 +97,7 @@ const HeroSection = () => {
             <img 
               src="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png" 
               alt="Dance One Radio" 
-              className="h-56 md:h-[23rem] w-auto object-contain animate-logo-foreground"
+              className="h-56 md:h-[23rem] w-auto object-contain animate-logo-foreground drop-shadow-[0_0_40px_hsl(var(--primary)/0.4)] animate-logo-glow-pulse"
               loading="eager"
               fetchPriority="high"
               width="640"
