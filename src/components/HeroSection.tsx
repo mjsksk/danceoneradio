@@ -14,13 +14,11 @@ const NowPlayingBlock = ({ streamTitle }: { streamTitle: string }) => {
       <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-background/20 backdrop-blur-md px-6 py-4 shadow-[0_0_30px_hsl(var(--primary)/0.18)]">
         <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 animate-pulse pointer-events-none" />
 
-        <div className="relative flex items-center gap-4 min-w-0">
-          <div className="flex-shrink-0">
-            <Disc3 className="h-10 w-10 text-primary animate-spin" style={{ animationDuration: '3s' }} />
-          </div>
+        <div className="relative flex flex-col items-center gap-2 min-w-0">
+          <Disc3 className="h-10 w-10 text-primary animate-spin" style={{ animationDuration: '3s' }} />
 
-          <div className="min-w-0 flex-1 text-left">
-            <div className="mb-1 flex items-center gap-2">
+          <div className="min-w-0 w-full text-center">
+            <div className="mb-1 flex items-center justify-center gap-2">
               <span className="relative flex h-3 w-3 flex-shrink-0">
                 <span className="absolute inline-flex h-full w-full rounded-full bg-destructive opacity-70 animate-ping"></span>
                 <span className="relative inline-flex h-3 w-3 rounded-full bg-destructive"></span>
