@@ -14,10 +14,22 @@ import { supabase } from '@/integrations/supabase/client';
 
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [newsletterOptIn, setNewsletterOptIn] = useState(false);
+  const [consentGiven, setConsentGiven] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!consentGiven) {
+      toast({
+        title: "Consent Required",
+        description: "Please agree to the data storage consent before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     const formData = new FormData(e.currentTarget);
@@ -45,9 +57,25 @@ const Contact = () => {
         return;
       }
 
-      // Send emails via edge function
+      // If newsletter opt-in, subscribe them
+      if (newsletterOptIn) {
+        try {
+          await supabase.functions.invoke('newsletter-subscribe', {
+            body: { email: contactData.email.trim().toLowerCase() }
+          });
+        } catch (nlError) {
+          console.error('Newsletter subscription error:', nlError);
+          // Don't block the contact form submission
+        }
+      }
+
+      // Send emails via edge function (include consent info)
       const emailResponse = await supabase.functions.invoke('send-contact-email', {
-        body: contactData
+        body: {
+          ...contactData,
+          consentGiven: true,
+          newsletterOptIn,
+        }
       });
 
       if (emailResponse.error) {
@@ -63,6 +91,8 @@ const Contact = () => {
           description: "We've received your message and sent you a confirmation email.",
         });
         (e.target as HTMLFormElement).reset();
+        setNewsletterOptIn(false);
+        setConsentGiven(false);
       }
     } catch (error) {
       console.error('Submit error:', error);
