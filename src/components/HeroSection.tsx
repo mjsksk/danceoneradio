@@ -93,7 +93,7 @@ const HeroSection = () => {
       backgroundFill="hsl(222.2, 84%, 4.9%)"
       containerClassName="min-h-screen"
     >
-      <div className="mx-auto flex min-h-screen max-w-4xl flex-col justify-center px-4 pt-24 md:pt-28">
+      <div className="mx-auto flex min-h-screen max-w-4xl flex-col justify-center px-4 pt-32 md:pt-36">
         <div className="mb-1 animate-fade-in">
           <div className="hero-logo flex justify-center">
             <img 
