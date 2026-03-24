@@ -9,25 +9,38 @@ import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import { AD_SLOTS } from '@/config/adSlots';
 import { useTrackHistoryUpdater } from '@/hooks/useTrackHistoryUpdater';
+import { Vortex } from '@/components/ui/vortex';
 
 const Index = () => {
-  // Keep track history updated
   useTrackHistoryUpdater();
 
   return (
-    <div className="flex flex-col min-h-screen bg-background overflow-x-hidden">
-      <SEO />
-      <Navigation />
-      <main className="flex-grow">
-        <HeroSection />
-        <ContinueListening />
-        <ShowsSection />
-        <NewsPreview />
-        <GoogleAds slot={AD_SLOTS.HEADER} format="auto" />
-        <GoogleAds slot={AD_SLOTS.IN_CONTENT} format="fluid" layout="in-article" />
-        <TracksSection />
-      </main>
-      <Footer />
+    <div className="relative min-h-screen overflow-x-hidden">
+      <Vortex
+        particleCount={600}
+        baseHue={260}
+        baseSpeed={0.05}
+        rangeSpeed={1.0}
+        baseRadius={1}
+        rangeRadius={2}
+        rangeY={800}
+        backgroundColor="hsl(var(--background))"
+        containerClassName="fixed inset-0 z-0"
+      />
+      <div className="relative z-10 flex flex-col min-h-screen">
+        <SEO />
+        <Navigation />
+        <main className="flex-grow">
+          <HeroSection />
+          <ContinueListening />
+          <ShowsSection />
+          <NewsPreview />
+          <GoogleAds slot={AD_SLOTS.HEADER} format="auto" />
+          <GoogleAds slot={AD_SLOTS.IN_CONTENT} format="fluid" layout="in-article" />
+          <TracksSection />
+        </main>
+        <Footer />
+      </div>
     </div>
   );
 };
