@@ -250,6 +250,10 @@ const About = () => {
                   <h3 className="text-xl font-['Orbitron'] font-bold text-accent mb-2">Wh0</h3>
                   <p className="text-primary font-['Rajdhani'] font-medium mb-2">Who Plays Sessions</p>
                   <p className="text-sm text-muted-foreground font-['Rajdhani'] mb-1">House • Disco House • Tech House</p>
+                  <div className="flex items-center justify-center gap-1 text-xs text-primary/80 font-['Rajdhani'] mb-2">
+                    <Calendar className="w-3 h-3" />
+                    <span>Fridays at 7 PM</span>
+                  </div>
                   <div className="mb-4 p-3 bg-secondary/50 rounded-lg border border-accent/20">
                     <div className="flex items-center justify-center text-xs text-muted-foreground">
                       <Globe className="w-3 h-3 mr-1" />
