@@ -346,6 +346,38 @@
     }
   }
 
+  /* Simplified animation for mobile - no translateZ or blur which cause iOS issues */
+  @media (max-width: 767px) {
+    .hero-logo img {
+      animation: hero-logo-foreground-mobile 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity;
+    }
+
+    .hero-logo {
+      animation: hero-logo-glow-pulse-mobile 5s ease-in-out 2.5s infinite;
+    }
+
+    @keyframes hero-logo-foreground-mobile {
+      0% {
+        transform: scale(0.5);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes hero-logo-glow-pulse-mobile {
+      0%, 100% {
+        filter: drop-shadow(0 0 15px hsl(var(--accent) / 0.3));
+      }
+      50% {
+        filter: drop-shadow(0 0 30px hsl(var(--accent) / 0.5));
+      }
+    }
+  }
+
   /* LCP optimization */
   .animate-neon-flicker {
     will-change: filter;
