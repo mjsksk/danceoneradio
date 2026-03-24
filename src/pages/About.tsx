@@ -6,6 +6,7 @@ import SocialShare from "@/components/SocialShare";
 import { Card, CardContent } from "@/components/ui/card";
 import { Radio, Music, Users, Headphones, Globe, Heart, Calendar } from "lucide-react";
 import wh0Image from "@/assets/wh0-bad-intentions.jpg";
+import wh0BioImage from "@/assets/wh0-bio.jpg";
 
 const About = () => {
   return (
@@ -355,7 +356,7 @@ const About = () => {
                 <CardContent className="p-0">
                   <div className="aspect-video relative overflow-hidden">
                     <img 
-                      src={wh0Image} 
+                      src={wh0BioImage} 
                       alt="Wh0 - Who Plays Sessions"
                       className="w-full h-full object-cover"
                     />
