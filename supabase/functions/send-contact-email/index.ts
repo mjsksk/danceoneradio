@@ -131,7 +131,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send confirmation email to the user
     const confirmationEmail = await resend.emails.send({
-      from: "Dance One Radio <onboarding@resend.dev>",
+      from: "Dance One Radio <noreply@danceoneradio.com>",
       to: [email],
       subject: "We received your message!",
       html: `
