@@ -113,7 +113,7 @@ const Downloads = () => {
                     rel="noopener noreferrer"
                   >
                     <img
-                      src="/lovable-uploads/google-play-badge.svg"
+                      src={googlePlayBadge}
                       alt="Get it on Google Play"
                       className="h-14 mx-auto hover:opacity-80 transition-opacity"
                       loading="lazy"
