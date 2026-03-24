@@ -10,31 +10,29 @@ const NowPlayingBlock = ({ streamTitle }: { streamTitle: string }) => {
   const [title, artist] = RadioStreamService.parseTrackInfo(streamTitle);
   
   return (
-    <div className="mb-6 animate-fade-in max-w-md mx-auto">
-      <div className="relative overflow-hidden rounded-xl border border-primary/20 bg-background/10 backdrop-blur-md px-5 py-3">
-        {/* Subtle animated gradient border glow */}
-        <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 animate-pulse pointer-events-none" />
-        
-        <div className="relative flex items-center gap-3 min-w-0">
-          {/* Spinning disc icon */}
+    <div className="mb-3 animate-fade-in max-w-xl mx-auto">
+      <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-background/20 backdrop-blur-md px-6 py-4 shadow-[0_0_30px_hsl(var(--primary)/0.18)]">
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 animate-pulse pointer-events-none" />
+
+        <div className="relative flex items-center gap-4 min-w-0">
           <div className="flex-shrink-0">
-            <Disc3 className="w-8 h-8 text-primary animate-spin" style={{ animationDuration: '3s' }} />
+            <Disc3 className="h-10 w-10 text-primary animate-spin" style={{ animationDuration: '3s' }} />
           </div>
-          
+
           <div className="min-w-0 flex-1 text-left">
-            <div className="flex items-center gap-1.5 mb-0.5">
-              <span className="relative flex h-2 w-2 flex-shrink-0">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+            <div className="mb-1 flex items-center gap-2">
+              <span className="relative flex h-3 w-3 flex-shrink-0">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-destructive opacity-70 animate-ping"></span>
+                <span className="relative inline-flex h-3 w-3 rounded-full bg-destructive"></span>
               </span>
-              <span className="text-[10px] uppercase tracking-widest text-primary/70 font-['Rajdhani'] font-semibold">
-                Now Playing
+              <span className="font-['Rajdhani'] text-xs font-bold uppercase tracking-[0.35em] text-primary/80">
+                Now Playing Live
               </span>
             </div>
-            <p className="text-sm font-semibold text-foreground truncate font-['Rajdhani']">
+            <p className="truncate font-['Rajdhani'] text-lg font-bold leading-tight text-foreground md:text-2xl">
               {title}
             </p>
-            <p className="text-xs text-muted-foreground truncate font-['Rajdhani']">
+            <p className="truncate font-['Rajdhani'] text-sm text-muted-foreground md:text-base">
               {artist}
             </p>
           </div>
@@ -95,13 +93,13 @@ const HeroSection = () => {
       backgroundFill="hsl(222.2, 84%, 4.9%)"
       containerClassName="min-h-screen"
     >
-      <div className="text-center max-w-4xl mx-auto px-4 pt-16">
-        <div className="mb-4 animate-fade-in">
-          <div className="flex justify-center mb-2 hero-logo">
+      <div className="mx-auto flex min-h-screen max-w-4xl flex-col justify-center px-4 pt-24 md:pt-28">
+        <div className="mb-1 animate-fade-in">
+          <div className="hero-logo flex justify-center">
             <img 
               src="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png" 
               alt="Dance One Radio" 
-              className="h-64 md:h-[28rem] w-auto object-contain animate-neon-flicker"
+              className="h-56 md:h-[23rem] w-auto object-contain animate-neon-flicker"
               loading="eager"
               fetchPriority="high"
               width="640"
@@ -111,10 +109,8 @@ const HeroSection = () => {
           </div>
         </div>
 
-        {/* Now Playing Info */}
         <NowPlayingBlock streamTitle={streamTitle} />
 
-        {/* Live Player */}
         <div className="mb-8 animate-slide-up">
           <LiveRadioPlayer streamUrls={[...PRIMARY_STREAM_URLS]} streamTitle={streamTitle} />
           
