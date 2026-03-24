@@ -98,7 +98,7 @@ const HeroSection = () => {
               src="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png" 
               alt="Dance One Radio" 
               className="h-56 md:h-[23rem] w-auto object-contain"
-              style={{ animation: 'logo-foreground 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards, logo-glow-pulse 4s ease-in-out 2.5s infinite' }}
+              style={{ animation: 'logo-foreground 3.5s cubic-bezier(0.16, 1, 0.3, 1) forwards, logo-glow-pulse 5s ease-in-out 3.5s infinite' }}
               loading="eager"
               fetchPriority="high"
               width="640"
