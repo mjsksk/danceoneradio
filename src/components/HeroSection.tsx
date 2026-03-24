@@ -94,13 +94,12 @@ const HeroSection = () => {
       <div className="mx-auto flex min-h-screen max-w-4xl flex-col justify-center px-4 pt-32 md:pt-36">
         <div className="mb-4 animate-fade-in">
           <div className="hero-logo flex justify-center">
-            <picture style={{ animation: 'logo-glow-pulse 5s ease-in-out 3.5s infinite' }}>
+            <picture>
               <source srcSet="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.webp" type="image/webp" />
               <img 
                 src="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png" 
                 alt="Dance One Radio" 
                 className="h-56 md:h-[23rem] w-auto object-contain"
-                style={{ animation: 'logo-foreground 3.5s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
                 loading="eager"
                 fetchPriority="high"
                 width="640"

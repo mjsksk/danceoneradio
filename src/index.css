@@ -297,12 +297,53 @@
   }
 
   /* Hero image optimization for LCP */
+  .hero-logo {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    animation: hero-logo-glow-pulse 5s ease-in-out 3.5s infinite;
+    transform: translateZ(0);
+    will-change: filter;
+  }
+
   .hero-logo img {
     max-width: min(640px, 90vw);
     height: auto;
     object-fit: contain;
     content-visibility: auto;
     contain: layout style paint;
+    animation: hero-logo-foreground 3.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transform-origin: center;
+    backface-visibility: hidden;
+    will-change: transform, opacity, filter;
+  }
+
+  @keyframes hero-logo-foreground {
+    0% {
+      transform: scale(0.3) translateZ(-200px);
+      opacity: 0;
+      filter: blur(10px);
+    }
+    60% {
+      transform: scale(1.05) translateZ(0);
+      opacity: 1;
+      filter: blur(0px);
+    }
+    100% {
+      transform: scale(1) translateZ(0);
+      opacity: 1;
+      filter: blur(0px);
+    }
+  }
+
+  @keyframes hero-logo-glow-pulse {
+    0%,
+    100% {
+      filter: drop-shadow(0 0 30px hsl(var(--accent) / 0.3)) drop-shadow(0 0 60px hsl(var(--accent) / 0.15));
+    }
+    50% {
+      filter: drop-shadow(0 0 50px hsl(var(--accent) / 0.5)) drop-shadow(0 0 100px hsl(var(--accent) / 0.25));
+    }
   }
 
   /* LCP optimization */
