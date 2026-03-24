@@ -34,11 +34,13 @@ const Contact = () => {
     setIsSubmitting(true);
 
     const formData = new FormData(e.currentTarget);
+    const trackLink = formData.get('trackLink') as string;
+    const artistName = formData.get('subject') as string;
     const contactData = {
       name: formData.get('name') as string,
       email: formData.get('email') as string,
-      subject: formData.get('subject') as string,
-      message: formData.get('message') as string,
+      subject: `Demo Submission: ${artistName}`,
+      message: `Artist Name: ${artistName}\nTrack Link: ${trackLink}\n\n${formData.get('message') as string}`,
       created_at: new Date().toISOString()
     };
 
@@ -167,13 +169,13 @@ const Contact = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
-                  Name
+                  Your Real Name
                 </label>
                 <Input
                   id="name"
                   name="name"
                   type="text"
-                  placeholder="Your name"
+                  placeholder="Your real name"
                   required
                   disabled={isSubmitting}
                 />
@@ -193,25 +195,38 @@ const Contact = () => {
               </div>
               <div>
                 <label htmlFor="subject" className="block text-sm font-medium text-foreground mb-2">
-                  Subject
+                  Artist Name
                 </label>
                 <Input
                   id="subject"
                   name="subject"
                   type="text"
-                  placeholder="What's this about?"
+                  placeholder="Your artist / DJ name"
+                  required
+                  disabled={isSubmitting}
+                />
+              </div>
+              <div>
+                <label htmlFor="trackLink" className="block text-sm font-medium text-foreground mb-2">
+                  Link to Download Your Track(s)
+                </label>
+                <Input
+                  id="trackLink"
+                  name="trackLink"
+                  type="url"
+                  placeholder="https://soundcloud.com/... or https://drive.google.com/..."
                   required
                   disabled={isSubmitting}
                 />
               </div>
               <div>
                 <label htmlFor="message" className="block text-sm font-medium text-foreground mb-2">
-                  Message
+                  Why Do You Feel Your Music Is Playable on Our Station?
                 </label>
                 <Textarea
                   id="message"
                   name="message"
-                  placeholder="Tell us more..."
+                  placeholder="Tell us why your music fits Dance One Radio..."
                   rows={5}
                   required
                   disabled={isSubmitting}
