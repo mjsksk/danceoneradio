@@ -15,6 +15,8 @@ interface ContactEmailRequest {
   email: string;
   subject: string;
   message: string;
+  consentGiven?: boolean;
+  newsletterOptIn?: boolean;
 }
 
 // Helper function to sanitize HTML content
