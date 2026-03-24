@@ -73,6 +73,9 @@ const HeroSection = () => {
           </div>
         </div>
 
+        {/* Now Playing Info */}
+        <NowPlayingBlock streamTitle={streamTitle} />
+
         {/* Live Player */}
         <div className="mb-8 animate-slide-up">
           <LiveRadioPlayer streamUrls={[...PRIMARY_STREAM_URLS]} streamTitle={streamTitle} />
