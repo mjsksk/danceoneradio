@@ -9,24 +9,13 @@ import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import { AD_SLOTS } from '@/config/adSlots';
 import { useTrackHistoryUpdater } from '@/hooks/useTrackHistoryUpdater';
-import { Vortex } from '@/components/ui/vortex';
+import { WavyBackground } from '@/components/ui/wavy-background';
 
 const Index = () => {
   useTrackHistoryUpdater();
 
   return (
     <div className="relative min-h-screen overflow-x-hidden">
-      <Vortex
-        particleCount={600}
-        baseHue={260}
-        baseSpeed={0.05}
-        rangeSpeed={1.0}
-        baseRadius={1}
-        rangeRadius={2}
-        rangeY={800}
-        backgroundColor="hsl(var(--background))"
-        containerClassName="fixed inset-0 z-0"
-      />
       <div className="relative z-10 flex flex-col min-h-screen">
         <SEO />
         <Navigation />

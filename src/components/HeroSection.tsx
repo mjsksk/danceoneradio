@@ -3,6 +3,7 @@ import SocialShare from '@/components/SocialShare';
 import LiveRadioPlayer from './LiveRadioPlayer';
 import { PRIMARY_STREAM_URLS } from '@/config/streamUrls';
 import { RadioStreamService } from '@/utils/RadioStreamService';
+import { WavyBackground } from '@/components/ui/wavy-background';
 
 const HeroSection = () => {
   const [streamTitle, setStreamTitle] = useState('🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵');
@@ -46,9 +47,16 @@ const HeroSection = () => {
     };
   }, []);
 
-  return <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Hero Content */}
-      <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
+  return (
+    <WavyBackground
+      colors={["#7c3aed", "#6d28d9", "#8b5cf6", "#a78bfa", "#22d3ee"]}
+      waveOpacity={0.3}
+      blur={12}
+      speed="slow"
+      backgroundFill="hsl(222.2, 84%, 4.9%)"
+      containerClassName="min-h-screen"
+    >
+      <div className="text-center max-w-4xl mx-auto px-4">
         <div className="mb-8 animate-fade-in">
           <div className="flex justify-center mb-6 hero-logo">
             <img 
@@ -86,8 +94,8 @@ const HeroSection = () => {
             <div className="w-1 h-3 bg-primary rounded-full mt-2 animate-glow-pulse"></div>
           </div>
         </div>
-
       </div>
-    </section>;
+    </WavyBackground>
+  );
 };
 export default HeroSection;
