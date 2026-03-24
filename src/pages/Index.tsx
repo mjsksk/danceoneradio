@@ -16,17 +16,6 @@ const Index = () => {
 
   return (
     <div className="relative min-h-screen overflow-x-hidden">
-      <Vortex
-        particleCount={600}
-        baseHue={260}
-        baseSpeed={0.05}
-        rangeSpeed={1.0}
-        baseRadius={1}
-        rangeRadius={2}
-        rangeY={800}
-        backgroundColor="hsl(var(--background))"
-        containerClassName="fixed inset-0 z-0"
-      />
       <div className="relative z-10 flex flex-col min-h-screen">
         <SEO />
         <Navigation />
