@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
@@ -127,6 +128,19 @@ const Contact = () => {
           </div>
           
           <GoogleAds key="contact-ad" slot={AD_SLOTS.SIDEBAR} />
+
+          {/* Advertise CTA */}
+          <div className="mb-8 rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-background to-accent/10 p-6 text-center">
+            <h2 className="text-xl font-semibold text-foreground">Looking to Advertise or Partner?</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Explore our advertising, sponsorship, and editorial partnership opportunities.
+            </p>
+            <Link to="/advertise">
+              <Button variant="outline" className="mt-4 border-primary/50 hover:bg-primary/10">
+                View Advertising Opportunities
+              </Button>
+            </Link>
+          </div>
           
           {/* Contact Form */}
           <div className="bg-card/50 backdrop-blur-sm border border-border rounded-lg p-6">
