@@ -344,6 +344,27 @@ const About = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Wh0 Bio */}
+              <Card className="card-cyber border-accent/30 overflow-hidden md:col-span-2">
+                <CardContent className="p-0">
+                  <div className="aspect-video relative overflow-hidden">
+                    <img 
+                      src="/assets/wh0-bad-intentions.jpg" 
+                      alt="Wh0 - Who Plays Sessions"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-2xl font-bold font-['Orbitron'] text-accent mb-2">Wh0</h3>
+                    <p className="text-primary font-['Rajdhani'] text-lg mb-4">Grammy-Nominated UK House Duo — "Who Plays Sessions"</p>
+                    <p className="text-foreground/80 font-['Rajdhani']">
+                      Wh0 is a Grammy-nominated UK house music production duo comprised of Robert Chetcuti and Tom Cross, who burst onto the scene in 2018 shrouded in mystery behind their signature black masks. Their philosophy is simple: it's all about the music, not what they look like. Since their debut, Wh0 have amassed over 70 million Spotify streams and topped the Music Week charts multiple times with their irresistible blend of groove-filled basslines, disco-infused hooks, and infectious house rhythms. Their "Who Plays Sessions" radio show on Dance One Radio brings together the finest in house, disco house, and tech house — showcasing both underground gems and dancefloor anthems. From intimate club sets to festival main stages, Wh0 continue to push the boundaries of modern house music while staying true to their roots of letting the music speak for itself.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
