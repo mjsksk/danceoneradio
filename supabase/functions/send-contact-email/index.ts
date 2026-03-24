@@ -157,8 +157,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send notification email to admin (using the same sender for demo)
     const adminEmail = await resend.emails.send({
-      from: "Dance One Radio <onboarding@resend.dev>",
-      to: [Deno.env.get("ADMIN_EMAIL")!], // Admin email from environment
+      from: "Dance One Radio <noreply@danceoneradio.com>",
+      to: [Deno.env.get("ADMIN_EMAIL")!],
       subject: `New Contact Form Message: ${subject}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
