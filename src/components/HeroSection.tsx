@@ -10,7 +10,7 @@ const NowPlayingBlock = ({ streamTitle }: { streamTitle: string }) => {
   const [title, artist] = RadioStreamService.parseTrackInfo(streamTitle);
   
   return (
-    <div className="mb-8 animate-fade-in max-w-2xl mx-auto w-full">
+    <div className="mb-4 animate-fade-in max-w-2xl mx-auto w-full">
       <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-background/20 backdrop-blur-md px-6 py-4 shadow-[0_0_30px_hsl(var(--primary)/0.18)]">
         <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 animate-pulse pointer-events-none" />
 
