@@ -15,6 +15,8 @@ interface ContactEmailRequest {
   email: string;
   subject: string;
   message: string;
+  consentGiven?: boolean;
+  newsletterOptIn?: boolean;
 }
 
 // Helper function to sanitize HTML content
@@ -113,9 +115,11 @@ const handler = async (req: Request): Promise<Response> => {
     
     // Sanitize all inputs
     const name = sanitizeHtml(requestData.name.trim());
-    const email = requestData.email.trim(); // Email doesn't need HTML escaping but validate format
+    const email = requestData.email.trim();
     const subject = sanitizeHtml(requestData.subject.trim());
     const message = sanitizeHtml(requestData.message.trim()).replace(/\n/g, '<br>');
+    const consentGiven = requestData.consentGiven === true;
+    const newsletterOptIn = requestData.newsletterOptIn === true;
 
     console.log('Processing contact form submission', {
       timestamp: new Date().toISOString(),
@@ -165,6 +169,12 @@ const handler = async (req: Request): Promise<Response> => {
             <p><strong>Email:</strong> ${email}</p>
             <p><strong>Subject:</strong> ${subject}</p>
             <p><strong>Message:</strong><br>${message}</p>
+          </div>
+
+          <div style="background-color: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 15px;">
+            <h3 style="margin: 0 0 10px; color: #2e7d32;">Consent & Preferences</h3>
+            <p style="margin: 5px 0;"><strong>Data Storage Consent:</strong> ${consentGiven ? '✅ Yes' : '❌ No'}</p>
+            <p style="margin: 5px 0;"><strong>Newsletter Opt-in:</strong> ${newsletterOptIn ? '✅ Yes' : '❌ No'}</p>
           </div>
           
           <p style="margin-top: 20px;">

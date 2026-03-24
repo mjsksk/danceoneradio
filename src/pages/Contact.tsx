@@ -8,15 +8,28 @@ import SocialShare from '@/components/SocialShare';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [newsletterOptIn, setNewsletterOptIn] = useState(false);
+  const [consentGiven, setConsentGiven] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!consentGiven) {
+      toast({
+        title: "Consent Required",
+        description: "Please agree to the data storage consent before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     const formData = new FormData(e.currentTarget);
@@ -44,9 +57,25 @@ const Contact = () => {
         return;
       }
 
-      // Send emails via edge function
+      // If newsletter opt-in, subscribe them
+      if (newsletterOptIn) {
+        try {
+          await supabase.functions.invoke('newsletter-subscribe', {
+            body: { email: contactData.email.trim().toLowerCase() }
+          });
+        } catch (nlError) {
+          console.error('Newsletter subscription error:', nlError);
+          // Don't block the contact form submission
+        }
+      }
+
+      // Send emails via edge function (include consent info)
       const emailResponse = await supabase.functions.invoke('send-contact-email', {
-        body: contactData
+        body: {
+          ...contactData,
+          consentGiven: true,
+          newsletterOptIn,
+        }
       });
 
       if (emailResponse.error) {
@@ -62,6 +91,8 @@ const Contact = () => {
           description: "We've received your message and sent you a confirmation email.",
         });
         (e.target as HTMLFormElement).reset();
+        setNewsletterOptIn(false);
+        setConsentGiven(false);
       }
     } catch (error) {
       console.error('Submit error:', error);
@@ -172,7 +203,35 @@ const Contact = () => {
                   disabled={isSubmitting}
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
+
+              {/* Newsletter Opt-in */}
+              <div className="flex items-start space-x-3">
+                <Checkbox
+                  id="newsletter"
+                  checked={newsletterOptIn}
+                  onCheckedChange={(checked) => setNewsletterOptIn(checked === true)}
+                  disabled={isSubmitting}
+                />
+                <label htmlFor="newsletter" className="text-sm text-muted-foreground leading-snug cursor-pointer">
+                  Sign me up for the Dance One Radio newsletter to receive updates, news, and exclusive content.
+                </label>
+              </div>
+
+              {/* Data Consent */}
+              <div className="flex items-start space-x-3">
+                <Checkbox
+                  id="consent"
+                  checked={consentGiven}
+                  onCheckedChange={(checked) => setConsentGiven(checked === true)}
+                  disabled={isSubmitting}
+                  required
+                />
+                <label htmlFor="consent" className="text-sm text-muted-foreground leading-snug cursor-pointer">
+                  I consent to having this website store my submitted information so they can respond to my inquiry. The submitted information will only be used for the purpose of contacting you and follow-up. <span className="text-destructive">*</span>
+                </label>
+              </div>
+
+              <Button type="submit" className="w-full" disabled={isSubmitting || !consentGiven}>
                 {isSubmitting ? 'Sending...' : 'Send Message'}
               </Button>
             </form>
