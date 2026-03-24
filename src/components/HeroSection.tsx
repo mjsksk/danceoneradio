@@ -3,30 +3,10 @@ import SocialShare from '@/components/SocialShare';
 import LiveRadioPlayer from './LiveRadioPlayer';
 import { PRIMARY_STREAM_URLS } from '@/config/streamUrls';
 import { RadioStreamService } from '@/utils/RadioStreamService';
-import { ParticleTextEffect } from '@/components/ui/particle-text-effect';
 
 const HeroSection = () => {
   const [streamTitle, setStreamTitle] = useState('🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵');
   
-  // Array of background videos - randomly selected on each page visit
-  const backgroundVideos = [
-    "https://upbwlnpycrbhxahjztrf.supabase.co/storage/v1/object/public/videos/Laser-Beam.mp4",
-    "https://upbwlnpycrbhxahjztrf.supabase.co/storage/v1/object/public/videos/sci_fi_background.mp4",
-    "https://upbwlnpycrbhxahjztrf.supabase.co/storage/v1/object/public/videos/wave_flow.mp4",
-    "/Sequence_01.mp4"
-  ];
-  
-  // Check if we should show Halloween video (until November 1st, 2025)
-  const now = new Date();
-  const halloweenEndDate = new Date('2025-11-01T00:00:00');
-  const isHalloweenPeriod = now < halloweenEndDate;
-  
-  // Select video: Halloween video until Nov 1st, then random selection
-  const selectedVideo = isHalloweenPeriod 
-    ? "/halloween-video.mp4"
-    : backgroundVideos[Math.floor(Math.random() * backgroundVideos.length)];
-  
-  const [videoKey, setVideoKey] = useState(0);
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     let isVisible = !document.hidden;
@@ -38,12 +18,7 @@ const HeroSection = () => {
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     const fetchStreamMetadata = async () => {
-      // Skip if tab is not visible
-      if (!isVisible) {
-        console.log('🎵 HeroSection: Skipping metadata fetch - tab not visible');
-        return;
-      }
-
+      if (!isVisible) return;
       try {
         const metadata = await RadioStreamService.getStreamMetadata();
         const formattedTitle = RadioStreamService.formatTitle(metadata);
@@ -54,13 +29,11 @@ const HeroSection = () => {
     };
 
     const scheduleNext = () => {
-      // Update every 10 seconds instead of 1 second - 90% reduction
       timeoutId = setTimeout(() => {
         fetchStreamMetadata().then(scheduleNext);
       }, 10000);
     };
 
-    // Fetch immediately if visible
     if (isVisible) {
       fetchStreamMetadata().then(scheduleNext);
     } else {
@@ -69,31 +42,11 @@ const HeroSection = () => {
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
+      if (timeoutId) clearTimeout(timeoutId);
     };
   }, []);
 
-  // Force video refresh on component mount to ensure new video selection
-  useEffect(() => {
-    setVideoKey(prev => prev + 1);
-  }, []);
   return <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Particle Text Animation Background */}
-      <ParticleTextEffect words={["This is not your ordinary radio station", "This is your LifeStyle", "Brought to you", "By the Best in Music and Sound"]} />
-      <div className="absolute inset-0 bg-background/40 backdrop-blur-[1px]"></div>
-
-      {/* Animated Particles */}
-      <div className="absolute inset-0">
-        {[...Array(20)].map((_, i) => <div key={i} className="absolute w-2 h-2 bg-primary/30 rounded-full animate-float" style={{
-        left: `${Math.random() * 100}%`,
-        top: `${Math.random() * 100}%`,
-        animationDelay: `${Math.random() * 6}s`,
-        animationDuration: `${4 + Math.random() * 4}s`
-      }} />)}
-      </div>
-
       {/* Hero Content */}
       <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
         <div className="mb-8 animate-fade-in">
