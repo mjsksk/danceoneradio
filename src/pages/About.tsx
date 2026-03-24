@@ -5,6 +5,7 @@ import GoogleAds from "@/components/GoogleAds";
 import SocialShare from "@/components/SocialShare";
 import { Card, CardContent } from "@/components/ui/card";
 import { Radio, Music, Users, Headphones, Globe, Heart, Calendar } from "lucide-react";
+import wh0Image from "@/assets/wh0-bad-intentions.jpg";
 
 const About = () => {
   return (
