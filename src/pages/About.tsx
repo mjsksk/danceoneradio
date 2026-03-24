@@ -237,7 +237,7 @@ const About = () => {
                   <div className="relative mb-6">
                     <div className="mx-auto rounded-full overflow-hidden border-2 border-accent/50 hover:border-accent transition-all duration-300 w-32 h-32 flex items-center justify-center bg-background">
                       <img 
-                        src="/assets/wh0-bad-intentions.jpg"
+                        src={wh0Image}
                         alt="Wh0"
                         className="w-full h-full object-cover"
                         loading="lazy"
@@ -351,7 +351,7 @@ const About = () => {
                 <CardContent className="p-0">
                   <div className="aspect-video relative overflow-hidden">
                     <img 
-                      src="/assets/wh0-bad-intentions.jpg" 
+                      src={wh0Image} 
                       alt="Wh0 - Who Plays Sessions"
                       className="w-full h-full object-cover"
                     />
