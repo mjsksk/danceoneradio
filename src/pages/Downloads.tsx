@@ -6,8 +6,9 @@ import { AD_SLOTS } from '@/config/adSlots';
 import SocialShare from '@/components/SocialShare';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Download, Monitor, Check, Shield, Settings, Bell, Headphones, Clock, Sparkles } from 'lucide-react';
+import { Download, Monitor, Check, Shield, Settings, Bell, Headphones, Clock, Sparkles, Smartphone, TabletSmartphone } from 'lucide-react';
+import appStoreBadge from '@/assets/app-store-badge-new.svg';
+import googlePlayBadge from '@/assets/google-play-badge-new.svg';
 
 const Downloads = () => {
   const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.10/dance-one-radio-setup-1.0.10-x64.exe';
@@ -19,9 +20,9 @@ const Downloads = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO 
-        title="Download Dance One Radio Apps - Desktop & Mobile"
-        description="Download Dance One Radio desktop apps for Windows, Mac, and Linux. Listen to live electronic dance music streams on your favorite device."
-        keywords="dance one radio app, radio desktop app, music streaming app, electronic music app, Windows radio app"
+        title="Dance One Radio Apps - Desktop & Mobile"
+        description="Download Dance One Radio apps for Windows, iOS, and Android. Listen to live electronic dance music streams on your favorite device."
+        keywords="dance one radio app, radio desktop app, music streaming app, electronic music app, Windows radio app, iOS radio app, Android radio app"
       />
       <Navigation />
       
@@ -33,50 +34,21 @@ const Downloads = () => {
               <div className="mb-6">
                 <Badge className="gap-2 mb-4 bg-primary/20 text-primary border-primary/30 hover:bg-primary/30">
                   <Sparkles className="w-4 h-4" />
-                  New Release
+                  Available on All Platforms
                 </Badge>
                 <h1 className="text-4xl md:text-6xl font-bold gradient-text mb-6">
-                  Download Dance One Radio
+                  Dance One Radio Apps
                 </h1>
                 <p className="text-xl text-muted-foreground mb-8">
-                  Get the ultimate listening experience with our Windows desktop application featuring enhanced audio quality, system tray controls, and global hotkeys.
+                  Get the ultimate listening experience on any device — desktop, phone, or tablet.
                 </p>
-              </div>
-              
-              {/* Download Card */}
-              <div className="max-w-md mx-auto mb-8">
-                <div className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-background to-primary/5 border border-primary/20 rounded-2xl p-8">
-                  <div className="relative z-10">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Download className="w-8 h-8 text-primary" />
-                    </div>
-                    
-                    <h3 className="text-xl font-semibold mb-2">Available Now</h3>
-                    <p className="text-muted-foreground mb-6">
-                      Download and install in minutes. Enjoy uninterrupted electronic music streaming right from your desktop.
-                    </p>
-                    
-                    <Button 
-                      size="lg"
-                      onClick={handleDownload}
-                      className="gap-2 text-lg px-8 py-6"
-                    >
-                      <Download className="w-5 h-5" />
-                      Download for Windows
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="text-sm text-muted-foreground mb-6">
-                Version 1.0.10 • Windows 10+ (64-bit) • Free Download
               </div>
               
               <div className="flex justify-center">
                 <SocialShare 
                   url={window.location.href}
-                  title="Download Dance One Radio Desktop App"
-                  description="Download Dance One Radio desktop apps for Windows. Experience the ultimate electronic music streaming with our feature-rich application."
+                  title="Dance One Radio Apps"
+                  description="Download Dance One Radio apps for Windows, iOS, and Android. Experience the ultimate electronic music streaming."
                   image={`${window.location.origin}/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png`}
                 />
               </div>
@@ -86,100 +58,188 @@ const Downloads = () => {
 
         <GoogleAds key="downloads-ad" slot={AD_SLOTS.SIDEBAR} />
 
-        {/* Features Section */}
+        {/* Mobile Apps Section */}
         <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Choose the Desktop App?</h2>
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <Smartphone className="w-8 h-8 text-primary" />
+                <h2 className="text-3xl md:text-4xl font-bold">Mobile Apps</h2>
+              </div>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Get enhanced features and better performance with our native Windows application
+                Take Dance One Radio with you wherever you go
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              <div className="bg-card p-6 rounded-lg border">
-                <div className="mb-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                    <Settings className="w-6 h-6 text-primary" />
+            <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto mb-12">
+              {/* iOS App */}
+              <div className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-background to-primary/5 border border-primary/20 rounded-2xl p-8 text-center">
+                <div className="relative z-10">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/20 flex items-center justify-center">
+                    <Smartphone className="w-8 h-8 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">System Tray Integration</h3>
-                  <p className="text-muted-foreground">
-                    Control playback directly from your system tray. Play, pause, and see current track without opening the app.
+                  <h3 className="text-xl font-semibold mb-2">iOS App</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Stream Dance One Radio on your iPhone or iPad with native iOS controls and CarPlay support.
                   </p>
+                  <a
+                    href="https://apps.apple.com/app/dance-one-radio/id6740014889"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <img
+                      src={appStoreBadge}
+                      alt="Download on the App Store"
+                      className="h-14 mx-auto hover:opacity-80 transition-opacity"
+                      loading="lazy"
+                    />
+                  </a>
                 </div>
               </div>
 
-              <div className="bg-card p-6 rounded-lg border">
-                <div className="mb-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                    <Clock className="w-6 h-6 text-primary" />
+              {/* Android App */}
+              <div className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-background to-primary/5 border border-primary/20 rounded-2xl p-8 text-center">
+                <div className="relative z-10">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/20 flex items-center justify-center">
+                    <TabletSmartphone className="w-8 h-8 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">Auto-Launch on Startup</h3>
-                  <p className="text-muted-foreground">
-                    Optionally start Dance One Radio automatically when Windows boots up for instant access.
+                  <h3 className="text-xl font-semibold mb-2">Android App</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Enjoy Dance One Radio on any Android device with background playback and notification controls.
                   </p>
-                </div>
-              </div>
-
-              <div className="bg-card p-6 rounded-lg border">
-                <div className="mb-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                    <Bell className="w-6 h-6 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">Native Notifications</h3>
-                  <p className="text-muted-foreground">
-                    Get Windows notifications when tracks change, keeping you informed of what's playing.
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-card p-6 rounded-lg border">
-                <div className="mb-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                    <Headphones className="w-6 h-6 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">Enhanced Audio</h3>
-                  <p className="text-muted-foreground">
-                    Optimized audio processing with real-time frequency analysis and enhanced visualizations.
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-card p-6 rounded-lg border">
-                <div className="mb-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                    <Monitor className="w-6 h-6 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">Multiple Window Modes</h3>
-                  <p className="text-muted-foreground">
-                    Full-size interface or compact mini-player. Minimize to tray for background listening.
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-card p-6 rounded-lg border">
-                <div className="mb-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                    <Shield className="w-6 h-6 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">Secure & Lightweight</h3>
-                  <p className="text-muted-foreground">
-                    Built with modern security practices. Small download size with powerful features.
-                  </p>
+                  <a
+                    href="https://play.google.com/store/apps/details?id=com.danceoneradio.app"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <img
+                      src={googlePlayBadge}
+                      alt="Get it on Google Play"
+                      className="h-14 mx-auto hover:opacity-80 transition-opacity"
+                      loading="lazy"
+                    />
+                  </a>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* System Requirements */}
+        {/* Desktop App Section */}
         <section className="py-20 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <Monitor className="w-8 h-8 text-primary" />
+                <h2 className="text-3xl md:text-4xl font-bold">Desktop App</h2>
+              </div>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                The full-featured experience for your Windows PC
+              </p>
+            </div>
+
+            {/* Download Card */}
+            <div className="max-w-md mx-auto mb-12">
+              <div className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-background to-primary/5 border border-primary/20 rounded-2xl p-8 text-center">
+                <div className="relative z-10">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center">
+                    <Download className="w-8 h-8 text-primary" />
+                  </div>
+                  
+                  <h3 className="text-xl font-semibold mb-2">Windows Desktop</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Download and install in minutes. Enjoy uninterrupted electronic music streaming right from your desktop.
+                  </p>
+                  
+                  <Button 
+                    size="lg"
+                    onClick={handleDownload}
+                    className="gap-2 text-lg px-8 py-6"
+                  >
+                    <Download className="w-5 h-5" />
+                    Download for Windows
+                  </Button>
+                  
+                  <div className="text-sm text-muted-foreground mt-4">
+                    Version 1.0.10 • Windows 10+ (64-bit) • Free
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Desktop Features Grid */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              <div className="bg-card p-6 rounded-lg border">
+                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                  <Settings className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">System Tray Integration</h3>
+                <p className="text-muted-foreground">
+                  Control playback directly from your system tray. Play, pause, and see current track without opening the app.
+                </p>
+              </div>
+
+              <div className="bg-card p-6 rounded-lg border">
+                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                  <Clock className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Auto-Launch on Startup</h3>
+                <p className="text-muted-foreground">
+                  Optionally start Dance One Radio automatically when Windows boots up for instant access.
+                </p>
+              </div>
+
+              <div className="bg-card p-6 rounded-lg border">
+                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                  <Bell className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Native Notifications</h3>
+                <p className="text-muted-foreground">
+                  Get Windows notifications when tracks change, keeping you informed of what's playing.
+                </p>
+              </div>
+
+              <div className="bg-card p-6 rounded-lg border">
+                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                  <Headphones className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Enhanced Audio</h3>
+                <p className="text-muted-foreground">
+                  Optimized audio processing with real-time frequency analysis and enhanced visualizations.
+                </p>
+              </div>
+
+              <div className="bg-card p-6 rounded-lg border">
+                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                  <Monitor className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Multiple Window Modes</h3>
+                <p className="text-muted-foreground">
+                  Full-size interface or compact mini-player. Minimize to tray for background listening.
+                </p>
+              </div>
+
+              <div className="bg-card p-6 rounded-lg border">
+                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                  <Shield className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Secure & Lightweight</h3>
+                <p className="text-muted-foreground">
+                  Built with modern security practices. Small download size with powerful features.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* System Requirements */}
+        <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">System Requirements</h2>
                 <p className="text-xl text-muted-foreground">
-                  Make sure your system meets these requirements for the best experience
+                  Desktop app requirements for the best experience
                 </p>
               </div>
 
@@ -239,7 +299,7 @@ const Downloads = () => {
         </section>
 
         {/* Installation Guide */}
-        <section className="py-20">
+        <section className="py-20 bg-muted/30">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">

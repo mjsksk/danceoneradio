@@ -59,6 +59,7 @@ export function AnimatedRoutes() {
         <Route path="/gallery" element={<PageTransition><Gallery /></PageTransition>} />
         <Route path="/gallery/love-parade-2005" element={<PageTransition><LoveParade2005 /></PageTransition>} />
         <Route path="/gallery/love-parade-2006" element={<PageTransition><LoveParade2006 /></PageTransition>} />
+        <Route path="/apps" element={<PageTransition><Downloads /></PageTransition>} />
         <Route path="/downloads" element={<PageTransition><Downloads /></PageTransition>} />
         <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />
         <Route path="/love" element={<PageTransition><Love /></PageTransition>} />
