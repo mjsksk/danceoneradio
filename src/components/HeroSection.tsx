@@ -6,6 +6,44 @@ import { RadioStreamService } from '@/utils/RadioStreamService';
 import { WavyBackground } from '@/components/ui/wavy-background';
 import { Radio, Music2, Disc3 } from 'lucide-react';
 
+const NowPlayingBlock = ({ streamTitle }: { streamTitle: string }) => {
+  const [title, artist] = RadioStreamService.parseTrackInfo(streamTitle);
+  
+  return (
+    <div className="mb-6 animate-fade-in max-w-md mx-auto">
+      <div className="relative overflow-hidden rounded-xl border border-primary/20 bg-background/10 backdrop-blur-md px-5 py-3">
+        {/* Subtle animated gradient border glow */}
+        <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 animate-pulse pointer-events-none" />
+        
+        <div className="relative flex items-center gap-3 min-w-0">
+          {/* Spinning disc icon */}
+          <div className="flex-shrink-0">
+            <Disc3 className="w-8 h-8 text-primary animate-spin" style={{ animationDuration: '3s' }} />
+          </div>
+          
+          <div className="min-w-0 flex-1 text-left">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <span className="relative flex h-2 w-2 flex-shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+              </span>
+              <span className="text-[10px] uppercase tracking-widest text-primary/70 font-['Rajdhani'] font-semibold">
+                Now Playing
+              </span>
+            </div>
+            <p className="text-sm font-semibold text-foreground truncate font-['Rajdhani']">
+              {title}
+            </p>
+            <p className="text-xs text-muted-foreground truncate font-['Rajdhani']">
+              {artist}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const HeroSection = () => {
   const [streamTitle, setStreamTitle] = useState('🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵');
   
