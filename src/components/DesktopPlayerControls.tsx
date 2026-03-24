@@ -23,6 +23,7 @@ export const DesktopPlayerControls = ({
 }: DesktopPlayerControlsProps) => {
   const {
     isDesktop,
+    hideWindow,
     updatePlaybackState,
     updateTrackInfo,
     registerMediaKeyHandlers,
@@ -55,6 +56,45 @@ export const DesktopPlayerControls = ({
       getAppVersion().then(setAppVersion);
     }
   }, [getAppVersion, isDesktop]);
+
+  useEffect(() => {
+    if (!isDesktop) {
+      return;
+    }
+
+    const isEditableTarget = (target: EventTarget | null) => {
+      if (!(target instanceof HTMLElement)) {
+        return false;
+      }
+
+      if (target.isContentEditable) {
+        return true;
+      }
+
+      const tagName = target.tagName;
+      return tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT';
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (isEditableTarget(event.target)) {
+        return;
+      }
+
+      if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'p') {
+        event.preventDefault();
+        onTogglePlayback();
+        return;
+      }
+
+      if (event.ctrlKey && !event.shiftKey && event.key.toLowerCase() === 'm') {
+        event.preventDefault();
+        hideWindow();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [hideWindow, isDesktop, onTogglePlayback]);
 
   if (!isDesktop) {
     return null;

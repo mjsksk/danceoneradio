@@ -1,7 +1,7 @@
 {
-  "version": "1.0.9",
-  "notes": "Switch Windows installs to current-user mode and improve in-app update handoff for smoother upgrades.",
-  "pub_date": "2026-03-23T17:28:05.472Z",
-  "url": "https://github.com/mjsksk/danceoneradio/releases/download/v1.0.9/dance-one-radio-setup-1.0.9-x64.exe",
-  "signature": "untrusted comment: signature from minisign secret key\nRUSH8mYSkz3Lf0jyJvP4E4J7u/bgX0CChzz43kWx851s9gpIk9d7e/IRfKJaNUk/f+7s7sVajx7gaSOkSSsWSilJl0WfT0lekQ8=\ntrusted comment: 1774286885\nPL2Sy0pKDE0RTHTZ7C0eEGOr2KkJh0/hghKRUJJB3Ak+pwSmDTYPXQMvovpotP6miynM5C6Mh54olwx/pPPnDw=="
+  "version": "1.0.10",
+  "notes": "Reconnect stalled live streams after long pauses and make desktop shortcut text match the real controls.",
+  "pub_date": "2026-03-24T13:46:41.747Z",
+  "url": "https://github.com/mjsksk/danceoneradio/releases/download/v1.0.10/dance-one-radio-setup-1.0.10-x64.exe",
+  "signature": "untrusted comment: signature from minisign secret key\nRUSH8mYSkz3Lf+DoAWAdEvkpvVKc1gWZaWIBmHFd95xhdTzg3nQUVTjhorhOh5nCcXKAqUF3tGndH6KhOccfErkOYfKg2v2yXQE=\ntrusted comment: 1774360001\nNHEitbK4B6z9NkC9E9cEYwRTD0+ehbwnl51uVuFT6rH5TqYJ2If5H6Oxn1gfwjVczxfEbYGpVoaZQGeegatFCA=="
 }
