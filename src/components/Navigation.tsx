@@ -39,7 +39,7 @@ const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Desktop Navigation - Centered */}
-          <div className="hidden md:flex items-center space-x-8 flex-1 justify-center" role="menubar">
+          <div className="hidden md:flex items-center space-x-4 lg:space-x-8 flex-1 justify-center" role="menubar">
             {navItems.map((item) => (
               <Link
                 key={item.name}
