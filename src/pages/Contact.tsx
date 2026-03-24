@@ -34,11 +34,13 @@ const Contact = () => {
     setIsSubmitting(true);
 
     const formData = new FormData(e.currentTarget);
+    const trackLink = formData.get('trackLink') as string;
+    const artistName = formData.get('subject') as string;
     const contactData = {
       name: formData.get('name') as string,
       email: formData.get('email') as string,
-      subject: formData.get('subject') as string,
-      message: formData.get('message') as string,
+      subject: `Demo Submission: ${artistName}`,
+      message: `Artist Name: ${artistName}\nTrack Link: ${trackLink}\n\n${formData.get('message') as string}`,
       created_at: new Date().toISOString()
     };
 
