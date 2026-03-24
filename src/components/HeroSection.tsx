@@ -3,7 +3,7 @@ import SocialShare from '@/components/SocialShare';
 import LiveRadioPlayer from './LiveRadioPlayer';
 import { PRIMARY_STREAM_URLS } from '@/config/streamUrls';
 import { RadioStreamService } from '@/utils/RadioStreamService';
-import { ParticleTextEffect } from '@/components/ui/particle-text-effect';
+import { Vortex } from '@/components/ui/vortex';
 
 const HeroSection = () => {
   const [streamTitle, setStreamTitle] = useState('🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵');
