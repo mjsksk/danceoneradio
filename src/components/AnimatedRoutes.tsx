@@ -39,6 +39,7 @@ import NewsArtistsReleases from '@/pages/NewsArtistsReleases';
 import NewsFestivalsEvents from '@/pages/NewsFestivalsEvents';
 import NewsIndustryCulture from '@/pages/NewsIndustryCulture';
 import About from '@/pages/About';
+import Advertise from '@/pages/Advertise';
 
 import DesktopPlayer from '@/pages/DesktopPlayer';
 import Auth from '@/pages/Auth';
