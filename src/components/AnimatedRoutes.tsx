@@ -50,6 +50,8 @@ const Auth = lazy(() => import('@/pages/Auth'));
 const Account = lazy(() => import('@/pages/Account'));
 const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
 const Merch = lazy(() => import('@/pages/Merch'));
+const Tracks = lazy(() => import('@/pages/Tracks'));
+const TrackPage = lazy(() => import('@/pages/TrackPage'));
 
 export function AnimatedRoutes() {
   const location = useLocation();
