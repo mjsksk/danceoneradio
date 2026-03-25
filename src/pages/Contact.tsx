@@ -169,7 +169,7 @@ const Contact = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
-                  Your Real Name
+                  Your Real Name <span className="text-destructive">*</span>
                 </label>
                 <Input
                   id="name"
