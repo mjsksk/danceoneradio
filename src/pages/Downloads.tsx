@@ -11,7 +11,7 @@ import appStoreBadge from '@/assets/app-store-badge-new.svg';
 import googlePlayBadge from '@/assets/google-play-badge-new.svg';
 
 const Downloads = () => {
-  const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.10/dance-one-radio-setup-1.0.10-x64.exe';
+  const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.11/dance-one-radio-setup-1.0.11-x64.exe';
 
   const handleDownload = () => {
     window.open(downloadUrl, '_blank');
@@ -161,7 +161,7 @@ const Downloads = () => {
                   </Button>
                   
                   <div className="text-sm text-muted-foreground mt-4">
-                    Version 1.0.10 • Windows 10+ (64-bit) • Free
+                    Version 1.0.11 • Windows 10+ (64-bit) • Free
                   </div>
                 </div>
               </div>

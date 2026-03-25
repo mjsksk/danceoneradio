@@ -1,5 +1,5 @@
 #[cfg(desktop)]
-use tauri::{AppHandle, Manager, Runtime};
+use tauri::{AppHandle, Emitter, Manager, Runtime};
 #[cfg(desktop)]
 use tauri::{
   menu::{Menu, MenuItem},
@@ -16,9 +16,13 @@ const TRAY_ID: &str = "main-tray";
 #[cfg(desktop)]
 const TRAY_SHOW_ID: &str = "tray-show";
 #[cfg(desktop)]
+const TRAY_TOGGLE_PLAYBACK_ID: &str = "tray-toggle-playback";
+#[cfg(desktop)]
 const TRAY_HIDE_ID: &str = "tray-hide";
 #[cfg(desktop)]
 const TRAY_QUIT_ID: &str = "tray-quit";
+#[cfg(desktop)]
+const TOGGLE_PLAYBACK_EVENT: &str = "desktop-toggle-playback";
 #[cfg(target_os = "windows")]
 const WINDOWS_APP_USER_MODEL_ID: &str = "com.danceoneradio.desktop";
 
@@ -76,11 +80,13 @@ fn restore_from_tray(app: tauri::AppHandle) {
 #[cfg(desktop)]
 fn build_tray<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
   let show_item = MenuItem::with_id(app, TRAY_SHOW_ID, "Open Dance One Radio", true, None::<&str>)?;
+  let toggle_playback_item = MenuItem::with_id(app, TRAY_TOGGLE_PLAYBACK_ID, "Play / Pause Stream", true, None::<&str>)?;
   let hide_item = MenuItem::with_id(app, TRAY_HIDE_ID, "Hide Window", true, None::<&str>)?;
   let quit_item = MenuItem::with_id(app, TRAY_QUIT_ID, "Quit", true, None::<&str>)?;
-  let menu = Menu::with_items(app, &[&show_item, &hide_item, &quit_item])?;
+  let menu = Menu::with_items(app, &[&show_item, &toggle_playback_item, &hide_item, &quit_item])?;
 
   let show_id = show_item.id().clone();
+  let toggle_playback_id = toggle_playback_item.id().clone();
   let hide_id = hide_item.id().clone();
   let quit_id = quit_item.id().clone();
 
@@ -91,6 +97,8 @@ fn build_tray<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
     .on_menu_event(move |app, event| {
       if event.id() == &show_id {
         show_main_window(app);
+      } else if event.id() == &toggle_playback_id {
+        let _ = app.emit(TOGGLE_PLAYBACK_EVENT, ());
       } else if event.id() == &hide_id {
         hide_main_window(app);
       } else if event.id() == &quit_id {

@@ -125,6 +125,31 @@ export const useDesktopIntegration = () => {
     onNextTrack?: () => void,
     onPreviousTrack?: () => void
   ) => {
+    if (isTauriDesktop) {
+      let isDisposed = false;
+      let unlistenToggle: (() => void) | null = null;
+
+      void import('@tauri-apps/api/event')
+        .then(async ({ listen }) => {
+          const unlisten = await listen('desktop-toggle-playback', () => {
+            onTogglePlayback();
+          });
+
+          if (isDisposed) {
+            unlisten();
+            return;
+          }
+
+          unlistenToggle = unlisten;
+        })
+        .catch((error) => console.error('Failed to register Tauri playback listeners:', error));
+
+      return () => {
+        isDisposed = true;
+        unlistenToggle?.();
+      };
+    }
+
     if (!isElectronDesktop) return;
 
     const electronAPI = window.electronAPI!;
@@ -145,7 +170,7 @@ export const useDesktopIntegration = () => {
       electronAPI.removeAllListeners('next-track');
       electronAPI.removeAllListeners('previous-track');
     };
-  }, [isElectronDesktop]);
+  }, [isElectronDesktop, isTauriDesktop]);
 
   const getAppVersion = useCallback(async (): Promise<string | null> => {
     if (isElectronDesktop) {

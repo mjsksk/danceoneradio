@@ -1,7 +1,7 @@
 {
-  "version": "1.0.10",
-  "notes": "Reconnect stalled live streams after long pauses and make desktop shortcut text match the real controls.",
-  "pub_date": "2026-03-24T13:46:41.747Z",
-  "url": "https://github.com/mjsksk/danceoneradio/releases/download/v1.0.10/dance-one-radio-setup-1.0.10-x64.exe",
-  "signature": "untrusted comment: signature from minisign secret key\nRUSH8mYSkz3Lf+DoAWAdEvkpvVKc1gWZaWIBmHFd95xhdTzg3nQUVTjhorhOh5nCcXKAqUF3tGndH6KhOccfErkOYfKg2v2yXQE=\ntrusted comment: 1774360001\nNHEitbK4B6z9NkC9E9cEYwRTD0+ehbwnl51uVuFT6rH5TqYJ2If5H6Oxn1gfwjVczxfEbYGpVoaZQGeegatFCA=="
+  "version": "1.0.11",
+  "notes": "Limit paused live-stream buffering to 15 seconds and add Play / Pause to the system tray menu.",
+  "pub_date": "2026-03-25T18:06:53.235Z",
+  "url": "https://github.com/mjsksk/danceoneradio/releases/download/v1.0.11/dance-one-radio-setup-1.0.11-x64.exe",
+  "signature": "untrusted comment: signature from minisign secret key\nRUSH8mYSkz3Lf+FMbdmit11cIeneb/hZfeIG8IkWzTSg73qbwSG1onmx3AATUDsqP30rbYXGquRZ/YA9aHiFIV7erc+doQumpQ0=\ntrusted comment: 1774462013\nkkpjeR74sNtWfCfHSEqeKtXEjEDMOYXBN2gF61I23mp+LunETm+rsXp4lOtQMxMdCdY9lGg69J/YsaGL7ZVBBA=="
 }
