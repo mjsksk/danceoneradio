@@ -19,10 +19,10 @@ const TrackPage = () => {
   const { data: newsArticles } = useNewsArticles({ limit: 5 });
   const { playLiveStream, isPlaying, source } = useAudioPlayer();
 
-  const isStreamPlaying = isPlaying && PRIMARY_STREAM_URLS.some(u => currentStreamUrl === u);
+  const isStreamPlaying = isPlaying && source === 'live';
 
   const handlePlayRadio = () => {
-    play(PRIMARY_STREAM_URLS[0], 'Dance One Radio - Live Stream');
+    playLiveStream([...PRIMARY_STREAM_URLS]);
   };
 
   const handleShare = () => {
