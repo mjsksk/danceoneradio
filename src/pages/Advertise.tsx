@@ -96,13 +96,13 @@ const Advertise = () => {
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-primary">
               Advertising & Partnerships
             </motion.p>
-            <motion.h1 {...fade} className="text-3xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl leading-[1.1]">
+            <motion.h1 initial="hidden" animate="visible" variants={fade} className="text-3xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl leading-[1.1]">
               The Sound of Global<br />Dance Culture
             </motion.h1>
-            <motion.p {...fade} transition={{ delay: 0.15 }} className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground md:text-lg leading-relaxed">
+            <motion.p initial="hidden" animate="visible" variants={fade} transition={{ delay: 0.15 }} className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground md:text-lg leading-relaxed">
               Dance One Radio streams the best in house, techno, and electronic music to a global audience 24/7 — across web, mobile, and smart devices.
             </motion.p>
-            <motion.p {...fade} transition={{ delay: 0.3 }} className="mt-8 text-sm text-muted-foreground italic md:text-base">
+            <motion.p initial="hidden" animate="visible" variants={fade} transition={{ delay: 0.3 }} className="mt-8 text-sm text-muted-foreground italic md:text-base">
               "Our audience doesn't just visit — they stay, listen, and engage."
             </motion.p>
           </div>
