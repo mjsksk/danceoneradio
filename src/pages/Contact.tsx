@@ -195,7 +195,7 @@ const Contact = () => {
               </div>
               <div>
                 <label htmlFor="subject" className="block text-sm font-medium text-foreground mb-2">
-                  Artist Name
+                  Artist Name <span className="text-destructive">*</span>
                 </label>
                 <Input
                   id="subject"
