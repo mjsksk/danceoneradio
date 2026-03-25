@@ -23,14 +23,19 @@ export const DesktopPlayerControls = ({
 }: DesktopPlayerControlsProps) => {
   const {
     isDesktop,
+    isTauriDesktop,
     hideWindow,
     updatePlaybackState,
     updateTrackInfo,
     registerMediaKeyHandlers,
     getAppVersion,
+    getLaunchOnStartupEnabled,
+    setLaunchOnStartupEnabled,
   } = useDesktopIntegration();
 
   const [appVersion, setAppVersion] = useState<string | null>(null);
+  const [launchOnStartupEnabled, setLaunchOnStartupState] = useState(false);
+  const [launchOnStartupPending, setLaunchOnStartupPending] = useState(false);
 
   useEffect(() => {
     if (isDesktop) {
@@ -56,6 +61,14 @@ export const DesktopPlayerControls = ({
       getAppVersion().then(setAppVersion);
     }
   }, [getAppVersion, isDesktop]);
+
+  useEffect(() => {
+    if (!isTauriDesktop) {
+      return;
+    }
+
+    getLaunchOnStartupEnabled().then(setLaunchOnStartupState);
+  }, [getLaunchOnStartupEnabled, isTauriDesktop]);
 
   useEffect(() => {
     if (!isDesktop) {
@@ -100,6 +113,13 @@ export const DesktopPlayerControls = ({
     return null;
   }
 
+  const handleLaunchOnStartupChange = async (enabled: boolean) => {
+    setLaunchOnStartupPending(true);
+    const nextValue = await setLaunchOnStartupEnabled(enabled);
+    setLaunchOnStartupState(nextValue);
+    setLaunchOnStartupPending(false);
+  };
+
   return (
     <div className="desktop-controls">
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -124,6 +144,21 @@ export const DesktopPlayerControls = ({
           className="data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-slate-600"
         />
       </div>
+
+      {isTauriDesktop ? (
+        <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/10 px-3 py-2 text-xs text-muted-foreground">
+          <div>
+            <div className="font-medium text-foreground">Start with Windows</div>
+            <div>Launch Dance One Radio automatically when you sign in.</div>
+          </div>
+          <Switch
+            checked={launchOnStartupEnabled}
+            disabled={launchOnStartupPending}
+            onCheckedChange={handleLaunchOnStartupChange}
+            className="data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-slate-600"
+          />
+        </div>
+      ) : null}
     </div>
   );
 };

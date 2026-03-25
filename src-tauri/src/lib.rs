@@ -1,4 +1,6 @@
 #[cfg(desktop)]
+use serde::Serialize;
+#[cfg(desktop)]
 use tauri::{AppHandle, Emitter, Manager, Runtime};
 #[cfg(desktop)]
 use tauri::{
@@ -6,6 +8,8 @@ use tauri::{
   tray::{MouseButton, TrayIconBuilder, TrayIconEvent},
   WindowEvent,
 };
+#[cfg(desktop)]
+use tauri_plugin_updater::UpdaterExt;
 #[cfg(target_os = "windows")]
 use windows_sys::Win32::UI::Shell::SetCurrentProcessExplicitAppUserModelID;
 
@@ -23,8 +27,35 @@ const TRAY_HIDE_ID: &str = "tray-hide";
 const TRAY_QUIT_ID: &str = "tray-quit";
 #[cfg(desktop)]
 const TOGGLE_PLAYBACK_EVENT: &str = "desktop-toggle-playback";
+#[cfg(desktop)]
+const UPDATE_PROGRESS_EVENT: &str = "desktop-update-event";
 #[cfg(target_os = "windows")]
 const WINDOWS_APP_USER_MODEL_ID: &str = "com.danceoneradio.desktop";
+
+#[cfg(desktop)]
+#[derive(Clone, Serialize)]
+struct DesktopUpdateInfo {
+  version: String,
+  notes: Option<String>,
+  date: Option<String>,
+}
+
+#[cfg(desktop)]
+#[derive(Clone, Serialize)]
+#[serde(tag = "event", content = "data")]
+enum DesktopUpdateEvent {
+  Started {
+    #[serde(rename = "contentLength")]
+    content_length: Option<u64>,
+  },
+  Progress {
+    #[serde(rename = "chunkLength")]
+    chunk_length: u64,
+    #[serde(rename = "contentLength")]
+    content_length: Option<u64>,
+  },
+  Finished,
+}
 
 #[cfg(target_os = "windows")]
 fn set_windows_app_user_model_id() {
@@ -67,6 +98,34 @@ fn hide_main_window<R: Runtime>(app: &AppHandle<R>) {
   }
 }
 
+#[cfg(desktop)]
+fn format_update_error_message(raw: impl Into<String>) -> String {
+  let message = raw.into();
+  let normalized = message.to_lowercase();
+
+  if normalized.contains("shell execute") || normalized.contains("could not run") {
+    return "Windows could not launch the installer. Close Dance One Radio from the tray and try again.".into();
+  }
+
+  if normalized.contains("signature") || normalized.contains("verification") {
+    return "The downloaded update could not be verified. Please try again after the release files finish syncing.".into();
+  }
+
+  if normalized.contains("404") || normalized.contains("not found") || normalized.contains("network") {
+    return "The update package is not reachable right now. Please try again in a few minutes.".into();
+  }
+
+  if normalized.contains("no update") || normalized.contains("already up to date") {
+    return "You are already on the latest version.".into();
+  }
+
+  if normalized.contains("installer") || normalized.contains("msi") || normalized.contains("nsis") {
+    return "Windows could not finish the installer handoff. Close Dance One Radio from the tray and try again.".into();
+  }
+
+  message
+}
+
 #[tauri::command]
 fn hide_to_tray(app: tauri::AppHandle) {
   hide_main_window(&app);
@@ -75,6 +134,68 @@ fn hide_to_tray(app: tauri::AppHandle) {
 #[tauri::command]
 fn restore_from_tray(app: tauri::AppHandle) {
   show_main_window(&app);
+}
+
+#[cfg(desktop)]
+#[tauri::command]
+async fn check_for_updates(app: tauri::AppHandle) -> Result<Option<DesktopUpdateInfo>, String> {
+  let updater = app
+    .updater_builder()
+    .build()
+    .map_err(|error| format_update_error_message(error.to_string()))?;
+
+  let update = updater
+    .check()
+    .await
+    .map_err(|error| format_update_error_message(error.to_string()))?;
+
+  Ok(update.map(|update| DesktopUpdateInfo {
+    version: update.version,
+    notes: update.body,
+    date: update.date.map(|date| date.to_string()),
+  }))
+}
+
+#[cfg(desktop)]
+#[tauri::command]
+async fn install_update(app: tauri::AppHandle) -> Result<(), String> {
+  let updater = app
+    .updater_builder()
+    .build()
+    .map_err(|error| format_update_error_message(error.to_string()))?;
+
+  let update = updater
+    .check()
+    .await
+    .map_err(|error| format_update_error_message(error.to_string()))?
+    .ok_or_else(|| "No update is currently available.".to_string())?;
+
+  let progress_app = app.clone();
+  let finished_app = app.clone();
+  let _ = progress_app.emit(
+    UPDATE_PROGRESS_EVENT,
+    DesktopUpdateEvent::Started {
+      content_length: None,
+    },
+  );
+
+  update
+    .download_and_install(
+      move |chunk_length, content_length| {
+        let _ = progress_app.emit(
+          UPDATE_PROGRESS_EVENT,
+          DesktopUpdateEvent::Progress {
+            chunk_length: chunk_length as u64,
+            content_length,
+          },
+        );
+      },
+      move || {
+        let _ = finished_app.emit(UPDATE_PROGRESS_EVENT, DesktopUpdateEvent::Finished);
+      },
+    )
+    .await
+    .map_err(|error| format_update_error_message(error.to_string()))
 }
 
 #[cfg(desktop)]
@@ -128,7 +249,13 @@ fn build_tray<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![hide_to_tray, restore_from_tray])
+    .invoke_handler(tauri::generate_handler![
+      hide_to_tray,
+      restore_from_tray,
+      check_for_updates,
+      install_update
+    ])
+    .plugin(tauri_plugin_autostart::Builder::new().build())
     .plugin(tauri_plugin_notification::init())
     .plugin(tauri_plugin_process::init())
     .plugin(tauri_plugin_updater::Builder::new().build())

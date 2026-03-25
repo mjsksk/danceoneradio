@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import type { Update } from '@tauri-apps/plugin-updater';
+import { useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDesktopIntegration } from '@/hooks/useDesktopIntegration';
@@ -10,26 +9,12 @@ export const DesktopUpdateActions = () => {
   const [updateMessage, setUpdateMessage] = useState('Check for updates and install the next release without leaving the app.');
   const [updateProgress, setUpdateProgress] = useState<number | null>(null);
   const [availableVersion, setAvailableVersion] = useState<string | null>(null);
-  const [pendingUpdate, setPendingUpdate] = useState<Update | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (pendingUpdate) {
-        void pendingUpdate.close().catch(() => undefined);
-      }
-    };
-  }, [pendingUpdate]);
 
   const handleCheckForUpdates = async () => {
     if (!isTauriDesktop) {
       setUpdateState('not-configured');
       setUpdateMessage('In-app updates are only available in the installed Tauri desktop app.');
       return;
-    }
-
-    if (pendingUpdate) {
-      void pendingUpdate.close().catch(() => undefined);
-      setPendingUpdate(null);
     }
 
     setUpdateState('checking');
@@ -40,7 +25,6 @@ export const DesktopUpdateActions = () => {
     const result = await checkForUpdates();
 
     if (result.status === 'available') {
-      setPendingUpdate(result.update);
       setAvailableVersion(result.version);
       setUpdateState('available');
       setUpdateMessage(`Version ${result.version} is ready. Install it in place when you are ready.`);
@@ -70,7 +54,7 @@ export const DesktopUpdateActions = () => {
   };
 
   const handleInstallUpdate = async () => {
-    if (!pendingUpdate || !availableVersion) {
+    if (!availableVersion) {
       return;
     }
 
@@ -87,7 +71,7 @@ export const DesktopUpdateActions = () => {
       setUpdateProgress(0);
       setUpdateMessage(`Downloading version ${availableVersion}...`);
 
-      await downloadAndInstallUpdate(pendingUpdate, (event) => {
+      await downloadAndInstallUpdate((event) => {
         if (event.event === 'Started') {
           totalBytes = event.data.contentLength ?? 0;
           setUpdateProgress(totalBytes > 0 ? 1 : null);
@@ -109,6 +93,8 @@ export const DesktopUpdateActions = () => {
           setUpdateMessage('Installing update and restarting Dance One Radio...');
         }
       });
+
+      setUpdateMessage('Windows has the update package. If the installer does not appear, close Dance One Radio from the tray and try again.');
     } catch (error) {
       setUpdateState('error');
       setUpdateProgress(null);

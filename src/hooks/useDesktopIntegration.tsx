@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import type { DownloadEvent, Update } from '@tauri-apps/plugin-updater';
 
 interface ElectronAPI {
   getAppVersion: () => Promise<string>;
@@ -44,6 +43,41 @@ export const useDesktopIntegration = () => {
     }
 
     return 'Unable to check for updates right now.';
+  };
+
+  const getUpdateInstallErrorMessage = (error: unknown): string => {
+    const message = getUpdateErrorMessage(error);
+    const normalized = message.toLowerCase();
+
+    if (normalized.includes('already on the latest') || normalized.includes('no update is currently available')) {
+      return 'You are already on the latest version.';
+    }
+
+    if (normalized.includes('signature') || normalized.includes('verification')) {
+      return 'The downloaded update could not be verified. Please try again after the release files finish syncing.';
+    }
+
+    if (
+      normalized.includes('404') ||
+      normalized.includes('not found') ||
+      normalized.includes('download') ||
+      normalized.includes('network') ||
+      normalized.includes('timed out')
+    ) {
+      return 'The update package is not reachable right now. Please try again in a few minutes.';
+    }
+
+    if (
+      normalized.includes('installer') ||
+      normalized.includes('shell execute') ||
+      normalized.includes('process') ||
+      normalized.includes('launch') ||
+      normalized.includes('access is denied')
+    ) {
+      return 'Windows could not finish the installer handoff. Close Dance One Radio from the tray and try again.';
+    }
+
+    return message || 'Unable to install the update right now.';
   };
 
   const updatePlaybackState = useCallback((isPlaying: boolean) => {
@@ -259,7 +293,7 @@ export const useDesktopIntegration = () => {
   const checkForUpdates = useCallback(async (): Promise<
     | { status: 'unsupported' }
     | { status: 'up-to-date' }
-    | { status: 'available'; update: Update; version: string; notes?: string; date?: string }
+    | { status: 'available'; version: string; notes?: string; date?: string }
     | { status: 'not-configured'; message: string }
     | { status: 'error'; message: string }
   > => {
@@ -268,8 +302,12 @@ export const useDesktopIntegration = () => {
     }
 
     try {
-      const { check } = await import('@tauri-apps/plugin-updater');
-      const update = await check();
+      const { invoke } = await import('@tauri-apps/api/core');
+      const update = await invoke<null | {
+        version: string;
+        notes?: string | null;
+        date?: string | null;
+      }>('check_for_updates');
 
       if (!update) {
         return { status: 'up-to-date' };
@@ -277,9 +315,8 @@ export const useDesktopIntegration = () => {
 
       return {
         status: 'available',
-        update,
         version: update.version,
-        notes: update.body,
+        notes: update.notes ?? undefined,
         date: update.date,
       };
     } catch (error) {
@@ -305,18 +342,70 @@ export const useDesktopIntegration = () => {
   }, [isTauriDesktop]);
 
   const downloadAndInstallUpdate = useCallback(async (
-    update: Update,
-    onEvent?: (event: DownloadEvent) => void,
+    onEvent?: (event:
+      | { event: 'Started'; data: { contentLength?: number | null } }
+      | { event: 'Progress'; data: { chunkLength: number; contentLength?: number | null } }
+      | { event: 'Finished' }
+    ) => void,
   ) => {
     if (!isTauriDesktop) {
       return;
     }
 
-    await update.downloadAndInstall(onEvent);
+    const [{ invoke }, { listen }] = await Promise.all([
+      import('@tauri-apps/api/core'),
+      import('@tauri-apps/api/event'),
+    ]);
 
-    if (typeof navigator === 'undefined' || !navigator.userAgent.includes('Windows')) {
-      const { relaunch } = await import('@tauri-apps/plugin-process');
-      await relaunch();
+    const unlisten = await listen<
+      | { event: 'Started'; data: { contentLength?: number | null } }
+      | { event: 'Progress'; data: { chunkLength: number; contentLength?: number | null } }
+      | { event: 'Finished' }
+    >('desktop-update-event', (event) => {
+      onEvent?.(event.payload);
+    });
+
+    try {
+      await invoke('install_update');
+    } catch (error) {
+      throw new Error(getUpdateInstallErrorMessage(error));
+    } finally {
+      unlisten();
+    }
+  }, [isTauriDesktop]);
+
+  const getLaunchOnStartupEnabled = useCallback(async (): Promise<boolean> => {
+    if (!isTauriDesktop) {
+      return false;
+    }
+
+    try {
+      const { isEnabled } = await import('@tauri-apps/plugin-autostart');
+      return await isEnabled();
+    } catch (error) {
+      console.error('Failed to read launch-on-startup setting:', error);
+      return false;
+    }
+  }, [isTauriDesktop]);
+
+  const setLaunchOnStartupEnabled = useCallback(async (enabled: boolean): Promise<boolean> => {
+    if (!isTauriDesktop) {
+      return false;
+    }
+
+    try {
+      const { enable, disable, isEnabled } = await import('@tauri-apps/plugin-autostart');
+
+      if (enabled) {
+        await enable();
+      } else {
+        await disable();
+      }
+
+      return await isEnabled();
+    } catch (error) {
+      console.error('Failed to update launch-on-startup setting:', error);
+      return false;
     }
   }, [isTauriDesktop]);
 
@@ -340,6 +429,8 @@ export const useDesktopIntegration = () => {
     getDesktopStreamState,
     primeDesktopStream,
     checkForUpdates,
-    downloadAndInstallUpdate
+    downloadAndInstallUpdate,
+    getLaunchOnStartupEnabled,
+    setLaunchOnStartupEnabled,
   };
 };
