@@ -208,7 +208,7 @@ const Contact = () => {
               </div>
               <div>
                 <label htmlFor="trackLink" className="block text-sm font-medium text-foreground mb-2">
-                  Link to Download Your Track(s)
+                  Link to Download Your Track(s) <span className="text-destructive">*</span>
                 </label>
                 <Input
                   id="trackLink"
