@@ -104,6 +104,8 @@ export function AnimatedRoutes() {
         <Route path="/account" element={<PageTransition><ProtectedRoute><Account /></ProtectedRoute></PageTransition>} />
         <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
         <Route path="/merch" element={<PageTransition><Merch /></PageTransition>} />
+        <Route path="/tracks" element={<PageTransition><Tracks /></PageTransition>} />
+        <Route path="/track/:slug" element={<PageTransition><TrackPage /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
