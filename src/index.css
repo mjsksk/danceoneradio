@@ -301,7 +301,7 @@
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    animation: hero-logo-glow-pulse 5s ease-in-out 1.5s infinite;
+    animation: hero-logo-glow-pulse 5s ease-in-out 0.5s infinite;
     transform: translateZ(0);
     will-change: filter;
   }
@@ -354,7 +354,7 @@
     }
 
     .hero-logo {
-      animation: hero-logo-glow-pulse-mobile 5s ease-in-out 1s infinite;
+      animation: hero-logo-glow-pulse-mobile 5s ease-in-out 0.2s infinite;
     }
 
     @keyframes hero-logo-foreground-mobile {
