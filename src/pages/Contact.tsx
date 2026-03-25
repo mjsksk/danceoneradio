@@ -182,7 +182,7 @@ const Contact = () => {
               </div>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
-                  Email
+                  Email <span className="text-destructive">*</span>
                 </label>
                 <Input
                   id="email"
