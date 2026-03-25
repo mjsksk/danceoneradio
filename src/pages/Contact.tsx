@@ -169,7 +169,7 @@ const Contact = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
-                  Your Real Name
+                  Your Real Name <span className="text-destructive">*</span>
                 </label>
                 <Input
                   id="name"
@@ -182,7 +182,7 @@ const Contact = () => {
               </div>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
-                  Email
+                  Email <span className="text-destructive">*</span>
                 </label>
                 <Input
                   id="email"
@@ -195,7 +195,7 @@ const Contact = () => {
               </div>
               <div>
                 <label htmlFor="subject" className="block text-sm font-medium text-foreground mb-2">
-                  Artist Name
+                  Artist Name <span className="text-destructive">*</span>
                 </label>
                 <Input
                   id="subject"
@@ -208,7 +208,7 @@ const Contact = () => {
               </div>
               <div>
                 <label htmlFor="trackLink" className="block text-sm font-medium text-foreground mb-2">
-                  Link to Download Your Track(s)
+                  Link to Download Your Track(s) <span className="text-destructive">*</span>
                 </label>
                 <Input
                   id="trackLink"
@@ -221,7 +221,7 @@ const Contact = () => {
               </div>
               <div>
                 <label htmlFor="message" className="block text-sm font-medium text-foreground mb-2">
-                  Why Do You Feel Your Music Is Playable on Our Station?
+                  Why Do You Feel Your Music Is Playable on Our Station? <span className="text-destructive">*</span>
                 </label>
                 <Textarea
                   id="message"
