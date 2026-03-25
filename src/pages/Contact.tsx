@@ -221,7 +221,7 @@ const Contact = () => {
               </div>
               <div>
                 <label htmlFor="message" className="block text-sm font-medium text-foreground mb-2">
-                  Why Do You Feel Your Music Is Playable on Our Station?
+                  Why Do You Feel Your Music Is Playable on Our Station? <span className="text-destructive">*</span>
                 </label>
                 <Textarea
                   id="message"
