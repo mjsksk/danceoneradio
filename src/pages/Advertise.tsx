@@ -116,7 +116,7 @@ const Advertise = () => {
               <h2 className="text-2xl font-bold text-foreground md:text-4xl text-center">
                 Why Dance One Radio
               </h2>
-              <div className="mt-6 space-y-4 text-muted-foreground text-sm leading-relaxed md:text-base">
+              <div className="mt-6 space-y-4 text-muted-foreground text-base leading-relaxed md:text-lg font-normal">
                 <p>Unlike traditional radio stations or music blogs, Dance One Radio delivers a curated, uninterrupted music experience designed for real electronic music listeners.</p>
                 <p>Our listeners don't bounce — they stay connected for extended sessions, creating deeper engagement and stronger brand impact.</p>
                 <p>We focus on quality sound, global reach, and seamless listening across all devices.</p>
@@ -134,7 +134,7 @@ const Advertise = () => {
                 <Disc3 className="h-6 w-6 text-primary" />
               </div>
               <h2 className="text-2xl font-bold text-foreground md:text-4xl">Discover Music Instantly</h2>
-              <p className="mt-4 text-muted-foreground text-sm leading-relaxed md:text-base">
+              <p className="mt-4 text-muted-foreground text-base leading-relaxed md:text-lg font-normal">
                 Every track played on Dance One Radio connects listeners to official platforms like Apple Music, Beatport, and more — turning listening into instant discovery.
               </p>
             </motion.div>
@@ -146,7 +146,7 @@ const Advertise = () => {
           <div className="container mx-auto px-4">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} className="mx-auto max-w-3xl">
               <h2 className="text-2xl font-bold text-foreground md:text-4xl text-center">How We Compare</h2>
-              <p className="mt-4 text-center text-muted-foreground text-sm leading-relaxed md:text-base">
+              <p className="mt-4 text-center text-muted-foreground text-base leading-relaxed md:text-lg font-normal">
                 Many platforms focus on website traffic rankings — but real radio success comes from listener engagement.
               </p>
               <p className="mt-3 text-center text-xs font-semibold uppercase tracking-[0.2em] text-primary">
@@ -179,7 +179,7 @@ const Advertise = () => {
                 <div key={opp.title} className="group rounded-lg border border-border/40 bg-card/20 p-5 transition-all hover:border-primary/30 hover:shadow-[0_0_20px_hsl(var(--primary)/0.06)]">
                   <opp.icon className="h-6 w-6 text-primary transition-transform group-hover:scale-110" />
                   <h3 className="mt-3 text-base font-semibold text-foreground">{opp.title}</h3>
-                  <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground md:text-sm">{opp.description}</p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground md:text-base font-normal">{opp.description}</p>
                 </div>
               ))}
             </div>
