@@ -165,7 +165,7 @@ const Contact = () => {
               </p>
             </div>
             
-            <h2 className="text-2xl font-semibold mb-6 text-foreground">Send us a message</h2>
+            <h2 className="text-2xl font-semibold mb-6 text-foreground">Send us your promo</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
