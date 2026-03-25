@@ -17,7 +17,7 @@ const TrackPage = () => {
   const { data: relatedTracks } = useRelatedTracks(track?.artist || '', slug || '');
   const { data: recentTracks } = useRecentTracks(15);
   const { data: newsArticles } = useNewsArticles({ limit: 5 });
-  const { play, isPlaying, currentStreamUrl } = useAudioPlayer();
+  const { playLiveStream, isPlaying, source } = useAudioPlayer();
 
   const isStreamPlaying = isPlaying && PRIMARY_STREAM_URLS.some(u => currentStreamUrl === u);
 
