@@ -354,7 +354,7 @@
     }
 
     .hero-logo {
-      animation: hero-logo-glow-pulse-mobile 5s ease-in-out 2.5s infinite;
+      animation: hero-logo-glow-pulse-mobile 5s ease-in-out 1s infinite;
     }
 
     @keyframes hero-logo-foreground-mobile {
