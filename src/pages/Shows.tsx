@@ -449,6 +449,43 @@ const Shows = () => {
 
         <GoogleAds key="shows-ad" slot={AD_SLOTS.HEADER} format="horizontal" />
 
+        {/* Guest Shows */}
+        <section className="py-12 relative">
+          <div className="container mx-auto px-4">
+            <div className="max-w-6xl mx-auto">
+              <h2 className="text-3xl md:text-4xl font-['Orbitron'] font-bold mb-8 text-center">
+                <span className="text-neon">GUEST</span>{" "}
+                <span className="text-neon-purple">SHOWS</span>
+              </h2>
+              <Link to="/show/wh0-plays-sessions/222" className="block">
+                <Card className="card-cyber p-6 sm:p-8 hover:scale-[1.01] transition-all duration-300 group cursor-pointer hover:border-neon/50">
+                  <div className="flex flex-col sm:flex-row gap-6 items-center">
+                    <div className="bg-gradient-to-br from-neon to-neon-purple text-background rounded-full w-16 h-16 flex items-center justify-center font-['Orbitron'] font-bold text-lg shrink-0">
+                      #222
+                    </div>
+                    <div className="flex-1 text-center sm:text-left">
+                      <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold text-primary group-hover:text-neon transition-colors">
+                        Wh0 Plays Sessions Episode 222
+                        <span className="inline-block ml-2 text-sm text-neon opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                      </h3>
+                      <p className="text-muted-foreground mt-1">Guest Mix by <span className="text-primary font-semibold">Johan S</span></p>
+                      <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-muted-foreground justify-center sm:justify-start">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4 text-neon" />
+                          <span>Tonight at 6:00 PM</span>
+                        </div>
+                        <div className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
+                          House • Tech House • Dance
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* Episodes List */}
         <section className="py-16 relative">
           <div className="container mx-auto px-4">
