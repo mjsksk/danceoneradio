@@ -107,6 +107,7 @@ export function AnimatedRoutes() {
         <Route path="/merch" element={<PageTransition><Merch /></PageTransition>} />
         <Route path="/tracks" element={<PageTransition><Tracks /></PageTransition>} />
         <Route path="/track/:slug" element={<PageTransition><TrackPage /></PageTransition>} />
+        <Route path="/show/wh0-plays-sessions/222" element={<PageTransition><Wh0PlaysSession222 /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
