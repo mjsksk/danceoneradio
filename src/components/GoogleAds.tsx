@@ -163,7 +163,7 @@ const GoogleAds = ({
   // Only render visible container when actual ad content is detected
   return (
     <div 
-      className={`flex justify-center transition-all duration-300 ${hasAdContent ? `my-4 ${className}` : ''}`}
+      className={`flex justify-center transition-all duration-300 ${hasAdContent ? 'my-4 ' + className : ''}`}
       style={{ 
         height: hasAdContent ? 'auto' : '0px',
         overflow: hasAdContent ? undefined : 'hidden',
