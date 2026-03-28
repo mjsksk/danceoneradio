@@ -358,7 +358,7 @@ const About = () => {
                     <img 
                       src={wh0BioImage} 
                       alt="Wh0 - Who Plays Sessions"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-[center_30%]"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
                   </div>
