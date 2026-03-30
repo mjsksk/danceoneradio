@@ -249,9 +249,27 @@ export const useLiveEqVisualizer = ({
     };
   }, [audioRef, isActive, isElectronDesktop]);
 
+  const diagnostics = {
+    audioContextState: sharedAudioContext?.state ?? 'none',
+    hasSourceNode: !!sharedSourceNode,
+    hasAnalyser: !!sharedAnalyser,
+    audioSrc: sharedAnalyserAudio?.src ?? audioRef.current?.src ?? 'none',
+    audioCrossOrigin: audioRef.current?.crossOrigin ?? 'not-set',
+    audioNetworkState: audioRef.current?.networkState ?? -1,
+    audioReadyState: audioRef.current?.readyState ?? -1,
+    isTouchDevice: typeof window !== 'undefined' && (window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0),
+    averageSignal: frequencyData.length > 0
+      ? Math.round(frequencyData.reduce((a, b) => a + b, 0) / frequencyData.length)
+      : 0,
+    peakBar: Math.round(Math.max(...frequencyData)),
+    minBar: Math.round(Math.min(...frequencyData)),
+    isElectronDesktop,
+  };
+
   return {
     frequencyData,
     barCount: EQ_BAR_COUNT,
     dataSource,
+    diagnostics,
   };
 };
