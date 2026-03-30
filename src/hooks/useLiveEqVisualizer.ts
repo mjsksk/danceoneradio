@@ -6,14 +6,18 @@ const EQ_MIN_HEIGHT = 12;
 const EQ_MAX_HEIGHT = 70;
 const ANALYSER_FFT_SIZE = 256;
 const SYNTHETIC_BIN_COUNT = ANALYSER_FFT_SIZE / 2;
-const MOBILE_SILENT_ANALYSER_THRESHOLD = 4;
-const MOBILE_SILENT_FRAME_LIMIT = 72;
+const SILENT_ANALYSER_THRESHOLD = 4;
+const SILENT_FRAME_LIMIT = 72;
 
 const createIdleFrequencyData = (count = EQ_BAR_COUNT) => new Array(count).fill(EQ_MIN_HEIGHT);
 
 const clampNormalized = (value: number) => Math.max(0, Math.min(1, value));
 
 const isTouchDeviceClient = () => typeof window !== 'undefined' && (window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0);
+
+const shouldUseDesktopEqMotion = (isElectronDesktop: boolean) => (
+  isElectronDesktop || isTouchDeviceClient()
+);
 
 const getPeakFrequencyValue = (frequencyBins: Uint8Array) => {
   let peak = 0;
@@ -165,7 +169,7 @@ export const useLiveEqVisualizer = ({
       animate();
     };
 
-    if (isElectronDesktop) {
+    if (shouldUseDesktopEqMotion(isElectronDesktop)) {
       startSyntheticAnimation('desktop-sim');
       return () => {
         isCancelled = true;
@@ -234,15 +238,11 @@ export const useLiveEqVisualizer = ({
           sharedAnalyser.getByteFrequencyData(sharedFrequencyBins as unknown as Uint8Array<ArrayBuffer>);
 
           const peakFrequencyValue = getPeakFrequencyValue(sharedFrequencyBins);
-          if (
-            !isElectronDesktop &&
-            isTouchDeviceClient() &&
-            peakFrequencyValue <= MOBILE_SILENT_ANALYSER_THRESHOLD
-          ) {
+          if (peakFrequencyValue <= SILENT_ANALYSER_THRESHOLD) {
             silentAnalyserFramesRef.current += 1;
 
-            if (silentAnalyserFramesRef.current >= MOBILE_SILENT_FRAME_LIMIT) {
-              startSyntheticAnimation('desktop-sim');
+            if (silentAnalyserFramesRef.current >= SILENT_FRAME_LIMIT) {
+              startSyntheticAnimation('fallback');
               return;
             }
           } else {
