@@ -243,7 +243,7 @@ const LiveRadioPlayer = ({
         animationRef.current = null;
       }
     };
-  }, [animationActive, audioPlayer.audioRef, isElectronDesktop]);
+  }, [animationActive, audioPlayer.audioRef, isElectronDesktop, eqBarCount]);
 
   useEffect(() => {
     const fetchAlbumArt = async () => {
