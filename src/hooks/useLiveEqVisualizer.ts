@@ -121,12 +121,15 @@ interface UseLiveEqVisualizerOptions {
   isElectronDesktop: boolean;
 }
 
+type EqDataSource = 'idle' | 'real' | 'fallback' | 'desktop-sim';
+
 export const useLiveEqVisualizer = ({
   audioRef,
   isActive,
   isElectronDesktop,
 }: UseLiveEqVisualizerOptions) => {
   const [frequencyData, setFrequencyData] = useState<number[]>(() => createIdleFrequencyData());
+  const [dataSource, setDataSource] = useState<EqDataSource>('idle');
   const animationRef = useRef<number | null>(null);
   const smoothedBarsRef = useRef<number[]>(createIdleFrequencyData());
   const lowSignalFramesRef = useRef(0);
@@ -147,6 +150,7 @@ export const useLiveEqVisualizer = ({
       syntheticTimeRef.current = 0;
       hasDetectedRealSignalRef.current = false;
       smoothedBarsRef.current = createIdleFrequencyData();
+      setDataSource('idle');
       setFrequencyData(createIdleFrequencyData());
       cancelFrame();
       return;
@@ -171,6 +175,7 @@ export const useLiveEqVisualizer = ({
         const { bars } = mapFrequencyBinsToBars(syntheticFrequencyBinsRef.current, smoothedBarsRef.current);
 
         smoothedBarsRef.current = bars;
+        setDataSource(isElectronDesktop ? 'desktop-sim' : 'fallback');
         setFrequencyData(bars);
         animationRef.current = requestAnimationFrame(animate);
       };
@@ -273,6 +278,8 @@ export const useLiveEqVisualizer = ({
             frequencyBinsForFrame = syntheticFrequencyBinsRef.current;
           }
 
+          setDataSource(useSyntheticFrame ? 'fallback' : 'real');
+
           const {
             bars: nextBars,
           } = mapFrequencyBinsToBars(frequencyBinsForFrame, smoothedBarsRef.current);
@@ -303,5 +310,6 @@ export const useLiveEqVisualizer = ({
   return {
     frequencyData,
     barCount: EQ_BAR_COUNT,
+    dataSource,
   };
 };
