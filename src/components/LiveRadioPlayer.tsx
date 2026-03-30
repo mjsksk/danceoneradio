@@ -54,7 +54,7 @@ const LiveRadioPlayer = ({
   const titleContainerRef = useRef<HTMLDivElement | null>(null);
   const titleMeasureRef = useRef<HTMLSpanElement | null>(null);
   const animationActive = isPlaying;
-  const { frequencyData, barCount, dataSource } = useLiveEqVisualizer({
+  const { frequencyData, barCount, dataSource, diagnostics } = useLiveEqVisualizer({
     audioRef: audioPlayer.audioRef,
     isActive: animationActive,
     isElectronDesktop,
