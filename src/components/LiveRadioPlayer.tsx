@@ -446,19 +446,19 @@ const LiveRadioPlayer = ({
           </div>
         </div>
 
-        <div className="flex items-end justify-center space-x-0.5 mb-6 h-20 w-full px-4" data-eq-container>
-          {frequencyData.map((height, i) => (
+        <div className="flex items-end justify-center gap-[2px] sm:gap-0.5 mb-6 h-20 w-full px-2 sm:px-4" data-eq-container>
+          {frequencyData.slice(0, eqBarCount).map((height, i) => (
             <div
               key={i}
               data-eq-bar
-              className="rounded-full transition-none shadow-lg flex-shrink-0"
+              className="rounded-full transition-none shadow-lg"
               style={{
                 height: `${Math.max(20, Math.min(70, height))}px`,
-                width: '3px',
-                minWidth: '3px',
-                maxWidth: '3px',
-                backgroundColor: animationActive ? `hsl(${(i / 63) * 300}, 90%, 60%)` : 'hsl(var(--muted))',
-                boxShadow: animationActive ? `0 0 8px hsl(${(i / 63) * 300}, 90%, 60%)` : 'none',
+                flex: '1 1 0',
+                maxWidth: '4px',
+                minWidth: '2px',
+                backgroundColor: animationActive ? `hsl(${(i / (eqBarCount - 1)) * 300}, 90%, 60%)` : 'hsl(var(--muted))',
+                boxShadow: animationActive ? `0 0 8px hsl(${(i / (eqBarCount - 1)) * 300}, 90%, 60%)` : 'none',
               }}
             />
           ))}
