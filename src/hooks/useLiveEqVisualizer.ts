@@ -237,7 +237,7 @@ export const useLiveEqVisualizer = ({
         animate();
       } catch (error) {
         console.error('Failed to initialize live EQ analyser:', error);
-        startSyntheticAnimation();
+        startSyntheticAnimation('fallback');
       }
     };
 
