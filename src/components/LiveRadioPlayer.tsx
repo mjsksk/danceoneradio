@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { CSSProperties } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,7 @@ import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { DesktopPlayerControls } from './DesktopPlayerControls';
 import PopupPlayerButton from './PopupPlayerButton';
 import { useLiveRadioPlayer } from '@/hooks/useLiveRadioPlayer';
+import { useLiveEqVisualizer } from '@/hooks/useLiveEqVisualizer';
 import stationLogo from '@/assets/dance-one-logo.png';
 
 interface LiveRadioPlayerProps {
@@ -18,18 +19,7 @@ interface LiveRadioPlayerProps {
   hidePopupButton?: boolean;
 }
 
-const EQ_BAR_COUNT_DESKTOP = 64;
-const EQ_BAR_COUNT_MOBILE = 32;
-const EQ_MIN_HEIGHT = 12;
-const EQ_MAX_HEIGHT = 70;
 const NOTIFICATION_PREF_KEY = 'desktop-track-change-notifications';
-const createIdleFrequencyData = (count: number) => new Array(count).fill(EQ_MIN_HEIGHT);
-
-let sharedAudioContext: AudioContext | null = null;
-let sharedAnalyser: AnalyserNode | null = null;
-let sharedSourceNode: MediaElementAudioSourceNode | null = null;
-let sharedAnalyserAudio: HTMLAudioElement | null = null;
-let sharedFrequencyBins: Uint8Array | null = null;
 
 const stripDecorativeSymbols = (value: string) => value
   .replace(/[\u{1F3B5}\u{1F3B6}\u{1F4FB}\u{1F50A}\u{1F3A7}]/gu, ' ')
@@ -51,20 +41,7 @@ const LiveRadioPlayer = ({
   const audioPlayer = useAudioPlayer();
   const { isPlaying, isLoading, handlePlayPause, primeLiveStream, streamTitle: globalStreamTitle, albumArt: globalAlbumArt } = useLiveRadioPlayer(streamUrls);
 
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const mql = window.matchMedia('(max-width: 767px)');
-    setIsMobile(mql.matches);
-    const handler = () => setIsMobile(mql.matches);
-    mql.addEventListener('change', handler);
-    return () => mql.removeEventListener('change', handler);
-  }, []);
-
-  const eqBarCount = isMobile ? EQ_BAR_COUNT_MOBILE : EQ_BAR_COUNT_DESKTOP;
-
   const [localAlbumArt, setLocalAlbumArt] = useState<string | null>(null);
-  const [animationActive, setAnimationActive] = useState(false);
-  const [frequencyData, setFrequencyData] = useState<number[]>(() => createIdleFrequencyData(EQ_BAR_COUNT_DESKTOP));
   const [currentStreamTitle, setCurrentStreamTitle] = useState(initialStreamTitle);
   const [isStreamLive, setIsStreamLive] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(() => localStorage.getItem(NOTIFICATION_PREF_KEY) === 'true');
@@ -73,11 +50,15 @@ const LiveRadioPlayer = ({
   const [titleScrollDistance, setTitleScrollDistance] = useState(0);
 
   const { showNotification, isElectronDesktop, ensureNotificationPermission } = useDesktopIntegration();
-  const animationRef = useRef<number | null>(null);
   const lastNotifiedTrackRef = useRef<string | null>(null);
-  const smoothedBarsRef = useRef<number[]>(createIdleFrequencyData(EQ_BAR_COUNT_DESKTOP));
   const titleContainerRef = useRef<HTMLDivElement | null>(null);
   const titleMeasureRef = useRef<HTMLSpanElement | null>(null);
+  const animationActive = isPlaying;
+  const { frequencyData, barCount } = useLiveEqVisualizer({
+    audioRef: audioPlayer.audioRef,
+    isActive: animationActive,
+    isElectronDesktop,
+  });
 
   const displayStreamTitle = globalStreamTitle || currentStreamTitle;
   const albumArt = globalAlbumArt || localAlbumArt;
@@ -100,150 +81,10 @@ const LiveRadioPlayer = ({
   };
 
   useEffect(() => {
-    if (isPlaying) {
-      setAnimationActive(true);
-    } else {
-      setAnimationActive(false);
-    }
-  }, [isPlaying]);
-
-  useEffect(() => {
     primeLiveStream().catch((error) => {
       console.error('Failed to prime live stream:', error);
     });
   }, [primeLiveStream]);
-
-  useEffect(() => {
-    if (!animationActive) {
-      smoothedBarsRef.current = createIdleFrequencyData(eqBarCount);
-      setFrequencyData(createIdleFrequencyData(eqBarCount));
-      return;
-    }
-
-    if (isElectronDesktop) {
-      let time = 0;
-
-      const animate = () => {
-        time += 0.05;
-        const bars = Array.from({ length: eqBarCount }, (_, i) => {
-          const base = 25 + Math.sin(time * (0.3 + i * 0.03) + i) * 18;
-          return Math.max(EQ_MIN_HEIGHT, Math.min(EQ_MAX_HEIGHT, base + (Math.random() - 0.5) * 6));
-        });
-
-        smoothedBarsRef.current = bars;
-        setFrequencyData(bars);
-        animationRef.current = requestAnimationFrame(animate);
-      };
-
-      animate();
-      return () => {
-        if (animationRef.current) {
-          cancelAnimationFrame(animationRef.current);
-          animationRef.current = null;
-        }
-      };
-    }
-
-    const audio = audioPlayer.audioRef.current;
-    const AudioContextCtor = window.AudioContext || (window as Window & typeof globalThis & {
-      webkitAudioContext?: typeof AudioContext;
-    }).webkitAudioContext;
-
-    if (!audio || !AudioContextCtor) {
-      return;
-    }
-
-    let isCancelled = false;
-
-    const setupAnalyser = async () => {
-      try {
-        let context = sharedAudioContext;
-        if (!context || context.state === 'closed') {
-          context = new AudioContextCtor();
-          sharedAudioContext = context;
-        }
-
-        if (context.state === 'suspended') {
-          await context.resume();
-        }
-
-        if (!sharedAnalyser || sharedAnalyserAudio !== audio) {
-          // If a source node already exists for a different audio element,
-          // disconnect it. But never call createMediaElementSource twice
-          // on the same HTMLMediaElement — that throws InvalidStateError.
-          if (sharedSourceNode && sharedAnalyserAudio !== audio) {
-            sharedSourceNode.disconnect();
-            sharedAnalyser?.disconnect();
-            sharedSourceNode = null;
-            sharedAnalyser = null;
-            sharedAnalyserAudio = null;
-          }
-
-          if (!sharedSourceNode) {
-            const sourceNode = context.createMediaElementSource(audio);
-            const analyser = context.createAnalyser();
-            analyser.fftSize = 256;
-            analyser.minDecibels = -95;
-            analyser.maxDecibels = -20;
-            analyser.smoothingTimeConstant = 0.82;
-
-            sourceNode.connect(analyser);
-            analyser.connect(context.destination);
-
-            sharedSourceNode = sourceNode;
-            sharedAnalyser = analyser;
-            sharedAnalyserAudio = audio;
-            sharedFrequencyBins = new Uint8Array(analyser.frequencyBinCount);
-          }
-        }
-
-        const animate = () => {
-          if (isCancelled || !sharedAnalyser || !sharedFrequencyBins) {
-            return;
-          }
-
-          sharedAnalyser.getByteFrequencyData(sharedFrequencyBins as unknown as Uint8Array<ArrayBuffer>);
-
-          const nextBars = Array.from({ length: eqBarCount }, (_, index) => {
-            const start = Math.floor((index / eqBarCount) * sharedFrequencyBins.length);
-            const end = Math.max(start + 1, Math.floor(((index + 1) / eqBarCount) * sharedFrequencyBins.length));
-
-            let total = 0;
-            for (let i = start; i < end; i += 1) {
-              total += sharedFrequencyBins[i];
-            }
-
-            const average = total / (end - start) / 255;
-            const emphasis = 1.15 - (index / eqBarCount) * 0.35;
-            const normalized = Math.min(1, average * emphasis * 1.4);
-            const targetHeight = EQ_MIN_HEIGHT + Math.pow(normalized, 1.35) * (EQ_MAX_HEIGHT - EQ_MIN_HEIGHT);
-            const previousHeight = smoothedBarsRef.current[index] ?? EQ_MIN_HEIGHT;
-            const smoothing = targetHeight > previousHeight ? 0.45 : 0.18;
-
-            return previousHeight + (targetHeight - previousHeight) * smoothing;
-          });
-
-          smoothedBarsRef.current = nextBars;
-          setFrequencyData(nextBars);
-          animationRef.current = requestAnimationFrame(animate);
-        };
-
-        animate();
-      } catch (error) {
-        console.error('Failed to initialize live EQ analyser:', error);
-      }
-    };
-
-    void setupAnalyser();
-
-    return () => {
-      isCancelled = true;
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-        animationRef.current = null;
-      }
-    };
-  }, [animationActive, audioPlayer.audioRef, isElectronDesktop, eqBarCount]);
 
   useEffect(() => {
     const fetchAlbumArt = async () => {
@@ -447,7 +288,7 @@ const LiveRadioPlayer = ({
         </div>
 
         <div className="flex items-end justify-center gap-[2px] sm:gap-0.5 mb-6 h-20 w-full px-2 sm:px-4" data-eq-container>
-          {frequencyData.slice(0, eqBarCount).map((height, i) => (
+          {frequencyData.map((height, i) => (
             <div
               key={i}
               data-eq-bar
@@ -456,9 +297,9 @@ const LiveRadioPlayer = ({
                 height: `${Math.max(20, Math.min(70, height))}px`,
                 flex: '1 1 0',
                 maxWidth: '4px',
-                minWidth: '2px',
-                backgroundColor: animationActive ? `hsl(${(i / (eqBarCount - 1)) * 300}, 90%, 60%)` : 'hsl(var(--muted))',
-                boxShadow: animationActive ? `0 0 8px hsl(${(i / (eqBarCount - 1)) * 300}, 90%, 60%)` : 'none',
+                minWidth: '1px',
+                backgroundColor: animationActive ? `hsl(${(i / (barCount - 1)) * 300}, 90%, 60%)` : 'hsl(var(--muted))',
+                boxShadow: animationActive ? `0 0 8px hsl(${(i / (barCount - 1)) * 300}, 90%, 60%)` : 'none',
               }}
             />
           ))}
