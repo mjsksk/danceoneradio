@@ -83,14 +83,6 @@ const populateSyntheticFrequencyBins = (time: number, frequencyBins: Uint8Array)
   }
 };
 
-const supportsEqFallback = () => {
-  if (typeof window === 'undefined') {
-    return false;
-  }
-
-  return window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
-};
-
 interface UseLiveEqVisualizerOptions {
   audioRef: RefObject<HTMLAudioElement>;
   isActive: boolean;
@@ -156,7 +148,7 @@ export const useLiveEqVisualizer = ({
       animate();
     };
 
-    if (isElectronDesktop || supportsEqFallback()) {
+    if (isElectronDesktop) {
       startSyntheticAnimation('desktop-sim');
       return () => {
         isCancelled = true;
