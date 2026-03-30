@@ -15,6 +15,32 @@ let sharedSourceNode: MediaElementAudioSourceNode | null = null;
 let sharedAnalyserAudio: HTMLAudioElement | null = null;
 let sharedFrequencyBins: Uint8Array | null = null;
 
+const createSyntheticSpectrum = (time: number, previousBars: number[]) => Array.from({ length: EQ_BAR_COUNT }, (_, index) => {
+  const position = index / (EQ_BAR_COUNT - 1);
+  const distanceFromMid = Math.abs(position - 0.48);
+  const bassContour = 1 - position * 0.42;
+  const midContour = Math.max(0, 1 - distanceFromMid * 2.6);
+  const bassPulse = (Math.sin(time * 2.3 - position * 6.2) + 1) / 2;
+  const midPulse = (Math.sin(time * 3.4 + position * 11.5) + 1) / 2;
+  const highPulse = (Math.sin(time * 4.8 + position * 19.5) + 1) / 2;
+  const shimmer = (Math.sin(time * 6.2 + index * 0.72) + 1) / 2;
+
+  const normalized = Math.min(
+    1,
+    0.08 +
+      bassPulse * bassContour * 0.62 +
+      midPulse * midContour * 0.28 +
+      highPulse * position * 0.12 +
+      shimmer * 0.06,
+  );
+
+  const targetHeight = EQ_MIN_HEIGHT + Math.pow(normalized, 1.3) * (EQ_MAX_HEIGHT - EQ_MIN_HEIGHT);
+  const previousHeight = previousBars[index] ?? EQ_MIN_HEIGHT;
+  const smoothing = targetHeight > previousHeight ? 0.24 : 0.15;
+
+  return previousHeight + (targetHeight - previousHeight) * smoothing;
+});
+
 const supportsEqFallback = () => {
   if (typeof window === 'undefined') {
     return false;
@@ -74,10 +100,7 @@ export const useLiveEqVisualizer = ({
         }
 
         time += 0.05;
-        const bars = Array.from({ length: EQ_BAR_COUNT }, (_, index) => {
-          const base = 25 + Math.sin(time * (0.3 + index * 0.03) + index) * 18;
-          return Math.max(EQ_MIN_HEIGHT, Math.min(EQ_MAX_HEIGHT, base + (Math.random() - 0.5) * 6));
-        });
+        const bars = createSyntheticSpectrum(time, smoothedBarsRef.current);
 
         smoothedBarsRef.current = bars;
         setFrequencyData(bars);
