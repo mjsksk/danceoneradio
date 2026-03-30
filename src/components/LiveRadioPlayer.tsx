@@ -54,7 +54,7 @@ const LiveRadioPlayer = ({
   const titleContainerRef = useRef<HTMLDivElement | null>(null);
   const titleMeasureRef = useRef<HTMLSpanElement | null>(null);
   const animationActive = isPlaying;
-  const { frequencyData, barCount } = useLiveEqVisualizer({
+  const { frequencyData, barCount, dataSource } = useLiveEqVisualizer({
     audioRef: audioPlayer.audioRef,
     isActive: animationActive,
     isElectronDesktop,
@@ -256,6 +256,11 @@ const LiveRadioPlayer = ({
                 OFFLINE
               </Badge>
             )}
+            {import.meta.env.DEV ? (
+              <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground border-border/60 opacity-70">
+                EQ:{dataSource}
+              </Badge>
+            ) : null}
           </div>
           <div ref={titleContainerRef} className="relative overflow-hidden bg-background/20 rounded-md p-2 mb-2">
             <span ref={titleMeasureRef} className="pointer-events-none absolute left-0 top-0 whitespace-nowrap opacity-0">
