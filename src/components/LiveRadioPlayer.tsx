@@ -204,9 +204,9 @@ const LiveRadioPlayer = ({
 
           sharedAnalyser.getByteFrequencyData(sharedFrequencyBins as unknown as Uint8Array<ArrayBuffer>);
 
-          const nextBars = Array.from({ length: EQ_BAR_COUNT }, (_, index) => {
-            const start = Math.floor((index / EQ_BAR_COUNT) * sharedFrequencyBins.length);
-            const end = Math.max(start + 1, Math.floor(((index + 1) / EQ_BAR_COUNT) * sharedFrequencyBins.length));
+          const nextBars = Array.from({ length: eqBarCount }, (_, index) => {
+            const start = Math.floor((index / eqBarCount) * sharedFrequencyBins.length);
+            const end = Math.max(start + 1, Math.floor(((index + 1) / eqBarCount) * sharedFrequencyBins.length));
 
             let total = 0;
             for (let i = start; i < end; i += 1) {
@@ -214,7 +214,7 @@ const LiveRadioPlayer = ({
             }
 
             const average = total / (end - start) / 255;
-            const emphasis = 1.15 - (index / EQ_BAR_COUNT) * 0.35;
+            const emphasis = 1.15 - (index / eqBarCount) * 0.35;
             const normalized = Math.min(1, average * emphasis * 1.4);
             const targetHeight = EQ_MIN_HEIGHT + Math.pow(normalized, 1.35) * (EQ_MAX_HEIGHT - EQ_MIN_HEIGHT);
             const previousHeight = smoothedBarsRef.current[index] ?? EQ_MIN_HEIGHT;
