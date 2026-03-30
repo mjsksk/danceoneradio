@@ -5,10 +5,6 @@ const EQ_BAR_COUNT = 64;
 const EQ_MIN_HEIGHT = 12;
 const EQ_MAX_HEIGHT = 70;
 const ANALYSER_FFT_SIZE = 256;
-const FLATLINE_BIN_THRESHOLD = 8;
-const FLATLINE_AVERAGE_THRESHOLD = 2;
-const FLATLINE_ACTIVE_BIN_LIMIT = 5;
-const LOW_SIGNAL_FRAME_LIMIT = 32;
 const SYNTHETIC_BIN_COUNT = ANALYSER_FFT_SIZE / 2;
 
 const createIdleFrequencyData = (count = EQ_BAR_COUNT) => new Array(count).fill(EQ_MIN_HEIGHT);
@@ -87,26 +83,6 @@ const populateSyntheticFrequencyBins = (time: number, frequencyBins: Uint8Array)
   }
 };
 
-const hasUsableFrequencySignal = (frequencyBins: Uint8Array) => {
-  let activeBins = 0;
-  let total = 0;
-  let peak = 0;
-
-  for (let index = 0; index < frequencyBins.length; index += 1) {
-    const value = frequencyBins[index];
-    total += value;
-    peak = Math.max(peak, value);
-
-    if (value > FLATLINE_BIN_THRESHOLD) {
-      activeBins += 1;
-    }
-  }
-
-  const average = total / frequencyBins.length;
-
-  return peak > FLATLINE_BIN_THRESHOLD && average > FLATLINE_AVERAGE_THRESHOLD && activeBins > FLATLINE_ACTIVE_BIN_LIMIT;
-};
-
 const supportsEqFallback = () => {
   if (typeof window === 'undefined') {
     return false;
@@ -132,9 +108,7 @@ export const useLiveEqVisualizer = ({
   const [dataSource, setDataSource] = useState<EqDataSource>('idle');
   const animationRef = useRef<number | null>(null);
   const smoothedBarsRef = useRef<number[]>(createIdleFrequencyData());
-  const lowSignalFramesRef = useRef(0);
   const syntheticTimeRef = useRef(0);
-  const hasDetectedRealSignalRef = useRef(false);
   const syntheticFrequencyBinsRef = useRef<Uint8Array>(new Uint8Array(SYNTHETIC_BIN_COUNT));
 
   useEffect(() => {
@@ -146,9 +120,7 @@ export const useLiveEqVisualizer = ({
     };
 
     if (!isActive) {
-      lowSignalFramesRef.current = 0;
       syntheticTimeRef.current = 0;
-      hasDetectedRealSignalRef.current = false;
       smoothedBarsRef.current = createIdleFrequencyData();
       setDataSource('idle');
       setFrequencyData(createIdleFrequencyData());
@@ -157,8 +129,9 @@ export const useLiveEqVisualizer = ({
     }
 
     let isCancelled = false;
+    syntheticTimeRef.current = 0;
 
-    const startSyntheticAnimation = () => {
+    const startSyntheticAnimation = (source: Extract<EqDataSource, 'fallback' | 'desktop-sim'>) => {
       if (isCancelled) {
         return;
       }
@@ -175,7 +148,7 @@ export const useLiveEqVisualizer = ({
         const { bars } = mapFrequencyBinsToBars(syntheticFrequencyBinsRef.current, smoothedBarsRef.current);
 
         smoothedBarsRef.current = bars;
-        setDataSource(isElectronDesktop ? 'desktop-sim' : 'fallback');
+        setDataSource(source);
         setFrequencyData(bars);
         animationRef.current = requestAnimationFrame(animate);
       };
@@ -183,8 +156,8 @@ export const useLiveEqVisualizer = ({
       animate();
     };
 
-    if (isElectronDesktop) {
-      startSyntheticAnimation();
+    if (isElectronDesktop || supportsEqFallback()) {
+      startSyntheticAnimation('desktop-sim');
       return () => {
         isCancelled = true;
         cancelFrame();
@@ -197,14 +170,12 @@ export const useLiveEqVisualizer = ({
     }).webkitAudioContext;
 
     if (!audio || !AudioContextCtor) {
-      startSyntheticAnimation();
+      startSyntheticAnimation('fallback');
       return () => {
         isCancelled = true;
         cancelFrame();
       };
     }
-
-    const prefersSyntheticFallback = supportsEqFallback();
 
     const setupAnalyser = async () => {
       try {
@@ -252,37 +223,11 @@ export const useLiveEqVisualizer = ({
           }
 
           sharedAnalyser.getByteFrequencyData(sharedFrequencyBins as unknown as Uint8Array<ArrayBuffer>);
-
-          const usableSignal = hasUsableFrequencySignal(sharedFrequencyBins);
-
-          if (usableSignal) {
-            hasDetectedRealSignalRef.current = true;
-          }
-
-          if (prefersSyntheticFallback) {
-            lowSignalFramesRef.current = hasDetectedRealSignalRef.current || usableSignal
-              ? 0
-              : lowSignalFramesRef.current + 1;
-          } else {
-            lowSignalFramesRef.current = 0;
-          }
-
-          const useSyntheticFrame = prefersSyntheticFallback
-            && !hasDetectedRealSignalRef.current
-            && lowSignalFramesRef.current >= LOW_SIGNAL_FRAME_LIMIT;
-          let frequencyBinsForFrame = sharedFrequencyBins;
-
-          if (useSyntheticFrame) {
-            syntheticTimeRef.current += 0.045;
-            populateSyntheticFrequencyBins(syntheticTimeRef.current, syntheticFrequencyBinsRef.current);
-            frequencyBinsForFrame = syntheticFrequencyBinsRef.current;
-          }
-
-          setDataSource(useSyntheticFrame ? 'fallback' : 'real');
+          setDataSource('real');
 
           const {
             bars: nextBars,
-          } = mapFrequencyBinsToBars(frequencyBinsForFrame, smoothedBarsRef.current);
+          } = mapFrequencyBinsToBars(sharedFrequencyBins, smoothedBarsRef.current);
 
           smoothedBarsRef.current = nextBars;
           setFrequencyData(nextBars);
@@ -292,13 +237,10 @@ export const useLiveEqVisualizer = ({
         animate();
       } catch (error) {
         console.error('Failed to initialize live EQ analyser:', error);
-        startSyntheticAnimation();
+        startSyntheticAnimation('fallback');
       }
     };
 
-    lowSignalFramesRef.current = 0;
-    syntheticTimeRef.current = 0;
-    hasDetectedRealSignalRef.current = false;
     void setupAnalyser();
 
     return () => {
