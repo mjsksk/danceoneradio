@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import type { RefObject } from 'react';
 
 const EQ_BAR_COUNT = 64;
 const EQ_MIN_HEIGHT = 12;
@@ -23,7 +24,7 @@ const supportsEqFallback = () => {
 };
 
 interface UseLiveEqVisualizerOptions {
-  audioRef: React.RefObject<HTMLAudioElement>;
+  audioRef: RefObject<HTMLAudioElement>;
   isActive: boolean;
   isElectronDesktop: boolean;
 }
@@ -154,7 +155,7 @@ export const useLiveEqVisualizer = ({
             return;
           }
 
-          sharedAnalyser.getByteFrequencyData(sharedFrequencyBins);
+          sharedAnalyser.getByteFrequencyData(sharedFrequencyBins as unknown as Uint8Array<ArrayBuffer>);
 
           let signalLevel = 0;
           const nextBars = Array.from({ length: EQ_BAR_COUNT }, (_, index) => {
