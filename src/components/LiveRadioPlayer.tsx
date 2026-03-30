@@ -51,9 +51,20 @@ const LiveRadioPlayer = ({
   const audioPlayer = useAudioPlayer();
   const { isPlaying, isLoading, handlePlayPause, primeLiveStream, streamTitle: globalStreamTitle, albumArt: globalAlbumArt } = useLiveRadioPlayer(streamUrls);
 
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 767px)');
+    setIsMobile(mql.matches);
+    const handler = () => setIsMobile(mql.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
+
+  const eqBarCount = isMobile ? EQ_BAR_COUNT_MOBILE : EQ_BAR_COUNT_DESKTOP;
+
   const [localAlbumArt, setLocalAlbumArt] = useState<string | null>(null);
   const [animationActive, setAnimationActive] = useState(false);
-  const [frequencyData, setFrequencyData] = useState<number[]>(createIdleFrequencyData);
+  const [frequencyData, setFrequencyData] = useState<number[]>(() => createIdleFrequencyData(EQ_BAR_COUNT_DESKTOP));
   const [currentStreamTitle, setCurrentStreamTitle] = useState(initialStreamTitle);
   const [isStreamLive, setIsStreamLive] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(() => localStorage.getItem(NOTIFICATION_PREF_KEY) === 'true');
@@ -64,7 +75,7 @@ const LiveRadioPlayer = ({
   const { showNotification, isElectronDesktop, ensureNotificationPermission } = useDesktopIntegration();
   const animationRef = useRef<number | null>(null);
   const lastNotifiedTrackRef = useRef<string | null>(null);
-  const smoothedBarsRef = useRef<number[]>(createIdleFrequencyData());
+  const smoothedBarsRef = useRef<number[]>(createIdleFrequencyData(EQ_BAR_COUNT_DESKTOP));
   const titleContainerRef = useRef<HTMLDivElement | null>(null);
   const titleMeasureRef = useRef<HTMLSpanElement | null>(null);
 
