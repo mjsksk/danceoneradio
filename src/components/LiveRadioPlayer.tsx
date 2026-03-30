@@ -115,8 +115,8 @@ const LiveRadioPlayer = ({
 
   useEffect(() => {
     if (!animationActive) {
-      smoothedBarsRef.current = createIdleFrequencyData();
-      setFrequencyData(createIdleFrequencyData());
+      smoothedBarsRef.current = createIdleFrequencyData(eqBarCount);
+      setFrequencyData(createIdleFrequencyData(eqBarCount));
       return;
     }
 
@@ -125,7 +125,7 @@ const LiveRadioPlayer = ({
 
       const animate = () => {
         time += 0.05;
-        const bars = Array.from({ length: EQ_BAR_COUNT }, (_, i) => {
+        const bars = Array.from({ length: eqBarCount }, (_, i) => {
           const base = 25 + Math.sin(time * (0.3 + i * 0.03) + i) * 18;
           return Math.max(EQ_MIN_HEIGHT, Math.min(EQ_MAX_HEIGHT, base + (Math.random() - 0.5) * 6));
         });
