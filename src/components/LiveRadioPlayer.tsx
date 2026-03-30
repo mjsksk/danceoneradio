@@ -23,7 +23,7 @@ const EQ_BAR_COUNT_MOBILE = 32;
 const EQ_MIN_HEIGHT = 12;
 const EQ_MAX_HEIGHT = 70;
 const NOTIFICATION_PREF_KEY = 'desktop-track-change-notifications';
-const createIdleFrequencyData = () => new Array(EQ_BAR_COUNT).fill(EQ_MIN_HEIGHT);
+const createIdleFrequencyData = (count: number) => new Array(count).fill(EQ_MIN_HEIGHT);
 
 let sharedAudioContext: AudioContext | null = null;
 let sharedAnalyser: AnalyserNode | null = null;
