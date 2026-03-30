@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import type { CSSProperties } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,11 +18,12 @@ interface LiveRadioPlayerProps {
   hidePopupButton?: boolean;
 }
 
-const EQ_BAR_COUNT = 64;
+const EQ_BAR_COUNT_DESKTOP = 64;
+const EQ_BAR_COUNT_MOBILE = 32;
 const EQ_MIN_HEIGHT = 12;
 const EQ_MAX_HEIGHT = 70;
 const NOTIFICATION_PREF_KEY = 'desktop-track-change-notifications';
-const createIdleFrequencyData = () => new Array(EQ_BAR_COUNT).fill(EQ_MIN_HEIGHT);
+const createIdleFrequencyData = (count: number) => new Array(count).fill(EQ_MIN_HEIGHT);
 
 let sharedAudioContext: AudioContext | null = null;
 let sharedAnalyser: AnalyserNode | null = null;
@@ -50,9 +51,20 @@ const LiveRadioPlayer = ({
   const audioPlayer = useAudioPlayer();
   const { isPlaying, isLoading, handlePlayPause, primeLiveStream, streamTitle: globalStreamTitle, albumArt: globalAlbumArt } = useLiveRadioPlayer(streamUrls);
 
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 767px)');
+    setIsMobile(mql.matches);
+    const handler = () => setIsMobile(mql.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
+
+  const eqBarCount = isMobile ? EQ_BAR_COUNT_MOBILE : EQ_BAR_COUNT_DESKTOP;
+
   const [localAlbumArt, setLocalAlbumArt] = useState<string | null>(null);
   const [animationActive, setAnimationActive] = useState(false);
-  const [frequencyData, setFrequencyData] = useState<number[]>(createIdleFrequencyData);
+  const [frequencyData, setFrequencyData] = useState<number[]>(() => createIdleFrequencyData(EQ_BAR_COUNT_DESKTOP));
   const [currentStreamTitle, setCurrentStreamTitle] = useState(initialStreamTitle);
   const [isStreamLive, setIsStreamLive] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(() => localStorage.getItem(NOTIFICATION_PREF_KEY) === 'true');
@@ -63,7 +75,7 @@ const LiveRadioPlayer = ({
   const { showNotification, isElectronDesktop, ensureNotificationPermission } = useDesktopIntegration();
   const animationRef = useRef<number | null>(null);
   const lastNotifiedTrackRef = useRef<string | null>(null);
-  const smoothedBarsRef = useRef<number[]>(createIdleFrequencyData());
+  const smoothedBarsRef = useRef<number[]>(createIdleFrequencyData(EQ_BAR_COUNT_DESKTOP));
   const titleContainerRef = useRef<HTMLDivElement | null>(null);
   const titleMeasureRef = useRef<HTMLSpanElement | null>(null);
 
@@ -103,8 +115,8 @@ const LiveRadioPlayer = ({
 
   useEffect(() => {
     if (!animationActive) {
-      smoothedBarsRef.current = createIdleFrequencyData();
-      setFrequencyData(createIdleFrequencyData());
+      smoothedBarsRef.current = createIdleFrequencyData(eqBarCount);
+      setFrequencyData(createIdleFrequencyData(eqBarCount));
       return;
     }
 
@@ -113,7 +125,7 @@ const LiveRadioPlayer = ({
 
       const animate = () => {
         time += 0.05;
-        const bars = Array.from({ length: EQ_BAR_COUNT }, (_, i) => {
+        const bars = Array.from({ length: eqBarCount }, (_, i) => {
           const base = 25 + Math.sin(time * (0.3 + i * 0.03) + i) * 18;
           return Math.max(EQ_MIN_HEIGHT, Math.min(EQ_MAX_HEIGHT, base + (Math.random() - 0.5) * 6));
         });
@@ -192,9 +204,9 @@ const LiveRadioPlayer = ({
 
           sharedAnalyser.getByteFrequencyData(sharedFrequencyBins as unknown as Uint8Array<ArrayBuffer>);
 
-          const nextBars = Array.from({ length: EQ_BAR_COUNT }, (_, index) => {
-            const start = Math.floor((index / EQ_BAR_COUNT) * sharedFrequencyBins.length);
-            const end = Math.max(start + 1, Math.floor(((index + 1) / EQ_BAR_COUNT) * sharedFrequencyBins.length));
+          const nextBars = Array.from({ length: eqBarCount }, (_, index) => {
+            const start = Math.floor((index / eqBarCount) * sharedFrequencyBins.length);
+            const end = Math.max(start + 1, Math.floor(((index + 1) / eqBarCount) * sharedFrequencyBins.length));
 
             let total = 0;
             for (let i = start; i < end; i += 1) {
@@ -202,7 +214,7 @@ const LiveRadioPlayer = ({
             }
 
             const average = total / (end - start) / 255;
-            const emphasis = 1.15 - (index / EQ_BAR_COUNT) * 0.35;
+            const emphasis = 1.15 - (index / eqBarCount) * 0.35;
             const normalized = Math.min(1, average * emphasis * 1.4);
             const targetHeight = EQ_MIN_HEIGHT + Math.pow(normalized, 1.35) * (EQ_MAX_HEIGHT - EQ_MIN_HEIGHT);
             const previousHeight = smoothedBarsRef.current[index] ?? EQ_MIN_HEIGHT;
@@ -231,7 +243,7 @@ const LiveRadioPlayer = ({
         animationRef.current = null;
       }
     };
-  }, [animationActive, audioPlayer.audioRef, isElectronDesktop]);
+  }, [animationActive, audioPlayer.audioRef, isElectronDesktop, eqBarCount]);
 
   useEffect(() => {
     const fetchAlbumArt = async () => {
@@ -434,19 +446,19 @@ const LiveRadioPlayer = ({
           </div>
         </div>
 
-        <div className="flex items-end justify-center space-x-0.5 mb-6 h-20 w-full px-4" data-eq-container>
-          {frequencyData.map((height, i) => (
+        <div className="flex items-end justify-center gap-[2px] sm:gap-0.5 mb-6 h-20 w-full px-2 sm:px-4" data-eq-container>
+          {frequencyData.slice(0, eqBarCount).map((height, i) => (
             <div
               key={i}
               data-eq-bar
-              className="rounded-full transition-none shadow-lg flex-shrink-0"
+              className="rounded-full transition-none shadow-lg"
               style={{
                 height: `${Math.max(20, Math.min(70, height))}px`,
-                width: '3px',
-                minWidth: '3px',
-                maxWidth: '3px',
-                backgroundColor: animationActive ? `hsl(${(i / 63) * 300}, 90%, 60%)` : 'hsl(var(--muted))',
-                boxShadow: animationActive ? `0 0 8px hsl(${(i / 63) * 300}, 90%, 60%)` : 'none',
+                flex: '1 1 0',
+                maxWidth: '4px',
+                minWidth: '2px',
+                backgroundColor: animationActive ? `hsl(${(i / (eqBarCount - 1)) * 300}, 90%, 60%)` : 'hsl(var(--muted))',
+                boxShadow: animationActive ? `0 0 8px hsl(${(i / (eqBarCount - 1)) * 300}, 90%, 60%)` : 'none',
               }}
             />
           ))}
