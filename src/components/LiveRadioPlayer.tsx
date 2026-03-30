@@ -18,7 +18,8 @@ interface LiveRadioPlayerProps {
   hidePopupButton?: boolean;
 }
 
-const EQ_BAR_COUNT = 64;
+const EQ_BAR_COUNT_DESKTOP = 64;
+const EQ_BAR_COUNT_MOBILE = 32;
 const EQ_MIN_HEIGHT = 12;
 const EQ_MAX_HEIGHT = 70;
 const NOTIFICATION_PREF_KEY = 'desktop-track-change-notifications';
