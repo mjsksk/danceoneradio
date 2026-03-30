@@ -354,6 +354,7 @@ const LiveRadioPlayer = ({
               <p>networkState: {diagnostics.audioNetworkState} | readyState: {diagnostics.audioReadyState}</p>
               <p>Touch device: {diagnostics.isTouchDevice ? 'yes' : 'no'} | Electron: {diagnostics.isElectronDesktop ? 'yes' : 'no'}</p>
               <p>Avg bar: {diagnostics.averageSignal} | Peak: {diagnostics.peakBar} | Min: {diagnostics.minBar}</p>
+              <p>Bins[0-7]: <span className="text-primary">{diagnostics.rawAnalyserBins.join(', ') || 'none'}</span></p>
               <p className="truncate">Audio src: {diagnostics.audioSrc}</p>
             </div>
           </details>

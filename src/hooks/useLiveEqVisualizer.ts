@@ -6,10 +6,24 @@ const EQ_MIN_HEIGHT = 12;
 const EQ_MAX_HEIGHT = 70;
 const ANALYSER_FFT_SIZE = 256;
 const SYNTHETIC_BIN_COUNT = ANALYSER_FFT_SIZE / 2;
+const MOBILE_SILENT_ANALYSER_THRESHOLD = 4;
+const MOBILE_SILENT_FRAME_LIMIT = 72;
 
 const createIdleFrequencyData = (count = EQ_BAR_COUNT) => new Array(count).fill(EQ_MIN_HEIGHT);
 
 const clampNormalized = (value: number) => Math.max(0, Math.min(1, value));
+
+const isTouchDeviceClient = () => typeof window !== 'undefined' && (window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0);
+
+const getPeakFrequencyValue = (frequencyBins: Uint8Array) => {
+  let peak = 0;
+
+  for (let index = 0; index < frequencyBins.length; index += 1) {
+    peak = Math.max(peak, frequencyBins[index]);
+  }
+
+  return peak;
+};
 
 let sharedAudioContext: AudioContext | null = null;
 let sharedAnalyser: AnalyserNode | null = null;
@@ -102,6 +116,7 @@ export const useLiveEqVisualizer = ({
   const smoothedBarsRef = useRef<number[]>(createIdleFrequencyData());
   const syntheticTimeRef = useRef(0);
   const syntheticFrequencyBinsRef = useRef<Uint8Array>(new Uint8Array(SYNTHETIC_BIN_COUNT));
+  const silentAnalyserFramesRef = useRef(0);
 
   useEffect(() => {
     const cancelFrame = () => {
@@ -113,6 +128,7 @@ export const useLiveEqVisualizer = ({
 
     if (!isActive) {
       syntheticTimeRef.current = 0;
+      silentAnalyserFramesRef.current = 0;
       smoothedBarsRef.current = createIdleFrequencyData();
       setDataSource('idle');
       setFrequencyData(createIdleFrequencyData());
@@ -129,6 +145,7 @@ export const useLiveEqVisualizer = ({
       }
 
       cancelFrame();
+      silentAnalyserFramesRef.current = 0;
 
       const animate = () => {
         if (isCancelled) {
@@ -215,6 +232,23 @@ export const useLiveEqVisualizer = ({
           }
 
           sharedAnalyser.getByteFrequencyData(sharedFrequencyBins as unknown as Uint8Array<ArrayBuffer>);
+
+          const peakFrequencyValue = getPeakFrequencyValue(sharedFrequencyBins);
+          if (
+            !isElectronDesktop &&
+            isTouchDeviceClient() &&
+            peakFrequencyValue <= MOBILE_SILENT_ANALYSER_THRESHOLD
+          ) {
+            silentAnalyserFramesRef.current += 1;
+
+            if (silentAnalyserFramesRef.current >= MOBILE_SILENT_FRAME_LIMIT) {
+              startSyntheticAnimation('desktop-sim');
+              return;
+            }
+          } else {
+            silentAnalyserFramesRef.current = 0;
+          }
+
           setDataSource('real');
 
           const {
@@ -249,12 +283,13 @@ export const useLiveEqVisualizer = ({
     audioCrossOrigin: audioRef.current?.crossOrigin ?? 'not-set',
     audioNetworkState: audioRef.current?.networkState ?? -1,
     audioReadyState: audioRef.current?.readyState ?? -1,
-    isTouchDevice: typeof window !== 'undefined' && (window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0),
+    isTouchDevice: isTouchDeviceClient(),
     averageSignal: frequencyData.length > 0
       ? Math.round(frequencyData.reduce((a, b) => a + b, 0) / frequencyData.length)
       : 0,
     peakBar: Math.round(Math.max(...frequencyData)),
     minBar: Math.round(Math.min(...frequencyData)),
+    rawAnalyserBins: sharedFrequencyBins ? Array.from(sharedFrequencyBins.slice(0, 8)) : [],
     isElectronDesktop,
   };
 
