@@ -4,10 +4,15 @@ import type { RefObject } from 'react';
 const EQ_BAR_COUNT = 64;
 const EQ_MIN_HEIGHT = 12;
 const EQ_MAX_HEIGHT = 70;
+const ANALYSER_FFT_SIZE = 256;
 const LOW_SIGNAL_THRESHOLD = 0.035;
+const LOW_SIGNAL_PEAK_THRESHOLD = 0.09;
 const LOW_SIGNAL_FRAME_LIMIT = 18;
+const SYNTHETIC_BIN_COUNT = ANALYSER_FFT_SIZE / 2;
 
 const createIdleFrequencyData = (count = EQ_BAR_COUNT) => new Array(count).fill(EQ_MIN_HEIGHT);
+
+const clampNormalized = (value: number) => Math.max(0, Math.min(1, value));
 
 let sharedAudioContext: AudioContext | null = null;
 let sharedAnalyser: AnalyserNode | null = null;
@@ -15,31 +20,71 @@ let sharedSourceNode: MediaElementAudioSourceNode | null = null;
 let sharedAnalyserAudio: HTMLAudioElement | null = null;
 let sharedFrequencyBins: Uint8Array | null = null;
 
-const createSyntheticSpectrum = (time: number, previousBars: number[]) => Array.from({ length: EQ_BAR_COUNT }, (_, index) => {
-  const position = index / (EQ_BAR_COUNT - 1);
-  const distanceFromMid = Math.abs(position - 0.48);
-  const bassContour = 1 - position * 0.42;
-  const midContour = Math.max(0, 1 - distanceFromMid * 2.6);
-  const bassPulse = (Math.sin(time * 2.3 - position * 6.2) + 1) / 2;
-  const midPulse = (Math.sin(time * 3.4 + position * 11.5) + 1) / 2;
-  const highPulse = (Math.sin(time * 4.8 + position * 19.5) + 1) / 2;
-  const shimmer = (Math.sin(time * 6.2 + index * 0.72) + 1) / 2;
+const mapFrequencyBinsToBars = (frequencyBins: Uint8Array, previousBars: number[]) => {
+  let signalLevel = 0;
+  let peakSignal = 0;
 
-  const normalized = Math.min(
-    1,
-    0.08 +
-      bassPulse * bassContour * 0.62 +
-      midPulse * midContour * 0.28 +
-      highPulse * position * 0.12 +
-      shimmer * 0.06,
-  );
+  const bars = Array.from({ length: EQ_BAR_COUNT }, (_, index) => {
+    const start = Math.floor((index / EQ_BAR_COUNT) * frequencyBins.length);
+    const end = Math.max(start + 1, Math.floor(((index + 1) / EQ_BAR_COUNT) * frequencyBins.length));
 
-  const targetHeight = EQ_MIN_HEIGHT + Math.pow(normalized, 1.3) * (EQ_MAX_HEIGHT - EQ_MIN_HEIGHT);
-  const previousHeight = previousBars[index] ?? EQ_MIN_HEIGHT;
-  const smoothing = targetHeight > previousHeight ? 0.24 : 0.15;
+    let total = 0;
+    for (let i = start; i < end; i += 1) {
+      total += frequencyBins[i];
+    }
 
-  return previousHeight + (targetHeight - previousHeight) * smoothing;
-});
+    const average = total / (end - start) / 255;
+    const emphasis = 1.15 - (index / EQ_BAR_COUNT) * 0.35;
+    const normalized = clampNormalized(average * emphasis * 1.4);
+    const targetHeight = EQ_MIN_HEIGHT + Math.pow(normalized, 1.35) * (EQ_MAX_HEIGHT - EQ_MIN_HEIGHT);
+    const previousHeight = previousBars[index] ?? EQ_MIN_HEIGHT;
+    const smoothing = targetHeight > previousHeight ? 0.45 : 0.18;
+
+    signalLevel += normalized;
+    peakSignal = Math.max(peakSignal, normalized);
+
+    return previousHeight + (targetHeight - previousHeight) * smoothing;
+  });
+
+  return {
+    bars,
+    averageSignal: signalLevel / EQ_BAR_COUNT,
+    peakSignal,
+  };
+};
+
+const populateSyntheticFrequencyBins = (time: number, frequencyBins: Uint8Array) => {
+  const kick = Math.pow((Math.sin(time * 2.4) + 1) / 2, 1.6);
+  const bassDrive = 0.16 + kick * 0.42;
+  const lowMidDrive = 0.14 + ((Math.sin(time * 1.8 + 0.8) + 1) / 2) * 0.22;
+  const upperMidDrive = 0.1 + ((Math.sin(time * 2.7 + 1.5) + 1) / 2) * 0.14;
+  const airDrive = 0.04 + ((Math.sin(time * 4.1 + 0.5) + 1) / 2) * 0.07;
+  const sweepCenter = 0.36 + ((Math.sin(time * 0.85) + 1) / 2) * 0.24;
+
+  for (let index = 0; index < frequencyBins.length; index += 1) {
+    const position = index / (frequencyBins.length - 1);
+    const bassWeight = Math.exp(-position * 4.8);
+    const lowMidWeight = Math.exp(-Math.pow((position - 0.26) / 0.18, 2));
+    const upperMidWeight = Math.exp(-Math.pow((position - 0.54) / 0.16, 2));
+    const airWeight = Math.exp(-Math.pow((position - 0.8) / 0.12, 2));
+    const sweepWeight = Math.exp(-Math.pow((position - sweepCenter) / 0.11, 2));
+    const shimmer = ((Math.sin(time * 6.2 - position * 18) + 1) / 2) * 0.03;
+    const texture = ((Math.sin(time * 3.8 + index * 0.42) + 1) / 2) * 0.025;
+
+    const energy = clampNormalized(
+      0.02 +
+        bassDrive * bassWeight +
+        lowMidDrive * lowMidWeight * 0.72 +
+        upperMidDrive * upperMidWeight * 0.54 +
+        airDrive * airWeight * 0.4 +
+        sweepWeight * 0.12 +
+        shimmer +
+        texture,
+    );
+
+    frequencyBins[index] = Math.round(energy * 255);
+  }
+};
 
 const supportsEqFallback = () => {
   if (typeof window === 'undefined') {
@@ -93,6 +138,7 @@ export const useLiveEqVisualizer = ({
 
       syntheticModeRef.current = true;
       cancelFrame();
+      const syntheticFrequencyBins = new Uint8Array(SYNTHETIC_BIN_COUNT);
 
       const animate = () => {
         if (isCancelled) {
@@ -100,7 +146,8 @@ export const useLiveEqVisualizer = ({
         }
 
         time += 0.05;
-        const bars = createSyntheticSpectrum(time, smoothedBarsRef.current);
+        populateSyntheticFrequencyBins(time, syntheticFrequencyBins);
+        const { bars } = mapFrequencyBinsToBars(syntheticFrequencyBins, smoothedBarsRef.current);
 
         smoothedBarsRef.current = bars;
         setFrequencyData(bars);
@@ -158,7 +205,7 @@ export const useLiveEqVisualizer = ({
             const sourceNode = context.createMediaElementSource(audio);
             const analyser = context.createAnalyser();
 
-            analyser.fftSize = 256;
+            analyser.fftSize = ANALYSER_FFT_SIZE;
             analyser.minDecibels = -95;
             analyser.maxDecibels = -20;
             analyser.smoothingTimeConstant = 0.82;
@@ -180,30 +227,14 @@ export const useLiveEqVisualizer = ({
 
           sharedAnalyser.getByteFrequencyData(sharedFrequencyBins as unknown as Uint8Array<ArrayBuffer>);
 
-          let signalLevel = 0;
-          const nextBars = Array.from({ length: EQ_BAR_COUNT }, (_, index) => {
-            const start = Math.floor((index / EQ_BAR_COUNT) * sharedFrequencyBins!.length);
-            const end = Math.max(start + 1, Math.floor(((index + 1) / EQ_BAR_COUNT) * sharedFrequencyBins!.length));
-
-            let total = 0;
-            for (let i = start; i < end; i += 1) {
-              total += sharedFrequencyBins![i];
-            }
-
-            const average = total / (end - start) / 255;
-            const emphasis = 1.15 - (index / EQ_BAR_COUNT) * 0.35;
-            const normalized = Math.min(1, average * emphasis * 1.4);
-            const targetHeight = EQ_MIN_HEIGHT + Math.pow(normalized, 1.35) * (EQ_MAX_HEIGHT - EQ_MIN_HEIGHT);
-            const previousHeight = smoothedBarsRef.current[index] ?? EQ_MIN_HEIGHT;
-            const smoothing = targetHeight > previousHeight ? 0.45 : 0.18;
-
-            signalLevel += normalized;
-            return previousHeight + (targetHeight - previousHeight) * smoothing;
-          });
+          const {
+            bars: nextBars,
+            averageSignal,
+            peakSignal,
+          } = mapFrequencyBinsToBars(sharedFrequencyBins, smoothedBarsRef.current);
 
           if (prefersSyntheticFallback) {
-            const averageSignal = signalLevel / EQ_BAR_COUNT;
-            lowSignalFramesRef.current = averageSignal < LOW_SIGNAL_THRESHOLD
+            lowSignalFramesRef.current = averageSignal < LOW_SIGNAL_THRESHOLD && peakSignal < LOW_SIGNAL_PEAK_THRESHOLD
               ? lowSignalFramesRef.current + 1
               : 0;
 
