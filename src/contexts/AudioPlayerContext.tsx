@@ -42,6 +42,15 @@ const STREAM_URLS = [...PRIMARY_STREAM_URLS];
 const STREAM_START_TIMEOUT_MS = 4500;
 const LIVE_RESUME_RESTART_THRESHOLD_MS = 15000;
 const LIVE_STALL_RECOVERY_DELAY_MS = 3500;
+const LIVE_WATCHDOG_INTERVAL_MS = 8000;
+const LIVE_WATCHDOG_STALE_THRESHOLD_MS = 12000;
+const LIVE_ERROR_RETRY_DELAY_MS = 5000;
+
+/** Append a cache-buster so the browser never serves stale buffered audio */
+const bustStreamUrl = (url: string) => {
+  const sep = url.includes('?') ? '&' : '?';
+  return `${url}${sep}_cb=${Date.now()}`;
+};
 
 const getAudioCrossOrigin = (url: string) => (
   url.includes('listen.mp3') ? 'anonymous' : null
