@@ -630,6 +630,22 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [cancelStreamAttempts, clearLivePauseExpiryTimeout, clearLiveRecoveryTimeout]);
 
+  // Liveness watchdog: if we're supposed to be playing live but haven't
+  // received a timeupdate in LIVE_WATCHDOG_STALE_THRESHOLD_MS, force restart.
+  useEffect(() => {
+    if (state.source !== 'live' || !state.isPlaying) return;
+
+    const watchdog = window.setInterval(() => {
+      const elapsed = Date.now() - lastTimeupdateRef.current;
+      if (elapsed > LIVE_WATCHDOG_STALE_THRESHOLD_MS) {
+        console.warn(`Live stream watchdog: no timeupdate for ${elapsed}ms, restarting`);
+        restartLiveStream(0);
+      }
+    }, LIVE_WATCHDOG_INTERVAL_MS);
+
+    return () => window.clearInterval(watchdog);
+  }, [state.source, state.isPlaying, restartLiveStream]);
+
   // Some browsers can throttle `timeupdate`; keep episode progress in sync while playing.
   useEffect(() => {
     const audio = audioRef.current;
