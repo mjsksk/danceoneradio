@@ -94,6 +94,8 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
   const livePauseTimestampRef = useRef<number | null>(null);
   const liveRecoveryTimeoutRef = useRef<number | null>(null);
   const livePauseExpiryTimeoutRef = useRef<number | null>(null);
+  const liveErrorRetryTimeoutRef = useRef<number | null>(null);
+  const lastTimeupdateRef = useRef<number>(0);
 
   const matchesAudioSource = useCallback((audio: HTMLAudioElement, url: string) => {
     const currentSource = audio.currentSrc || audio.src;
