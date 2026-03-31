@@ -7,7 +7,7 @@ import SocialShare from '@/components/SocialShare';
 import SEO from '@/components/SEO';
 import GoogleAds from '@/components/GoogleAds';
 import { AD_SLOTS } from '@/config/adSlots';
-import TrackAffiliateLinks from '@/components/TrackAffiliateLinks';
+import EpisodeTracklist from '@/components/EpisodeTracklist';
 import { LoginPrompt } from '@/components/LoginPrompt';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
