@@ -473,24 +473,28 @@ const TracksSection = () => {
                          <TrackAffiliateLinks title={track.title} artist={track.artist} variant="desktop" />
                        </div>
                      </div>
-                      <a
-                        href={`https://www.amazon.com/s?k=${encodeURIComponent(`${track.artist} ${track.title}`)}&tag=danceone-20`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 mt-1.5 px-3 py-1 rounded-full text-xs font-semibold font-['Rajdhani'] bg-orange-500/15 text-orange-400 hover:bg-orange-500/25 hover:text-orange-300 transition-colors border border-orange-500/20"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        🛒 Buy on Amazon
-                      </a>
-                      <a
-                        href={`https://www.beatport.com/search?q=${encodeURIComponent(`${track.artist} ${track.title}`)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 mt-1.5 ml-2 px-3 py-1 rounded-full text-xs font-semibold font-['Rajdhani'] bg-green-500/15 text-green-400 hover:bg-green-500/25 hover:text-green-300 transition-colors border border-green-500/20"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        🎵 View on Beatport
-                      </a>
+                      {track.artist && track.title && (
+                        <div className="flex flex-wrap items-center gap-2 mt-2">
+                          <a
+                            href={`https://www.amazon.com/s?k=${encodeURIComponent(`${track.artist} ${track.title}`)}&tag=danceone-20`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold font-['Rajdhani'] bg-primary text-primary-foreground hover:bg-primary/80 transition-colors shadow-[0_0_12px_hsl(var(--primary)/0.3)]"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            🛒 Buy on Amazon
+                          </a>
+                          <a
+                            href={`https://www.beatport.com/search?q=${encodeURIComponent(`${track.artist} ${track.title}`)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold font-['Rajdhani'] border border-primary/30 text-primary/80 hover:bg-primary/10 hover:text-primary transition-colors"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            🎵 Open on Beatport
+                          </a>
+                        </div>
+                      )}
                      <div className="sm:hidden">
                        <TrackAffiliateLinks title={track.title} artist={track.artist} variant="mobile" />
                      </div>
