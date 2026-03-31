@@ -200,53 +200,7 @@ import { useEpisodePlayer } from '@/hooks/useEpisodePlayer';
 
         <GoogleAds key={`episode${episodeNumber}-ad`} slot={AD_SLOTS.IN_CONTENT} />
 
-        {tracks.length > 0 && (
-          <section className="py-12">
-            <div className="container mx-auto px-4">
-              <div className="max-w-4xl mx-auto">
-                <h2 className="text-2xl md:text-3xl font-['Orbitron'] font-bold mb-8 text-center">
-                  <span className="text-neon-purple">Track Listing</span>
-                </h2>
-                
-                <div className="grid gap-3">
-                  {tracks.map((track) => (
-                    <Card key={track.position} className="card-cyber p-2 sm:p-4 hover:scale-[1.01] transition-all duration-200 group">
-                      <div className="flex items-center gap-2 sm:gap-4">
-                        <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full flex items-center justify-center text-neon font-['Orbitron'] font-bold text-xs sm:text-sm shrink-0">
-                          {track.position}
-                        </div>
-                        
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-xs sm:text-sm font-semibold text-primary group-hover:text-neon transition-colors break-words sm:truncate">
-                            {track.title}
-                            {track.isUnreleased && (
-                              <span className="ml-2 px-2 py-0.5 bg-neon/20 text-neon text-[10px] sm:text-xs rounded-full">
-                                UNRELEASED
-                              </span>
-                            )}
-                          </h3>
-                          <p className="text-xs sm:text-sm text-muted-foreground break-words sm:truncate">
-                            {track.artist}
-                          </p>
-                          <div className="sm:hidden">
-                            <TrackAffiliateLinks title={track.title} artist={track.artist} variant="mobile" />
-                          </div>
-                        </div>
-                        
-                        <div className="hidden sm:block">
-                          <TrackAffiliateLinks title={track.title} artist={track.artist} />
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-        <GoogleAds key={`episode${episodeNumber}-tracklist-ad`} slot={AD_SLOTS.AFTER_TRACKLIST} format="rectangle" />
-      </main>
-
+        <EpisodeTracklist episodeNumber={episodeNumber} />
       <Footer />
       </div>
     </div>
