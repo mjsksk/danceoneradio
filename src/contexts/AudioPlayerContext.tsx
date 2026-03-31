@@ -590,11 +590,8 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
         const attemptToken = streamAttemptTokenRef.current;
         clearStreamStartTimeout();
 
-        if (nextUrlIndex < streamUrls.length) {
-          attemptLiveStream(streamUrls, nextUrlIndex, attemptToken);
-        } else {
-          setState(prev => ({ ...prev, isLoading: false }));
-        }
+        // attemptLiveStream now handles exhaustion with auto-retry
+        attemptLiveStream(streamUrls, nextUrlIndex, attemptToken);
       } else {
         setState(prev => ({ ...prev, isLoading: false }));
       }
