@@ -499,7 +499,10 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       }
       setState(prev => ({ ...prev, isPlaying: false }));
     };
-    const handleTimeUpdate = () => setState(prev => ({ ...prev, currentTime: audio.currentTime }));
+    const handleTimeUpdate = () => {
+      lastTimeupdateRef.current = Date.now();
+      setState(prev => ({ ...prev, currentTime: audio.currentTime }));
+    };
     const handleLoadedMetadata = () => {
       clearLivePauseExpiryTimeout();
       clearLiveRecoveryTimeout();
