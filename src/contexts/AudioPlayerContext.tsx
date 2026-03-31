@@ -365,19 +365,9 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     clearLivePauseExpiryTimeout();
 
     if (state.source === 'live') {
-      const pausedForMs = livePauseTimestampRef.current ? Date.now() - livePauseTimestampRef.current : 0;
-      const shouldRestartLiveStream =
-        pausedForMs >= LIVE_RESUME_RESTART_THRESHOLD_MS ||
-        !audio.currentSrc ||
-        audio.ended ||
-        audio.error !== null ||
-        audio.networkState === HTMLMediaElement.NETWORK_EMPTY ||
-        audio.readyState <= HTMLMediaElement.HAVE_CURRENT_DATA;
-
-      if (shouldRestartLiveStream) {
-        restartLiveStream(currentUrlIndex);
-        return;
-      }
+      // Always restart live stream fresh to avoid stale buffered audio
+      restartLiveStream(0);
+      return;
     }
 
     audio.play()
@@ -385,14 +375,9 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
         livePauseTimestampRef.current = null;
       })
       .catch(err => {
-        if (state.source === 'live') {
-          restartLiveStream(currentUrlIndex);
-          return;
-        }
-
         console.error('Error resuming:', err);
       });
-  }, [clearLivePauseExpiryTimeout, clearStreamStartTimeout, currentUrlIndex, restartLiveStream, state.source]);
+  }, [clearLivePauseExpiryTimeout, clearStreamStartTimeout, restartLiveStream, state.source]);
 
   const seek = useCallback((time: number) => {
     if (!audioRef.current) return;
