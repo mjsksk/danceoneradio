@@ -7,75 +7,13 @@ import SocialShare from '@/components/SocialShare';
 import SEO from '@/components/SEO';
 import GoogleAds from '@/components/GoogleAds';
 import { AD_SLOTS } from '@/config/adSlots';
-import TrackAffiliateLinks from '@/components/TrackAffiliateLinks';
+import EpisodeTracklist from '@/components/EpisodeTracklist';
 import { LoginPrompt } from '@/components/LoginPrompt';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEpisodePlayer } from '@/hooks/useEpisodePlayer';
 
-interface Track {
-  position: number;
-  title: string;
-  artist: string;
-  isUnreleased?: boolean;
-}
-
-const Episode399 = () => {
-  const { user } = useAuth();
-  const episodeNumber = 399;
-  const episodeTitle = "Future Dance Anthems with Mario 399";
-  const audioUrl = "https://media.blubrry.com/biggest_tunes_with_mario_135/mc.blubrry.com/biggest_tunes_with_mario_135/Biggest-Tunes-with-Mario-399-streamed.mp3?awCollectionId=673838&awEpisodeId=11890632&aw_0_azn.pgenre=Music&aw_0_1st.ri=blubrry&aw_0_azn.pcountry=US&aw_0_azn.planguage=en-us&cat_exclude=IAB1-8%2CIAB1-9%2CIAB7-41%2CIAB8-5%2CIAB8-18%2CIAB11-4%2CIAB23%2CIAB24%2CIAB25%2CIAB26&aw_0_cnt.rss=https%3A%2F%2Ffeeds.blubrry.com%2Ffeeds%2Fbiggest_tunes_with_mario_135.xml";
-  const episodeDate = "December 20, 2025";
-  
-  const { 
-    isPlaying, 
-    isLoading, 
-    currentTime, 
-    duration, 
-    progress, 
-    handlePlayPause, 
-    handleSeek, 
-    formatTime 
-  } = useEpisodePlayer({ episodeNumber, episodeTitle, audioUrl });
-  
-  const [bgLoaded, setBgLoaded] = useState(false);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  useEffect(() => {
-    const img = new Image();
-    img.onload = () => setBgLoaded(true);
-    img.src = '/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png';
-  }, []);
-
-  const onSeekClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const percentage = x / rect.width;
-    handleSeek(percentage * duration);
-  };
-
-  const tracks: Track[] = [
-    { position: 1, title: "Come Closer (feat. Sienna Sophia)", artist: "Josh Baker" },
-    { position: 2, title: "Hypnotizing", artist: "Makito" },
-    { position: 3, title: "Real Love (Extended Mix)", artist: "Syn Cole & Alexander Jean" },
-    { position: 4, title: "It's Only Real 2025", artist: "Denis Sulta" },
-    { position: 5, title: "Underground (Danny P & Caleb Laurenson Remix)", artist: "Nick Curly", isUnreleased: true },
-    { position: 6, title: "Deeper (Extended Mix)", artist: "Disclosure, Leon Thomas" },
-    { position: 7, title: "Mr. Cool", artist: "Kenya Grace" },
-    { position: 8, title: "En NY", artist: "Verano" },
-    { position: 9, title: "Swoon", artist: "The Chemical Brothers" },
-    { position: 10, title: "Vois Sur Ton Chemin (Deep House Mix)", artist: "Sir Gladis" },
-    { position: 11, title: "Setting Souls", artist: "Joe Gifford" },
-    { position: 12, title: "Unshaken (Extended)", artist: "Laurent Schark & Sami & The Spirit Choir" },
-    { position: 13, title: "2011", artist: "Effy" },
-    { position: 14, title: "Deep Sweet Dream (Jope Extended Remix)", artist: "Taglo" },
-    { position: 15, title: "Lose Control (Extended Mix)", artist: "EC Twins & Emiliana" },
-    { position: 16, title: "I'm not in Love (Original Deep House Version)", artist: "Sir Gladis" },
-  ];
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
@@ -262,50 +200,7 @@ const Episode399 = () => {
 
         <GoogleAds key={`episode${episodeNumber}-ad`} slot={AD_SLOTS.IN_CONTENT} />
 
-        {tracks.length > 0 && (
-          <section className="py-12">
-            <div className="container mx-auto px-4">
-              <div className="max-w-4xl mx-auto">
-                <h2 className="text-2xl md:text-3xl font-['Orbitron'] font-bold mb-8 text-center">
-                  <span className="text-neon-purple">Track Listing</span>
-                </h2>
-                
-                <div className="grid gap-3">
-                  {tracks.map((track) => (
-                    <Card key={track.position} className="card-cyber p-2 sm:p-4 hover:scale-[1.01] transition-all duration-200 group">
-                      <div className="flex items-center gap-2 sm:gap-4">
-                        <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full flex items-center justify-center text-neon font-['Orbitron'] font-bold text-xs sm:text-sm shrink-0">
-                          {track.position}
-                        </div>
-                        
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-xs sm:text-sm font-semibold text-primary group-hover:text-neon transition-colors break-words sm:truncate">
-                            {track.title}
-                            {track.isUnreleased && (
-                              <span className="ml-2 px-2 py-0.5 bg-neon/20 text-neon text-[10px] sm:text-xs rounded-full">
-                                UNRELEASED
-                              </span>
-                            )}
-                          </h3>
-                          <p className="text-xs sm:text-sm text-muted-foreground break-words sm:truncate">
-                            {track.artist}
-                          </p>
-                          <div className="sm:hidden">
-                            <TrackAffiliateLinks title={track.title} artist={track.artist} variant="mobile" />
-                          </div>
-                        </div>
-                        
-                        <div className="hidden sm:block">
-                          <TrackAffiliateLinks title={track.title} artist={track.artist} />
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
+        <EpisodeTracklist episodeNumber={episodeNumber} />
         <GoogleAds key={`episode${episodeNumber}-tracklist-ad`} slot={AD_SLOTS.AFTER_TRACKLIST} format="rectangle" />
       </main>
 
