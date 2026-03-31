@@ -52,6 +52,7 @@ const Episode399 = () => {
     handleSeek(percentage * duration);
   };
 
+  return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
       <SEO 
         title={`Anthems of the week ${episodeNumber} - Future Dance Anthems with Mario | Dance One Radio`}
