@@ -218,17 +218,9 @@ export const useLiveRadioPlayer = (streamUrls: string[] = [...PRIMARY_STREAM_URL
       return;
     }
 
-    const audio = audioPlayer.audioRef.current;
-    if (!audio || audio.src) {
-      return;
-    }
-
-      const preloadUrls = streamUrls.length > 0 ? streamUrls : [...PRIMARY_STREAM_URLS];
-      audio.preload = 'auto';
-      audio.crossOrigin = getAudioCrossOrigin(preloadUrls[0]);
-      audio.src = preloadUrls[0];
-      audio.load();
-  }, [audioPlayer.audioRef, streamUrls, usesDesktopAudioBridge]);
+    // Do NOT preload the stream URL — this causes stale buffered audio
+    // when the user plays later. The stream will be loaded fresh on play.
+  }, [usesDesktopAudioBridge]);
 
   return {
     isPlaying,

@@ -42,6 +42,15 @@ const STREAM_URLS = [...PRIMARY_STREAM_URLS];
 const STREAM_START_TIMEOUT_MS = 4500;
 const LIVE_RESUME_RESTART_THRESHOLD_MS = 15000;
 const LIVE_STALL_RECOVERY_DELAY_MS = 3500;
+const LIVE_WATCHDOG_INTERVAL_MS = 8000;
+const LIVE_WATCHDOG_STALE_THRESHOLD_MS = 12000;
+const LIVE_ERROR_RETRY_DELAY_MS = 5000;
+
+/** Append a cache-buster so the browser never serves stale buffered audio */
+const bustStreamUrl = (url: string) => {
+  const sep = url.includes('?') ? '&' : '?';
+  return `${url}${sep}_cb=${Date.now()}`;
+};
 
 const getAudioCrossOrigin = (url: string) => (
   url.includes('listen.mp3') ? 'anonymous' : null
@@ -85,6 +94,8 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
   const livePauseTimestampRef = useRef<number | null>(null);
   const liveRecoveryTimeoutRef = useRef<number | null>(null);
   const livePauseExpiryTimeoutRef = useRef<number | null>(null);
+  const liveErrorRetryTimeoutRef = useRef<number | null>(null);
+  const lastTimeupdateRef = useRef<number>(0);
 
   const matchesAudioSource = useCallback((audio: HTMLAudioElement, url: string) => {
     const currentSource = audio.currentSrc || audio.src;
@@ -113,12 +124,20 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  const clearLiveErrorRetryTimeout = useCallback(() => {
+    if (liveErrorRetryTimeoutRef.current !== null) {
+      window.clearTimeout(liveErrorRetryTimeoutRef.current);
+      liveErrorRetryTimeoutRef.current = null;
+    }
+  }, []);
+
   const cancelStreamAttempts = useCallback(() => {
     streamAttemptTokenRef.current += 1;
     clearStreamStartTimeout();
     clearLiveRecoveryTimeout();
     clearLivePauseExpiryTimeout();
-  }, [clearLivePauseExpiryTimeout, clearLiveRecoveryTimeout, clearStreamStartTimeout]);
+    clearLiveErrorRetryTimeout();
+  }, [clearLivePauseExpiryTimeout, clearLiveRecoveryTimeout, clearStreamStartTimeout, clearLiveErrorRetryTimeout]);
 
   // Fetch stream metadata for live stream
   useEffect(() => {
@@ -153,7 +172,12 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
 
     if (urlIndex >= urls.length) {
       clearStreamStartTimeout();
-      setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
+      // Instead of giving up, schedule a retry from the first URL
+      console.warn('All stream URLs exhausted, retrying in', LIVE_ERROR_RETRY_DELAY_MS, 'ms');
+      liveErrorRetryTimeoutRef.current = window.setTimeout(() => {
+        if (streamAttemptTokenRef.current !== attemptToken) return;
+        attemptLiveStream(urls, 0, attemptToken);
+      }, LIVE_ERROR_RETRY_DELAY_MS);
       return;
     }
 
@@ -161,17 +185,15 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     clearStreamStartTimeout();
 
     const nextUrl = urls[urlIndex];
-    const alreadyPrimed = matchesAudioSource(audio, nextUrl);
 
+    // ALWAYS force-reload with cache-busting to avoid stale buffered audio
     audio.crossOrigin = getAudioCrossOrigin(nextUrl);
+    audio.pause();
+    audio.src = bustStreamUrl(nextUrl);
+    audio.load();
 
-    if (!alreadyPrimed) {
-      audio.pause();
-      audio.src = nextUrl;
-      audio.load();
-    } else if (audio.networkState === HTMLMediaElement.NETWORK_EMPTY) {
-      audio.load();
-    }
+    // Reset the watchdog timestamp so the liveness check starts fresh
+    lastTimeupdateRef.current = Date.now();
 
     streamStartTimeoutRef.current = window.setTimeout(() => {
       if (streamAttemptTokenRef.current !== attemptToken) return;
@@ -194,6 +216,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
         livePauseTimestampRef.current = null;
         clearLivePauseExpiryTimeout();
         clearStreamStartTimeout();
+        lastTimeupdateRef.current = Date.now();
         setState(prev => ({ ...prev, isPlaying: true, isLoading: false }));
       })
       .catch(err => {
@@ -203,7 +226,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
         console.error(`Error playing live stream URL ${urlIndex + 1}:`, err);
         attemptLiveStream(urls, urlIndex + 1, attemptToken);
       });
-  }, [clearLivePauseExpiryTimeout, clearStreamStartTimeout, matchesAudioSource]);
+  }, [clearLivePauseExpiryTimeout, clearStreamStartTimeout]);
 
   const restartLiveStream = useCallback((preferredUrlIndex = 0) => {
     if (!audioRef.current) return;
@@ -342,19 +365,9 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     clearLivePauseExpiryTimeout();
 
     if (state.source === 'live') {
-      const pausedForMs = livePauseTimestampRef.current ? Date.now() - livePauseTimestampRef.current : 0;
-      const shouldRestartLiveStream =
-        pausedForMs >= LIVE_RESUME_RESTART_THRESHOLD_MS ||
-        !audio.currentSrc ||
-        audio.ended ||
-        audio.error !== null ||
-        audio.networkState === HTMLMediaElement.NETWORK_EMPTY ||
-        audio.readyState <= HTMLMediaElement.HAVE_CURRENT_DATA;
-
-      if (shouldRestartLiveStream) {
-        restartLiveStream(currentUrlIndex);
-        return;
-      }
+      // Always restart live stream fresh to avoid stale buffered audio
+      restartLiveStream(0);
+      return;
     }
 
     audio.play()
@@ -362,14 +375,9 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
         livePauseTimestampRef.current = null;
       })
       .catch(err => {
-        if (state.source === 'live') {
-          restartLiveStream(currentUrlIndex);
-          return;
-        }
-
         console.error('Error resuming:', err);
       });
-  }, [clearLivePauseExpiryTimeout, clearStreamStartTimeout, currentUrlIndex, restartLiveStream, state.source]);
+  }, [clearLivePauseExpiryTimeout, clearStreamStartTimeout, restartLiveStream, state.source]);
 
   const seek = useCallback((time: number) => {
     if (!audioRef.current) return;
@@ -476,7 +484,10 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       }
       setState(prev => ({ ...prev, isPlaying: false }));
     };
-    const handleTimeUpdate = () => setState(prev => ({ ...prev, currentTime: audio.currentTime }));
+    const handleTimeUpdate = () => {
+      lastTimeupdateRef.current = Date.now();
+      setState(prev => ({ ...prev, currentTime: audio.currentTime }));
+    };
     const handleLoadedMetadata = () => {
       clearLivePauseExpiryTimeout();
       clearLiveRecoveryTimeout();
@@ -564,11 +575,8 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
         const attemptToken = streamAttemptTokenRef.current;
         clearStreamStartTimeout();
 
-        if (nextUrlIndex < streamUrls.length) {
-          attemptLiveStream(streamUrls, nextUrlIndex, attemptToken);
-        } else {
-          setState(prev => ({ ...prev, isLoading: false }));
-        }
+        // attemptLiveStream now handles exhaustion with auto-retry
+        attemptLiveStream(streamUrls, nextUrlIndex, attemptToken);
       } else {
         setState(prev => ({ ...prev, isLoading: false }));
       }
@@ -606,6 +614,22 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       clearLiveRecoveryTimeout();
     };
   }, [cancelStreamAttempts, clearLivePauseExpiryTimeout, clearLiveRecoveryTimeout]);
+
+  // Liveness watchdog: if we're supposed to be playing live but haven't
+  // received a timeupdate in LIVE_WATCHDOG_STALE_THRESHOLD_MS, force restart.
+  useEffect(() => {
+    if (state.source !== 'live' || !state.isPlaying) return;
+
+    const watchdog = window.setInterval(() => {
+      const elapsed = Date.now() - lastTimeupdateRef.current;
+      if (elapsed > LIVE_WATCHDOG_STALE_THRESHOLD_MS) {
+        console.warn(`Live stream watchdog: no timeupdate for ${elapsed}ms, restarting`);
+        restartLiveStream(0);
+      }
+    }, LIVE_WATCHDOG_INTERVAL_MS);
+
+    return () => window.clearInterval(watchdog);
+  }, [state.source, state.isPlaying, restartLiveStream]);
 
   // Some browsers can throttle `timeupdate`; keep episode progress in sync while playing.
   useEffect(() => {
