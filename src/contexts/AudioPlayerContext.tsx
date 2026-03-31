@@ -124,12 +124,20 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  const clearLiveErrorRetryTimeout = useCallback(() => {
+    if (liveErrorRetryTimeoutRef.current !== null) {
+      window.clearTimeout(liveErrorRetryTimeoutRef.current);
+      liveErrorRetryTimeoutRef.current = null;
+    }
+  }, []);
+
   const cancelStreamAttempts = useCallback(() => {
     streamAttemptTokenRef.current += 1;
     clearStreamStartTimeout();
     clearLiveRecoveryTimeout();
     clearLivePauseExpiryTimeout();
-  }, [clearLivePauseExpiryTimeout, clearLiveRecoveryTimeout, clearStreamStartTimeout]);
+    clearLiveErrorRetryTimeout();
+  }, [clearLivePauseExpiryTimeout, clearLiveRecoveryTimeout, clearStreamStartTimeout, clearLiveErrorRetryTimeout]);
 
   // Fetch stream metadata for live stream
   useEffect(() => {
