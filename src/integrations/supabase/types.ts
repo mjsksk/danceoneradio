@@ -449,6 +449,51 @@ export type Database = {
         }
         Relationships: []
       }
+      show_tracks: {
+        Row: {
+          album: string | null
+          amazon_url: string | null
+          apple_music_url: string | null
+          artist: string
+          beatport_url: string | null
+          created_at: string
+          duration_seconds: number | null
+          episode_number: number
+          id: string
+          played_at: string | null
+          title: string
+          track_order: number
+        }
+        Insert: {
+          album?: string | null
+          amazon_url?: string | null
+          apple_music_url?: string | null
+          artist: string
+          beatport_url?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          episode_number: number
+          id?: string
+          played_at?: string | null
+          title: string
+          track_order: number
+        }
+        Update: {
+          album?: string | null
+          amazon_url?: string | null
+          apple_music_url?: string | null
+          artist?: string
+          beatport_url?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          episode_number?: number
+          id?: string
+          played_at?: string | null
+          title?: string
+          track_order?: number
+        }
+        Relationships: []
+      }
       site_visits: {
         Row: {
           country: string | null
