@@ -15,7 +15,43 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useEpisodePlayer } from '@/hooks/useEpisodePlayer';
 
 
-  return (
+const Episode399 = () => {
+  const { user } = useAuth();
+  const episodeNumber = 399;
+  const episodeTitle = "Future Dance Anthems with Mario 399";
+  const audioUrl = "https://media.blubrry.com/biggest_tunes_with_mario_135/mc.blubrry.com/biggest_tunes_with_mario_135/Biggest-Tunes-with-Mario-399-streamed.mp3?awCollectionId=673838&awEpisodeId=11890632&aw_0_azn.pgenre=Music&aw_0_1st.ri=blubrry&aw_0_azn.pcountry=US&aw_0_azn.planguage=en-us&cat_exclude=IAB1-8%2CIAB1-9%2CIAB7-41%2CIAB8-5%2CIAB8-18%2CIAB11-4%2CIAB23%2CIAB24%2CIAB25%2CIAB26&aw_0_cnt.rss=https%3A%2F%2Ffeeds.blubrry.com%2Ffeeds%2Fbiggest_tunes_with_mario_135.xml";
+  const episodeDate = "December 20, 2025";
+  
+  const { 
+    isPlaying, 
+    isLoading, 
+    currentTime, 
+    duration, 
+    progress, 
+    handlePlayPause, 
+    handleSeek, 
+    formatTime 
+  } = useEpisodePlayer({ episodeNumber, episodeTitle, audioUrl });
+  
+  const [bgLoaded, setBgLoaded] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => setBgLoaded(true);
+    img.src = '/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png';
+  }, []);
+
+  const onSeekClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percentage = x / rect.width;
+    handleSeek(percentage * duration);
+  };
+
     <div className="min-h-screen bg-background overflow-x-hidden relative">
       <SEO 
         title={`Anthems of the week ${episodeNumber} - Future Dance Anthems with Mario | Dance One Radio`}
