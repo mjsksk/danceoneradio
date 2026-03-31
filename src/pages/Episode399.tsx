@@ -201,6 +201,9 @@ import { useEpisodePlayer } from '@/hooks/useEpisodePlayer';
         <GoogleAds key={`episode${episodeNumber}-ad`} slot={AD_SLOTS.IN_CONTENT} />
 
         <EpisodeTracklist episodeNumber={episodeNumber} />
+        <GoogleAds key={`episode${episodeNumber}-tracklist-ad`} slot={AD_SLOTS.AFTER_TRACKLIST} format="rectangle" />
+      </main>
+
       <Footer />
       </div>
     </div>
