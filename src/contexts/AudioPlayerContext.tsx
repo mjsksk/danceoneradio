@@ -172,7 +172,12 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
 
     if (urlIndex >= urls.length) {
       clearStreamStartTimeout();
-      setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
+      // Instead of giving up, schedule a retry from the first URL
+      console.warn('All stream URLs exhausted, retrying in', LIVE_ERROR_RETRY_DELAY_MS, 'ms');
+      liveErrorRetryTimeoutRef.current = window.setTimeout(() => {
+        if (streamAttemptTokenRef.current !== attemptToken) return;
+        attemptLiveStream(urls, 0, attemptToken);
+      }, LIVE_ERROR_RETRY_DELAY_MS);
       return;
     }
 
@@ -180,17 +185,15 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     clearStreamStartTimeout();
 
     const nextUrl = urls[urlIndex];
-    const alreadyPrimed = matchesAudioSource(audio, nextUrl);
 
+    // ALWAYS force-reload with cache-busting to avoid stale buffered audio
     audio.crossOrigin = getAudioCrossOrigin(nextUrl);
+    audio.pause();
+    audio.src = bustStreamUrl(nextUrl);
+    audio.load();
 
-    if (!alreadyPrimed) {
-      audio.pause();
-      audio.src = nextUrl;
-      audio.load();
-    } else if (audio.networkState === HTMLMediaElement.NETWORK_EMPTY) {
-      audio.load();
-    }
+    // Reset the watchdog timestamp so the liveness check starts fresh
+    lastTimeupdateRef.current = Date.now();
 
     streamStartTimeoutRef.current = window.setTimeout(() => {
       if (streamAttemptTokenRef.current !== attemptToken) return;
@@ -213,6 +216,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
         livePauseTimestampRef.current = null;
         clearLivePauseExpiryTimeout();
         clearStreamStartTimeout();
+        lastTimeupdateRef.current = Date.now();
         setState(prev => ({ ...prev, isPlaying: true, isLoading: false }));
       })
       .catch(err => {
@@ -222,7 +226,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
         console.error(`Error playing live stream URL ${urlIndex + 1}:`, err);
         attemptLiveStream(urls, urlIndex + 1, attemptToken);
       });
-  }, [clearLivePauseExpiryTimeout, clearStreamStartTimeout, matchesAudioSource]);
+  }, [clearLivePauseExpiryTimeout, clearStreamStartTimeout]);
 
   const restartLiveStream = useCallback((preferredUrlIndex = 0) => {
     if (!audioRef.current) return;
