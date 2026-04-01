@@ -15,8 +15,9 @@ const clampNormalized = (value: number) => Math.max(0, Math.min(1, value));
 
 const isTouchDeviceClient = () => typeof window !== 'undefined' && (window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0);
 
-const shouldUseDesktopEqMotion = (isElectronDesktop: boolean) => (
-  isElectronDesktop || isTouchDeviceClient()
+// Touch devices and Electron still use synthetic as a fallback label
+const getSyntheticLabel = (isElectronDesktop: boolean): Extract<EqDataSource, 'fallback' | 'desktop-sim'> => (
+  isElectronDesktop || isTouchDeviceClient() ? 'desktop-sim' : 'fallback'
 );
 
 const getPeakFrequencyValue = (frequencyBins: Uint8Array) => {
