@@ -68,6 +68,36 @@ export type Database = {
         }
         Relationships: []
       }
+      app_downloads: {
+        Row: {
+          country: string | null
+          country_code: string | null
+          downloaded_at: string
+          id: string
+          platform: string
+          version: string | null
+          visitor_hash: string | null
+        }
+        Insert: {
+          country?: string | null
+          country_code?: string | null
+          downloaded_at?: string
+          id?: string
+          platform?: string
+          version?: string | null
+          visitor_hash?: string | null
+        }
+        Update: {
+          country?: string | null
+          country_code?: string | null
+          downloaded_at?: string
+          id?: string
+          platform?: string
+          version?: string | null
+          visitor_hash?: string | null
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           created_at: string
@@ -614,6 +644,15 @@ export type Database = {
       cleanup_old_site_visits: { Args: never; Returns: undefined }
       cleanup_old_subscriber_tracking_data: { Args: never; Returns: undefined }
       cleanup_old_unsubscribe_attempts: { Args: never; Returns: undefined }
+      get_download_stats: {
+        Args: { end_date?: string; start_date?: string }
+        Returns: {
+          downloads_this_month: number
+          downloads_this_week: number
+          downloads_today: number
+          total_downloads: number
+        }[]
+      }
       get_listener_analytics:
         | {
             Args: never
