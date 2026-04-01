@@ -154,7 +154,7 @@ export const useLiveEqVisualizer = ({
             return;
           }
 
-          sharedAnalyser.getByteFrequencyData(sharedFrequencyBins);
+          sharedAnalyser.getByteFrequencyData(sharedFrequencyBins as unknown as Uint8Array<ArrayBuffer>);
 
           let signalLevel = 0;
           const nextBars = Array.from({ length: EQ_BAR_COUNT }, (_, index) => {
