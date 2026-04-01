@@ -27,12 +27,11 @@ const Downloads = () => {
   const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.12/dance-one-radio-setup-1.0.12-x64.exe';
 
   const handleDownload = () => {
-    // Track the download
+    // Track the download (fire and forget)
     supabase
       .from('app_downloads')
       .insert({ platform: 'windows', version: '1.0.12' })
-      .then(() => {})
-      .catch(() => {});
+      .then(() => {});
 
     window.open(downloadUrl, '_blank');
   };

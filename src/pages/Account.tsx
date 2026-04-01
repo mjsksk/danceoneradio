@@ -336,6 +336,7 @@ export default function Account() {
       <NotificationHistory />
       <PushSubscriberManager />
       <VisitorAnalytics />
+      <DownloadAnalytics />
       <ListenerAnalytics />
       <SubscriberGrowthChart />
       <NewsletterCampaign />
