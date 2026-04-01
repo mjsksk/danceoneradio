@@ -244,7 +244,7 @@ export const useLiveEqVisualizer = ({
             silentAnalyserFramesRef.current += 1;
 
             if (silentAnalyserFramesRef.current >= SILENT_FRAME_LIMIT) {
-              startSyntheticAnimation('fallback');
+              startSyntheticAnimation(fallbackLabel);
               return;
             }
           } else {
