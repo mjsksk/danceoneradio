@@ -180,7 +180,7 @@ const SAMBroadcasterSync = () => {
           />
           {existingCount !== null && existingCount > 0 && (
             <div className="flex items-center gap-2">
-              <span className="text-xs text-yellow-500 flex items-center gap-1">
+              <span className="text-xs text-warning flex items-center gap-1">
                 <AlertTriangle className="w-3 h-3" />
                 {existingCount} tracks already exist
               </span>
