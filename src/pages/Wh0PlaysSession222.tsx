@@ -95,6 +95,16 @@ const Wh0PlaysSession222 = () => {
             </div>
             
             <div className="max-w-4xl mx-auto">
+              <div className="flex justify-center mb-8">
+                <img 
+                  src="/images/wh0-plays-joshua-roberts.jpg" 
+                  alt="Wh0 Plays Sessions 222 - Joshua Roberts"
+                  className="w-64 h-64 sm:w-80 sm:h-80 rounded-2xl object-cover shadow-[0_0_30px_hsl(var(--primary)/0.2)]"
+                  loading="eager"
+                  width="320"
+                  height="320"
+                />
+              </div>
               <h1 className="text-3xl md:text-5xl font-['Orbitron'] font-bold mb-6 text-center">
                 <span className="text-neon">Wh0 Plays Sessions</span>{" "}
                 <span className="text-neon-purple">222</span>
