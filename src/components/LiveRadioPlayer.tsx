@@ -54,7 +54,7 @@ const LiveRadioPlayer = ({
   const titleContainerRef = useRef<HTMLDivElement | null>(null);
   const titleMeasureRef = useRef<HTMLSpanElement | null>(null);
   const animationActive = isPlaying;
-  const { frequencyData, barCount, dataSource, diagnostics } = useLiveEqVisualizer({
+  const { frequencyData, barCount } = useLiveEqVisualizer({
     audioRef: audioPlayer.audioRef,
     isActive: animationActive,
     isElectronDesktop,
@@ -256,11 +256,6 @@ const LiveRadioPlayer = ({
                 OFFLINE
               </Badge>
             )}
-            {import.meta.env.DEV ? (
-              <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground border-border/60 opacity-70">
-                EQ:{dataSource}
-              </Badge>
-            ) : null}
           </div>
           <div ref={titleContainerRef} className="relative overflow-hidden bg-background/20 rounded-md p-2 mb-2">
             <span ref={titleMeasureRef} className="pointer-events-none absolute left-0 top-0 whitespace-nowrap opacity-0">
@@ -343,22 +338,6 @@ const LiveRadioPlayer = ({
             notificationsEnabled={notificationsEnabled}
             onNotificationsChange={handleNotificationsChange}
           />
-        {import.meta.env.DEV && diagnostics ? (
-          <details className="mt-4 rounded-lg border border-border/40 bg-background/60 p-3 text-[10px] font-mono text-muted-foreground backdrop-blur">
-            <summary className="cursor-pointer select-none font-semibold">EQ Diagnostics</summary>
-            <div className="mt-2 space-y-1">
-              <p>Source: <span className="text-primary">{dataSource}</span></p>
-              <p>AudioContext: <span className="text-primary">{diagnostics.audioContextState}</span></p>
-              <p>SourceNode: {diagnostics.hasSourceNode ? '✅' : '❌'} | Analyser: {diagnostics.hasAnalyser ? '✅' : '❌'}</p>
-              <p>crossOrigin: <span className="text-primary">{diagnostics.audioCrossOrigin}</span></p>
-              <p>networkState: {diagnostics.audioNetworkState} | readyState: {diagnostics.audioReadyState}</p>
-              <p>Touch device: {diagnostics.isTouchDevice ? 'yes' : 'no'} | Electron: {diagnostics.isElectronDesktop ? 'yes' : 'no'}</p>
-              <p>Avg bar: {diagnostics.averageSignal} | Peak: {diagnostics.peakBar} | Min: {diagnostics.minBar}</p>
-              <p>Bins[0-7]: <span className="text-primary">{diagnostics.rawAnalyserBins.join(', ') || 'none'}</span></p>
-              <p className="truncate">Audio src: {diagnostics.audioSrc}</p>
-            </div>
-          </details>
-        ) : null}
         </div>
       </div>
     </div>
