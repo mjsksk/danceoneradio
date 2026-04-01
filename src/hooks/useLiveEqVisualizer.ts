@@ -15,8 +15,9 @@ const clampNormalized = (value: number) => Math.max(0, Math.min(1, value));
 
 const isTouchDeviceClient = () => typeof window !== 'undefined' && (window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0);
 
-const shouldUseDesktopEqMotion = (isElectronDesktop: boolean) => (
-  isElectronDesktop || isTouchDeviceClient()
+// Touch devices and Electron still use synthetic as a fallback label
+const getSyntheticLabel = (isElectronDesktop: boolean): Extract<EqDataSource, 'fallback' | 'desktop-sim'> => (
+  isElectronDesktop || isTouchDeviceClient() ? 'desktop-sim' : 'fallback'
 );
 
 const getPeakFrequencyValue = (frequencyBins: Uint8Array) => {
@@ -176,13 +177,7 @@ export const useLiveEqVisualizer = ({
       animate();
     };
 
-    if (shouldUseDesktopEqMotion(isElectronDesktop)) {
-      startSyntheticAnimation('desktop-sim');
-      return () => {
-        isCancelled = true;
-        cancelFrame();
-      };
-    }
+    const fallbackLabel = getSyntheticLabel(isElectronDesktop);
 
     const audio = audioRef.current;
     const AudioContextCtor = window.AudioContext || (window as Window & typeof globalThis & {
@@ -190,7 +185,7 @@ export const useLiveEqVisualizer = ({
     }).webkitAudioContext;
 
     if (!audio || !AudioContextCtor) {
-      startSyntheticAnimation('fallback');
+      startSyntheticAnimation(fallbackLabel);
       return () => {
         isCancelled = true;
         cancelFrame();
@@ -249,7 +244,7 @@ export const useLiveEqVisualizer = ({
             silentAnalyserFramesRef.current += 1;
 
             if (silentAnalyserFramesRef.current >= SILENT_FRAME_LIMIT) {
-              startSyntheticAnimation('fallback');
+              startSyntheticAnimation(fallbackLabel);
               return;
             }
           } else {
@@ -270,7 +265,7 @@ export const useLiveEqVisualizer = ({
         animate();
       } catch (error) {
         console.error('Failed to initialize live EQ analyser:', error);
-        startSyntheticAnimation('fallback');
+        startSyntheticAnimation(fallbackLabel);
       }
     };
 
