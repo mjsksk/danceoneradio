@@ -179,12 +179,15 @@ export const useLiveEqVisualizer = ({
 
     const fallbackLabel = getSyntheticLabel(isElectronDesktop);
 
+    // Touch devices and Electron go straight to independent synthetic bars
+    const shouldUseSynthetic = isElectronDesktop || isTouchDeviceClient();
+
     const audio = audioRef.current;
     const AudioContextCtor = window.AudioContext || (window as Window & typeof globalThis & {
       webkitAudioContext?: typeof AudioContext;
     }).webkitAudioContext;
 
-    if (!audio || !AudioContextCtor) {
+    if (!audio || !AudioContextCtor || shouldUseSynthetic) {
       startSyntheticAnimation(fallbackLabel);
       return () => {
         isCancelled = true;
