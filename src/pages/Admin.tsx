@@ -88,6 +88,8 @@ const Admin = () => {
 
             <NewsletterSubscribers />
 
+            <SAMBroadcasterSync />
+
             <CSVTrackImporter />
           </div>
         </main>
