@@ -419,7 +419,29 @@ iframe[src*="googlesyndication"],
 iframe[src*="doubleclick"],
 [id^="google_ads"],
 div[id^="google_ads"],
-ins.adsbygoogle[data-ad-status] {
+ins.adsbygoogle[data-ad-status],
+div[id^="google_ads_iframe"],
+div[id*="google_esf"],
+div[data-google-query-id],
+.google-auto-placed,
+div[id^="gpt_unit_"],
+div[data-ad-format],
+div[class*="google-auto-placed"] {
+  z-index: 9998 !important;
+  position: relative !important;
+}
+
+/* Force Google anchor/overlay ads below nav */
+div[id="google_ads_iframe_/"] iframe,
+div[class*="google-auto-placed"][style*="fixed"],
+div[class*="google-auto-placed"][style*="sticky"],
+iframe[id^="aswift_"][style*="fixed"],
+iframe[id^="aswift_"][style*="sticky"] {
+  z-index: 9998 !important;
+}
+
+/* Prevent any ad container from using position:fixed above nav */
+body > div[style*="position: fixed"][style*="z-index"]:not([class*="sonner"]):not([id="mobile-menu"]):not([role="dialog"]) {
   z-index: 9998 !important;
 }
 
