@@ -177,13 +177,7 @@ export const useLiveEqVisualizer = ({
       animate();
     };
 
-    if (shouldUseDesktopEqMotion(isElectronDesktop)) {
-      startSyntheticAnimation('desktop-sim');
-      return () => {
-        isCancelled = true;
-        cancelFrame();
-      };
-    }
+    const fallbackLabel = getSyntheticLabel(isElectronDesktop);
 
     const audio = audioRef.current;
     const AudioContextCtor = window.AudioContext || (window as Window & typeof globalThis & {
@@ -191,7 +185,7 @@ export const useLiveEqVisualizer = ({
     }).webkitAudioContext;
 
     if (!audio || !AudioContextCtor) {
-      startSyntheticAnimation('fallback');
+      startSyntheticAnimation(fallbackLabel);
       return () => {
         isCancelled = true;
         cancelFrame();
