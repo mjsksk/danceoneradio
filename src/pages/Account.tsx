@@ -28,6 +28,7 @@ import { PushNotificationComposer } from '@/components/admin/PushNotificationCom
 import { PushDiagnostics } from '@/components/admin/PushDiagnostics';
 import NotificationHistory from '@/components/admin/NotificationHistory';
 import { PushSubscriberManager } from '@/components/admin/PushSubscriberManager';
+import DownloadAnalytics from '@/components/admin/DownloadAnalytics';
 
 interface EpisodeProgress {
   id: string;
@@ -335,6 +336,7 @@ export default function Account() {
       <NotificationHistory />
       <PushSubscriberManager />
       <VisitorAnalytics />
+      <DownloadAnalytics />
       <ListenerAnalytics />
       <SubscriberGrowthChart />
       <NewsletterCampaign />
