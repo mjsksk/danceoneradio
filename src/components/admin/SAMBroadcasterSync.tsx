@@ -196,7 +196,7 @@ const SAMBroadcasterSync = () => {
             </div>
           )}
           {existingCount === 0 && episodeNumber && (
-            <span className="text-xs text-green-500">No existing tracks</span>
+            <span className="text-xs text-primary">No existing tracks</span>
           )}
         </div>
 
