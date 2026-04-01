@@ -63,17 +63,17 @@ const DownloadAnalytics = () => {
             <p className="text-xs text-muted-foreground">Total</p>
           </div>
           <div className="rounded-lg border bg-background/50 p-4 text-center">
-            <Clock className="h-5 w-5 text-green-400 mx-auto mb-2" />
+            <Clock className="h-5 w-5 text-primary mx-auto mb-2" />
             <p className="text-2xl font-bold">{stats?.downloads_today ?? 0}</p>
             <p className="text-xs text-muted-foreground">Today</p>
           </div>
           <div className="rounded-lg border bg-background/50 p-4 text-center">
-            <Calendar className="h-5 w-5 text-blue-400 mx-auto mb-2" />
+            <Calendar className="h-5 w-5 text-primary mx-auto mb-2" />
             <p className="text-2xl font-bold">{stats?.downloads_this_week ?? 0}</p>
             <p className="text-xs text-muted-foreground">This Week</p>
           </div>
           <div className="rounded-lg border bg-background/50 p-4 text-center">
-            <Calendar className="h-5 w-5 text-purple-400 mx-auto mb-2" />
+            <Calendar className="h-5 w-5 text-accent-foreground mx-auto mb-2" />
             <p className="text-2xl font-bold">{stats?.downloads_this_month ?? 0}</p>
             <p className="text-xs text-muted-foreground">This Month</p>
           </div>
