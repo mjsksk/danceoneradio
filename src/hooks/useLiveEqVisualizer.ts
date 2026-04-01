@@ -68,33 +68,40 @@ const mapFrequencyBinsToBars = (frequencyBins: Uint8Array, previousBars: number[
   };
 };
 
+// Pre-computed per-bin random phases for independent bar movement
+const BIN_PHASES: number[] = [];
+const BIN_SPEEDS: number[] = [];
+const BIN_OFFSETS: number[] = [];
+for (let i = 0; i < SYNTHETIC_BIN_COUNT; i++) {
+  // Use a seeded-style deterministic pseudo-random via sine hashing
+  BIN_PHASES.push(((Math.sin(i * 127.1 + 311.7) * 43758.5453) % 1) * Math.PI * 2);
+  BIN_SPEEDS.push(1.8 + ((Math.sin(i * 269.5 + 183.3) * 43758.5453) % 1) * 3.2);
+  BIN_OFFSETS.push(0.08 + ((Math.sin(i * 419.2 + 71.9) * 43758.5453) % 1) * 0.12);
+}
+
 const populateSyntheticFrequencyBins = (time: number, frequencyBins: Uint8Array) => {
-  const kick = Math.pow((Math.sin(time * 2.4) + 1) / 2, 1.6);
-  const bassDrive = 0.16 + kick * 0.42;
-  const lowMidDrive = 0.14 + ((Math.sin(time * 1.8 + 0.8) + 1) / 2) * 0.22;
-  const upperMidDrive = 0.1 + ((Math.sin(time * 2.7 + 1.5) + 1) / 2) * 0.14;
-  const airDrive = 0.04 + ((Math.sin(time * 4.1 + 0.5) + 1) / 2) * 0.07;
-  const sweepCenter = 0.36 + ((Math.sin(time * 0.85) + 1) / 2) * 0.24;
+  // Global energy envelope for natural breathing
+  const globalPulse = 0.55 + 0.25 * Math.sin(time * 0.9);
 
   for (let index = 0; index < frequencyBins.length; index += 1) {
     const position = index / (frequencyBins.length - 1);
-    const bassWeight = Math.exp(-position * 4.8);
-    const lowMidWeight = Math.exp(-Math.pow((position - 0.26) / 0.18, 2));
-    const upperMidWeight = Math.exp(-Math.pow((position - 0.54) / 0.16, 2));
-    const airWeight = Math.exp(-Math.pow((position - 0.8) / 0.12, 2));
-    const sweepWeight = Math.exp(-Math.pow((position - sweepCenter) / 0.11, 2));
-    const shimmer = ((Math.sin(time * 6.2 - position * 18) + 1) / 2) * 0.03;
-    const texture = ((Math.sin(time * 3.8 + index * 0.42) + 1) / 2) * 0.025;
+
+    // Bass-heavy frequency curve
+    const bassWeight = Math.exp(-position * 3.5);
+    const freqCurve = 0.35 + bassWeight * 0.65;
+
+    // Each bin oscillates at its own unique speed and phase — independent motion
+    const ownPhase = BIN_PHASES[index];
+    const ownSpeed = BIN_SPEEDS[index];
+    const ownOffset = BIN_OFFSETS[index];
+
+    const primary = (Math.sin(time * ownSpeed + ownPhase) + 1) / 2;
+    const secondary = (Math.sin(time * ownSpeed * 0.7 + ownPhase * 1.3 + 2.1) + 1) / 2;
+    const jitter = (Math.sin(time * ownSpeed * 2.3 + ownPhase * 0.8) + 1) / 2 * 0.08;
 
     const energy = clampNormalized(
-      0.02 +
-        bassDrive * bassWeight +
-        lowMidDrive * lowMidWeight * 0.72 +
-        upperMidDrive * upperMidWeight * 0.54 +
-        airDrive * airWeight * 0.4 +
-        sweepWeight * 0.12 +
-        shimmer +
-        texture,
+      ownOffset +
+      (primary * 0.55 + secondary * 0.3 + jitter) * freqCurve * globalPulse
     );
 
     frequencyBins[index] = Math.round(energy * 255);
