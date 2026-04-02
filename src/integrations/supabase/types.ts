@@ -613,26 +613,26 @@ export type Database = {
         }
         Insert: {
           browser?: string | null
-          city?: never
+          city?: string | null
           country?: string | null
           device_type?: string | null
           id?: string | null
           is_active?: boolean | null
           masked_email?: never
           os?: string | null
-          region?: never
+          region?: string | null
           subscribed_at?: string | null
         }
         Update: {
           browser?: string | null
-          city?: never
+          city?: string | null
           country?: string | null
           device_type?: string | null
           id?: string | null
           is_active?: boolean | null
           masked_email?: never
           os?: string | null
-          region?: never
+          region?: string | null
           subscribed_at?: string | null
         }
         Relationships: []
