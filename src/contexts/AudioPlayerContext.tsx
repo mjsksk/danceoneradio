@@ -258,7 +258,9 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     if (!audio || !audio.paused) return;
 
     livePauseTimestampRef.current = null;
+    audio.pause();
     audio.removeAttribute('src');
+    audio.src = '';
     audio.load();
     setState(prev => (
       prev.source === 'live'
@@ -489,14 +491,28 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       setState(prev => ({ ...prev, currentTime: audio.currentTime }));
     };
     const handleLoadedMetadata = () => {
-      clearLivePauseExpiryTimeout();
+      const preserveLivePauseExpiry =
+        state.source === 'live' &&
+        audio.paused &&
+        livePauseTimestampRef.current !== null;
+
+      if (!preserveLivePauseExpiry) {
+        clearLivePauseExpiryTimeout();
+      }
       clearLiveRecoveryTimeout();
       clearStreamStartTimeout();
       const nextDuration = Number.isFinite(audio.duration) ? audio.duration : 0;
       setState(prev => ({ ...prev, duration: nextDuration, isLoading: false }));
     };
     const handleCanPlay = () => {
-      clearLivePauseExpiryTimeout();
+      const preserveLivePauseExpiry =
+        state.source === 'live' &&
+        audio.paused &&
+        livePauseTimestampRef.current !== null;
+
+      if (!preserveLivePauseExpiry) {
+        clearLivePauseExpiryTimeout();
+      }
       clearLiveRecoveryTimeout();
       clearStreamStartTimeout();
       setState(prev => ({ ...prev, isLoading: false }));

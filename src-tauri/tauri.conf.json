@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Dance One Radio",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "identifier": "com.danceoneradio.desktop",
   "build": {
     "frontendDist": "desktop-dist",
@@ -14,9 +14,9 @@
       {
         "title": "Dance One Radio",
         "width": 1080,
-        "height": 900,
+        "height": 960,
         "minWidth": 980,
-        "minHeight": 820,
+        "minHeight": 900,
         "center": true,
         "resizable": true,
         "fullscreen": false,
