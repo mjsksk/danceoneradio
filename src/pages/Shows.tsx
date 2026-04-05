@@ -458,57 +458,79 @@ const Shows = () => {
                 <span className="text-neon-purple">SHOWS</span>
               </h2>
               <div className="grid gap-4">
-                <Link to="/show/wh0-plays-sessions/223" className="block">
-                  <Card className="card-cyber p-6 sm:p-8 hover:scale-[1.01] transition-all duration-300 group cursor-pointer hover:border-neon/50">
-                    <div className="flex flex-col sm:flex-row gap-6 items-center">
-                      <div className="bg-gradient-to-br from-neon to-neon-purple text-background rounded-full w-16 h-16 flex items-center justify-center font-['Orbitron'] font-bold text-lg shrink-0">
-                        #223
-                      </div>
-                      <div className="flex-1 text-center sm:text-left">
-                        <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold text-primary group-hover:text-neon transition-colors">
-                          Wh0 Plays Sessions Episode 223 — Bad Intentions
-                          <span className="inline-block ml-2 text-sm text-neon opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-                        </h3>
-                        <p className="text-muted-foreground mt-1">17 tracks • Mark Knight, Afrojack, LP Giobbi & more</p>
-                        <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-muted-foreground justify-center sm:justify-start">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4 text-neon" />
-                            <span>Friday at 6:00 PM</span>
-                          </div>
-                          <div className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
-                            House • Tech House • Dance
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
-                </Link>
+                {(() => {
+                  const guestShows = [
+                    {
+                      number: 223,
+                      title: 'Wh0 Plays Sessions Episode 223 — Bad Intentions',
+                      subtitle: '17 tracks • Mark Knight, Afrojack, LP Giobbi & more',
+                      link: '/show/wh0-plays-sessions/223',
+                      broadcastDate: '2026-04-03T18:00:00',
+                      genres: 'House • Tech House • Dance',
+                    },
+                    {
+                      number: 222,
+                      title: 'Wh0 Plays Sessions Episode 222',
+                      subtitle: <span>Guest Mix by <span className="text-primary font-semibold">Johan S</span></span>,
+                      link: '/show/wh0-plays-sessions/222',
+                      broadcastDate: '2026-03-27T18:00:00',
+                      genres: 'House • Tech House • Dance',
+                    },
+                  ];
 
-                <Link to="/show/wh0-plays-sessions/222" className="block">
-                  <Card className="card-cyber p-6 sm:p-8 hover:scale-[1.01] transition-all duration-300 group cursor-pointer hover:border-neon/50">
-                    <div className="flex flex-col sm:flex-row gap-6 items-center">
-                      <div className="bg-gradient-to-br from-neon/60 to-neon-purple/60 text-background rounded-full w-16 h-16 flex items-center justify-center font-['Orbitron'] font-bold text-lg shrink-0">
-                        #222
-                      </div>
-                      <div className="flex-1 text-center sm:text-left">
-                        <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold text-primary group-hover:text-neon transition-colors">
-                          Wh0 Plays Sessions Episode 222
-                          <span className="inline-block ml-2 text-sm text-neon opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-                        </h3>
-                        <p className="text-muted-foreground mt-1">Guest Mix by <span className="text-primary font-semibold">Johan S</span></p>
-                        <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-muted-foreground justify-center sm:justify-start">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4 text-neon" />
-                            <span>March 27, 2026</span>
+                  return guestShows.map((show, index) => {
+                    const broadcastDate = new Date(show.broadcastDate);
+                    const now = new Date();
+                    const isPast = now > broadcastDate;
+                    const isUpcoming = !isPast;
+
+                    const formattedDate = broadcastDate.toLocaleDateString('en-US', {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                    });
+
+                    return (
+                      <Link key={show.number} to={show.link} className="block">
+                        <Card className="card-cyber p-6 sm:p-8 hover:scale-[1.01] transition-all duration-300 group cursor-pointer hover:border-neon/50">
+                          <div className="flex flex-col sm:flex-row gap-6 items-center">
+                            <div className={`bg-gradient-to-br ${isUpcoming ? 'from-neon to-neon-purple' : 'from-neon/60 to-neon-purple/60'} text-background rounded-full w-16 h-16 flex items-center justify-center font-['Orbitron'] font-bold text-lg shrink-0`}>
+                              #{show.number}
+                            </div>
+                            <div className="flex-1 text-center sm:text-left">
+                              <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold text-primary group-hover:text-neon transition-colors">
+                                {show.title}
+                                <span className="inline-block ml-2 text-sm text-neon opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                              </h3>
+                              <p className="text-muted-foreground mt-1">{show.subtitle}</p>
+                              <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-muted-foreground justify-center sm:justify-start">
+                                <div className="flex items-center gap-2">
+                                  {isUpcoming ? (
+                                    <>
+                                      <Calendar className="w-4 h-4 text-neon" />
+                                      <span>
+                                        {broadcastDate.toLocaleDateString('en-US', { weekday: 'long' })} at{' '}
+                                        {broadcastDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Clock className="w-4 h-4 text-muted-foreground" />
+                                      <span>Aired {formattedDate}</span>
+                                    </>
+                                  )}
+                                </div>
+                                <div className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
+                                  {show.genres}
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                          <div className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
-                            House • Tech House • Dance
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
-                </Link>
+                        </Card>
+                      </Link>
+                    );
+                  });
+                })()}
               </div>
             </div>
           </div>
