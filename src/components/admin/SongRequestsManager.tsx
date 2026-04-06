@@ -464,6 +464,7 @@ export default function SongRequestsManager() {
                           if (open) {
                             setNotesDialogId(r.id);
                             setNotesText(r.admin_notes || '');
+                            setFilenameText(r.sam_filename || '');
                           } else {
                             setNotesDialogId(null);
                           }
