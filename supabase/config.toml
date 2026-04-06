@@ -50,3 +50,9 @@ verify_jwt = false
 
 [functions.create-merch-checkout]
 verify_jwt = false
+
+[functions.sam-next-request]
+verify_jwt = false
+
+[functions.sam-mark-imported]
+verify_jwt = false
