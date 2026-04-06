@@ -389,6 +389,11 @@ export default function SongRequestsManager() {
                         <Badge className={statusColors[r.status] || ''} variant="outline">
                           {r.status}
                         </Badge>
+                        {r.sam_filename && (
+                          <span title={`File: ${r.sam_filename}`}>
+                            <HardDrive className="w-3.5 h-3.5 text-primary" />
+                          </span>
+                        )}
                         {r.is_duplicate && (
                           <span title="Duplicate">
                             <AlertTriangle className="w-3.5 h-3.5 text-yellow-500" />
