@@ -496,12 +496,12 @@ export default function SongRequestsManager() {
                               />
                               <div>
                                 <label className="text-xs font-medium text-muted-foreground mb-1 block">
-                                  SAM Filename (full local path)
+                                  SAM Relative Path (relative to C:\D1Files\Dance Music)
                                 </label>
                                 <Input
                                   value={filenameText}
                                   onChange={e => setFilenameText(e.target.value)}
-                                  placeholder="D:\Music\Artist - Title.mp3"
+                                  placeholder="Artist\Track.mp3"
                                   className="font-mono text-xs"
                                 />
                               </div>
