@@ -172,16 +172,16 @@ export default function SongRequestsManager() {
     try {
       const { error } = await supabase
         .from('song_requests')
-        .update({ admin_notes: notesText })
+        .update({ admin_notes: notesText, sam_filename: filenameText || null } as any)
         .eq('id', notesDialogId);
       if (error) throw error;
       setRequests(prev =>
-        prev.map(r => (r.id === notesDialogId ? { ...r, admin_notes: notesText } : r))
+        prev.map(r => (r.id === notesDialogId ? { ...r, admin_notes: notesText, sam_filename: filenameText || null } : r))
       );
       setNotesDialogId(null);
-      toast.success('Notes saved');
+      toast.success('Notes & filename saved');
     } catch {
-      toast.error('Failed to save notes');
+      toast.error('Failed to save');
     }
   };
 
