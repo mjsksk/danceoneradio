@@ -62,6 +62,7 @@ interface SongRequest {
   reviewed_by: string | null;
   reviewed_at: string | null;
   sam_filename: string | null;
+  sam_imported_at: string | null;
 }
 
 type StatusFilter = 'all' | 'new' | 'approved' | 'rejected' | 'played';
