@@ -60,6 +60,7 @@ interface SongRequest {
   user_agent: string | null;
   reviewed_by: string | null;
   reviewed_at: string | null;
+  sam_filename: string | null;
 }
 
 type StatusFilter = 'all' | 'new' | 'approved' | 'rejected' | 'played';
