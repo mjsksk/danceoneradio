@@ -554,6 +554,72 @@ export type Database = {
         }
         Relationships: []
       }
+      song_requests: {
+        Row: {
+          admin_notes: string | null
+          artist_name: string
+          created_at: string
+          duplicate_reason: string | null
+          email: string | null
+          id: string
+          ip_address: string | null
+          is_duplicate: boolean
+          listener_name: string
+          message: string | null
+          normalized_artist_name: string | null
+          normalized_song_title: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          song_title: string
+          source: string | null
+          status: string
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          artist_name: string
+          created_at?: string
+          duplicate_reason?: string | null
+          email?: string | null
+          id?: string
+          ip_address?: string | null
+          is_duplicate?: boolean
+          listener_name: string
+          message?: string | null
+          normalized_artist_name?: string | null
+          normalized_song_title?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          song_title: string
+          source?: string | null
+          status?: string
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          artist_name?: string
+          created_at?: string
+          duplicate_reason?: string | null
+          email?: string | null
+          id?: string
+          ip_address?: string | null
+          is_duplicate?: boolean
+          listener_name?: string
+          message?: string | null
+          normalized_artist_name?: string | null
+          normalized_song_title?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          song_title?: string
+          source?: string | null
+          status?: string
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       unsubscribe_attempts: {
         Row: {
           attempted_at: string
