@@ -49,6 +49,7 @@ Deno.serve(async (req: Request) => {
   if (data.message) {
     body += `MESSAGE=${sanitize(data.message)}\n`;
   }
+  body += `FILENAME=${sanitize(data.sam_filename)}\n`;
 
   return new Response(body, { status: 200, headers: { "Content-Type": "text/plain" } });
 });
