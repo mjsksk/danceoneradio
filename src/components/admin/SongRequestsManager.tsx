@@ -81,6 +81,7 @@ export default function SongRequestsManager() {
   const [notesDialogId, setNotesDialogId] = useState<string | null>(null);
   const [notesText, setNotesText] = useState('');
   const [compactView, setCompactView] = useState(false);
+  const [filenameText, setFilenameText] = useState('');
 
   const fetchRequests = useCallback(async () => {
     setLoading(true);
