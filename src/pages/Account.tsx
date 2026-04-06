@@ -29,6 +29,7 @@ import { PushDiagnostics } from '@/components/admin/PushDiagnostics';
 import NotificationHistory from '@/components/admin/NotificationHistory';
 import { PushSubscriberManager } from '@/components/admin/PushSubscriberManager';
 import DownloadAnalytics from '@/components/admin/DownloadAnalytics';
+import SongRequestsManager from '@/components/admin/SongRequestsManager';
 
 interface EpisodeProgress {
   id: string;
@@ -342,6 +343,7 @@ export default function Account() {
       <NewsletterCampaign />
       <ManualSubscriberAdd />
       <NewsletterSubscribers />
+      <SongRequestsManager />
       <CSVTrackImporter />
     </div>
   );
