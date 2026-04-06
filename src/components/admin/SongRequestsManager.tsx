@@ -364,6 +364,8 @@ export default function SongRequestsManager() {
                   <TableHead>Artist</TableHead>
                   <TableHead>Song</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>RELATIVEFILE</TableHead>
+                  <TableHead>SAM</TableHead>
                   <TableHead>Message</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
