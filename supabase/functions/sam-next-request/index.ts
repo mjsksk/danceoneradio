@@ -13,10 +13,40 @@ Deno.serve(async (req: Request) => {
     return new Response("ERROR=UNAUTHORIZED\n", { status: 401, headers: { "Content-Type": "text/plain" } });
   }
 
+  const debug = url.searchParams.get("debug") === "1";
+
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
+
+  // Debug: count approved requests by eligibility
+  if (debug) {
+    const { data: allApproved } = await supabase
+      .from("song_requests")
+      .select("id, status, sam_filename, sam_imported_at")
+      .eq("status", "approved");
+
+    const approvedCount = allApproved?.length ?? 0;
+    const withFile = allApproved?.filter(r => r.sam_filename) ?? [];
+    const withFileNotImported = withFile.filter(r => !r.sam_imported_at);
+
+    let debugBody = `DEBUG=1\n`;
+    debugBody += `APPROVED_COUNT=${approvedCount}\n`;
+    debugBody += `APPROVED_WITH_RELATIVEFILE=${withFile.length}\n`;
+    debugBody += `APPROVED_ELIGIBLE=${withFileNotImported.length}\n`;
+
+    for (const r of withFileNotImported) {
+      debugBody += `ELIGIBLE_ID=${r.id}\n`;
+      debugBody += `ELIGIBLE_FILE=${r.sam_filename}\n`;
+    }
+
+    if (withFileNotImported.length === 0) {
+      debugBody += `NO_REQUEST=1\n`;
+    }
+
+    return new Response(debugBody, { status: 200, headers: { "Content-Type": "text/plain" } });
+  }
 
   const { data, error } = await supabase
     .from("song_requests")
@@ -29,6 +59,7 @@ Deno.serve(async (req: Request) => {
     .maybeSingle();
 
   if (error) {
+    console.error("DB error:", error);
     return new Response("ERROR=DB_FAILURE\n", { status: 500, headers: { "Content-Type": "text/plain" } });
   }
 

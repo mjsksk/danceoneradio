@@ -62,6 +62,7 @@ interface SongRequest {
   reviewed_by: string | null;
   reviewed_at: string | null;
   sam_filename: string | null;
+  sam_imported_at: string | null;
 }
 
 type StatusFilter = 'all' | 'new' | 'approved' | 'rejected' | 'played';
@@ -364,6 +365,8 @@ export default function SongRequestsManager() {
                   <TableHead>Artist</TableHead>
                   <TableHead>Song</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>RELATIVEFILE</TableHead>
+                  <TableHead>SAM</TableHead>
                   <TableHead>Message</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -393,17 +396,34 @@ export default function SongRequestsManager() {
                         <Badge className={statusColors[r.status] || ''} variant="outline">
                           {r.status}
                         </Badge>
-                        {r.sam_filename && (
-                          <span title={`File: ${r.sam_filename}`}>
-                            <HardDrive className="w-3.5 h-3.5 text-primary" />
-                          </span>
-                        )}
                         {r.is_duplicate && (
                           <span title="Duplicate">
                             <AlertTriangle className="w-3.5 h-3.5 text-yellow-500" />
                           </span>
                         )}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {r.sam_filename ? (
+                        <span className="font-mono text-xs text-primary" title={r.sam_filename}>
+                          {r.sam_filename}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {r.status === 'approved' && r.sam_filename && !r.sam_imported_at ? (
+                        <Badge className="bg-green-500/20 text-green-400 border-green-500/30" variant="outline">
+                          Eligible
+                        </Badge>
+                      ) : r.sam_imported_at ? (
+                        <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30" variant="outline">
+                          Imported
+                        </Badge>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
                     </TableCell>
                     <TableCell className="max-w-[200px]">
                       {r.message && (
