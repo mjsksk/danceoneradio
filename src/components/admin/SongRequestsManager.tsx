@@ -41,6 +41,7 @@ import {
   StickyNote,
   AlertTriangle,
   ListMusic,
+  HardDrive,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
