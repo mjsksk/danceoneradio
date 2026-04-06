@@ -87,6 +87,9 @@ export default function SongRequestsManager() {
   const fetchRequests = useCallback(async () => {
     setLoading(true);
     try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      console.log('[SongRequests] Auth session:', sessionData?.session?.user?.id ?? 'NO SESSION');
+
       let query = supabase
         .from('song_requests')
         .select('*')
@@ -102,11 +105,12 @@ export default function SongRequestsManager() {
         );
       }
 
-      const { data, error } = await query.limit(200);
+      const { data, error, status, statusText } = await query.limit(200);
+      console.log('[SongRequests] Query result:', { count: data?.length ?? 0, error, status, statusText });
       if (error) throw error;
       setRequests((data as SongRequest[]) || []);
     } catch (err) {
-      console.error('Error fetching requests:', err);
+      console.error('[SongRequests] Error fetching requests:', err);
       toast.error('Failed to load requests');
     } finally {
       setLoading(false);
