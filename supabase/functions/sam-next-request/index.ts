@@ -23,9 +23,10 @@ Deno.serve(async (req: Request) => {
 
   const { data, error } = await supabase
     .from("song_requests")
-    .select("id, artist_name, song_title, listener_name, message")
+    .select("id, artist_name, song_title, listener_name, message, sam_filename")
     .eq("status", "approved")
     .is("sam_imported_at", null)
+    .not("sam_filename", "is", null)
     .order("created_at", { ascending: true })
     .limit(1)
     .maybeSingle();
@@ -48,6 +49,7 @@ Deno.serve(async (req: Request) => {
   if (data.message) {
     body += `MESSAGE=${sanitize(data.message)}\n`;
   }
+  body += `FILENAME=${sanitize(data.sam_filename)}\n`;
 
   return new Response(body, { status: 200, headers: { "Content-Type": "text/plain" } });
 });

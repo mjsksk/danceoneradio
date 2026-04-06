@@ -1,0 +1,1 @@
+ALTER TABLE public.song_requests ADD COLUMN IF NOT EXISTS sam_filename text DEFAULT NULL;

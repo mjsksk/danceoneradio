@@ -41,6 +41,7 @@ import {
   StickyNote,
   AlertTriangle,
   ListMusic,
+  HardDrive,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -60,6 +61,7 @@ interface SongRequest {
   user_agent: string | null;
   reviewed_by: string | null;
   reviewed_at: string | null;
+  sam_filename: string | null;
 }
 
 type StatusFilter = 'all' | 'new' | 'approved' | 'rejected' | 'played';
@@ -80,6 +82,7 @@ export default function SongRequestsManager() {
   const [notesDialogId, setNotesDialogId] = useState<string | null>(null);
   const [notesText, setNotesText] = useState('');
   const [compactView, setCompactView] = useState(false);
+  const [filenameText, setFilenameText] = useState('');
 
   const fetchRequests = useCallback(async () => {
     setLoading(true);
@@ -170,16 +173,16 @@ export default function SongRequestsManager() {
     try {
       const { error } = await supabase
         .from('song_requests')
-        .update({ admin_notes: notesText })
+        .update({ admin_notes: notesText, sam_filename: filenameText || null } as any)
         .eq('id', notesDialogId);
       if (error) throw error;
       setRequests(prev =>
-        prev.map(r => (r.id === notesDialogId ? { ...r, admin_notes: notesText } : r))
+        prev.map(r => (r.id === notesDialogId ? { ...r, admin_notes: notesText, sam_filename: filenameText || null } : r))
       );
       setNotesDialogId(null);
-      toast.success('Notes saved');
+      toast.success('Notes & filename saved');
     } catch {
-      toast.error('Failed to save notes');
+      toast.error('Failed to save');
     }
   };
 
@@ -386,6 +389,11 @@ export default function SongRequestsManager() {
                         <Badge className={statusColors[r.status] || ''} variant="outline">
                           {r.status}
                         </Badge>
+                        {r.sam_filename && (
+                          <span title={`File: ${r.sam_filename}`}>
+                            <HardDrive className="w-3.5 h-3.5 text-primary" />
+                          </span>
+                        )}
                         {r.is_duplicate && (
                           <span title="Duplicate">
                             <AlertTriangle className="w-3.5 h-3.5 text-yellow-500" />
@@ -462,6 +470,7 @@ export default function SongRequestsManager() {
                           if (open) {
                             setNotesDialogId(r.id);
                             setNotesText(r.admin_notes || '');
+                            setFilenameText(r.sam_filename || '');
                           } else {
                             setNotesDialogId(null);
                           }
@@ -483,8 +492,19 @@ export default function SongRequestsManager() {
                                 value={notesText}
                                 onChange={e => setNotesText(e.target.value)}
                                 placeholder="Internal notes..."
-                                rows={4}
+                                rows={3}
                               />
+                              <div>
+                                <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                                  SAM Filename (full local path)
+                                </label>
+                                <Input
+                                  value={filenameText}
+                                  onChange={e => setFilenameText(e.target.value)}
+                                  placeholder="D:\Music\Artist - Title.mp3"
+                                  className="font-mono text-xs"
+                                />
+                              </div>
                               {r.ip_address && (
                                 <p className="text-xs text-muted-foreground">IP: {r.ip_address}</p>
                               )}
@@ -494,7 +514,7 @@ export default function SongRequestsManager() {
                                 </p>
                               )}
                               <Button onClick={saveNotes} className="w-full">
-                                Save Notes
+                                Save
                               </Button>
                             </div>
                           </DialogContent>
