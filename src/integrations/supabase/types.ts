@@ -570,6 +570,7 @@ export type Database = {
           normalized_song_title: string | null
           reviewed_at: string | null
           reviewed_by: string | null
+          sam_filename: string | null
           sam_imported_at: string | null
           song_title: string
           source: string | null
@@ -592,6 +593,7 @@ export type Database = {
           normalized_song_title?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          sam_filename?: string | null
           sam_imported_at?: string | null
           song_title: string
           source?: string | null
@@ -614,6 +616,7 @@ export type Database = {
           normalized_song_title?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          sam_filename?: string | null
           sam_imported_at?: string | null
           song_title?: string
           source?: string | null
