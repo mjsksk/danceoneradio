@@ -387,7 +387,9 @@ export default function SongRequestsManager() {
                           {r.status}
                         </Badge>
                         {r.is_duplicate && (
-                          <AlertTriangle className="w-3.5 h-3.5 text-yellow-500" title="Duplicate" />
+                          <span title="Duplicate">
+                            <AlertTriangle className="w-3.5 h-3.5 text-yellow-500" />
+                          </span>
                         )}
                       </div>
                     </TableCell>
