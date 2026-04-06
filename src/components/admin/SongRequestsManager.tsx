@@ -486,8 +486,19 @@ export default function SongRequestsManager() {
                                 value={notesText}
                                 onChange={e => setNotesText(e.target.value)}
                                 placeholder="Internal notes..."
-                                rows={4}
+                                rows={3}
                               />
+                              <div>
+                                <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                                  SAM Filename (full local path)
+                                </label>
+                                <Input
+                                  value={filenameText}
+                                  onChange={e => setFilenameText(e.target.value)}
+                                  placeholder="D:\Music\Artist - Title.mp3"
+                                  className="font-mono text-xs"
+                                />
+                              </div>
                               {r.ip_address && (
                                 <p className="text-xs text-muted-foreground">IP: {r.ip_address}</p>
                               )}
@@ -497,7 +508,7 @@ export default function SongRequestsManager() {
                                 </p>
                               )}
                               <Button onClick={saveNotes} className="w-full">
-                                Save Notes
+                                Save
                               </Button>
                             </div>
                           </DialogContent>
