@@ -1,7 +1,7 @@
 {
-  "version": "1.0.12",
-  "notes": "Improve Windows update handoff diagnostics and add an option to start the app when Windows starts.",
-  "pub_date": "2026-03-25T19:07:42.828Z",
-  "url": "https://github.com/mjsksk/danceoneradio/releases/download/v1.0.12/dance-one-radio-setup-1.0.12-x64.exe",
-  "signature": "untrusted comment: signature from minisign secret key\nRUSH8mYSkz3Lfw02mCJj9iBBdA7SAmN27emuKLPKgMq+MYR1a6WFRfCCVOPBRc8siHQn9qpJL/3WOsV7FsyiqDGsrimxEt4YkwE=\ntrusted comment: 1774465662\nsd+nau1sdF1LUBayZxf8SiC4GE0tc3mc2acGGEQyho6MjSha1CCX5cE8L3+YIXARv0nKCKqD6/zx3Hqxw4YpAA=="
+  "version": "1.0.13",
+  "notes": "Refresh the live stream after 15 seconds when resuming from pause and increase the default desktop window height so the full player footer stays visible.",
+  "pub_date": "2026-04-07T13:27:24.039Z",
+  "url": "https://github.com/mjsksk/danceoneradio/releases/download/v1.0.13/dance-one-radio-setup-1.0.13-x64.exe",
+  "signature": "untrusted comment: signature from minisign secret key\nRUSH8mYSkz3Lfynm9cEdmo4kEyxTXE2/E860enIcwXxaV92W3493Q81wsbiRLUhtEtCmkyrsb1VHVCk8/55bxRx/Qgp+SD75VAY=\ntrusted comment: 1775568444\nUt9jl8Knkc6izfjjhHwD5+LylHMKawygMcO2CS/bnl6ZeNa/DgVhr0HY+YumozSG2jGcNzHdWi6indXAP21TDQ=="
 }
