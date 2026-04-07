@@ -17,7 +17,7 @@ import { Switch } from '@/components/ui/switch';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 // Admin components
-import CSVTrackImporter from '@/components/admin/CSVTrackImporter';
+
 import NewsletterSubscribers from '@/components/admin/NewsletterSubscribers';
 import SubscriberGrowthChart from '@/components/admin/SubscriberGrowthChart';
 import NewsletterCampaign from '@/components/admin/NewsletterCampaign';
@@ -344,7 +344,6 @@ export default function Account() {
       <ManualSubscriberAdd />
       <NewsletterSubscribers />
       <SongRequestsManager />
-      <CSVTrackImporter />
     </div>
   );
 
