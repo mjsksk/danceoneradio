@@ -75,38 +75,59 @@ function findMatches(
     const libArtist = track.normalized_artist;
     const libTitle = track.normalized_title;
     const libCombined = `${libArtist} ${libTitle}`;
+    // Also normalize the raw filename for contains checks
+    const libFilenameNorm = normalize(track.filename);
 
-    // Exact match
+    // 1. Exact normalized match
     if (normArtist === libArtist && normTitle === libTitle) {
       candidates.push({
         library_id: track.id,
         artist: track.artist,
         title: track.title,
-        filename: track.filename,
+        filename: track.filename.trim(),
         confidence: 1.0,
         method: "exact",
       });
       continue;
     }
 
-    // Contains match - check if one contains the other
+    // 2. Title-contains match (highest priority partial match)
+    //    "high on me" should match library title "high on me" or filename containing it
     if (
-      (libCombined.includes(normArtist) && libCombined.includes(normTitle)) ||
-      (normCombined.includes(libArtist) && normCombined.includes(libTitle))
+      normTitle.length >= 3 &&
+      (libTitle.includes(normTitle) || libFilenameNorm.includes(normTitle))
     ) {
-      const conf = 0.85;
+      // Bonus if artist also matches
+      const artistBonus = (normArtist.length >= 2 && (libArtist.includes(normArtist) || libCombined.includes(normArtist))) ? 0.05 : 0;
+      const conf = Math.min(0.95, 0.90 + artistBonus);
       candidates.push({
         library_id: track.id,
         artist: track.artist,
         title: track.title,
-        filename: track.filename,
+        filename: track.filename.trim(),
         confidence: conf,
+        method: "title-contains",
+      });
+      continue;
+    }
+
+    // 3. Artist+title combined contains match
+    if (
+      (libCombined.includes(normArtist) && libCombined.includes(normTitle)) ||
+      (normCombined.includes(libArtist) && normCombined.includes(libTitle))
+    ) {
+      candidates.push({
+        library_id: track.id,
+        artist: track.artist,
+        title: track.title,
+        filename: track.filename.trim(),
+        confidence: 0.85,
         method: "contains",
       });
       continue;
     }
 
-    // Fuzzy similarity
+    // 4. Fuzzy similarity
     const artistSim = similarity(normArtist, libArtist);
     const titleSim = similarity(normTitle, libTitle);
     const combinedSim = similarity(normCombined, libCombined);
@@ -117,7 +138,7 @@ function findMatches(
         library_id: track.id,
         artist: track.artist,
         title: track.title,
-        filename: track.filename,
+        filename: track.filename.trim(),
         confidence: Math.round(bestSim * 100) / 100,
         method: "fuzzy",
       });
@@ -126,7 +147,7 @@ function findMatches(
 
   // Sort by confidence descending
   candidates.sort((a, b) => b.confidence - a.confidence);
-  return candidates.slice(0, 5); // Top 5
+  return candidates.slice(0, 5);
 }
 
 Deno.serve(async (req) => {
