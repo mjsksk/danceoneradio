@@ -267,9 +267,12 @@ export default function SAMLibraryManager() {
 
         <div className="bg-primary/10 border border-primary/20 rounded-lg p-3">
           <p className="text-xs font-['Rajdhani'] text-muted-foreground">
-            <strong>CSV Format:</strong> One track per line. Supports: <code>filename.mp3</code>, 
-            <code>Artist - Title.mp3</code>, or tab-separated <code>Artist{'\t'}Title{'\t'}filename.mp3</code>.
-            Filenames should be relative to <code>C:\D1Files\Dance Music</code>.
+            <strong>CSV Format:</strong> One track per line. Supports: <code>Artist - Title.mp3</code>, 
+            full paths like <code>C:\D1Files\Dance Music\Artist - Title.mp3</code>, 
+            or tab-separated <code>Artist{'\t'}Title{'\t'}filename.mp3</code>.
+          </p>
+          <p className="text-xs font-['Rajdhani'] text-muted-foreground mt-1">
+            <strong>Quick export from Windows:</strong> Open <code>cmd</code> in your music folder and run: <code>dir /b /s *.mp3 &gt; tracklist.txt</code>
           </p>
         </div>
 
@@ -278,9 +281,18 @@ export default function SAMLibraryManager() {
             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary" />
           </div>
         ) : tracks.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            <HardDrive className="w-12 h-12 mx-auto mb-4 opacity-30" />
-            <p>Library is empty. Import tracks via CSV.</p>
+          <div className="text-center py-8">
+            <HardDrive className="w-12 h-12 mx-auto mb-4 text-destructive opacity-60" />
+            <p className="font-['Orbitron'] text-lg font-bold text-destructive mb-2">
+              ⚠ SAM Library is empty — import required
+            </p>
+            <p className="text-sm text-muted-foreground font-['Rajdhani'] max-w-md mx-auto">
+              Song request matching cannot work until library tracks are imported.
+              Export your music folder to a text file and import it above.
+            </p>
+            <p className="text-xs text-muted-foreground font-['Rajdhani'] mt-2">
+              Run in <code className="bg-muted px-1 rounded">C:\D1Files\Dance Music</code>: <code className="bg-muted px-1 rounded">dir /b /s *.mp3 &gt; tracklist.txt</code>
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
