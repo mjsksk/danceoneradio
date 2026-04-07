@@ -52,6 +52,11 @@ interface MatchCandidate {
   filename: string;
   confidence: number;
   method: string;
+  normalized_artist?: string;
+  normalized_artist_nospace?: string;
+  normalized_title?: string;
+  normalized_title_nospace?: string;
+  priority?: number;
 }
 
 interface SongRequest {
@@ -79,6 +84,11 @@ interface SongRequest {
   match_candidates: MatchCandidate[] | null;
   normalized_artist_name: string | null;
   normalized_song_title: string | null;
+  normalized_request_artist: string | null;
+  normalized_request_artist_nospace: string | null;
+  normalized_request_title: string | null;
+  normalized_request_title_nospace: string | null;
+  match_reason: string | null;
 }
 
 type StatusFilter = 'all' | 'new' | 'approved' | 'rejected' | 'played';
@@ -107,6 +117,40 @@ export default function SongRequestsManager() {
   const [compactView, setCompactView] = useState(false);
   const [filenameText, setFilenameText] = useState('');
   const [candidateDialogReq, setCandidateDialogReq] = useState<SongRequest | null>(null);
+  const [rematchingId, setRematchingId] = useState<string | null>(null);
+
+  const rerunMatch = async (id: string) => {
+    setRematchingId(id);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+      if (!token) { toast.error('Not authenticated'); return; }
+
+      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+      const resp = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/match-song-requests`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ request_ids: [id] }),
+        }
+      );
+
+      const result = await resp.json();
+      if (!resp.ok) { toast.error(result.error || 'Re-match failed'); return; }
+
+      toast.success(`Re-matched: ${result.results?.[0]?.match_method || 'done'}`);
+      fetchRequests();
+    } catch (err) {
+      console.error('Re-match error:', err);
+      toast.error('Re-match failed');
+    } finally {
+      setRematchingId(null);
+    }
+  };
 
   const fetchRequests = useCallback(async () => {
     setLoading(true);
@@ -394,9 +438,12 @@ export default function SongRequestsManager() {
                     <TableCell>
                       <div className="text-sm font-medium">{r.artist_name}</div>
                       <div className="text-xs text-muted-foreground">{r.song_title}</div>
-                      {r.normalized_artist_name && (
-                        <div className="text-[10px] text-muted-foreground/60 mt-0.5 font-mono" title="Normalized">
-                          norm: {r.normalized_artist_name} — {r.normalized_song_title}
+                      {(r.normalized_request_artist || r.normalized_artist_name) && (
+                        <div className="text-[10px] text-muted-foreground/60 mt-0.5 font-mono space-y-0.5" title="Normalized request values">
+                          <div>norm: {r.normalized_request_artist || r.normalized_artist_name} — {r.normalized_request_title || r.normalized_song_title}</div>
+                          {r.normalized_request_artist_nospace && (
+                            <div>nospace: {r.normalized_request_artist_nospace} — {r.normalized_request_title_nospace}</div>
+                          )}
                         </div>
                       )}
                     </TableCell>
@@ -409,7 +456,7 @@ export default function SongRequestsManager() {
                           </Badge>
                           {r.match_confidence != null && (
                             <div className="text-xs text-muted-foreground">
-                              {Math.round(r.match_confidence * 100)}%
+                              {r.match_confidence}%
                             </div>
                           )}
                           {r.matched_artist && (
@@ -423,7 +470,7 @@ export default function SongRequestsManager() {
                             </div>
                           )}
                           {r.match_method === 'no-match' && (
-                            <div className="text-[10px] text-destructive/70">No library match found</div>
+                            <div className="text-[10px] text-destructive/70">{r.match_reason || 'No library match found'}</div>
                           )}
                           {r.match_candidates && r.match_candidates.length > 1 && (
                             <Button
@@ -439,6 +486,16 @@ export default function SongRequestsManager() {
                       ) : (
                         <span className="text-xs text-muted-foreground">Not matched</span>
                       )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="mt-1 text-xs h-6 px-2 gap-1"
+                        disabled={rematchingId === r.id}
+                        onClick={() => rerunMatch(r.id)}
+                      >
+                        <Zap className="w-3 h-3" />
+                        {rematchingId === r.id ? '...' : 'Re-match'}
+                      </Button>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
@@ -527,6 +584,14 @@ export default function SongRequestsManager() {
                   <p className="text-sm text-muted-foreground">
                     {candidateDialogReq.artist_name} — {candidateDialogReq.song_title}
                   </p>
+                  {candidateDialogReq.normalized_request_artist && (
+                    <div className="text-xs font-mono text-muted-foreground/60 mt-1 space-y-0.5">
+                      <div>norm artist: {candidateDialogReq.normalized_request_artist}</div>
+                      <div>norm artist nospace: {candidateDialogReq.normalized_request_artist_nospace}</div>
+                      <div>norm title: {candidateDialogReq.normalized_request_title}</div>
+                      <div>norm title nospace: {candidateDialogReq.normalized_request_title_nospace}</div>
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   {(candidateDialogReq.match_candidates || []).map((c, i) => (
@@ -534,11 +599,17 @@ export default function SongRequestsManager() {
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium">{c.artist} — {c.title}</div>
                         <div className="font-mono text-xs text-muted-foreground truncate">{c.filename}</div>
+                        {c.normalized_artist && (
+                          <div className="text-[10px] font-mono text-muted-foreground/50 mt-0.5">
+                            lib norm: {c.normalized_artist} / {c.normalized_artist_nospace} — {c.normalized_title} / {c.normalized_title_nospace}
+                          </div>
+                        )}
                         <div className="flex items-center gap-2 mt-1">
                           <Badge variant="outline" className={matchMethodColors[c.method] || 'bg-muted'}>
                             {c.method}
                           </Badge>
-                          <span className="text-xs text-muted-foreground">{Math.round(c.confidence * 100)}%</span>
+                          <span className="text-xs text-muted-foreground">{c.confidence}%</span>
+                          {c.priority && <span className="text-xs text-muted-foreground/50">P{c.priority}</span>}
                         </div>
                       </div>
                       <Button
