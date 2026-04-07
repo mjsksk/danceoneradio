@@ -447,7 +447,9 @@ export type Database = {
           filename: string
           id: string
           normalized_artist: string
+          normalized_artist_nospace: string | null
           normalized_title: string
+          normalized_title_nospace: string | null
           title: string
         }
         Insert: {
@@ -456,7 +458,9 @@ export type Database = {
           filename: string
           id?: string
           normalized_artist: string
+          normalized_artist_nospace?: string | null
           normalized_title: string
+          normalized_title_nospace?: string | null
           title: string
         }
         Update: {
@@ -465,7 +469,9 @@ export type Database = {
           filename?: string
           id?: string
           normalized_artist?: string
+          normalized_artist_nospace?: string | null
           normalized_title?: string
+          normalized_title_nospace?: string | null
           title?: string
         }
         Relationships: []
@@ -598,10 +604,15 @@ export type Database = {
           match_candidates: Json | null
           match_confidence: number | null
           match_method: string | null
+          match_reason: string | null
           matched_artist: string | null
           matched_title: string | null
           message: string | null
           normalized_artist_name: string | null
+          normalized_request_artist: string | null
+          normalized_request_artist_nospace: string | null
+          normalized_request_title: string | null
+          normalized_request_title_nospace: string | null
           normalized_song_title: string | null
           reviewed_at: string | null
           reviewed_by: string | null
@@ -626,10 +637,15 @@ export type Database = {
           match_candidates?: Json | null
           match_confidence?: number | null
           match_method?: string | null
+          match_reason?: string | null
           matched_artist?: string | null
           matched_title?: string | null
           message?: string | null
           normalized_artist_name?: string | null
+          normalized_request_artist?: string | null
+          normalized_request_artist_nospace?: string | null
+          normalized_request_title?: string | null
+          normalized_request_title_nospace?: string | null
           normalized_song_title?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -654,10 +670,15 @@ export type Database = {
           match_candidates?: Json | null
           match_confidence?: number | null
           match_method?: string | null
+          match_reason?: string | null
           matched_artist?: string | null
           matched_title?: string | null
           message?: string | null
           normalized_artist_name?: string | null
+          normalized_request_artist?: string | null
+          normalized_request_artist_nospace?: string | null
+          normalized_request_title?: string | null
+          normalized_request_title_nospace?: string | null
           normalized_song_title?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -756,6 +777,42 @@ export type Database = {
       }
     }
     Functions: {
+      apply_song_request_match: {
+        Args: { _request_id: string }
+        Returns: {
+          candidates_count: number
+          id: string
+          match_candidates: Json
+          match_confidence: number
+          match_method: string
+          matched_artist: string
+          matched_title: string
+          no_match_reason: string
+          normalized_request_artist: string
+          normalized_request_artist_nospace: string
+          normalized_request_title: string
+          normalized_request_title_nospace: string
+          sam_filename: string
+        }[]
+      }
+      apply_song_request_matches: {
+        Args: { _request_ids?: string[] }
+        Returns: {
+          candidates_count: number
+          id: string
+          match_candidates: Json
+          match_confidence: number
+          match_method: string
+          matched_artist: string
+          matched_title: string
+          no_match_reason: string
+          normalized_request_artist: string
+          normalized_request_artist_nospace: string
+          normalized_request_title: string
+          normalized_request_title_nospace: string
+          sam_filename: string
+        }[]
+      }
       cleanup_old_notifications: { Args: never; Returns: undefined }
       cleanup_old_request_logs: { Args: never; Returns: undefined }
       cleanup_old_site_visits: { Args: never; Returns: undefined }
@@ -814,6 +871,44 @@ export type Database = {
               total_unique_listeners: number
             }[]
           }
+      get_song_request_match_candidates: {
+        Args: { _candidate_limit?: number; _request_id: string }
+        Returns: {
+          artist: string
+          confidence: number
+          filename: string
+          library_id: string
+          method: string
+          normalized_artist: string
+          normalized_artist_nospace: string
+          normalized_title: string
+          normalized_title_nospace: string
+          priority: number
+          title: string
+        }[]
+      }
+      get_song_request_match_candidates_by_values: {
+        Args: {
+          _candidate_limit?: number
+          _request_artist: string
+          _request_artist_nospace: string
+          _request_title: string
+          _request_title_nospace: string
+        }
+        Returns: {
+          artist: string
+          confidence: number
+          filename: string
+          library_id: string
+          method: string
+          normalized_artist: string
+          normalized_artist_nospace: string
+          normalized_title: string
+          normalized_title_nospace: string
+          priority: number
+          title: string
+        }[]
+      }
       get_subscriber_count: { Args: { before_date?: string }; Returns: number }
       get_subscriber_growth: {
         Args: { start_date: string }
@@ -855,6 +950,11 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      normalize_match_value: { Args: { value: string }; Returns: string }
+      normalize_match_value_nospace: {
+        Args: { value: string }
+        Returns: string
       }
       validate_unsubscribe_token: {
         Args: { token_input: string }
