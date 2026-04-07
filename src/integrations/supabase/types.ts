@@ -443,51 +443,36 @@ export type Database = {
       sam_library: {
         Row: {
           artist: string
-          artist_key: string | null
-          artist_norm: string | null
           created_at: string
           filename: string
-          full_key: string | null
           id: string
           normalized_artist: string
           normalized_artist_nospace: string | null
           normalized_title: string
           normalized_title_nospace: string | null
           title: string
-          title_key: string | null
-          title_norm: string | null
         }
         Insert: {
           artist: string
-          artist_key?: string | null
-          artist_norm?: string | null
           created_at?: string
           filename: string
-          full_key?: string | null
           id?: string
           normalized_artist: string
           normalized_artist_nospace?: string | null
           normalized_title: string
           normalized_title_nospace?: string | null
           title: string
-          title_key?: string | null
-          title_norm?: string | null
         }
         Update: {
           artist?: string
-          artist_key?: string | null
-          artist_norm?: string | null
           created_at?: string
           filename?: string
-          full_key?: string | null
           id?: string
           normalized_artist?: string
           normalized_artist_nospace?: string | null
           normalized_title?: string
           normalized_title_nospace?: string | null
           title?: string
-          title_key?: string | null
-          title_norm?: string | null
         }
         Relationships: []
       }
@@ -629,11 +614,6 @@ export type Database = {
           normalized_request_title: string | null
           normalized_request_title_nospace: string | null
           normalized_song_title: string | null
-          req_artist_key: string | null
-          req_artist_norm: string | null
-          req_full_key: string | null
-          req_title_key: string | null
-          req_title_norm: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           sam_filename: string | null
@@ -667,11 +647,6 @@ export type Database = {
           normalized_request_title?: string | null
           normalized_request_title_nospace?: string | null
           normalized_song_title?: string | null
-          req_artist_key?: string | null
-          req_artist_norm?: string | null
-          req_full_key?: string | null
-          req_title_key?: string | null
-          req_title_norm?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           sam_filename?: string | null
@@ -705,11 +680,6 @@ export type Database = {
           normalized_request_title?: string | null
           normalized_request_title_nospace?: string | null
           normalized_song_title?: string | null
-          req_artist_key?: string | null
-          req_artist_norm?: string | null
-          req_full_key?: string | null
-          req_title_key?: string | null
-          req_title_norm?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           sam_filename?: string | null
@@ -807,56 +777,11 @@ export type Database = {
       }
     }
     Functions: {
-      apply_song_request_match: {
-        Args: { _request_id: string }
-        Returns: {
-          candidates_count: number
-          id: string
-          match_candidates: Json
-          match_confidence: number
-          match_method: string
-          matched_artist: string
-          matched_title: string
-          no_match_reason: string
-          normalized_request_artist: string
-          normalized_request_artist_nospace: string
-          normalized_request_title: string
-          normalized_request_title_nospace: string
-          sam_filename: string
-        }[]
-      }
-      apply_song_request_matches: {
-        Args: { _request_ids?: string[] }
-        Returns: {
-          candidates_count: number
-          id: string
-          match_candidates: Json
-          match_confidence: number
-          match_method: string
-          matched_artist: string
-          matched_title: string
-          no_match_reason: string
-          normalized_request_artist: string
-          normalized_request_artist_nospace: string
-          normalized_request_title: string
-          normalized_request_title_nospace: string
-          sam_filename: string
-        }[]
-      }
-      basename_text: { Args: { value: string }; Returns: string }
       cleanup_old_notifications: { Args: never; Returns: undefined }
       cleanup_old_request_logs: { Args: never; Returns: undefined }
       cleanup_old_site_visits: { Args: never; Returns: undefined }
       cleanup_old_subscriber_tracking_data: { Args: never; Returns: undefined }
       cleanup_old_unsubscribe_attempts: { Args: never; Returns: undefined }
-      effective_library_artist: {
-        Args: { artist: string; filename: string }
-        Returns: string
-      }
-      effective_library_title: {
-        Args: { filename: string; title: string }
-        Returns: string
-      }
       get_download_stats: {
         Args: { end_date?: string; start_date?: string }
         Returns: {
@@ -910,87 +835,6 @@ export type Database = {
               total_unique_listeners: number
             }[]
           }
-      get_song_request_debug_candidates: {
-        Args: { _candidate_limit?: number; _request_id: string }
-        Returns: {
-          artist: string
-          artist_key: string
-          artist_norm: string
-          confidence: number
-          full_key: string
-          library_id: string
-          match_method: string
-          priority: number
-          relativefile: string
-          similarity_score: number
-          title: string
-          title_key: string
-          title_norm: string
-        }[]
-      }
-      get_song_request_debug_candidates_by_values: {
-        Args: {
-          _candidate_limit?: number
-          _req_artist_key: string
-          _req_artist_norm: string
-          _req_full_key: string
-          _req_title_key: string
-          _req_title_norm: string
-        }
-        Returns: {
-          artist: string
-          artist_key: string
-          artist_norm: string
-          confidence: number
-          full_key: string
-          library_id: string
-          match_method: string
-          priority: number
-          relativefile: string
-          similarity_score: number
-          title: string
-          title_key: string
-          title_norm: string
-        }[]
-      }
-      get_song_request_match_candidates: {
-        Args: { _candidate_limit?: number; _request_id: string }
-        Returns: {
-          artist: string
-          confidence: number
-          filename: string
-          library_id: string
-          method: string
-          normalized_artist: string
-          normalized_artist_nospace: string
-          normalized_title: string
-          normalized_title_nospace: string
-          priority: number
-          title: string
-        }[]
-      }
-      get_song_request_match_candidates_by_values: {
-        Args: {
-          _candidate_limit?: number
-          _request_artist: string
-          _request_artist_nospace: string
-          _request_title: string
-          _request_title_nospace: string
-        }
-        Returns: {
-          artist: string
-          confidence: number
-          filename: string
-          library_id: string
-          method: string
-          normalized_artist: string
-          normalized_artist_nospace: string
-          normalized_title: string
-          normalized_title_nospace: string
-          priority: number
-          title: string
-        }[]
-      }
       get_subscriber_count: { Args: { before_date?: string }; Returns: number }
       get_subscriber_growth: {
         Args: { start_date: string }
@@ -1032,14 +876,6 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
-      }
-      library_filename_artist: { Args: { value: string }; Returns: string }
-      library_filename_stem: { Args: { value: string }; Returns: string }
-      library_filename_title: { Args: { value: string }; Returns: string }
-      normalize_match_value: { Args: { value: string }; Returns: string }
-      normalize_match_value_nospace: {
-        Args: { value: string }
-        Returns: string
       }
       validate_unsubscribe_token: {
         Args: { token_input: string }
