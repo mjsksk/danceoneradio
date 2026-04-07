@@ -440,6 +440,36 @@ export type Database = {
         }
         Relationships: []
       }
+      sam_library: {
+        Row: {
+          artist: string
+          created_at: string
+          filename: string
+          id: string
+          normalized_artist: string
+          normalized_title: string
+          title: string
+        }
+        Insert: {
+          artist: string
+          created_at?: string
+          filename: string
+          id?: string
+          normalized_artist: string
+          normalized_title: string
+          title: string
+        }
+        Update: {
+          artist?: string
+          created_at?: string
+          filename?: string
+          id?: string
+          normalized_artist?: string
+          normalized_title?: string
+          title?: string
+        }
+        Relationships: []
+      }
       scheduled_notifications: {
         Row: {
           body: string
@@ -565,6 +595,11 @@ export type Database = {
           ip_address: string | null
           is_duplicate: boolean
           listener_name: string
+          match_candidates: Json | null
+          match_confidence: number | null
+          match_method: string | null
+          matched_artist: string | null
+          matched_title: string | null
           message: string | null
           normalized_artist_name: string | null
           normalized_song_title: string | null
@@ -588,6 +623,11 @@ export type Database = {
           ip_address?: string | null
           is_duplicate?: boolean
           listener_name: string
+          match_candidates?: Json | null
+          match_confidence?: number | null
+          match_method?: string | null
+          matched_artist?: string | null
+          matched_title?: string | null
           message?: string | null
           normalized_artist_name?: string | null
           normalized_song_title?: string | null
@@ -611,6 +651,11 @@ export type Database = {
           ip_address?: string | null
           is_duplicate?: boolean
           listener_name?: string
+          match_candidates?: Json | null
+          match_confidence?: number | null
+          match_method?: string | null
+          matched_artist?: string | null
+          matched_title?: string | null
           message?: string | null
           normalized_artist_name?: string | null
           normalized_song_title?: string | null
