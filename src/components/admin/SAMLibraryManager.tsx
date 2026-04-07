@@ -3,33 +3,31 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { HardDrive, RefreshCw, ExternalLink, Copy, Check } from 'lucide-react';
+import { HardDrive, RefreshCw, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function SAMLibraryManager() {
   const [pendingCount, setPendingCount] = useState<number | null>(null);
-  const [matchedCount, setMatchedCount] = useState<number | null>(null);
+  const [queuedCount, setQueuedCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
 
   const fetchStats = useCallback(async () => {
     setLoading(true);
     try {
-      const [pendingRes, matchedRes] = await Promise.all([
+      const [pendingRes, queuedRes] = await Promise.all([
         supabase
           .from('song_requests')
           .select('id', { count: 'exact', head: true })
           .eq('status', 'approved')
-          .is('sam_filename', null)
           .is('sam_imported_at', null),
         supabase
           .from('song_requests')
           .select('id', { count: 'exact', head: true })
-          .eq('status', 'approved')
-          .not('sam_filename', 'is', null),
+          .eq('status', 'queued'),
       ]);
       setPendingCount(pendingRes.count ?? 0);
-      setMatchedCount(matchedRes.count ?? 0);
+      setQueuedCount(queuedRes.count ?? 0);
     } catch {
       toast.error('Failed to load stats');
     } finally {
@@ -53,7 +51,7 @@ export default function SAMLibraryManager() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <CardTitle className="flex items-center gap-2 font-['Orbitron'] text-xl">
             <HardDrive className="w-5 h-5 text-primary" />
-            SAM Local Resolver
+            SAM Integration
           </CardTitle>
           <Button variant="outline" size="sm" onClick={fetchStats} disabled={loading}>
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -64,10 +62,10 @@ export default function SAMLibraryManager() {
         {/* Status badges */}
         <div className="flex gap-3 flex-wrap">
           <Badge variant="secondary" className="text-sm px-3 py-1">
-            {pendingCount ?? '…'} awaiting match
+            {pendingCount ?? '…'} awaiting SAM pickup
           </Badge>
           <Badge variant="default" className="text-sm px-3 py-1">
-            {matchedCount ?? '…'} matched
+            {queuedCount ?? '…'} queued in SAM
           </Badge>
         </div>
 
@@ -77,14 +75,14 @@ export default function SAMLibraryManager() {
             How it works
           </p>
           <ol className="text-xs font-['Rajdhani'] text-muted-foreground space-y-1.5 list-decimal list-inside">
-            <li>Approved requests are stored in Supabase</li>
-            <li>The local resolver (Python script on SAM PC) polls for unmatched requests</li>
-            <li>It queries the <strong>live SAM MariaDB</strong> (samdb) for the best match</li>
-            <li>Match results are reported back — <code>sam_filename</code> is populated</li>
-            <li><code>sam-next-request</code> returns the matched file for SAM to queue</li>
+            <li>Requests are submitted and reviewed here (approve / reject)</li>
+            <li>The local resolver (Python script on SAM PC) polls for approved requests</li>
+            <li>It searches the <strong>live SAM MariaDB</strong> for matching tracks</li>
+            <li>Matched tracks are queued directly in SAM Broadcaster</li>
+            <li>The resolver marks requests as imported via the API</li>
           </ol>
           <p className="text-xs font-['Rajdhani'] text-muted-foreground mt-2">
-            No CSV import needed — matching runs against the live SAM database.
+            All matching happens locally against the live SAM database — no library import needed.
           </p>
         </div>
 
@@ -122,14 +120,14 @@ set SAM_MUSIC_ROOT=C:\\D1Files\\Dance Music`}
           </div>
         </div>
 
-        {/* Pending requests warning */}
+        {/* Pending requests info */}
         {pendingCount !== null && pendingCount > 0 && (
-          <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3">
-            <p className="text-sm font-['Rajdhani'] text-destructive font-semibold">
-              ⚠ {pendingCount} approved request{pendingCount > 1 ? 's' : ''} awaiting local matching
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
+            <p className="text-sm font-['Rajdhani'] text-blue-400 font-semibold">
+              ℹ {pendingCount} approved request{pendingCount > 1 ? 's' : ''} waiting for SAM PC pickup
             </p>
             <p className="text-xs font-['Rajdhani'] text-muted-foreground mt-1">
-              Ensure the local SAM resolver is running on the SAM PC to match these requests.
+              Ensure the local resolver is running on the SAM PC to process these.
             </p>
           </div>
         )}

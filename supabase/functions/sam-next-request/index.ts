@@ -13,47 +13,16 @@ Deno.serve(async (req: Request) => {
     return new Response("ERROR=UNAUTHORIZED\n", { status: 401, headers: { "Content-Type": "text/plain" } });
   }
 
-  const debug = url.searchParams.get("debug") === "1";
-
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
-  // Debug: count approved requests by eligibility
-  if (debug) {
-    const { data: allApproved } = await supabase
-      .from("song_requests")
-      .select("id, status, sam_filename, sam_imported_at")
-      .eq("status", "approved");
-
-    const approvedCount = allApproved?.length ?? 0;
-    const withFile = allApproved?.filter(r => r.sam_filename) ?? [];
-    const withFileNotImported = withFile.filter(r => !r.sam_imported_at);
-
-    let debugBody = `DEBUG=1\n`;
-    debugBody += `APPROVED_COUNT=${approvedCount}\n`;
-    debugBody += `APPROVED_WITH_RELATIVEFILE=${withFile.length}\n`;
-    debugBody += `APPROVED_ELIGIBLE=${withFileNotImported.length}\n`;
-
-    for (const r of withFileNotImported) {
-      debugBody += `ELIGIBLE_ID=${r.id}\n`;
-      debugBody += `ELIGIBLE_FILE=${r.sam_filename}\n`;
-    }
-
-    if (withFileNotImported.length === 0) {
-      debugBody += `NO_REQUEST=1\n`;
-    }
-
-    return new Response(debugBody, { status: 200, headers: { "Content-Type": "text/plain" } });
-  }
-
   const { data, error } = await supabase
     .from("song_requests")
-    .select("id, sam_filename")
+    .select("id, artist_name, song_title, listener_name, message")
     .eq("status", "approved")
     .is("sam_imported_at", null)
-    .not("sam_filename", "is", null)
     .order("created_at", { ascending: true })
     .limit(1)
     .maybeSingle();
@@ -69,7 +38,14 @@ Deno.serve(async (req: Request) => {
 
   const sanitize = (val: string | null) => (val || "").replace(/[\r\n]+/g, " ").trim();
 
-  const body = `REQUEST_ID=${data.id}\nRELATIVEFILE=${sanitize(data.sam_filename)}\n`;
+  const body = [
+    `REQUEST_ID=${data.id}`,
+    `ARTIST=${sanitize(data.artist_name)}`,
+    `TITLE=${sanitize(data.song_title)}`,
+    `LISTENER=${sanitize(data.listener_name)}`,
+    `MESSAGE=${sanitize(data.message)}`,
+    "",
+  ].join("\n");
 
   return new Response(body, { status: 200, headers: { "Content-Type": "text/plain" } });
 });
