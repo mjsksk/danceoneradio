@@ -1,0 +1,1 @@
+UPDATE song_requests SET status = 'approved', sam_filename = 'KYOTO (DE) - High On Me.mp3' WHERE id = '4a19a7ea-a7d4-45d8-aec6-ba0230f1d837';
