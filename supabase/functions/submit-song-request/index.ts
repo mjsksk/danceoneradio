@@ -3,6 +3,7 @@ import { corsHeaders } from "../_shared/corsHeaders.ts";
 
 const RATE_LIMIT_WINDOW_MS = 30 * 60 * 1000; // 30 minutes
 const MAX_REQUESTS = 3;
+const ADMIN_EMAIL = "mario@danceoneradio.com";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -21,7 +22,6 @@ Deno.serve(async (req) => {
 
     // Honeypot check
     if (body.website) {
-      // Bot detected - return fake success
       return new Response(JSON.stringify({ success: true }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -70,20 +70,18 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Get IP and user agent
     const forwardedFor = req.headers.get("x-forwarded-for");
     const realIp = req.headers.get("x-real-ip");
     const cfIp = req.headers.get("cf-connecting-ip");
     const ipAddress = cfIp || realIp || forwardedFor?.split(",")[0].trim() || "unknown";
     const userAgent = (req.headers.get("user-agent") || "").substring(0, 500);
 
-    // Create service-role client
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Rate limiting check
+    // Rate limiting
     const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MS).toISOString();
     const { data: recentRequests, error: rlError } = await supabase
       .from("song_requests")
@@ -100,11 +98,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Normalize for duplicate detection
+    // Duplicate detection
     const normalizedArtist = artistName.toLowerCase().replace(/[^a-z0-9]/g, "");
     const normalizedTitle = songTitle.toLowerCase().replace(/[^a-z0-9]/g, "");
-
-    // Check for duplicates (same normalized artist+title in last 24 hours)
     const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const { data: duplicates } = await supabase
       .from("song_requests")
@@ -116,7 +112,7 @@ Deno.serve(async (req) => {
 
     const isDuplicate = duplicates && duplicates.length > 0;
 
-    // Insert the request
+    // Insert
     const { error: insertError } = await supabase
       .from("song_requests")
       .insert({
@@ -142,6 +138,60 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Send email notification to admin
+    try {
+      const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+      const adminEmail = Deno.env.get("ADMIN_EMAIL") || ADMIN_EMAIL;
+
+      if (RESEND_API_KEY) {
+        const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+        const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
+
+        const dupTag = isDuplicate ? " [DUPLICATE]" : "";
+        const msgLine = message ? `<p><strong>Message:</strong> ${escapeHtml(message)}</p>` : "";
+        const emailLine = email ? `<p><strong>Email:</strong> ${escapeHtml(email)}</p>` : "";
+
+        const html = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #7c3aed;">🎵 New Song Request${dupTag}</h2>
+            <div style="background: #f4f4f5; border-radius: 8px; padding: 20px; margin: 16px 0;">
+              <p><strong>Artist:</strong> ${escapeHtml(artistName)}</p>
+              <p><strong>Song:</strong> ${escapeHtml(songTitle)}</p>
+              <p><strong>Requested by:</strong> ${escapeHtml(listenerName)}</p>
+              ${emailLine}
+              ${msgLine}
+            </div>
+            <p style="color: #71717a; font-size: 12px;">
+              Submitted at ${new Date().toLocaleString("en-GB", { timeZone: "Europe/London" })}
+              ${isDuplicate ? " — ⚠️ Duplicate request detected" : ""}
+            </p>
+          </div>
+        `;
+
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+        };
+        if (LOVABLE_API_KEY) {
+          headers["Authorization"] = `Bearer ${LOVABLE_API_KEY}`;
+          headers["X-Connection-Api-Key"] = RESEND_API_KEY;
+        }
+
+        await fetch(`${GATEWAY_URL}/emails`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            from: "Dance One Radio <noreply@danceoneradio.com>",
+            to: [adminEmail],
+            subject: `🎵 Song Request: ${artistName} - ${songTitle}${dupTag}`,
+            html,
+          }),
+        });
+      }
+    } catch (emailErr) {
+      // Don't fail the request if email fails
+      console.error("Email notification error:", emailErr);
+    }
+
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -154,3 +204,11 @@ Deno.serve(async (req) => {
     });
   }
 });
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
