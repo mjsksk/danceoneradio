@@ -89,6 +89,8 @@ const Admin = () => {
 
             <NewsletterSubscribers />
 
+            <SAMLibraryManager />
+
             <SAMBroadcasterSync />
 
             <CSVTrackImporter />

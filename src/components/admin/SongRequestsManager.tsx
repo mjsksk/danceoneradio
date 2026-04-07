@@ -126,7 +126,7 @@ export default function SongRequestsManager() {
 
       const { data, error } = await query.limit(200);
       if (error) throw error;
-      setRequests((data as SongRequest[]) || []);
+      setRequests((data as unknown as SongRequest[]) || []);
     } catch (err) {
       console.error('[SongRequests] Error:', err);
       toast.error('Failed to load requests');
