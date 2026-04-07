@@ -77,6 +77,8 @@ interface SongRequest {
   match_confidence: number | null;
   match_method: string | null;
   match_candidates: MatchCandidate[] | null;
+  normalized_artist_name: string | null;
+  normalized_song_title: string | null;
 }
 
 type StatusFilter = 'all' | 'new' | 'approved' | 'rejected' | 'played';

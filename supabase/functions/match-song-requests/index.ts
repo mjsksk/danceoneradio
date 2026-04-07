@@ -17,6 +17,11 @@ function normalize(input: string): string {
   return s;
 }
 
+// No-space version for catching cases like "AmaxDj" vs "Amax DJ"
+function normalizeNospace(input: string): string {
+  return normalize(input).replace(/\s+/g, "");
+}
+
 // Levenshtein distance
 function levenshtein(a: string, b: string): number {
   const m = a.length, n = b.length;
@@ -68,6 +73,8 @@ function findMatches(
   const normArtist = normalize(reqArtist);
   const normTitle = normalize(reqTitle);
   const normCombined = `${normArtist} ${normTitle}`;
+  const nospaceArtist = normalizeNospace(reqArtist);
+  const nospaceTitle = normalizeNospace(reqTitle);
 
   const candidates: MatchCandidate[] = [];
 
@@ -75,10 +82,11 @@ function findMatches(
     const libArtist = track.normalized_artist;
     const libTitle = track.normalized_title;
     const libCombined = `${libArtist} ${libTitle}`;
-    // Also normalize the raw filename for contains checks
     const libFilenameNorm = normalize(track.filename);
+    const libArtistNospace = libArtist.replace(/\s+/g, "");
+    const libTitleNospace = libTitle.replace(/\s+/g, "");
 
-    // 1. Exact normalized match
+    // 1. Exact normalized match (spaced)
     if (normArtist === libArtist && normTitle === libTitle) {
       candidates.push({
         library_id: track.id,
@@ -91,27 +99,75 @@ function findMatches(
       continue;
     }
 
-    // 2. Title-contains match (highest priority partial match)
-    //    "high on me" should match library title "high on me" or filename containing it
+    // 2. Exact no-space match (catches "AmaxDj" vs "Amax DJ")
+    if (nospaceArtist === libArtistNospace && nospaceTitle === libTitleNospace) {
+      candidates.push({
+        library_id: track.id,
+        artist: track.artist,
+        title: track.title,
+        filename: track.filename.trim(),
+        confidence: 0.98,
+        method: "exact-nospace",
+      });
+      continue;
+    }
+
+    // 3. Title exact match + artist nospace match
+    if (normTitle === libTitle && nospaceArtist === libArtistNospace) {
+      candidates.push({
+        library_id: track.id,
+        artist: track.artist,
+        title: track.title,
+        filename: track.filename.trim(),
+        confidence: 0.97,
+        method: "title-exact-artist-nospace",
+      });
+      continue;
+    }
+
+    // 4. Title-contains match (highest priority partial match)
     if (
       normTitle.length >= 3 &&
-      (libTitle.includes(normTitle) || libFilenameNorm.includes(normTitle))
+      (libTitle.includes(normTitle) || normTitle.includes(libTitle) || libFilenameNorm.includes(normTitle))
     ) {
-      // Bonus if artist also matches
-      const artistBonus = (normArtist.length >= 2 && (libArtist.includes(normArtist) || libCombined.includes(normArtist))) ? 0.05 : 0;
-      const conf = Math.min(0.95, 0.90 + artistBonus);
+      // Bonus if artist also matches (spaced or nospace)
+      const artistMatch = (normArtist.length >= 2 && (
+        libArtist.includes(normArtist) || 
+        libCombined.includes(normArtist) ||
+        nospaceArtist === libArtistNospace ||
+        libArtistNospace.includes(nospaceArtist)
+      ));
+      const conf = artistMatch ? 0.95 : 0.90;
       candidates.push({
         library_id: track.id,
         artist: track.artist,
         title: track.title,
         filename: track.filename.trim(),
         confidence: conf,
-        method: "title-contains",
+        method: artistMatch ? "title-contains+artist" : "title-contains",
       });
       continue;
     }
 
-    // 3. Artist+title combined contains match
+    // 5. Nospace title contains
+    if (
+      nospaceTitle.length >= 3 &&
+      (libTitleNospace.includes(nospaceTitle) || nospaceTitle.includes(libTitleNospace))
+    ) {
+      const artistMatch = nospaceArtist === libArtistNospace || libArtistNospace.includes(nospaceArtist);
+      const conf = artistMatch ? 0.93 : 0.88;
+      candidates.push({
+        library_id: track.id,
+        artist: track.artist,
+        title: track.title,
+        filename: track.filename.trim(),
+        confidence: conf,
+        method: "nospace-title-contains",
+      });
+      continue;
+    }
+
+    // 6. Artist+title combined contains match
     if (
       (libCombined.includes(normArtist) && libCombined.includes(normTitle)) ||
       (normCombined.includes(libArtist) && normCombined.includes(libTitle))
@@ -127,9 +183,9 @@ function findMatches(
       continue;
     }
 
-    // 4. Fuzzy similarity
-    const artistSim = similarity(normArtist, libArtist);
-    const titleSim = similarity(normTitle, libTitle);
+    // 7. Fuzzy similarity (both spaced and nospace)
+    const artistSim = Math.max(similarity(normArtist, libArtist), similarity(nospaceArtist, libArtistNospace));
+    const titleSim = Math.max(similarity(normTitle, libTitle), similarity(nospaceTitle, libTitleNospace));
     const combinedSim = similarity(normCombined, libCombined);
     const bestSim = Math.max((artistSim * 0.4 + titleSim * 0.6), combinedSim);
 
@@ -177,7 +233,6 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Verify the user is admin
     const token = authHeader.replace("Bearer ", "");
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     if (authError || !user) {
@@ -187,7 +242,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Check admin role
     const { data: roleData } = await supabase
       .from("user_roles")
       .select("role")
@@ -203,7 +257,7 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
-    const { request_ids } = body; // optional: match specific requests, or all unmatched
+    const { request_ids } = body;
 
     // Load entire library
     const { data: library, error: libError } = await supabase
@@ -226,7 +280,6 @@ Deno.serve(async (req) => {
     if (request_ids && request_ids.length > 0) {
       query = query.in("id", request_ids);
     } else {
-      // Match all that haven't been matched yet
       query = query.is("match_method", null);
     }
 
@@ -241,19 +294,28 @@ Deno.serve(async (req) => {
       matched_title: string | null;
       sam_filename: string | null;
       candidates_count: number;
+      normalized_request: { artist: string; title: string; artist_nospace: string; title_nospace: string };
     }> = [];
 
     for (const req of requests || []) {
       const candidates = findMatches(req.artist_name, req.song_title, library as LibraryTrack[]);
 
+      const normalizedRequest = {
+        artist: normalize(req.artist_name),
+        title: normalize(req.song_title),
+        artist_nospace: normalizeNospace(req.artist_name),
+        title_nospace: normalizeNospace(req.song_title),
+      };
+
       if (candidates.length === 0) {
-        // No match
         await supabase
           .from("song_requests")
           .update({
             match_method: "no-match",
             match_confidence: 0,
             match_candidates: [],
+            normalized_artist_name: normalizedRequest.artist,
+            normalized_song_title: normalizedRequest.title,
           })
           .eq("id", req.id);
 
@@ -265,6 +327,7 @@ Deno.serve(async (req) => {
           matched_title: null,
           sam_filename: null,
           candidates_count: 0,
+          normalized_request: normalizedRequest,
         });
         continue;
       }
@@ -278,9 +341,10 @@ Deno.serve(async (req) => {
         match_confidence: best.confidence,
         match_method: isStrongMatch ? "auto-matched" : "needs-review",
         match_candidates: candidates,
+        normalized_artist_name: normalizedRequest.artist,
+        normalized_song_title: normalizedRequest.title,
       };
 
-      // Auto-populate RELATIVEFILE only for strong matches
       if (isStrongMatch) {
         updateData.sam_filename = best.filename;
       }
@@ -298,6 +362,7 @@ Deno.serve(async (req) => {
         matched_title: best.title,
         sam_filename: isStrongMatch ? best.filename : null,
         candidates_count: candidates.length,
+        normalized_request: normalizedRequest,
       });
     }
 
