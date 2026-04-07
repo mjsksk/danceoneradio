@@ -49,14 +49,16 @@ interface MatchCandidate {
   library_id: string;
   artist: string;
   title: string;
-  filename: string;
+  relativefile: string;
   confidence: number;
-  method: string;
-  normalized_artist?: string;
-  normalized_artist_nospace?: string;
-  normalized_title?: string;
-  normalized_title_nospace?: string;
+  match_method: string;
+  artist_norm?: string;
+  artist_key?: string;
+  title_norm?: string;
+  title_key?: string;
+  full_key?: string;
   priority?: number;
+  similarity_score?: number;
 }
 
 interface SongRequest {
@@ -84,10 +86,15 @@ interface SongRequest {
   match_candidates: MatchCandidate[] | null;
   normalized_artist_name: string | null;
   normalized_song_title: string | null;
-  normalized_request_artist: string | null;
-  normalized_request_artist_nospace: string | null;
-  normalized_request_title: string | null;
-  normalized_request_title_nospace: string | null;
+  req_artist_norm: string | null;
+  req_artist_key: string | null;
+  req_title_norm: string | null;
+  req_title_key: string | null;
+  req_full_key: string | null;
+  normalized_request_artist?: string | null;
+  normalized_request_artist_nospace?: string | null;
+  normalized_request_title?: string | null;
+  normalized_request_title_nospace?: string | null;
   match_reason: string | null;
 }
 
@@ -258,7 +265,7 @@ export default function SongRequestsManager() {
           matched_title: candidate.title,
           match_confidence: candidate.confidence,
           match_method: 'admin-selected',
-          sam_filename: candidate.filename,
+          sam_filename: candidate.relativefile,
         } as any)
         .eq('id', reqId);
       if (error) throw error;
@@ -269,7 +276,7 @@ export default function SongRequestsManager() {
           matched_title: candidate.title,
           match_confidence: candidate.confidence,
           match_method: 'admin-selected',
-          sam_filename: candidate.filename,
+          sam_filename: candidate.relativefile,
         } : r)
       );
       setCandidateDialogReq(null);
@@ -438,11 +445,11 @@ export default function SongRequestsManager() {
                     <TableCell>
                       <div className="text-sm font-medium">{r.artist_name}</div>
                       <div className="text-xs text-muted-foreground">{r.song_title}</div>
-                      {(r.normalized_request_artist || r.normalized_artist_name) && (
+                      {(r.req_artist_key || r.normalized_request_artist || r.normalized_artist_name) && (
                         <div className="text-[10px] text-muted-foreground/60 mt-0.5 font-mono space-y-0.5" title="Normalized request values">
-                          <div>norm: {r.normalized_request_artist || r.normalized_artist_name} — {r.normalized_request_title || r.normalized_song_title}</div>
-                          {r.normalized_request_artist_nospace && (
-                            <div>nospace: {r.normalized_request_artist_nospace} — {r.normalized_request_title_nospace}</div>
+                          <div>key: {r.req_artist_key || r.normalized_request_artist_nospace || ''} — {r.req_title_key || r.normalized_request_title_nospace || ''}</div>
+                          {r.req_full_key && (
+                            <div>full: {r.req_full_key}</div>
                           )}
                         </div>
                       )}
@@ -472,14 +479,14 @@ export default function SongRequestsManager() {
                           {r.match_method === 'no-match' && (
                             <div className="text-[10px] text-destructive/70">{r.match_reason || 'No library match found'}</div>
                           )}
-                          {r.match_candidates && r.match_candidates.length > 1 && (
+                          {r.match_candidates && r.match_candidates.length > 0 && (
                             <Button
                               size="sm"
                               variant="link"
                               className="text-xs p-0 h-auto"
                               onClick={() => setCandidateDialogReq(r)}
                             >
-                              {r.match_candidates.length} candidates
+                              👁 {r.match_candidates.length} candidate{r.match_candidates.length !== 1 ? 's' : ''}
                             </Button>
                           )}
                         </div>
@@ -586,10 +593,9 @@ export default function SongRequestsManager() {
                   </p>
                   {candidateDialogReq.normalized_request_artist && (
                     <div className="text-xs font-mono text-muted-foreground/60 mt-1 space-y-0.5">
-                      <div>norm artist: {candidateDialogReq.normalized_request_artist}</div>
-                      <div>norm artist nospace: {candidateDialogReq.normalized_request_artist_nospace}</div>
-                      <div>norm title: {candidateDialogReq.normalized_request_title}</div>
-                      <div>norm title nospace: {candidateDialogReq.normalized_request_title_nospace}</div>
+                      <div>req_artist_key: {candidateDialogReq.req_artist_key || candidateDialogReq.normalized_request_artist_nospace}</div>
+                      <div>req_title_key: {candidateDialogReq.req_title_key || candidateDialogReq.normalized_request_title_nospace}</div>
+                      <div>req_full_key: {candidateDialogReq.req_full_key || ''}</div>
                     </div>
                   )}
                 </div>
@@ -598,18 +604,22 @@ export default function SongRequestsManager() {
                     <div key={i} className="flex items-center gap-3 p-3 rounded-lg border border-border/50 hover:border-primary/30 transition-colors">
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium">{c.artist} — {c.title}</div>
-                        <div className="font-mono text-xs text-muted-foreground truncate">{c.filename}</div>
-                        {c.normalized_artist && (
+                        <div className="font-mono text-xs text-muted-foreground truncate">{c.relativefile}</div>
+                        {c.artist_key && (
                           <div className="text-[10px] font-mono text-muted-foreground/50 mt-0.5">
-                            lib norm: {c.normalized_artist} / {c.normalized_artist_nospace} — {c.normalized_title} / {c.normalized_title_nospace}
+                            artist_key: {c.artist_key} | title_key: {c.title_key}
+                            {c.full_key && <> | full: {c.full_key}</>}
                           </div>
                         )}
                         <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="outline" className={matchMethodColors[c.method] || 'bg-muted'}>
-                            {c.method}
+                          <Badge variant="outline" className={matchMethodColors[c.match_method] || 'bg-muted'}>
+                            {c.match_method}
                           </Badge>
                           <span className="text-xs text-muted-foreground">{c.confidence}%</span>
                           {c.priority && <span className="text-xs text-muted-foreground/50">P{c.priority}</span>}
+                          {c.similarity_score != null && c.priority === 4 && (
+                            <span className="text-xs text-muted-foreground/50">sim: {(c.similarity_score * 100).toFixed(0)}%</span>
+                          )}
                         </div>
                       </div>
                       <Button
