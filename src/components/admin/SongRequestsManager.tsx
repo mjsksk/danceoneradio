@@ -41,25 +41,9 @@ import {
   StickyNote,
   AlertTriangle,
   ListMusic,
-  Zap,
+  Eye,
 } from 'lucide-react';
 import { toast } from 'sonner';
-
-interface MatchCandidate {
-  library_id: string;
-  artist: string;
-  title: string;
-  relativefile: string;
-  confidence: number;
-  match_method: string;
-  artist_norm?: string;
-  artist_key?: string;
-  title_norm?: string;
-  title_key?: string;
-  full_key?: string;
-  priority?: number;
-  similarity_score?: number;
-}
 
 interface SongRequest {
   id: string;
@@ -73,44 +57,19 @@ interface SongRequest {
   is_duplicate: boolean;
   duplicate_reason: string | null;
   admin_notes: string | null;
-  ip_address: string | null;
-  user_agent: string | null;
   reviewed_by: string | null;
   reviewed_at: string | null;
-  sam_filename: string | null;
   sam_imported_at: string | null;
-  matched_artist: string | null;
-  matched_title: string | null;
-  match_confidence: number | null;
-  match_method: string | null;
-  match_candidates: MatchCandidate[] | null;
-  normalized_artist_name: string | null;
-  normalized_song_title: string | null;
-  req_artist_norm: string | null;
-  req_artist_key: string | null;
-  req_title_norm: string | null;
-  req_title_key: string | null;
-  req_full_key: string | null;
-  normalized_request_artist?: string | null;
-  normalized_request_artist_nospace?: string | null;
-  normalized_request_title?: string | null;
-  normalized_request_title_nospace?: string | null;
-  match_reason: string | null;
 }
 
-type StatusFilter = 'all' | 'new' | 'approved' | 'rejected' | 'played';
+type StatusFilter = 'all' | 'new' | 'approved' | 'rejected' | 'played' | 'queued';
 
 const statusColors: Record<string, string> = {
   new: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
   approved: 'bg-green-500/20 text-green-400 border-green-500/30',
   rejected: 'bg-red-500/20 text-red-400 border-red-500/30',
   played: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-};
-
-const matchMethodColors: Record<string, string> = {
-  'auto-matched': 'bg-green-500/20 text-green-400 border-green-500/30',
-  'needs-review': 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-  'no-match': 'bg-red-500/20 text-red-400 border-red-500/30',
+  queued: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
 };
 
 export default function SongRequestsManager() {
@@ -122,49 +81,14 @@ export default function SongRequestsManager() {
   const [notesDialogId, setNotesDialogId] = useState<string | null>(null);
   const [notesText, setNotesText] = useState('');
   const [compactView, setCompactView] = useState(false);
-  const [filenameText, setFilenameText] = useState('');
-  const [candidateDialogReq, setCandidateDialogReq] = useState<SongRequest | null>(null);
-  const [rematchingId, setRematchingId] = useState<string | null>(null);
-
-  const rerunMatch = async (id: string) => {
-    setRematchingId(id);
-    try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData?.session?.access_token;
-      if (!token) { toast.error('Not authenticated'); return; }
-
-      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-      const resp = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/match-song-requests`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ request_ids: [id] }),
-        }
-      );
-
-      const result = await resp.json();
-      if (!resp.ok) { toast.error(result.error || 'Re-match failed'); return; }
-
-      toast.success(`Re-matched: ${result.results?.[0]?.match_method || 'done'}`);
-      fetchRequests();
-    } catch (err) {
-      console.error('Re-match error:', err);
-      toast.error('Re-match failed');
-    } finally {
-      setRematchingId(null);
-    }
-  };
+  const [detailReq, setDetailReq] = useState<SongRequest | null>(null);
 
   const fetchRequests = useCallback(async () => {
     setLoading(true);
     try {
       let query = supabase
         .from('song_requests')
-        .select('*')
+        .select('id, created_at, listener_name, email, artist_name, song_title, message, status, is_duplicate, duplicate_reason, admin_notes, reviewed_by, reviewed_at, sam_imported_at')
         .order('created_at', { ascending: false });
 
       if (statusFilter !== 'all') {
@@ -243,46 +167,16 @@ export default function SongRequestsManager() {
     try {
       const { error } = await supabase
         .from('song_requests')
-        .update({ admin_notes: notesText, sam_filename: filenameText || null } as any)
+        .update({ admin_notes: notesText })
         .eq('id', notesDialogId);
       if (error) throw error;
       setRequests(prev =>
-        prev.map(r => (r.id === notesDialogId ? { ...r, admin_notes: notesText, sam_filename: filenameText || null } : r))
+        prev.map(r => (r.id === notesDialogId ? { ...r, admin_notes: notesText } : r))
       );
       setNotesDialogId(null);
-      toast.success('Notes & filename saved');
+      toast.success('Notes saved');
     } catch {
       toast.error('Failed to save');
-    }
-  };
-
-  const selectCandidate = async (reqId: string, candidate: MatchCandidate) => {
-    try {
-      const { error } = await supabase
-        .from('song_requests')
-        .update({
-          matched_artist: candidate.artist,
-          matched_title: candidate.title,
-          match_confidence: candidate.confidence,
-          match_method: 'admin-selected',
-          sam_filename: candidate.relativefile,
-        } as any)
-        .eq('id', reqId);
-      if (error) throw error;
-      setRequests(prev =>
-        prev.map(r => r.id === reqId ? {
-          ...r,
-          matched_artist: candidate.artist,
-          matched_title: candidate.title,
-          match_confidence: candidate.confidence,
-          match_method: 'admin-selected',
-          sam_filename: candidate.relativefile,
-        } : r)
-      );
-      setCandidateDialogReq(null);
-      toast.success('Match selected');
-    } catch {
-      toast.error('Failed to select match');
     }
   };
 
@@ -310,9 +204,6 @@ export default function SongRequestsManager() {
     if (selectedIds.size === requests.length) setSelectedIds(new Set());
     else setSelectedIds(new Set(requests.map(r => r.id)));
   };
-
-  const isSamEligible = (r: SongRequest) =>
-    r.status === 'approved' && r.sam_filename && !r.sam_imported_at;
 
   const counts = {
     new: requests.filter(r => r.status === 'new').length,
@@ -361,6 +252,7 @@ export default function SongRequestsManager() {
               <SelectItem value="new">New</SelectItem>
               <SelectItem value="approved">Approved</SelectItem>
               <SelectItem value="rejected">Rejected</SelectItem>
+              <SelectItem value="queued">Queued</SelectItem>
               <SelectItem value="played">Played</SelectItem>
             </SelectContent>
           </Select>
@@ -401,11 +293,6 @@ export default function SongRequestsManager() {
                   <span className="font-medium text-sm">{r.artist_name} — {r.song_title}</span>
                   <span className="text-xs text-muted-foreground ml-2">from {r.listener_name}</span>
                 </div>
-                {r.match_method && (
-                  <Badge className={matchMethodColors[r.match_method] || 'bg-muted'} variant="outline">
-                    {r.match_method}
-                  </Badge>
-                )}
                 <Button size="sm" variant="ghost" onClick={() => copyRequestText(r)}><Copy className="w-3 h-3" /></Button>
                 {r.status === 'new' && (
                   <Button size="sm" variant="ghost" onClick={() => updateStatus(r.id, 'approved')}><Check className="w-3 h-3" /></Button>
@@ -423,10 +310,9 @@ export default function SongRequestsManager() {
                   </TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead>Listener</TableHead>
-                  <TableHead>Request</TableHead>
-                  <TableHead>Match</TableHead>
+                  <TableHead>Artist</TableHead>
+                  <TableHead>Song</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>SAM</TableHead>
                   <TableHead>Message</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -442,82 +328,13 @@ export default function SongRequestsManager() {
                       <div className="text-sm font-medium">{r.listener_name}</div>
                       {r.email && <div className="text-xs text-muted-foreground">{r.email}</div>}
                     </TableCell>
-                    <TableCell>
-                      <div className="text-sm font-medium">{r.artist_name}</div>
-                      <div className="text-xs text-muted-foreground">{r.song_title}</div>
-                      {(r.req_artist_key || r.normalized_request_artist || r.normalized_artist_name) && (
-                        <div className="text-[10px] text-muted-foreground/60 mt-0.5 font-mono space-y-0.5" title="Normalized request values">
-                          <div>key: {r.req_artist_key || r.normalized_request_artist_nospace || ''} — {r.req_title_key || r.normalized_request_title_nospace || ''}</div>
-                          {r.req_full_key && (
-                            <div>full: {r.req_full_key}</div>
-                          )}
-                        </div>
-                      )}
-                    </TableCell>
-                    {/* Match info */}
-                    <TableCell>
-                      {r.match_method ? (
-                        <div className="space-y-1">
-                          <Badge className={matchMethodColors[r.match_method] || 'bg-muted'} variant="outline">
-                            {r.match_method}
-                          </Badge>
-                          {r.match_confidence != null && (
-                            <div className="text-xs text-muted-foreground">
-                              {r.match_confidence}%
-                            </div>
-                          )}
-                          {r.matched_artist && (
-                            <div className="text-xs text-primary/70 truncate max-w-[180px]" title={`${r.matched_artist} - ${r.matched_title}`}>
-                              → {r.matched_artist} - {r.matched_title}
-                            </div>
-                          )}
-                          {r.sam_filename && (
-                            <div className="font-mono text-[10px] text-muted-foreground truncate max-w-[180px]" title={r.sam_filename}>
-                              📁 {r.sam_filename}
-                            </div>
-                          )}
-                          {r.match_method === 'no-match' && (
-                            <div className="text-[10px] text-destructive/70">{r.match_reason || 'No library match found'}</div>
-                          )}
-                          {r.match_candidates && r.match_candidates.length > 0 && (
-                            <Button
-                              size="sm"
-                              variant="link"
-                              className="text-xs p-0 h-auto"
-                              onClick={() => setCandidateDialogReq(r)}
-                            >
-                              👁 {r.match_candidates.length} candidate{r.match_candidates.length !== 1 ? 's' : ''}
-                            </Button>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">Not matched</span>
-                      )}
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="mt-1 text-xs h-6 px-2 gap-1"
-                        disabled={rematchingId === r.id}
-                        onClick={() => rerunMatch(r.id)}
-                      >
-                        <Zap className="w-3 h-3" />
-                        {rematchingId === r.id ? '...' : 'Re-match'}
-                      </Button>
-                    </TableCell>
+                    <TableCell className="text-sm">{r.artist_name}</TableCell>
+                    <TableCell className="text-sm">{r.song_title}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <Badge className={statusColors[r.status] || ''} variant="outline">{r.status}</Badge>
                         {r.is_duplicate && <AlertTriangle className="w-3.5 h-3.5 text-yellow-500" />}
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      {isSamEligible(r) ? (
-                        <Badge className="bg-green-500/20 text-green-400 border-green-500/30" variant="outline">Eligible</Badge>
-                      ) : r.sam_imported_at ? (
-                        <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30" variant="outline">Imported</Badge>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
-                      )}
                     </TableCell>
                     <TableCell className="max-w-[150px]">
                       {r.message && <p className="text-xs text-muted-foreground truncate" title={r.message}>{r.message}</p>}
@@ -525,6 +342,7 @@ export default function SongRequestsManager() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1 justify-end">
+                        <Button size="sm" variant="ghost" onClick={() => setDetailReq(r)} title="Details"><Eye className="w-3.5 h-3.5" /></Button>
                         <Button size="sm" variant="ghost" onClick={() => copyRequestText(r)} title="Copy"><Copy className="w-3.5 h-3.5" /></Button>
                         {r.status !== 'approved' && (
                           <Button size="sm" variant="ghost" onClick={() => updateStatus(r.id, 'approved')} title="Approve" className="text-green-400 hover:text-green-300">
@@ -545,7 +363,7 @@ export default function SongRequestsManager() {
                           <Button size="sm" variant="ghost" onClick={() => updateStatus(r.id, 'new')} title="Reset"><RotateCcw className="w-3.5 h-3.5" /></Button>
                         )}
                         <Dialog open={notesDialogId === r.id} onOpenChange={(open) => {
-                          if (open) { setNotesDialogId(r.id); setNotesText(r.admin_notes || ''); setFilenameText(r.sam_filename || ''); }
+                          if (open) { setNotesDialogId(r.id); setNotesText(r.admin_notes || ''); }
                           else setNotesDialogId(null);
                         }}>
                           <DialogTrigger asChild>
@@ -556,12 +374,6 @@ export default function SongRequestsManager() {
                             <div className="space-y-3">
                               <p className="text-sm text-muted-foreground">{r.artist_name} — {r.song_title} (from {r.listener_name})</p>
                               <Textarea value={notesText} onChange={e => setNotesText(e.target.value)} placeholder="Internal notes..." rows={3} />
-                              <div>
-                                <label className="text-xs font-medium text-muted-foreground mb-1 block">
-                                  SAM Relative Path (relative to C:\D1Files\Dance Music)
-                                </label>
-                                <Input value={filenameText} onChange={e => setFilenameText(e.target.value)} placeholder="Artist - Track.mp3" className="font-mono text-xs" />
-                              </div>
                               <Button onClick={saveNotes} className="w-full">Save</Button>
                             </div>
                           </DialogContent>
@@ -578,60 +390,50 @@ export default function SongRequestsManager() {
           </div>
         )}
 
-        {/* Candidate selection dialog */}
-        <Dialog open={!!candidateDialogReq} onOpenChange={(open) => { if (!open) setCandidateDialogReq(null); }}>
-          <DialogContent className="max-w-lg">
+        {/* Detail dialog */}
+        <Dialog open={!!detailReq} onOpenChange={(open) => { if (!open) setDetailReq(null); }}>
+          <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>Match Candidates</DialogTitle>
+              <DialogTitle>Request Details</DialogTitle>
             </DialogHeader>
-            {candidateDialogReq && (
-              <div className="space-y-3">
-                <div className="p-3 bg-muted/50 rounded-lg">
-                  <p className="text-sm font-medium">Original request:</p>
-                  <p className="text-sm text-muted-foreground">
-                    {candidateDialogReq.artist_name} — {candidateDialogReq.song_title}
-                  </p>
-                  {candidateDialogReq.normalized_request_artist && (
-                    <div className="text-xs font-mono text-muted-foreground/60 mt-1 space-y-0.5">
-                      <div>req_artist_key: {candidateDialogReq.req_artist_key || candidateDialogReq.normalized_request_artist_nospace}</div>
-                      <div>req_title_key: {candidateDialogReq.req_title_key || candidateDialogReq.normalized_request_title_nospace}</div>
-                      <div>req_full_key: {candidateDialogReq.req_full_key || ''}</div>
-                    </div>
-                  )}
+            {detailReq && (
+              <div className="space-y-3 text-sm">
+                <div className="grid grid-cols-[100px_1fr] gap-y-2">
+                  <span className="text-muted-foreground">Listener</span>
+                  <span className="font-medium">{detailReq.listener_name}</span>
+                  {detailReq.email && <>
+                    <span className="text-muted-foreground">Email</span>
+                    <span>{detailReq.email}</span>
+                  </>}
+                  <span className="text-muted-foreground">Artist</span>
+                  <span className="font-medium">{detailReq.artist_name}</span>
+                  <span className="text-muted-foreground">Song</span>
+                  <span className="font-medium">{detailReq.song_title}</span>
+                  <span className="text-muted-foreground">Status</span>
+                  <Badge className={statusColors[detailReq.status] || ''} variant="outline">{detailReq.status}</Badge>
+                  <span className="text-muted-foreground">Submitted</span>
+                  <span>{formatDate(detailReq.created_at)}</span>
+                  {detailReq.reviewed_at && <>
+                    <span className="text-muted-foreground">Reviewed</span>
+                    <span>{formatDate(detailReq.reviewed_at)}</span>
+                  </>}
+                  {detailReq.sam_imported_at && <>
+                    <span className="text-muted-foreground">SAM Import</span>
+                    <span>{formatDate(detailReq.sam_imported_at)}</span>
+                  </>}
                 </div>
-                <div className="space-y-2">
-                  {(candidateDialogReq.match_candidates || []).map((c, i) => (
-                    <div key={i} className="flex items-center gap-3 p-3 rounded-lg border border-border/50 hover:border-primary/30 transition-colors">
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium">{c.artist} — {c.title}</div>
-                        <div className="font-mono text-xs text-muted-foreground truncate">{c.relativefile}</div>
-                        {c.artist_key && (
-                          <div className="text-[10px] font-mono text-muted-foreground/50 mt-0.5">
-                            artist_key: {c.artist_key} | title_key: {c.title_key}
-                            {c.full_key && <> | full: {c.full_key}</>}
-                          </div>
-                        )}
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="outline" className={matchMethodColors[c.match_method] || 'bg-muted'}>
-                            {c.match_method}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">{c.confidence}%</span>
-                          {c.priority && <span className="text-xs text-muted-foreground/50">P{c.priority}</span>}
-                          {c.similarity_score != null && c.priority === 4 && (
-                            <span className="text-xs text-muted-foreground/50">sim: {(c.similarity_score * 100).toFixed(0)}%</span>
-                          )}
-                        </div>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => selectCandidate(candidateDialogReq.id, c)}
-                      >
-                        <Check className="w-3 h-3 mr-1" /> Select
-                      </Button>
-                    </div>
-                  ))}
-                </div>
+                {detailReq.message && (
+                  <div>
+                    <p className="text-muted-foreground mb-1">Message</p>
+                    <p className="bg-muted/50 rounded p-2 text-xs">{detailReq.message}</p>
+                  </div>
+                )}
+                {detailReq.admin_notes && (
+                  <div>
+                    <p className="text-muted-foreground mb-1">Admin Notes</p>
+                    <p className="bg-primary/10 rounded p-2 text-xs">{detailReq.admin_notes}</p>
+                  </div>
+                )}
               </div>
             )}
           </DialogContent>

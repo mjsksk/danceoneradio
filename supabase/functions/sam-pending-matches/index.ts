@@ -1,7 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 
-// Returns approved requests that have NOT yet been matched (no sam_filename).
-// The local SAM resolver polls this endpoint to find requests needing matching.
+// Returns approved requests not yet imported by the SAM PC.
+// The local SAM resolver polls this endpoint to find requests needing processing.
 
 Deno.serve(async (req: Request) => {
   if (req.method !== "GET") {
@@ -25,9 +25,8 @@ Deno.serve(async (req: Request) => {
 
   const { data, error } = await supabase
     .from("song_requests")
-    .select("id, artist_name, song_title, status, created_at")
+    .select("id, artist_name, song_title, listener_name, message, created_at")
     .eq("status", "approved")
-    .is("sam_filename", null)
     .is("sam_imported_at", null)
     .order("created_at", { ascending: true })
     .limit(Math.min(Math.max(limit, 1), 50));
@@ -47,6 +46,8 @@ Deno.serve(async (req: Request) => {
     body += `REQUEST_ID=${row.id}\n`;
     body += `ARTIST=${sanitize(row.artist_name)}\n`;
     body += `TITLE=${sanitize(row.song_title)}\n`;
+    body += `LISTENER=${sanitize(row.listener_name)}\n`;
+    body += `MESSAGE=${sanitize(row.message)}\n`;
     body += `---\n`;
   }
 
