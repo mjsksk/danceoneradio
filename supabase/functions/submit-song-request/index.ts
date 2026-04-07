@@ -142,9 +142,11 @@ Deno.serve(async (req) => {
     try {
       const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
       const adminEmail = Deno.env.get("ADMIN_EMAIL") || ADMIN_EMAIL;
+      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
-      if (RESEND_API_KEY) {
-        const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+      console.log("Email config:", { hasResendKey: !!RESEND_API_KEY, hasLovableKey: !!LOVABLE_API_KEY, adminEmail });
+
+      if (RESEND_API_KEY && LOVABLE_API_KEY) {
         const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
 
         const dupTag = isDuplicate ? " [DUPLICATE]" : "";
@@ -168,27 +170,30 @@ Deno.serve(async (req) => {
           </div>
         `;
 
-        const headers: Record<string, string> = {
-          "Content-Type": "application/json",
+        const emailPayload = {
+          from: "Dance One Radio <onboarding@resend.dev>",
+          to: [adminEmail],
+          subject: `🎵 Song Request: ${artistName} - ${songTitle}${dupTag}`,
+          html,
         };
-        if (LOVABLE_API_KEY) {
-          headers["Authorization"] = `Bearer ${LOVABLE_API_KEY}`;
-          headers["X-Connection-Api-Key"] = RESEND_API_KEY;
-        }
 
-        await fetch(`${GATEWAY_URL}/emails`, {
+        console.log("Sending email via gateway...", { to: adminEmail, subject: emailPayload.subject });
+
+        const emailRes = await fetch("https://api.resend.com/emails", {
           method: "POST",
-          headers,
-          body: JSON.stringify({
-            from: "Dance One Radio <noreply@danceoneradio.com>",
-            to: [adminEmail],
-            subject: `🎵 Song Request: ${artistName} - ${songTitle}${dupTag}`,
-            html,
-          }),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${RESEND_API_KEY}`,
+          },
+          body: JSON.stringify(emailPayload),
         });
+
+        const emailResBody = await emailRes.text();
+        console.log("Email API response:", { status: emailRes.status, body: emailResBody });
+      } else {
+        console.warn("Email skipped: missing RESEND_API_KEY or LOVABLE_API_KEY");
       }
     } catch (emailErr) {
-      // Don't fail the request if email fails
       console.error("Email notification error:", emailErr);
     }
 
