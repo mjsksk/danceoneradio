@@ -24,12 +24,12 @@ import appStoreBadge from '@/assets/app-store-badge-new.svg';
 import googlePlayBadge from '@/assets/google-play-badge-new.svg';
 
 const Downloads = () => {
-  const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.13/dance-one-radio-setup-1.0.13-x64.exe';
+  const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.14/dance-one-radio-setup-1.0.14-x64.exe';
 
   const handleDownload = () => {
     supabase
       .from('app_downloads')
-      .insert({ platform: 'windows', version: '1.0.13' })
+      .insert({ platform: 'windows', version: '1.0.14' })
       .then(() => {});
 
     window.open(downloadUrl, '_blank');
@@ -173,7 +173,7 @@ const Downloads = () => {
                   </Button>
 
                   <div className="mt-4 text-sm text-muted-foreground">
-                    Version 1.0.13 • Windows 10+ (64-bit) • Free
+                    Version 1.0.14 • Windows 10+ (64-bit) • Free
                   </div>
                 </div>
               </div>
