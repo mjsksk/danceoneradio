@@ -394,6 +394,11 @@ export default function SongRequestsManager() {
                     <TableCell>
                       <div className="text-sm font-medium">{r.artist_name}</div>
                       <div className="text-xs text-muted-foreground">{r.song_title}</div>
+                      {r.normalized_artist_name && (
+                        <div className="text-[10px] text-muted-foreground/60 mt-0.5 font-mono" title="Normalized">
+                          norm: {r.normalized_artist_name} — {r.normalized_song_title}
+                        </div>
+                      )}
                     </TableCell>
                     {/* Match info */}
                     <TableCell>
@@ -408,14 +413,17 @@ export default function SongRequestsManager() {
                             </div>
                           )}
                           {r.matched_artist && (
-                            <div className="text-xs text-primary/70 truncate max-w-[150px]" title={`${r.matched_artist} - ${r.matched_title}`}>
+                            <div className="text-xs text-primary/70 truncate max-w-[180px]" title={`${r.matched_artist} - ${r.matched_title}`}>
                               → {r.matched_artist} - {r.matched_title}
                             </div>
                           )}
                           {r.sam_filename && (
-                            <div className="font-mono text-[10px] text-muted-foreground truncate max-w-[150px]" title={r.sam_filename}>
-                              {r.sam_filename}
+                            <div className="font-mono text-[10px] text-muted-foreground truncate max-w-[180px]" title={r.sam_filename}>
+                              📁 {r.sam_filename}
                             </div>
+                          )}
+                          {r.match_method === 'no-match' && (
+                            <div className="text-[10px] text-destructive/70">No library match found</div>
                           )}
                           {r.match_candidates && r.match_candidates.length > 1 && (
                             <Button
