@@ -202,6 +202,11 @@ export const useLiveRadioPlayer = (streamUrls: string[] = [...PRIMARY_STREAM_URL
     }
 
     if (isLive) {
+      if (audioPlayer.isLoading) {
+        audioPlayer.playLiveStream(streamUrls);
+        return;
+      }
+
       if (audioPlayer.isPlaying) {
         audioPlayer.pause();
       } else {
