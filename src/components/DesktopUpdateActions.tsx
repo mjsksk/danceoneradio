@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDesktopIntegration } from '@/hooks/useDesktopIntegration';
+import { getInstallerReadyMessage } from '@/utils/desktopPlatform';
 
 export const DesktopUpdateActions = () => {
-  const { isTauriDesktop, checkForUpdates, downloadAndInstallUpdate } = useDesktopIntegration();
+  const { isTauriDesktop, desktopPlatform, checkForUpdates, downloadAndInstallUpdate } = useDesktopIntegration();
   const [updateState, setUpdateState] = useState<'idle' | 'checking' | 'up-to-date' | 'available' | 'installing' | 'not-configured' | 'error'>('idle');
   const [updateMessage, setUpdateMessage] = useState('Check for updates and install the next release without leaving the app.');
   const [updateProgress, setUpdateProgress] = useState<number | null>(null);
@@ -94,7 +95,7 @@ export const DesktopUpdateActions = () => {
         }
       });
 
-      setUpdateMessage('Windows has the update package. If the installer does not appear, close Dance One Radio from the tray and try again.');
+      setUpdateMessage(getInstallerReadyMessage(desktopPlatform));
     } catch (error) {
       setUpdateState('error');
       setUpdateProgress(null);

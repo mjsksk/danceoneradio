@@ -172,10 +172,46 @@ function ensureDirectory(filePath) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
 }
 
+function readExistingManifest(filePath) {
+  if (!fs.existsSync(filePath)) {
+    return null;
+  }
+
+  return JSON.parse(fs.readFileSync(filePath, "utf8"));
+}
+
+function getInitialPlatforms(existingManifest, existingTargetKey) {
+  if (!existingManifest) {
+    return {};
+  }
+
+  if (existingManifest.platforms && typeof existingManifest.platforms === "object") {
+    return { ...existingManifest.platforms };
+  }
+
+  if (existingManifest.url && existingManifest.signature) {
+    assert(
+      existingTargetKey,
+      "Existing manifest uses the single-platform format. Re-run with --existing-target-key to preserve it while adding a platform-specific entry.",
+    );
+
+    return {
+      [existingTargetKey]: {
+        url: existingManifest.url,
+        signature: existingManifest.signature,
+      },
+    };
+  }
+
+  return {};
+}
+
 const args = parseArgs(process.argv.slice(2));
 const version = args.version;
 const installerPath = args.installer;
 const assetUrl = args.url;
+const targetKey = args["target-key"];
+const existingTargetKey = args["existing-target-key"];
 
 assert(version, "Missing required --version argument.");
 assert(installerPath, "Missing required --installer argument.");
@@ -184,11 +220,12 @@ assert(assetUrl, "Missing required --url argument.");
 const keyPath = args.key ?? DEFAULT_KEY_PATH;
 const configPath = args.config ?? DEFAULT_CONFIG_PATH;
 const outputPath = args.output ?? DEFAULT_OUTPUT_PATH;
-const notes = args.notes ?? "Dance One Radio desktop app update.";
-const pubDate = args["pub-date"] ?? new Date().toISOString();
 const trustedComment = args["trusted-comment"] ?? Math.floor(Date.now() / 1000).toString(10);
 const untrustedComment = args["untrusted-comment"] ?? DEFAULT_UNTRUSTED_COMMENT;
 const signatureOutputPath = args["sig-output"];
+const existingManifest = readExistingManifest(outputPath);
+const notes = args.notes ?? existingManifest?.notes ?? "Dance One Radio desktop app update.";
+const pubDate = args["pub-date"] ?? existingManifest?.pub_date ?? new Date().toISOString();
 
 const tauriConfig = JSON.parse(fs.readFileSync(configPath, "utf8"));
 const installerBuffer = fs.readFileSync(installerPath);
@@ -209,13 +246,26 @@ const signatureContent = createSignatureContent({
   untrustedComment,
 });
 
-const latestJson = {
-  version,
-  notes,
-  pub_date: pubDate,
-  url: assetUrl,
-  signature: signatureContent,
-};
+const latestJson = targetKey
+  ? {
+      version,
+      notes,
+      pub_date: pubDate,
+      platforms: {
+        ...getInitialPlatforms(existingManifest, existingTargetKey),
+        [targetKey]: {
+          url: assetUrl,
+          signature: signatureContent,
+        },
+      },
+    }
+  : {
+      version,
+      notes,
+      pub_date: pubDate,
+      url: assetUrl,
+      signature: signatureContent,
+    };
 
 ensureDirectory(outputPath);
 fs.writeFileSync(outputPath, `${JSON.stringify(latestJson, null, 2)}\n`);
@@ -232,6 +282,7 @@ console.log(
       outputPath,
       signatureOutputPath: signatureOutputPath ?? null,
       assetUrl,
+      targetKey: targetKey ?? null,
       pubDate,
     },
     null,

@@ -8,13 +8,18 @@ import { useTrackHistoryUpdater } from '@/hooks/useTrackHistoryUpdater';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import { PRIMARY_STREAM_URLS } from '@/config/streamUrls';
 import stationLogo from '@/assets/dance-one-logo.png';
+import {
+  getDesktopPlayerLabel,
+  getHideActionLabel,
+  getHideDestinationLabel,
+} from '@/utils/desktopPlatform';
 
 const TracksSection = lazy(() => import('@/components/TracksSection'));
 
 const DesktopPlayer = () => {
   const [streamTitle, setStreamTitle] = useState('Dance One Radio - Live Stream');
   const [activeTab, setActiveTab] = useState<'player' | 'history'>('player');
-  const { isDesktop, hideWindow } = useDesktopIntegration();
+  const { isDesktop, hideWindow, desktopPlatform } = useDesktopIntegration();
 
   useEffect(() => {
     const fetchStreamMetadata = async () => {
@@ -50,7 +55,7 @@ const DesktopPlayer = () => {
               <img src={stationLogo} alt="Dance One Radio" className="h-9 w-9 object-contain" />
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.35em] text-primary/80">Windows Desktop Player</p>
+              <p className="text-xs uppercase tracking-[0.35em] text-primary/80">{getDesktopPlayerLabel(desktopPlatform)}</p>
               <h1 className="font-['Orbitron'] text-2xl font-semibold text-white">Dance One Radio</h1>
             </div>
           </div>
@@ -61,10 +66,10 @@ const DesktopPlayer = () => {
                 variant="outline"
                 className="h-12 rounded-xl border-primary/30 bg-primary/10 px-4 text-sm font-medium text-primary hover:bg-primary/20 hover:text-primary"
                 onClick={hideWindow}
-                title="Hide to system tray"
+                title={`Hide to ${getHideDestinationLabel(desktopPlatform)}`}
               >
                 <Minimize2 className="mr-2 h-4 w-4" />
-                Hide To Tray
+                {getHideActionLabel(desktopPlatform)}
               </Button>
             </div>
           ) : null}

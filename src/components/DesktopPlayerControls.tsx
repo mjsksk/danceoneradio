@@ -2,6 +2,13 @@ import { useEffect, useState } from 'react';
 import { Monitor } from 'lucide-react';
 import { useDesktopIntegration } from '@/hooks/useDesktopIntegration';
 import { Switch } from '@/components/ui/switch';
+import {
+  getCloseBehaviorLabel,
+  getHideShortcutLabel,
+  getLaunchOnStartupDescription,
+  getLaunchOnStartupLabel,
+  getPlaybackShortcutLabel,
+} from '@/utils/desktopPlatform';
 
 interface DesktopPlayerControlsProps {
   isPlaying: boolean;
@@ -24,6 +31,7 @@ export const DesktopPlayerControls = ({
   const {
     isDesktop,
     isTauriDesktop,
+    desktopPlatform,
     hideWindow,
     updatePlaybackState,
     updateTrackInfo,
@@ -93,13 +101,15 @@ export const DesktopPlayerControls = ({
         return;
       }
 
-      if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'p') {
+      const commandKeyActive = desktopPlatform === 'macos' ? event.metaKey : event.ctrlKey;
+
+      if (commandKeyActive && event.shiftKey && event.key.toLowerCase() === 'p') {
         event.preventDefault();
         onTogglePlayback();
         return;
       }
 
-      if (event.ctrlKey && !event.shiftKey && event.key.toLowerCase() === 'm') {
+      if (commandKeyActive && !event.shiftKey && event.key.toLowerCase() === 'm') {
         event.preventDefault();
         hideWindow();
       }
@@ -107,7 +117,7 @@ export const DesktopPlayerControls = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [hideWindow, isDesktop, onTogglePlayback]);
+  }, [desktopPlatform, hideWindow, isDesktop, onTogglePlayback]);
 
   if (!isDesktop) {
     return null;
@@ -129,8 +139,8 @@ export const DesktopPlayerControls = ({
       </div>
 
       <div className="text-xs text-muted-foreground">
-        <div>Shortcuts: Ctrl+Shift+P (Play/Pause) | Ctrl+M (Hide)</div>
-        <div>Close hides to tray | Use the tray menu to fully quit</div>
+        <div>Shortcuts: {getPlaybackShortcutLabel(desktopPlatform)} (Play/Pause) | {getHideShortcutLabel(desktopPlatform)} (Hide)</div>
+        <div>{getCloseBehaviorLabel(desktopPlatform)}</div>
       </div>
 
       <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/10 px-3 py-2 text-xs text-muted-foreground">
@@ -148,8 +158,8 @@ export const DesktopPlayerControls = ({
       {isTauriDesktop ? (
         <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/10 px-3 py-2 text-xs text-muted-foreground">
           <div>
-            <div className="font-medium text-foreground">Start with Windows</div>
-            <div>Launch Dance One Radio automatically when you sign in.</div>
+            <div className="font-medium text-foreground">{getLaunchOnStartupLabel(desktopPlatform)}</div>
+            <div>{getLaunchOnStartupDescription(desktopPlatform)}</div>
           </div>
           <Switch
             checked={launchOnStartupEnabled}

@@ -32,6 +32,18 @@ const UPDATE_PROGRESS_EVENT: &str = "desktop-update-event";
 #[cfg(target_os = "windows")]
 const WINDOWS_APP_USER_MODEL_ID: &str = "com.danceoneradio.desktop";
 
+#[cfg(target_os = "macos")]
+const UPDATE_SURFACE_NAME: &str = "menu bar";
+#[cfg(not(target_os = "macos"))]
+const UPDATE_SURFACE_NAME: &str = "tray";
+
+#[cfg(target_os = "macos")]
+const UPDATE_PLATFORM_NAME: &str = "macOS";
+#[cfg(target_os = "windows")]
+const UPDATE_PLATFORM_NAME: &str = "Windows";
+#[cfg(not(any(target_os = "macos", target_os = "windows")))]
+const UPDATE_PLATFORM_NAME: &str = "The app";
+
 #[cfg(desktop)]
 #[derive(Clone, Serialize)]
 struct DesktopUpdateInfo {
@@ -104,7 +116,9 @@ fn format_update_error_message(raw: impl Into<String>) -> String {
   let normalized = message.to_lowercase();
 
   if normalized.contains("shell execute") || normalized.contains("could not run") {
-    return "Windows could not launch the installer. Close Dance One Radio from the tray and try again.".into();
+    return format!(
+      "{UPDATE_PLATFORM_NAME} could not launch the installer. Close Dance One Radio from the {UPDATE_SURFACE_NAME} and try again."
+    );
   }
 
   if normalized.contains("signature") || normalized.contains("verification") {
@@ -120,7 +134,9 @@ fn format_update_error_message(raw: impl Into<String>) -> String {
   }
 
   if normalized.contains("installer") || normalized.contains("msi") || normalized.contains("nsis") {
-    return "Windows could not finish the installer handoff. Close Dance One Radio from the tray and try again.".into();
+    return format!(
+      "{UPDATE_PLATFORM_NAME} could not finish the installer handoff. Close Dance One Radio from the {UPDATE_SURFACE_NAME} and try again."
+    );
   }
 
   message

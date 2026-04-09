@@ -1,4 +1,9 @@
 import { useCallback } from 'react';
+import {
+  detectDesktopPlatform,
+  getDesktopPlatformName,
+  getInstallerHandoffErrorMessage,
+} from '@/utils/desktopPlatform';
 
 interface ElectronAPI {
   getAppVersion: () => Promise<string>;
@@ -32,6 +37,8 @@ export const useDesktopIntegration = () => {
   const isElectronDesktop = hasWindow && Boolean(window.electronAPI);
   const isTauriDesktop = hasWindow && ('__TAURI_INTERNALS__' in window || window.navigator.userAgent.includes('Tauri'));
   const isDesktop = isElectronDesktop || isTauriDesktop;
+  const desktopPlatform = isDesktop ? detectDesktopPlatform() : 'unknown';
+  const desktopPlatformName = getDesktopPlatformName(desktopPlatform);
 
   const getUpdateErrorMessage = (error: unknown): string => {
     if (error instanceof Error && error.message) {
@@ -74,7 +81,7 @@ export const useDesktopIntegration = () => {
       normalized.includes('launch') ||
       normalized.includes('access is denied')
     ) {
-      return 'Windows could not finish the installer handoff. Close Dance One Radio from the tray and try again.';
+      return getInstallerHandoffErrorMessage(desktopPlatform);
     }
 
     return message || 'Unable to install the update right now.';
@@ -233,10 +240,10 @@ export const useDesktopIntegration = () => {
       return window.electronAPI!.platform;
     }
     if (isTauriDesktop) {
-      return 'desktop';
+      return desktopPlatform;
     }
     return null;
-  }, [isElectronDesktop, isTauriDesktop]);
+  }, [desktopPlatform, isElectronDesktop, isTauriDesktop]);
 
   const hideWindow = useCallback(() => {
     if (isElectronDesktop) {
@@ -413,6 +420,8 @@ export const useDesktopIntegration = () => {
     isDesktop,
     isElectronDesktop,
     isTauriDesktop,
+    desktopPlatform,
+    desktopPlatformName,
     updatePlaybackState,
     updateTrackInfo,
     showNotification,

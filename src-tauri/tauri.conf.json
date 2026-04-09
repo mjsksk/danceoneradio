@@ -7,7 +7,7 @@
     "frontendDist": "desktop-dist",
     "devUrl": "http://localhost:8080/desktop-shell/index.html",
     "beforeDevCommand": "npm run dev -- --host",
-    "beforeBuildCommand": "C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -Command \"npm run desktop:build\""
+    "beforeBuildCommand": "npm run desktop:build"
   },
   "app": {
     "windows": [
@@ -29,26 +29,14 @@
   },
   "bundle": {
     "active": true,
-    "targets": "nsis",
     "publisher": "Dance One Radio",
     "createUpdaterArtifacts": false,
     "useLocalToolsDir": true,
-    "windows": {
-      "webviewInstallMode": {
-        "silent": true,
-        "type": "offlineInstaller"
-      },
-      "nsis": {
-        "displayLanguageSelector": false,
-        "installerHooks": "windows-installer-hooks.nsh",
-        "installMode": "currentUser",
-        "startMenuFolder": "Dance One Radio"
-      }
-    },
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
+      "icons/icon.icns",
       "icons/icon.ico"
     ]
   },
@@ -57,10 +45,7 @@
       "endpoints": [
         "https://www.danceoneradio.com/updates/latest.json"
       ],
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdGQ0IzRDkzMTI2NkYyODcKUldTSDhtWVNrejNMZitHM08ycmovRjYxSTdhNnE2RlNSV1dKcUcyZGtMd2x6WGNQMVcydFd2bDUK",
-      "windows": {
-        "installMode": "passive"
-      }
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdGQ0IzRDkzMTI2NkYyODcKUldTSDhtWVNrejNMZitHM08ycmovRjYxSTdhNnE2RlNSV1dKcUcyZGtMd2x6WGNQMVcydFd2bDUK"
     }
   }
 }
