@@ -11,7 +11,7 @@ export const DesktopDownloadSection = () => {
   const handleDownload = () => {
     setDownloadStarted(true);
 
-    const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.15/dance-one-radio-setup-1.0.15-x64.exe';
+    const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.19/dance-one-radio-setup-1.0.19-x64.exe';
     window.open(downloadUrl, '_blank');
 
     setTimeout(() => setDownloadStarted(false), 2000);
@@ -105,7 +105,7 @@ export const DesktopDownloadSection = () => {
           {/* Additional Info */}
           <div className="border-t pt-4">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Version 1.0.15</span>
+              <span className="text-muted-foreground">Version 1.0.19</span>
               <Badge variant="secondary" className="gap-1">
                 <Smartphone className="w-3 h-3" />
                 Windows Only
@@ -124,7 +124,7 @@ export const QuickDownloadButton = () => {
   const handleQuickDownload = () => {
     setIsDownloading(true);
 
-    const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.15/dance-one-radio-setup-1.0.15-x64.exe';
+    const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.19/dance-one-radio-setup-1.0.19-x64.exe';
     window.open(downloadUrl, '_blank');
 
     setTimeout(() => setIsDownloading(false), 2000);

@@ -308,15 +308,15 @@ const LiveRadioPlayer = ({
         <div className="space-y-3">
           <div className="flex gap-2">
             <Button onClick={handlePlayPause} className={`btn-cyber ${hidePopupButton ? 'w-full' : 'flex-1'}`} size="lg">
-              {isLoading ? (
-                <>
-                  <div className="w-5 h-5 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  RETRYING...
-                </>
-              ) : isPlaying ? (
+              {isPlaying ? (
                 <>
                   <Pause className="w-5 h-5 mr-2" />
                   PAUSE STREAM
+                </>
+              ) : isLoading ? (
+                <>
+                  <div className="w-5 h-5 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  STOP LOADING
                 </>
               ) : (
                 <>

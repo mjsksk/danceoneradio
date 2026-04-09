@@ -756,7 +756,7 @@ dependencies = [
 
 [[package]]
 name = "dance-one-radio"
-version = "1.0.15"
+version = "1.0.19"
 dependencies = [
  "log",
  "serde",

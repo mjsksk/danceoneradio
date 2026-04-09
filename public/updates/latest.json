@@ -1,7 +1,7 @@
 {
-  "version": "1.0.15",
-  "notes": "Harden live stream recovery so long-running playback reconnects cleanly instead of getting stuck on loading, and let the loading button force a fresh retry.",
-  "pub_date": "2026-04-08T19:16:54.090Z",
-  "url": "https://github.com/mjsksk/danceoneradio/releases/download/v1.0.15/dance-one-radio-setup-1.0.15-x64.exe",
-  "signature": "untrusted comment: signature from minisign secret key\nRUSH8mYSkz3Lf77+8gTHsaDQSGa3hqCKjSGE0SyN7BOdj61na/yqSLVrXfgfv7uFuJNemitqJgR/muBId2ge4JjPWNWJCIs9IQY=\ntrusted comment: 1775675814\nCHZYMcUZxLnSRG/LVu+GHqvPWmf6QGqLR6bNAVafqj5yldcXdy+gPMOyL6/5BO3dR+4EB33K+b6jJ0bMN1dgDQ=="
+  "version": "1.0.19",
+  "notes": "Prevent paused live streams from waking themselves back up, keep manual pauses stable, and harden playback state recovery after long sessions.",
+  "pub_date": "2026-04-09T16:59:47.021Z",
+  "url": "https://github.com/mjsksk/danceoneradio/releases/download/v1.0.19/dance-one-radio-setup-1.0.19-x64.exe",
+  "signature": "untrusted comment: signature from minisign secret key\nRUSH8mYSkz3Lf2utVuewM1JeVDbZGK+TOl3M6SSHPYWfWo/sDKIyr/YmaPzlQ8GgM+2tR85l+Ri/QUMo+vQwW5NCxTXkXrxGOg8=\ntrusted comment: 1775753987\ndPDmsJ6b1vbfL/3Ba+pDbny5Oe3ZNUiPfoHzB4oRrFdcjhBr8VCcZfnkgTtttuZ/TLnTP7nv7SYFZbNMt9QGBA=="
 }

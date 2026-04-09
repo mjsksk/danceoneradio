@@ -97,6 +97,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
   const liveErrorRetryTimeoutRef = useRef<number | null>(null);
   const liveReconnectInProgressRef = useRef(false);
   const manualPauseRequestedRef = useRef(false);
+  const liveUserPausedRef = useRef(false);
   const lastTimeupdateRef = useRef<number>(0);
   const lastLiveProgressRef = useRef<number>(0);
   const liveLoadingSinceRef = useRef<number | null>(null);
@@ -257,6 +258,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     clearLiveErrorRetryTimeout();
     livePauseTimestampRef.current = null;
     liveReconnectInProgressRef.current = true;
+    liveUserPausedRef.current = false;
     liveLoadingSinceRef.current = Date.now();
     setCurrentUrlIndex(safeUrlIndex);
     setState(prev => ({
@@ -333,6 +335,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     setCurrentUrlIndex(0);
     livePauseTimestampRef.current = null;
     liveReconnectInProgressRef.current = true;
+    liveUserPausedRef.current = false;
     liveLoadingSinceRef.current = Date.now();
     clearLivePauseExpiryTimeout();
     clearLiveErrorRetryTimeout();
@@ -353,6 +356,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     if (!audioRef.current) return;
 
     cancelStreamAttempts();
+    liveUserPausedRef.current = false;
     
     setState(prev => ({
       ...prev,
@@ -374,14 +378,15 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
 
   const pause = useCallback(() => {
     if (!audioRef.current) return;
-    manualPauseRequestedRef.current = true;
     cancelStreamAttempts();
+    manualPauseRequestedRef.current = true;
     if (state.source === 'live') {
+      liveUserPausedRef.current = true;
       livePauseTimestampRef.current = Date.now();
       scheduleLivePauseExpiry();
     }
     audioRef.current.pause();
-    setState(prev => ({ ...prev, isPlaying: false }));
+    setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
   }, [cancelStreamAttempts, scheduleLivePauseExpiry, state.source]);
 
   const resume = useCallback(() => {
@@ -393,6 +398,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
 
     if (state.source === 'live') {
       // Always restart live stream fresh to avoid stale buffered audio
+      liveUserPausedRef.current = false;
       restartLiveStream(0);
       return;
     }
@@ -421,6 +427,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
   const closePlayer = useCallback(() => {
     if (!audioRef.current) return;
     cancelStreamAttempts();
+    liveUserPausedRef.current = false;
     audioRef.current.pause();
     audioRef.current.src = '';
     setState(prev => ({
@@ -492,6 +499,12 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     if (!audio) return;
 
     const handlePlay = () => {
+      if (state.source === 'live' && liveUserPausedRef.current) {
+        audio.pause();
+        setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
+        return;
+      }
+
       liveReconnectInProgressRef.current = false;
       clearLivePauseExpiryTimeout();
       clearLiveRecoveryTimeout();
@@ -500,6 +513,12 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       setState(prev => ({ ...prev, isPlaying: true, isLoading: false }));
     };
     const handlePlaying = () => {
+      if (state.source === 'live' && liveUserPausedRef.current) {
+        audio.pause();
+        setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
+        return;
+      }
+
       liveReconnectInProgressRef.current = false;
       clearLivePauseExpiryTimeout();
       clearLiveRecoveryTimeout();
@@ -512,14 +531,22 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       manualPauseRequestedRef.current = false;
       clearLiveRecoveryTimeout();
       if (state.source === 'live' && !liveReconnectInProgressRef.current && wasManualPause) {
+        liveUserPausedRef.current = true;
         livePauseTimestampRef.current = Date.now();
         scheduleLivePauseExpiry();
       }
-      setState(prev => ({ ...prev, isPlaying: false }));
+      setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
     };
     const handleTimeUpdate = () => {
       markLiveProgress();
-      setState(prev => ({ ...prev, currentTime: audio.currentTime }));
+      setState(prev => {
+        const nextTime = audio.currentTime;
+        if (prev.source === 'live' && !audio.paused) {
+          return { ...prev, currentTime: nextTime, isPlaying: true, isLoading: false };
+        }
+
+        return { ...prev, currentTime: nextTime };
+      });
     };
     const handleLoadedMetadata = () => {
       const preserveLivePauseExpiry =
@@ -534,7 +561,12 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       clearStreamStartTimeout();
       markLiveProgress();
       const nextDuration = Number.isFinite(audio.duration) ? audio.duration : 0;
-      setState(prev => ({ ...prev, duration: nextDuration, isLoading: false }));
+      setState(prev => ({
+        ...prev,
+        duration: nextDuration,
+        isLoading: false,
+        isPlaying: prev.source === 'live' && !audio.paused ? true : prev.isPlaying,
+      }));
     };
     const handleCanPlay = () => {
       const preserveLivePauseExpiry =
@@ -548,17 +580,25 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       clearLiveRecoveryTimeout();
       clearStreamStartTimeout();
       markLiveProgress();
-      setState(prev => ({ ...prev, isLoading: false }));
+      setState(prev => ({
+        ...prev,
+        isLoading: false,
+        isPlaying: prev.source === 'live' && !audio.paused ? true : prev.isPlaying,
+      }));
     };
     const handleProgress = () => {
       if (state.source !== 'live') return;
       markLiveProgress();
+      if (!audio.paused && audio.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        setState(prev => ({ ...prev, isPlaying: true, isLoading: false }));
+      }
     };
     const handleWaiting = () => {
       if (state.source !== 'live' || audio.paused) return;
 
       liveLoadingSinceRef.current ??= Date.now();
       setState(prev => ({ ...prev, isLoading: true }));
+      if (liveReconnectInProgressRef.current) return;
       scheduleLiveRecovery(currentUrlIndex);
     };
     const handleStalled = () => {
@@ -566,6 +606,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
 
       liveLoadingSinceRef.current ??= Date.now();
       setState(prev => ({ ...prev, isLoading: true }));
+      if (liveReconnectInProgressRef.current) return;
       scheduleLiveRecovery(currentUrlIndex);
     };
     const handleSuspendLikeState = () => {
@@ -573,6 +614,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
 
       liveLoadingSinceRef.current ??= Date.now();
       setState(prev => ({ ...prev, isLoading: true }));
+      if (liveReconnectInProgressRef.current) return;
       scheduleLiveRecovery(currentUrlIndex);
     };
     
@@ -697,7 +739,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       const audio = audioRef.current;
       if (!audio) return;
 
-      const intentionallyPaused = livePauseTimestampRef.current !== null && audio.paused;
+      const intentionallyPaused = liveUserPausedRef.current;
       if (intentionallyPaused) return;
 
       const loadingElapsed = liveLoadingSinceRef.current

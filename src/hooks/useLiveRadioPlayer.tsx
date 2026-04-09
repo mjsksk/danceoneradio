@@ -153,7 +153,9 @@ export const useLiveRadioPlayer = (streamUrls: string[] = [...PRIMARY_STREAM_URL
 
   const isLive = audioPlayer.source === 'live';
   const isPlaying = usesDesktopAudioBridge ? desktopPlaybackState.isPlaying : isLive && audioPlayer.isPlaying;
-  const isLoading = usesDesktopAudioBridge ? desktopPlaybackState.isLoading : isLive && audioPlayer.isLoading;
+  const isLoading = usesDesktopAudioBridge
+    ? desktopPlaybackState.isLoading && !desktopPlaybackState.isPlaying
+    : isLive && audioPlayer.isLoading && !audioPlayer.isPlaying;
 
   useEffect(() => {
     if (!usesDesktopAudioBridge) {
@@ -202,16 +204,17 @@ export const useLiveRadioPlayer = (streamUrls: string[] = [...PRIMARY_STREAM_URL
     }
 
     if (isLive) {
-      if (audioPlayer.isLoading) {
-        audioPlayer.playLiveStream(streamUrls);
+      if (audioPlayer.isPlaying) {
+        audioPlayer.pause();
         return;
       }
 
-      if (audioPlayer.isPlaying) {
+      if (audioPlayer.isLoading) {
         audioPlayer.pause();
-      } else {
-        audioPlayer.resume();
+        return;
       }
+
+      audioPlayer.resume();
     } else {
       audioPlayer.playLiveStream(streamUrls);
     }
