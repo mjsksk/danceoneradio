@@ -1,4 +1,8 @@
 #[cfg(desktop)]
+use std::sync::Mutex;
+#[cfg(desktop)]
+use std::time::{Duration, Instant};
+#[cfg(desktop)]
 use serde::Serialize;
 #[cfg(desktop)]
 use tauri::{AppHandle, Emitter, Manager, Runtime};
@@ -29,6 +33,8 @@ const TRAY_QUIT_ID: &str = "tray-quit";
 const TOGGLE_PLAYBACK_EVENT: &str = "desktop-toggle-playback";
 #[cfg(desktop)]
 const UPDATE_PROGRESS_EVENT: &str = "desktop-update-event";
+#[cfg(desktop)]
+const RELOAD_AFTER_HIDDEN_FOR: Duration = Duration::from_secs(60 * 10);
 #[cfg(target_os = "windows")]
 const WINDOWS_APP_USER_MODEL_ID: &str = "com.danceoneradio.desktop";
 
@@ -69,6 +75,12 @@ enum DesktopUpdateEvent {
   Finished,
 }
 
+#[cfg(desktop)]
+#[derive(Default)]
+struct WindowHideState {
+  hidden_at: Mutex<Option<Instant>>,
+}
+
 #[cfg(target_os = "windows")]
 fn set_windows_app_user_model_id() {
   let app_id: Vec<u16> = WINDOWS_APP_USER_MODEL_ID
@@ -82,8 +94,34 @@ fn set_windows_app_user_model_id() {
 }
 
 #[cfg(desktop)]
+fn take_hidden_duration<R: Runtime>(app: &AppHandle<R>) -> Option<Duration> {
+  let state = app.try_state::<WindowHideState>()?;
+  let mut hidden_at = state.hidden_at.lock().ok()?;
+  let duration = hidden_at.map(|instant| instant.elapsed());
+  *hidden_at = None;
+  duration
+}
+
+#[cfg(desktop)]
+fn mark_window_hidden<R: Runtime>(app: &AppHandle<R>) {
+  if let Some(state) = app.try_state::<WindowHideState>() {
+    if let Ok(mut hidden_at) = state.hidden_at.lock() {
+      *hidden_at = Some(Instant::now());
+    }
+  }
+}
+
+#[cfg(desktop)]
 fn show_main_window<R: Runtime>(app: &AppHandle<R>) {
   if let Some(window) = app.get_webview_window(MAIN_WINDOW_LABEL) {
+    let should_reload = take_hidden_duration(app)
+      .map(|duration| duration >= RELOAD_AFTER_HIDDEN_FOR)
+      .unwrap_or(false);
+
+    if should_reload {
+      let _ = window.reload();
+    }
+
     if let Some(icon) = app.default_window_icon().cloned() {
       let _ = window.set_icon(icon);
     }
@@ -105,6 +143,7 @@ fn apply_main_window_icon<R: Runtime>(app: &AppHandle<R>) {
 
 #[cfg(desktop)]
 fn hide_main_window<R: Runtime>(app: &AppHandle<R>) {
+  mark_window_hidden(app);
   if let Some(window) = app.get_webview_window(MAIN_WINDOW_LABEL) {
     let _ = window.hide();
   }
@@ -265,6 +304,7 @@ fn build_tray<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
+    .manage(WindowHideState::default())
     .invoke_handler(tauri::generate_handler![
       hide_to_tray,
       restore_from_tray,
@@ -274,6 +314,9 @@ pub fn run() {
     .plugin(tauri_plugin_autostart::Builder::new().build())
     .plugin(tauri_plugin_notification::init())
     .plugin(tauri_plugin_process::init())
+    .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+      show_main_window(app);
+    }))
     .plugin(tauri_plugin_updater::Builder::new().build())
     .setup(|app| {
       #[cfg(target_os = "windows")]

@@ -1,6 +1,6 @@
 [package]
 name = "dance-one-radio"
-version = "1.0.19"
+version = "1.0.20"
 description = "Dance One Radio desktop app"
 authors = ["Dance One Radio"]
 license = ""
@@ -26,6 +26,7 @@ tauri-plugin-autostart = "2"
 tauri-plugin-log = "2"
 tauri-plugin-notification = "2"
 tauri-plugin-process = "2"
+tauri-plugin-single-instance = "2"
 tauri-plugin-updater = "2"
 
 [target.'cfg(windows)'.dependencies]

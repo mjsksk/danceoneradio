@@ -1,7 +1,7 @@
 {
-  "version": "1.0.19",
-  "notes": "Prevent paused live streams from waking themselves back up, keep manual pauses stable, and harden playback state recovery after long sessions.",
+  "version": "1.0.20",
+  "notes": "Prevent duplicate app launches, restore the existing window on relaunch, and reload the desktop window after long tray-hidden sessions to avoid blank restores.",
   "pub_date": "2026-04-09T16:59:47.021Z",
-  "url": "https://github.com/mjsksk/danceoneradio/releases/download/v1.0.19/dance-one-radio-setup-1.0.19-x64.exe",
-  "signature": "untrusted comment: signature from minisign secret key\nRUSH8mYSkz3Lf2utVuewM1JeVDbZGK+TOl3M6SSHPYWfWo/sDKIyr/YmaPzlQ8GgM+2tR85l+Ri/QUMo+vQwW5NCxTXkXrxGOg8=\ntrusted comment: 1775753987\ndPDmsJ6b1vbfL/3Ba+pDbny5Oe3ZNUiPfoHzB4oRrFdcjhBr8VCcZfnkgTtttuZ/TLnTP7nv7SYFZbNMt9QGBA=="
+  "url": "https://github.com/mjsksk/danceoneradio/releases/download/v1.0.20/dance-one-radio-setup-1.0.20-x64.exe",
+  "signature": "untrusted comment: signature from minisign secret key\nRUSH8mYSkz3Lf/7MAKorIBa7Py5pno1ELK0spkZtMgGaB4VbI8SI3wm1aAL9NNH2KMNX9RTf5tJzOI67eiL9eNf+uaIcATGZUAE=\ntrusted comment: 1775838534\nPuH0Wzees3isMjljqQ4MJm4ePqsUqiWiP6FYgNskVLSkmpDh4miC7DOZyxx8GaqLYOiChelikXJwYS+/JJUQDA=="
 }
