@@ -1,29 +1,33 @@
 
 
-## Plan: Enable Downloads Page with Live Download Link
+## Plan: Create Wh0 Plays Sessions Episode 224 Page
 
-### What changes
+### What gets built
 
-1. **Downloads page (`src/pages/Downloads.tsx`)**
-   - Set `isComingSoon = false` (or remove the flag entirely)
-   - Replace the "Coming Soon" badge with a "New Release" or "Available Now" badge
-   - Replace the disabled button and "Under Development" card with an active download button pointing to: `https://github.com/mjsksk/danceoneradio/releases/download/v1.0.6/dance-one-radio-setup-1.0.6-x64.exe`
-   - Update version text from `1.0.0` to `1.0.6`
-   - Update the installation guide section to reflect the installer workflow (not portable)
+A new guest show page at `/show/wh0-plays-sessions/224` following the exact same pattern as Episodes 222 and 223, with 15 tracks and timestamps.
 
-2. **DesktopDownloadSection component (`src/components/DesktopDownloadSection.tsx`)**
-   - Update the installer URL to the new GitHub releases link
-   - Update version references from `1.0.0` to `1.0.6`
+### Changes
 
-### Technical details
+**1. Create `src/pages/Wh0PlaysSession224.tsx`**
+- Clone the Episode 223 template
+- 15 tracks with the provided tracklist and timestamps
+- Reuse existing artwork image (will use the same `wh0-plays-bad-intentions.jpg` or the sessions logo — since you said "add existing picture", I'll use the sessions logo `/images/wh0-plays-sessions-logo.jpg`)
+- Title: "Wh0 Plays Sessions 224"
+- No subtitle/theme name provided, so it will just show "Mixed by Wh0"
+- Labels left as empty strings (not provided)
 
-- The hero section will show a prominent download button that triggers `window.open()` to the GitHub releases URL
-- The "Coming Soon" placeholder (animated glow, Clock icon, disabled button) will be replaced with an active download card
-- Both the Downloads page and the DesktopDownloadSection dialog will use the same GitHub URL for consistency
+**2. Update `src/components/AnimatedRoutes.tsx`**
+- Add import for `Wh0PlaysSession224`
+- Add route: `/show/wh0-plays-sessions/224`
 
-### Build errors
+**3. Update `src/pages/Shows.tsx`**
+- Add Episode 224 entry to the guest shows array (at the top, as the newest)
+- Subtitle: "15 tracks • Mark Knight, Wh0, Low Steppa & more"
+- Broadcast date: April 10, 2026 (next in the weekly sequence after April 3)
 
-Will also fix the two existing build errors:
-- `LiveRadioPlayer.tsx` line 183: Cast `Uint8Array` to fix the `ArrayBufferLike` type mismatch
-- `newsletter-campaign/index.ts`: Add resend dependency or adjust import (Deno edge function issue — will investigate)
+**4. Fix build error** in `supabase/functions/newsletter-campaign/index.ts`
+- The `npm:resend@2.0.0` import is causing a Deno build error — will switch to direct `fetch` against the Resend API (same pattern used in `submit-song-request`), removing the npm import.
+
+### No other changes needed
+- Routing, SEO, affiliate links, ads all come from the template automatically.
 
