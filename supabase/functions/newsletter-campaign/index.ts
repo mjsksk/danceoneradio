@@ -1,7 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import { Resend } from "npm:resend@2.0.0";
-import * as ammonia from "https://deno.land/x/ammonia@0.3.1/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -231,8 +229,10 @@ const handler = async (req: Request): Promise<Response> => {
       recipients = subscribers;
     }
 
-    // Initialize Resend
-    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+    if (!RESEND_API_KEY) {
+      throw new Error("RESEND_API_KEY is not configured");
+    }
 
     // Send emails to recipients using SANITIZED content
     const emailPromises = recipients.map(async (recipient) => {
@@ -265,12 +265,23 @@ const handler = async (req: Request): Promise<Response> => {
       `;
 
       try {
-        await resend.emails.send({
-          from: "Dance One Radio <noreply@danceoneradio.com>",
-          to: [recipient.email],
-          subject: isTestMode ? `[TEST] ${sanitizedSubject}` : sanitizedSubject,
-          html: emailContent,
+        const res = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${RESEND_API_KEY}`,
+          },
+          body: JSON.stringify({
+            from: "Dance One Radio <noreply@danceoneradio.com>",
+            to: [recipient.email],
+            subject: isTestMode ? `[TEST] ${sanitizedSubject}` : sanitizedSubject,
+            html: emailContent,
+          }),
         });
+        if (!res.ok) {
+          const errBody = await res.text();
+          throw new Error(`Resend API error ${res.status}: ${errBody}`);
+        }
         return { email: recipient.email, status: "sent" };
       } catch (error) {
         console.error(`Failed to send email to ${recipient.email}:`, error);
