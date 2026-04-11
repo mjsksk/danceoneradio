@@ -461,6 +461,14 @@ const Shows = () => {
                 {(() => {
                   const guestShows = [
                     {
+                      number: 224,
+                      title: 'Wh0 Plays Sessions Episode 224',
+                      subtitle: '15 tracks • Mark Knight, Wh0, Low Steppa & more',
+                      link: '/show/wh0-plays-sessions/224',
+                      broadcastDate: '2026-04-10T18:00:00',
+                      genres: 'House • Tech House • Dance',
+                    },
+                    {
                       number: 223,
                       title: 'Wh0 Plays Sessions Episode 223 — Bad Intentions',
                       subtitle: '17 tracks • Mark Knight, Afrojack, LP Giobbi & more',

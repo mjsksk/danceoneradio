@@ -56,6 +56,7 @@ const Tracks = lazy(() => import('@/pages/Tracks'));
 const TrackPage = lazy(() => import('@/pages/TrackPage'));
 const Wh0PlaysSession222 = lazy(() => import('@/pages/Wh0PlaysSession222'));
 const Wh0PlaysSession223 = lazy(() => import('@/pages/Wh0PlaysSession223'));
+const Wh0PlaysSession224 = lazy(() => import('@/pages/Wh0PlaysSession224'));
 const SongRequests = lazy(() => import('@/pages/SongRequests'));
 
 export function AnimatedRoutes() {
