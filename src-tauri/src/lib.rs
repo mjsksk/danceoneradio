@@ -5,7 +5,7 @@ use std::time::{Duration, Instant};
 #[cfg(desktop)]
 use serde::Serialize;
 #[cfg(desktop)]
-use tauri::{AppHandle, Emitter, Manager, Runtime};
+use tauri::{AppHandle, Emitter, Manager, Runtime, WebviewWindowBuilder};
 #[cfg(desktop)]
 use tauri::{
   menu::{Menu, MenuItem},
@@ -35,6 +35,8 @@ const TOGGLE_PLAYBACK_EVENT: &str = "desktop-toggle-playback";
 const UPDATE_PROGRESS_EVENT: &str = "desktop-update-event";
 #[cfg(desktop)]
 const RELOAD_AFTER_HIDDEN_FOR: Duration = Duration::from_secs(60 * 10);
+#[cfg(desktop)]
+const RENDERER_STALE_AFTER: Duration = Duration::from_secs(90);
 #[cfg(target_os = "windows")]
 const WINDOWS_APP_USER_MODEL_ID: &str = "com.danceoneradio.desktop";
 
@@ -81,6 +83,19 @@ struct WindowHideState {
   hidden_at: Mutex<Option<Instant>>,
 }
 
+#[cfg(desktop)]
+#[derive(Default)]
+struct PlaybackState {
+  is_playing: Mutex<bool>,
+}
+
+#[cfg(desktop)]
+#[derive(Default)]
+struct RendererState {
+  last_seen: Mutex<Option<Instant>>,
+  pending_toggle_playback: Mutex<bool>,
+}
+
 #[cfg(target_os = "windows")]
 fn set_windows_app_user_model_id() {
   let app_id: Vec<u16> = WINDOWS_APP_USER_MODEL_ID
@@ -103,6 +118,13 @@ fn take_hidden_duration<R: Runtime>(app: &AppHandle<R>) -> Option<Duration> {
 }
 
 #[cfg(desktop)]
+fn peek_hidden_duration<R: Runtime>(app: &AppHandle<R>) -> Option<Duration> {
+  let state = app.try_state::<WindowHideState>()?;
+  let hidden_at = state.hidden_at.lock().ok()?;
+  hidden_at.map(|instant| instant.elapsed())
+}
+
+#[cfg(desktop)]
 fn mark_window_hidden<R: Runtime>(app: &AppHandle<R>) {
   if let Some(state) = app.try_state::<WindowHideState>() {
     if let Ok(mut hidden_at) = state.hidden_at.lock() {
@@ -112,10 +134,84 @@ fn mark_window_hidden<R: Runtime>(app: &AppHandle<R>) {
 }
 
 #[cfg(desktop)]
-fn show_main_window<R: Runtime>(app: &AppHandle<R>) {
+fn is_renderer_stale<R: Runtime>(app: &AppHandle<R>) -> bool {
+  app
+    .try_state::<RendererState>()
+    .and_then(|state| state.last_seen.lock().ok().and_then(|last_seen| *last_seen))
+    .map(|last_seen| last_seen.elapsed() >= RENDERER_STALE_AFTER)
+    .unwrap_or(true)
+}
+
+#[cfg(desktop)]
+fn recreate_main_window<R: Runtime>(app: &AppHandle<R>, should_show: bool) -> tauri::Result<()> {
   if let Some(window) = app.get_webview_window(MAIN_WINDOW_LABEL) {
-    let should_reload = take_hidden_duration(app)
-      .map(|duration| duration >= RELOAD_AFTER_HIDDEN_FOR)
+    let _ = window.destroy();
+  }
+
+  let Some(config) = app
+    .config()
+    .app
+    .windows
+    .iter()
+    .find(|window| window.label == MAIN_WINDOW_LABEL)
+    .or_else(|| app.config().app.windows.first())
+  else {
+    return Ok(());
+  };
+
+  let mut builder = WebviewWindowBuilder::from_config(app, config)?;
+  if !should_show {
+    builder = builder.visible(false);
+  }
+
+  let window = builder.build()?;
+
+  if let Some(icon) = app.default_window_icon().cloned() {
+    let _ = window.set_icon(icon);
+  }
+
+  if should_show {
+    let _ = window.unminimize();
+    let _ = window.show();
+    let _ = window.set_focus();
+  } else {
+    mark_window_hidden(app);
+    let _ = window.hide();
+  }
+
+  Ok(())
+}
+
+#[cfg(desktop)]
+fn queue_toggle_playback_for_renderer<R: Runtime>(app: &AppHandle<R>) {
+  if let Some(state) = app.try_state::<RendererState>() {
+    if let Ok(mut pending_toggle) = state.pending_toggle_playback.lock() {
+      *pending_toggle = true;
+    }
+  }
+}
+
+#[cfg(desktop)]
+fn show_main_window<R: Runtime>(app: &AppHandle<R>) {
+  let is_playing = app
+    .try_state::<PlaybackState>()
+    .and_then(|state| state.is_playing.lock().ok().map(|guard| *guard))
+    .unwrap_or(false);
+  let hidden_duration = take_hidden_duration(app);
+  let renderer_stale = is_renderer_stale(app);
+  let should_recreate = hidden_duration
+    .map(|duration| duration >= RELOAD_AFTER_HIDDEN_FOR && !is_playing && renderer_stale)
+    .unwrap_or(false);
+
+  if should_recreate {
+    if recreate_main_window(app, true).is_ok() {
+      return;
+    }
+  }
+
+  if let Some(window) = app.get_webview_window(MAIN_WINDOW_LABEL) {
+    let should_reload = hidden_duration
+      .map(|duration| duration >= RELOAD_AFTER_HIDDEN_FOR && !is_playing)
       .unwrap_or(false);
 
     if should_reload {
@@ -189,6 +285,39 @@ fn hide_to_tray(app: tauri::AppHandle) {
 #[tauri::command]
 fn restore_from_tray(app: tauri::AppHandle) {
   show_main_window(&app);
+}
+
+#[tauri::command]
+fn update_playback_state(app: tauri::AppHandle, is_playing: bool) {
+  if let Some(state) = app.try_state::<PlaybackState>() {
+    if let Ok(mut playback_state) = state.is_playing.lock() {
+      *playback_state = is_playing;
+    }
+  }
+}
+
+#[tauri::command]
+fn renderer_ping(app: tauri::AppHandle) {
+  if let Some(state) = app.try_state::<RendererState>() {
+    if let Ok(mut last_seen) = state.last_seen.lock() {
+      *last_seen = Some(Instant::now());
+    }
+
+    let should_emit_toggle = state
+      .pending_toggle_playback
+      .lock()
+      .ok()
+      .map(|mut pending_toggle| {
+        let should_emit = *pending_toggle;
+        *pending_toggle = false;
+        should_emit
+      })
+      .unwrap_or(false);
+
+    if should_emit_toggle {
+      let _ = app.emit(TOGGLE_PLAYBACK_EVENT, ());
+    }
+  }
 }
 
 #[cfg(desktop)]
@@ -274,6 +403,20 @@ fn build_tray<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
       if event.id() == &show_id {
         show_main_window(app);
       } else if event.id() == &toggle_playback_id {
+        let is_playing = app
+          .try_state::<PlaybackState>()
+          .and_then(|state| state.is_playing.lock().ok().map(|guard| *guard))
+          .unwrap_or(false);
+        let hidden_for_long = peek_hidden_duration(app)
+          .map(|duration| duration >= RELOAD_AFTER_HIDDEN_FOR)
+          .unwrap_or(false);
+
+        if !is_playing && hidden_for_long && is_renderer_stale(app) {
+          queue_toggle_playback_for_renderer(app);
+          let _ = recreate_main_window(app, false);
+          return;
+        }
+
         let _ = app.emit(TOGGLE_PLAYBACK_EVENT, ());
       } else if event.id() == &hide_id {
         hide_main_window(app);
@@ -305,9 +448,13 @@ fn build_tray<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
 pub fn run() {
   tauri::Builder::default()
     .manage(WindowHideState::default())
+    .manage(PlaybackState::default())
+    .manage(RendererState::default())
     .invoke_handler(tauri::generate_handler![
       hide_to_tray,
       restore_from_tray,
+      update_playback_state,
+      renderer_ping,
       check_for_updates,
       install_update
     ])

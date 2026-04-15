@@ -1,7 +1,7 @@
 {
-  "version": "1.0.20",
-  "notes": "Prevent duplicate app launches, restore the existing window on relaunch, and reload the desktop window after long tray-hidden sessions to avoid blank restores.",
+  "version": "1.0.22",
+  "notes": "Recover tray playback when the hidden renderer has gone stale, rebuild the paused window before replay, and prevent white-screen restores after long tray sessions.",
   "pub_date": "2026-04-09T16:59:47.021Z",
-  "url": "https://github.com/mjsksk/danceoneradio/releases/download/v1.0.20/dance-one-radio-setup-1.0.20-x64.exe",
-  "signature": "untrusted comment: signature from minisign secret key\nRUSH8mYSkz3Lf/7MAKorIBa7Py5pno1ELK0spkZtMgGaB4VbI8SI3wm1aAL9NNH2KMNX9RTf5tJzOI67eiL9eNf+uaIcATGZUAE=\ntrusted comment: 1775838534\nPuH0Wzees3isMjljqQ4MJm4ePqsUqiWiP6FYgNskVLSkmpDh4miC7DOZyxx8GaqLYOiChelikXJwYS+/JJUQDA=="
+  "url": "https://github.com/mjsksk/danceoneradio/releases/download/v1.0.22/dance-one-radio-setup-1.0.22-x64.exe",
+  "signature": "untrusted comment: signature from minisign secret key\nRUSH8mYSkz3Lf9EzPO/zbzIlz7cgo2zusFitDYLKiBsLw4xFj67mUWUcH/fbImVx5VVoHQ/tAaQt5XFaJf90UdCUTNiThD2zhgs=\ntrusted comment: 1776257825\ntuOsmweYKAb465dfHolrPuPGTih/Owg2CwcTTNzcDP9FlvebwxSa2puznbMEzS8+Fw+A6+bgvpAvH74Bt4KsBg=="
 }

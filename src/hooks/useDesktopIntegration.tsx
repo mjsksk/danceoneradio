@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import {
   detectDesktopPlatform,
   getDesktopPlatformName,
@@ -91,7 +91,12 @@ export const useDesktopIntegration = () => {
     if (isElectronDesktop) {
       window.electronAPI!.updatePlaybackState(isPlaying);
     }
-  }, [isElectronDesktop]);
+    if (isTauriDesktop) {
+      void import('@tauri-apps/api/core')
+        .then(({ invoke }) => invoke('update_playback_state', { isPlaying }))
+        .catch((error) => console.error('Failed to update Tauri playback state:', error));
+    }
+  }, [isElectronDesktop, isTauriDesktop]);
 
   const updateTrackInfo = useCallback((trackInfo: { title?: string; artist?: string }) => {
     if (isElectronDesktop) {
@@ -414,6 +419,42 @@ export const useDesktopIntegration = () => {
       console.error('Failed to update launch-on-startup setting:', error);
       return false;
     }
+  }, [isTauriDesktop]);
+
+  useEffect(() => {
+    if (!isTauriDesktop) {
+      return;
+    }
+
+    let isDisposed = false;
+    let pingInterval: number | null = null;
+
+    const sendPing = () => {
+      void import('@tauri-apps/api/core')
+        .then(({ invoke }) => invoke('renderer_ping'))
+        .catch((error) => {
+          if (!isDisposed) {
+            console.error('Failed to ping Tauri renderer state:', error);
+          }
+        });
+    };
+
+    const handleVisibility = () => sendPing();
+    const handleFocus = () => sendPing();
+
+    sendPing();
+    pingInterval = window.setInterval(sendPing, 30000);
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      isDisposed = true;
+      if (pingInterval !== null) {
+        window.clearInterval(pingInterval);
+      }
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, [isTauriDesktop]);
 
   return {
