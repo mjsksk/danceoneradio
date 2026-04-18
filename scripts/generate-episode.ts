@@ -65,6 +65,7 @@ function generateFileHeader(episode: Episode): string {
  */
 
 `;
+}
 
 async function fetchRSSFeed(): Promise<string> {
   console.log('Fetching RSS feed...');
