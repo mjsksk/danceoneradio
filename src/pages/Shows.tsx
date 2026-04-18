@@ -377,36 +377,13 @@ const Shows = () => {
           <div className="container mx-auto px-4">
             <div className="text-center mb-16 animate-fade-in">
               <h1 className="text-4xl md:text-6xl font-['Orbitron'] font-bold mb-6">
-                <span className="text-neon">FUTURE DANCE</span>{" "}
-                <span className="text-neon-purple">ANTHEMS</span>
+                <span className="text-neon">SHOWS &</span>{" "}
+                <span className="text-neon-purple">PODCASTS</span>
               </h1>
               <p className="text-xl text-muted-foreground font-['Rajdhani'] max-w-3xl mx-auto mb-8">
-                Dance anthems that consistently rule the dance and electronic scene. Featuring infectious beats, catchy hooks, and high-energy vibes perfect for both clubbing and radio airplay.
+                Exclusive DJ mixes, podcasts, and guest sessions from Dance One Radio. Featuring infectious beats, catchy hooks, and high-energy vibes perfect for both clubbing and radio airplay.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button 
-                    size="lg" 
-                    className="text-lg px-8 py-4 hover:scale-105 transition-transform"
-                    onClick={() => {
-                      if (episodes.length > 0 && episodes[0].enclosure.url) {
-                        handlePlayPauseWithProgress(episodes[0]);
-                      }
-                    }}
-                  disabled={loading || episodes.length === 0}
-                >
-                  <Play className="w-5 h-5 mr-2" />
-                  Listen Now
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  className="text-lg px-8 py-4 hover:scale-105 transition-transform"
-                  onClick={() => window.open('https://podcasts.apple.com/us/podcast/future-dance-anthems-with-mario/id1439656478', '_blank')}
-                >
-                  <ExternalLink className="w-5 h-5 mr-2" />
-                  Apple Podcasts
-                </Button>
-                
                 <SocialShare 
                   url={window.location.href}
                   title="Future Dance Anthems with Mario - DJ Shows & Podcasts"
