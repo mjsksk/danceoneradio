@@ -419,34 +419,6 @@ const Shows = () => {
           </div>
         </section>
 
-        {/* Podcast Stats */}
-        <section className="py-12 relative">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="card-cyber p-6 text-center">
-                  <div className="text-3xl font-['Orbitron'] font-bold text-neon mb-2">
-                    {totalEpisodes}
-                  </div>
-                  <div className="text-muted-foreground">Latest Episodes</div>
-                </Card>
-                <Card className="card-cyber p-6 text-center">
-                  <div className="text-3xl font-['Orbitron'] font-bold text-neon-purple mb-2">
-                    Bi-Weekly
-                  </div>
-                  <div className="text-muted-foreground">Release Schedule</div>
-                </Card>
-                <Card className="card-cyber p-6 text-center">
-                  <div className="text-3xl font-['Orbitron'] font-bold text-primary mb-2">
-                    EDM
-                  </div>
-                  <div className="text-muted-foreground">Genre Focus</div>
-                </Card>
-              </div>
-            </div>
-          </div>
-        </section>
-
         <GoogleAds key="shows-ad" slot={AD_SLOTS.HEADER} format="horizontal" />
 
         {/* Guest Shows */}
