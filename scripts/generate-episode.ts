@@ -83,15 +83,16 @@ function parseEpisodeFromRSS(rssContent: string): Episode | null {
 
   const item = episodeMatch[1];
   
-  // Extract episode number from title (e.g., "Anthems of the week 396")
-  const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/);
-  const title = titleMatch ? titleMatch[1] : '';
+  // Extract episode number from title (supports both CDATA-wrapped and plain titles)
+  const titleMatch = item.match(/<title>(?:<!\[CDATA\[([\s\S]*?)\]\]>|([\s\S]*?))<\/title>/);
+  const title = (titleMatch ? (titleMatch[1] ?? titleMatch[2]) : '').trim();
   const numberMatch = title.match(/(\d+)/);
   const episodeNumber = numberMatch ? parseInt(numberMatch[1]) : 0;
 
-  // Extract description
-  const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/);
-  const description = descMatch ? descMatch[1].replace(/<[^>]*>/g, '').trim() : '';
+  // Extract description (supports CDATA or plain)
+  const descMatch = item.match(/<description>(?:<!\[CDATA\[([\s\S]*?)\]\]>|([\s\S]*?))<\/description>/);
+  const descriptionRaw = descMatch ? (descMatch[1] ?? descMatch[2] ?? '') : '';
+  const description = descriptionRaw.replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').trim();
 
   // Extract audio URL
   const audioMatch = item.match(/<enclosure url="([^"]+)"/);
