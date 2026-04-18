@@ -65,14 +65,34 @@ serve(async (req) => {
     const showsUrl = url.searchParams.get('url') || ''
     
     // Validate and sanitize inputs
-    if (showsUrl && !isValidUrl(showsUrl)) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid URL provided' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+    const ALLOWED_HOSTS = [
+      'danceoneradio.com',
+      'www.danceoneradio.com',
+      'danceoneradio.live',
+      'www.danceoneradio.live',
+      'danceoneradio.lovable.app',
+    ];
+    if (showsUrl) {
+      if (!isValidUrl(showsUrl)) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid URL provided' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      try {
+        const parsed = new URL(showsUrl);
+        if (!ALLOWED_HOSTS.includes(parsed.hostname)) {
+          return new Response(
+            JSON.stringify({ error: 'URL host not allowed' }),
+            { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          )
         }
-      )
+      } catch {
+        return new Response(
+          JSON.stringify({ error: 'Invalid URL' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
     }
     
     const safeUrl = escapeHtml(showsUrl)
