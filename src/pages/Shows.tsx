@@ -419,111 +419,219 @@ const Shows = () => {
           </div>
         </section>
 
-        {/* Podcast Stats */}
-        <section className="py-12 relative">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="card-cyber p-6 text-center">
-                  <div className="text-3xl font-['Orbitron'] font-bold text-neon mb-2">
-                    {totalEpisodes}
-                  </div>
-                  <div className="text-muted-foreground">Latest Episodes</div>
-                </Card>
-                <Card className="card-cyber p-6 text-center">
-                  <div className="text-3xl font-['Orbitron'] font-bold text-neon-purple mb-2">
-                    Bi-Weekly
-                  </div>
-                  <div className="text-muted-foreground">Release Schedule</div>
-                </Card>
-                <Card className="card-cyber p-6 text-center">
-                  <div className="text-3xl font-['Orbitron'] font-bold text-primary mb-2">
-                    EDM
-                  </div>
-                  <div className="text-muted-foreground">Genre Focus</div>
-                </Card>
-              </div>
-            </div>
-          </div>
-        </section>
-
         <GoogleAds key="shows-ad" slot={AD_SLOTS.HEADER} format="horizontal" />
 
-        {/* Guest Shows */}
+        {/* Episodes + Guest Shows side-by-side */}
         <section className="py-12 relative">
           <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-['Orbitron'] font-bold mb-8 text-center">
-                <span className="text-neon">GUEST</span>{" "}
-                <span className="text-neon-purple">SHOWS</span>
-              </h2>
-              <div className="grid gap-4">
-                {(() => {
-                  const guestShows = [
-                    {
-                      number: 225,
-                      title: 'Wh0 Plays Sessions Episode 225',
-                      subtitle: '14 tracks • Mark Knight, Wh0, Rue Jay, Joshwa & more',
-                      link: '/show/wh0-plays-sessions/225',
-                      broadcastDate: '2026-04-17T18:00:00',
-                      genres: 'House • Tech House • Dance',
-                    },
-                    {
-                      number: 224,
-                      title: 'Wh0 Plays Sessions Episode 224',
-                      subtitle: '15 tracks • Mark Knight, Wh0, Low Steppa & more',
-                      link: '/show/wh0-plays-sessions/224',
-                      broadcastDate: '2026-04-10T18:00:00',
-                      genres: 'House • Tech House • Dance',
-                    },
-                    {
-                      number: 223,
-                      title: 'Wh0 Plays Sessions Episode 223 — Bad Intentions',
-                      subtitle: '17 tracks • Mark Knight, Afrojack, LP Giobbi & more',
-                      link: '/show/wh0-plays-sessions/223',
-                      broadcastDate: '2026-04-03T18:00:00',
-                      genres: 'House • Tech House • Dance',
-                    },
-                    {
-                      number: 222,
-                      title: 'Wh0 Plays Sessions Episode 222',
-                      subtitle: <span>Guest Mix by <span className="text-primary font-semibold">Johan S</span></span>,
-                      link: '/show/wh0-plays-sessions/222',
-                      broadcastDate: '2026-03-27T18:00:00',
-                      genres: 'House • Tech House • Dance',
-                    },
-                  ];
+            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
+              {/* Latest Episodes Column */}
+              <div>
+                <h2 className="text-3xl md:text-4xl font-['Orbitron'] font-bold mb-8 text-center">
+                  <span className="text-neon-purple">LATEST EPISODES</span>
+                </h2>
 
-                  return guestShows.map((show, index) => {
-                    const broadcastDate = new Date(show.broadcastDate);
-                    const now = new Date();
-                    const isPast = now > broadcastDate;
-                    const isUpcoming = !isPast;
+                {loading ? (
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                    <p className="mt-4 text-muted-foreground">Loading episodes...</p>
+                  </div>
+                ) : episodes.length === 0 ? (
+                  <div className="text-center py-12">
+                    <p className="text-muted-foreground">No episodes available</p>
+                  </div>
+                ) : (
+                  <div className="grid gap-6">
+                    {episodes.map((episode, index) => {
+                      const episodeNumber = episode.episodeNumber || (totalEpisodes - index);
+                      const hasDedicatedPage = episode.episodeNumber !== undefined && episode.episodeNumber > 0 && availableEpisodePages.includes(episode.episodeNumber);
 
-                    const formattedDate = broadcastDate.toLocaleDateString('en-US', {
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric',
-                    });
-
-                    return (
-                      <Link key={show.number} to={show.link} className="block">
-                        <Card className="card-cyber p-6 sm:p-8 hover:scale-[1.01] transition-all duration-300 group cursor-pointer hover:border-neon/50">
-                          <div className="flex flex-col sm:flex-row gap-6 items-center">
-                            <div className={`bg-gradient-to-br ${isUpcoming ? 'from-neon to-neon-purple' : 'from-neon/60 to-neon-purple/60'} text-background rounded-full w-16 h-16 flex items-center justify-center font-['Orbitron'] font-bold text-lg shrink-0`}>
-                              #{show.number}
+                      const cardContent = (
+                        <div className="flex flex-col gap-4">
+                          <div className="flex items-start gap-4">
+                            <div className="bg-gradient-to-br from-neon to-neon-purple text-background rounded-full w-12 h-12 flex items-center justify-center font-['Orbitron'] font-bold text-base shrink-0">
+                              #{episodeNumber}
                             </div>
-                            <div className="flex-1 text-center sm:text-left">
-                              <h3 className="text-xl md:text-2xl font-['Orbitron'] font-bold text-primary group-hover:text-neon transition-colors">
-                                {show.title}
-                                <span className="inline-block ml-2 text-sm text-neon opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                            <div className="flex-1 min-w-0" id={`episode-${episodeNumber}`}>
+                              <h3 className={`text-lg md:text-xl font-['Orbitron'] font-bold mb-2 text-primary transition-colors break-words ${hasDedicatedPage ? 'group-hover:text-neon cursor-pointer' : ''}`}>
+                                {episode.title}
+                                {hasDedicatedPage && (
+                                  <span className="inline-block ml-2 text-sm text-neon opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                                )}
                               </h3>
-                              <p className="text-muted-foreground mt-1">{show.subtitle}</p>
-                              <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-muted-foreground justify-center sm:justify-start">
-                                <div className="flex items-center gap-2">
+                              <div className="flex flex-wrap items-center gap-3 mb-2 text-xs text-muted-foreground">
+                                <div className="flex items-center gap-1.5">
+                                  <Calendar className="w-3.5 h-3.5 text-neon" />
+                                  <span>{formatDate(episode.pubDate)}</span>
+                                </div>
+                                {episode.duration && (
+                                  <div className="flex items-center gap-1.5">
+                                    <Clock className="w-3.5 h-3.5 text-neon-purple" />
+                                    <span>{episode.duration}</span>
+                                  </div>
+                                )}
+                              </div>
+                              <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                                {episode.description}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap gap-2">
+                            {episode.enclosure.url && (
+                              <Button
+                                size="sm"
+                                className="flex items-center gap-2 hover:scale-105 transition-all duration-200 bg-gradient-to-r from-neon to-neon-purple text-background hover:shadow-lg hover:shadow-neon/25"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handlePlayPauseWithProgress(episode);
+                                }}
+                              >
+                                {isEpisodePlaying(episode.episodeNumber || 0) ? (
+                                  <Pause className="w-4 h-4" />
+                                ) : (
+                                  <Play className="w-4 h-4" />
+                                )}
+                                {isEpisodePlaying(episode.episodeNumber || 0) ? 'Pause' : 'Play'}
+                              </Button>
+                            )}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex items-center gap-2 border-primary/30 hover:border-primary hover:bg-primary/10"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                window.open(`https://podcasts.apple.com/podcast/future-dance-anthems-with-mario/id1439656478`, '_blank');
+                              }}
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                              Apple
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-xs text-muted-foreground hover:text-primary"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleShareEpisode(episode, index);
+                              }}
+                            >
+                              Share
+                            </Button>
+                          </div>
+                        </div>
+                      );
+
+                      const episodeCard = hasDedicatedPage ? (
+                        <Link
+                          key={episode.guid || index}
+                          to={`/episode/${episode.episodeNumber}`}
+                          className="block"
+                        >
+                          <Card className="card-cyber p-5 hover:scale-[1.01] transition-all duration-300 group cursor-pointer hover:border-neon/50">
+                            {cardContent}
+                          </Card>
+                        </Link>
+                      ) : (
+                        <Card key={episode.guid || index} className="card-cyber p-5 hover:scale-[1.01] transition-all duration-300 group">
+                          {cardContent}
+                        </Card>
+                      );
+
+                      return (
+                        <div key={episode.guid || index}>
+                          {episodeCard}
+                          {(index + 1) % 5 === 0 && index < episodes.length - 1 && (
+                            <div className="mt-6">
+                              <GoogleAds key={`shows-between-${index}`} slot={AD_SLOTS.BETWEEN_EPISODES} format="fluid" layout="in-article" />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Guest Shows Column */}
+              <div>
+                <h2 className="text-3xl md:text-4xl font-['Orbitron'] font-bold mb-8 text-center">
+                  <span className="text-neon">GUEST</span>{" "}
+                  <span className="text-neon-purple">SHOWS</span>
+                </h2>
+                <div className="grid gap-4">
+                  {(() => {
+                    const guestShows = [
+                      {
+                        number: 225,
+                        title: 'Wh0 Plays Sessions Episode 225',
+                        subtitle: '14 tracks • Mark Knight, Wh0, Rue Jay, Joshwa & more',
+                        link: '/show/wh0-plays-sessions/225',
+                        broadcastDate: '2026-04-17T18:00:00',
+                        genres: 'House • Tech House • Dance',
+                      },
+                      {
+                        number: 224,
+                        title: 'Wh0 Plays Sessions Episode 224',
+                        subtitle: '15 tracks • Mark Knight, Wh0, Low Steppa & more',
+                        link: '/show/wh0-plays-sessions/224',
+                        broadcastDate: '2026-04-10T18:00:00',
+                        genres: 'House • Tech House • Dance',
+                      },
+                      {
+                        number: 223,
+                        title: 'Wh0 Plays Sessions Episode 223 — Bad Intentions',
+                        subtitle: '17 tracks • Mark Knight, Afrojack, LP Giobbi & more',
+                        link: '/show/wh0-plays-sessions/223',
+                        broadcastDate: '2026-04-03T18:00:00',
+                        genres: 'House • Tech House • Dance',
+                      },
+                      {
+                        number: 222,
+                        title: 'Wh0 Plays Sessions Episode 222',
+                        subtitle: <span>Guest Mix by <span className="text-primary font-semibold">Johan S</span></span>,
+                        link: '/show/wh0-plays-sessions/222',
+                        broadcastDate: '2026-03-27T18:00:00',
+                        genres: 'House • Tech House • Dance',
+                      },
+                    ];
+
+                    return guestShows.map((show) => {
+                      const broadcastDate = new Date(show.broadcastDate);
+                      const now = new Date();
+                      const isPast = now > broadcastDate;
+                      const isUpcoming = !isPast;
+
+                      const formattedDate = broadcastDate.toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                      });
+
+                      return (
+                        <Link key={show.number} to={show.link} className="block">
+                          <Card className="card-cyber p-5 hover:scale-[1.01] transition-all duration-300 group cursor-pointer hover:border-neon/50">
+                            <div className="flex flex-col gap-3">
+                              <div className="flex items-start gap-4">
+                                <div className={`bg-gradient-to-br ${isUpcoming ? 'from-neon to-neon-purple' : 'from-neon/60 to-neon-purple/60'} text-background rounded-full w-12 h-12 flex items-center justify-center font-['Orbitron'] font-bold text-base shrink-0`}>
+                                  #{show.number}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="text-lg md:text-xl font-['Orbitron'] font-bold text-primary group-hover:text-neon transition-colors break-words">
+                                    {show.title}
+                                    <span className="inline-block ml-2 text-sm text-neon opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                                  </h3>
+                                  <p className="text-sm text-muted-foreground mt-1">{show.subtitle}</p>
+                                </div>
+                              </div>
+                              <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                                <div className="flex items-center gap-1.5">
                                   {isUpcoming ? (
                                     <>
-                                      <Calendar className="w-4 h-4 text-neon" />
+                                      <Calendar className="w-3.5 h-3.5 text-neon" />
                                       <span>
                                         {broadcastDate.toLocaleDateString('en-US', { weekday: 'long' })} at{' '}
                                         {broadcastDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
@@ -531,171 +639,23 @@ const Shows = () => {
                                     </>
                                   ) : (
                                     <>
-                                      <Clock className="w-4 h-4 text-muted-foreground" />
+                                      <Clock className="w-3.5 h-3.5 text-muted-foreground" />
                                       <span>Aired {formattedDate}</span>
                                     </>
                                   )}
                                 </div>
-                                <div className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
+                                <div className="px-2.5 py-0.5 bg-primary/10 text-primary rounded-full text-xs font-medium">
                                   {show.genres}
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        </Card>
-                      </Link>
-                    );
-                  });
-                })()}
+                          </Card>
+                        </Link>
+                      );
+                    });
+                  })()}
+                </div>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Episodes List */}
-        <section className="py-16 relative">
-          <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-['Orbitron'] font-bold mb-12 text-center">
-                <span className="text-neon-purple">LATEST EPISODES</span>
-              </h2>
-
-              {loading ? (
-                <div className="text-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                  <p className="mt-4 text-muted-foreground">Loading episodes...</p>
-                </div>
-              ) : episodes.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground">No episodes available</p>
-                </div>
-              ) : (
-                <div className="grid gap-8">
-                  {episodes.map((episode, index) => {
-                    const episodeNumber = episode.episodeNumber || (totalEpisodes - index);
-                    const hasDedicatedPage = episode.episodeNumber !== undefined && episode.episodeNumber > 0 && availableEpisodePages.includes(episode.episodeNumber);
-                    
-                    const cardContent = (
-                      <div className="flex flex-col lg:flex-row gap-8">
-                        {/* Episode Number Badge */}
-                        <div className="lg:w-20 flex lg:flex-col items-center lg:items-start gap-4">
-                          <div className="bg-gradient-to-br from-neon to-neon-purple text-background rounded-full w-16 h-16 flex items-center justify-center font-['Orbitron'] font-bold text-lg">
-                            #{episodeNumber}
-                          </div>
-                        </div>
-
-                        {/* Episode Content */}
-                        <div className="flex-1 space-y-4">
-                          <div id={`episode-${episodeNumber}`}>
-                            <h3 className={`text-xl md:text-2xl font-['Orbitron'] font-bold mb-3 text-primary transition-colors ${hasDedicatedPage ? 'group-hover:text-neon cursor-pointer' : ''}`}>
-                              {episode.title}
-                              {hasDedicatedPage && (
-                                <span className="inline-block ml-2 text-sm text-neon opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-                              )}
-                            </h3>
-                            
-                            <div className="flex flex-wrap items-center gap-6 mb-4 text-sm text-muted-foreground">
-                              <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-neon" />
-                                <span>{formatDate(episode.pubDate)}</span>
-                              </div>
-                              {episode.duration && (
-                                <div className="flex items-center gap-2">
-                                  <Clock className="w-4 h-4 text-neon-purple" />
-                                  <span>{episode.duration}</span>
-                                </div>
-                              )}
-                              <div className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
-                                EDM • House • Dance
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <p className="text-muted-foreground leading-relaxed">
-                            {episode.description.length > 300 
-                              ? `${episode.description.substring(0, 300)}...` 
-                              : episode.description}
-                          </p>
-                        </div>
-                        
-                        {/* Action Buttons */}
-                        <div className="lg:w-52 flex flex-col gap-3">
-                          {episode.enclosure.url && (
-                            <Button 
-                              className="w-full flex items-center gap-2 hover:scale-105 transition-all duration-200 bg-gradient-to-r from-neon to-neon-purple text-background hover:shadow-lg hover:shadow-neon/25"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                handlePlayPauseWithProgress(episode);
-                              }}
-                            >
-                              {isEpisodePlaying(episode.episodeNumber || 0) ? (
-                                <Pause className="w-4 h-4" />
-                              ) : (
-                                <Play className="w-4 h-4" />
-                              )}
-                              {isEpisodePlaying(episode.episodeNumber || 0) ? 'Pause' : 'Play'} Episode
-                            </Button>
-                          )}
-                          
-                          <Button 
-                            variant="outline" 
-                            className="w-full flex items-center gap-2 hover:scale-105 transition-all duration-200 border-primary/30 hover:border-primary hover:bg-primary/10"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              window.open(`https://podcasts.apple.com/podcast/future-dance-anthems-with-mario/id1439656478`, '_blank');
-                            }}
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                            Apple Podcasts
-                          </Button>
-                          
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            className="w-full text-xs text-muted-foreground hover:text-primary"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleShareEpisode(episode, index);
-                            }}
-                          >
-                            Share Episode
-                          </Button>
-                        </div>
-                      </div>
-                    );
-
-                    const episodeCard = hasDedicatedPage ? (
-                      <Link 
-                        key={episode.guid || index} 
-                        to={`/episode/${episode.episodeNumber}`}
-                        className="block"
-                      >
-                        <Card className="card-cyber p-8 hover:scale-[1.01] transition-all duration-300 group cursor-pointer hover:border-neon/50">
-                          {cardContent}
-                        </Card>
-                      </Link>
-                    ) : (
-                      <Card key={episode.guid || index} className="card-cyber p-8 hover:scale-[1.01] transition-all duration-300 group">
-                        {cardContent}
-                      </Card>
-                    );
-
-                    return (
-                      <div key={episode.guid || index}>
-                        {episodeCard}
-                        {(index + 1) % 5 === 0 && index < episodes.length - 1 && (
-                          <div className="mt-8">
-                            <GoogleAds key={`shows-between-${index}`} slot={AD_SLOTS.BETWEEN_EPISODES} format="fluid" layout="in-article" />
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
             </div>
           </div>
         </section>

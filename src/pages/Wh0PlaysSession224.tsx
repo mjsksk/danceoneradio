@@ -34,7 +34,7 @@ const Wh0PlaysSession224 = () => {
   useEffect(() => {
     const img = new Image();
     img.onload = () => setBgLoaded(true);
-    img.src = '/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png';
+    img.src = '/images/wh0-plays-sessions-logo.jpg';
   }, []);
 
   const tracks: Track[] = [
@@ -68,9 +68,9 @@ const Wh0PlaysSession224 = () => {
           bgLoaded ? 'opacity-20' : 'opacity-0'
         }`}
         style={{
-          backgroundImage: 'url(/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png)',
+          backgroundImage: 'url(/images/wh0-plays-sessions-logo.jpg)',
           backgroundSize: 'cover',
-          backgroundPosition: 'top center',
+          backgroundPosition: 'center center',
           backgroundRepeat: 'no-repeat',
           willChange: 'transform',
           transform: 'translateZ(0)',
