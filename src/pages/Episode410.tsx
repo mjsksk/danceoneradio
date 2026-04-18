@@ -24,6 +24,7 @@ import Footer from '@/components/Footer';
 import SocialShare from '@/components/SocialShare';
 import SEO from '@/components/SEO';
 import GoogleAds from '@/components/GoogleAds';
+import { AD_SLOTS } from '@/config/adSlots';
 import EpisodeTracklist from '@/components/EpisodeTracklist';
 import { LoginPrompt } from '@/components/LoginPrompt';
 import { Link } from 'react-router-dom';
@@ -341,9 +342,10 @@ const Episode410 = () => {
           </div>
         </section>
 
-        <GoogleAds key="episode410-ad" slot="6777392184" />
+        <GoogleAds key={`episode${episodeNumber}-ad`} slot={AD_SLOTS.IN_CONTENT} />
 
         <EpisodeTracklist episodeNumber={episodeNumber} />
+        <GoogleAds key={`episode${episodeNumber}-tracklist-ad`} slot={AD_SLOTS.AFTER_TRACKLIST} format="rectangle" />
       </main>
 
       <Footer />
