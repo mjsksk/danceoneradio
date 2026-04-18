@@ -405,7 +405,8 @@ const Shows = () => {
               {/* Latest Episodes Column */}
               <div>
                 <h2 className="text-3xl md:text-4xl font-['Orbitron'] font-bold mb-8 text-center">
-                  <span className="text-neon-purple">LATEST EPISODES</span>
+                  <span className="text-neon">FUTURE DANCE ANTHEMS</span>{" "}
+                  <span className="text-neon-purple">WITH MARIO</span>
                 </h2>
 
                 {loading ? (
