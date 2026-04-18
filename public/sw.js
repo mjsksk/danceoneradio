@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dance-one-radio-v7';
-console.log('🔔 Service Worker loaded: v7');
+const CACHE_NAME = 'dance-one-radio-v8';
+console.log('🔔 Service Worker loaded: v8');
 const STATIC_ASSETS = [
   '/assets/dance-one-logo-DP6h_tTr.png',
   '/assets/hero-bg-B-ZqE77g.jpg',
@@ -9,6 +9,17 @@ const STATIC_ASSETS = [
   '/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png',
   '/lovable-uploads/f807b27f-9eaf-4d20-b3f5-4bad24538a4e.png'
 ];
+
+const CACHEABLE_ASSET_PATTERN = /\.(?:css|js|png|jpg|jpeg|svg|webp|gif|woff2?)$/i;
+
+function isCacheableAsset(requestUrl) {
+  const url = new URL(requestUrl);
+  return url.origin === self.location.origin && (
+    url.pathname.startsWith('/assets/') ||
+    url.pathname.startsWith('/lovable-uploads/') ||
+    CACHEABLE_ASSET_PATTERN.test(url.pathname)
+  );
+}
 
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
@@ -40,6 +51,12 @@ self.addEventListener('activate', (event) => {
     })
   );
   return self.clients.claim();
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 // Push event - handle incoming push notifications
@@ -124,6 +141,7 @@ self.addEventListener('notificationclick', (event) => {
 // Fetch event - serve from cache with fallback to network
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  const acceptsHtml = event.request.headers.get('accept')?.includes('text/html');
   
   if (event.request.url.includes('myradiostream.com') || 
       event.request.url.includes('api.allorigins.win') ||
@@ -132,49 +150,42 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (event.request.destination === 'document' || 
-      event.request.headers.get('accept')?.includes('text/html')) {
+  if (event.request.mode === 'navigate' || event.request.destination === 'document' || acceptsHtml) {
     event.respondWith(
-      fetch(event.request).catch(() => {
-        return caches.match('/index.html') || caches.match('/');
+      fetch(event.request, { cache: 'no-store' }).catch(async () => {
+        return caches.match('/') || caches.match('/index.html');
       })
     );
     return;
   }
 
+  if (!isCacheableAsset(event.request.url)) {
+    return;
+  }
+
   event.respondWith(
-    caches.match(event.request)
+    fetch(event.request)
       .then((response) => {
-        if (response) return response;
-        
-        return fetch(event.request)
-          .then((response) => {
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-            
-            if (event.request.url.includes('/assets/') || 
-                event.request.url.includes('/lovable-uploads/') ||
-                event.request.url.includes('.css') ||
-                event.request.url.includes('.js') ||
-                event.request.url.includes('.png') ||
-                event.request.url.includes('.jpg') ||
-                event.request.url.includes('.svg')) {
-              
-              const responseToCache = response.clone();
-              caches.open(CACHE_NAME)
-                .then((cache) => {
-                  cache.put(event.request, responseToCache);
-                });
-            }
-            
-            return response;
-          })
-          .catch(() => {
-            if (event.request.destination === 'image') {
-              return new Response('', { status: 204 });
-            }
+        if (response && response.status === 200 && response.type === 'basic') {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
           });
+        }
+
+        return response;
+      })
+      .catch(async () => {
+        const cachedResponse = await caches.match(event.request);
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+
+        if (event.request.destination === 'image') {
+          return new Response('', { status: 204 });
+        }
+
+        throw new Error(`Network request failed for ${event.request.url}`);
       })
   );
 });
