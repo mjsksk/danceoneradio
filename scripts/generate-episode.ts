@@ -254,8 +254,7 @@ const Episode${episode.number} = () => {
     return \`\${minutes}:\${seconds.toString().padStart(2, '0')}\`;
   };
 
-  // TODO: Import tracks from CSV after generation
-  const tracks: Track[] = [];
+
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
