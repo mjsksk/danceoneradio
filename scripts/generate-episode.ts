@@ -616,6 +616,7 @@ async function main() {
     // Update routing
     console.log('\n🔄 Updating routing configuration...');
     updateAppRouting(episode.number);
+    updateAnimatedRoutes(episode.number);
 
     // Update Shows page available episodes
     console.log('\n📝 Updating Shows.tsx available episodes...');
