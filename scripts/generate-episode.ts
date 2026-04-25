@@ -501,6 +501,30 @@ function updateAppRouting(episodeNumber: number): void {
   console.log('✓ Updated App.tsx routing');
 }
 
+function updateAnimatedRoutes(episodeNumber: number): void {
+  const filePath = path.join(process.cwd(), 'src', 'components', 'AnimatedRoutes.tsx');
+  let content = fs.readFileSync(filePath, 'utf-8');
+
+  // Add lazy import after the last Episode lazy import
+  const importLine = `const Episode${episodeNumber} = lazy(() => import('@/pages/Episode${episodeNumber}'));`;
+  const lazyMatches = content.match(/const Episode\d+ = lazy\(\(\) => import\('@\/pages\/Episode\d+'\)\);/g);
+  if (lazyMatches && !content.includes(importLine)) {
+    const last = lazyMatches[lazyMatches.length - 1];
+    content = content.replace(last, `${last}\n${importLine}`);
+  }
+
+  // Add route after the last Episode route
+  const routeLine = `        <Route path="/episode/${episodeNumber}" element={<PageTransition><Episode${episodeNumber} /></PageTransition>} />`;
+  const routeMatches = content.match(/\s+<Route path="\/episode\/\d+" element={<PageTransition><Episode\d+ \/><\/PageTransition>} \/>/g);
+  if (routeMatches && !content.includes(routeLine)) {
+    const last = routeMatches[routeMatches.length - 1];
+    content = content.replace(last, `${last}\n${routeLine}`);
+  }
+
+  fs.writeFileSync(filePath, content, 'utf-8');
+  console.log('✓ Updated AnimatedRoutes.tsx routing');
+}
+
 function updateShowsPageAvailableEpisodes(episodeNumber: number): void {
   const showsPath = path.join(process.cwd(), 'src', 'pages', 'Shows.tsx');
   let showsContent = fs.readFileSync(showsPath, 'utf-8');
