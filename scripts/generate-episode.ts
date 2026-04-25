@@ -127,7 +127,7 @@ function episodeExists(episodeNumber: number): boolean {
 
 function generateEpisodeFile(episode: Episode): string {
   const header = generateFileHeader(episode);
-  return `${header}import { ArrowLeft, Calendar, Clock, Music, Play, Pause, Apple } from 'lucide-react';
+  return `${header}import { ArrowLeft, Calendar, Clock, Play, Pause, Apple } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Navigation from '@/components/Navigation';
@@ -136,17 +136,12 @@ import SocialShare from '@/components/SocialShare';
 import SEO from '@/components/SEO';
 import GoogleAds from '@/components/GoogleAds';
 import { LoginPrompt } from '@/components/LoginPrompt';
+import EpisodeTracklist from '@/components/EpisodeTracklist';
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useListeningProgress } from '@/hooks/useListeningProgress';
 
-interface Track {
-  position: number;
-  title: string;
-  artist: string;
-  isUnreleased?: boolean;
-}
 
 const Episode${episode.number} = () => {
   const { user } = useAuth();
@@ -259,8 +254,7 @@ const Episode${episode.number} = () => {
     return \`\${minutes}:\${seconds.toString().padStart(2, '0')}\`;
   };
 
-  // TODO: Import tracks from CSV after generation
-  const tracks: Track[] = [];
+
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
@@ -463,57 +457,8 @@ const Episode${episode.number} = () => {
 
         <GoogleAds key="episode${episode.number}-ad" slot="6777392184" />
 
-        {/* Track Listing */}
-        <section className="py-12">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-2xl md:text-3xl font-['Orbitron'] font-bold mb-8 text-center">
-                <span className="text-neon-purple">Track Listing</span>
-              </h2>
-              
-              {tracks.length === 0 ? (
-                <Card className="card-cyber p-8 text-center">
-                  <p className="text-muted-foreground">
-                    Track listing will be added soon. Use the CSV importer in the admin panel to add tracks.
-                  </p>
-                </Card>
-              ) : (
-                <div className="grid gap-3">
-                  {tracks.map((track) => (
-                    <Card key={track.position} className="card-cyber p-4 hover:scale-[1.01] transition-all duration-200 group">
-                      <div className="flex items-center gap-4">
-                        {/* Track Number */}
-                        <div className="w-12 h-12 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full flex items-center justify-center text-neon font-['Orbitron'] font-bold text-sm">
-                          {track.position}
-                        </div>
-                        
-                        {/* Track Info */}
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-primary group-hover:text-neon transition-colors truncate">
-                            {track.title}
-                            {track.isUnreleased && (
-                              <span className="ml-2 px-2 py-1 bg-neon/20 text-neon text-xs rounded-full">
-                                UNRELEASED
-                              </span>
-                            )}
-                          </h3>
-                          <p className="text-sm text-muted-foreground truncate">
-                            {track.artist}
-                          </p>
-                        </div>
-                        
-                        {/* Music Icon */}
-                        <div className="w-8 h-8 flex items-center justify-center text-muted-foreground group-hover:text-neon-purple transition-colors">
-                          <Music className="w-4 h-4" />
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
+        <EpisodeTracklist episodeNumber={episodeNumber} />
+
       </main>
 
       <Footer />
@@ -554,6 +499,30 @@ function updateAppRouting(episodeNumber: number): void {
 
   fs.writeFileSync(appPath, appContent, 'utf-8');
   console.log('✓ Updated App.tsx routing');
+}
+
+function updateAnimatedRoutes(episodeNumber: number): void {
+  const filePath = path.join(process.cwd(), 'src', 'components', 'AnimatedRoutes.tsx');
+  let content = fs.readFileSync(filePath, 'utf-8');
+
+  // Add lazy import after the last Episode lazy import
+  const importLine = `const Episode${episodeNumber} = lazy(() => import('@/pages/Episode${episodeNumber}'));`;
+  const lazyMatches = content.match(/const Episode\d+ = lazy\(\(\) => import\('@\/pages\/Episode\d+'\)\);/g);
+  if (lazyMatches && !content.includes(importLine)) {
+    const last = lazyMatches[lazyMatches.length - 1];
+    content = content.replace(last, `${last}\n${importLine}`);
+  }
+
+  // Add route after the last Episode route
+  const routeLine = `        <Route path="/episode/${episodeNumber}" element={<PageTransition><Episode${episodeNumber} /></PageTransition>} />`;
+  const routeMatches = content.match(/\s+<Route path="\/episode\/\d+" element={<PageTransition><Episode\d+ \/><\/PageTransition>} \/>/g);
+  if (routeMatches && !content.includes(routeLine)) {
+    const last = routeMatches[routeMatches.length - 1];
+    content = content.replace(last, `${last}\n${routeLine}`);
+  }
+
+  fs.writeFileSync(filePath, content, 'utf-8');
+  console.log('✓ Updated AnimatedRoutes.tsx routing');
 }
 
 function updateShowsPageAvailableEpisodes(episodeNumber: number): void {
@@ -647,6 +616,7 @@ async function main() {
     // Update routing
     console.log('\n🔄 Updating routing configuration...');
     updateAppRouting(episode.number);
+    updateAnimatedRoutes(episode.number);
 
     // Update Shows page available episodes
     console.log('\n📝 Updating Shows.tsx available episodes...');
