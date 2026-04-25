@@ -544,6 +544,14 @@ const Shows = () => {
                   {(() => {
                     const guestShows = [
                       {
+                        number: 226,
+                        title: 'Wh0 Plays Sessions Episode 226',
+                        subtitle: '15 tracks • Mark Knight, Wh0, Cristoph, CASSIMM & more',
+                        link: '/show/wh0-plays-sessions/226',
+                        broadcastDate: '2026-04-24T18:00:00',
+                        genres: 'House • Tech House • Dance',
+                      },
+                      {
                         number: 225,
                         title: 'Wh0 Plays Sessions Episode 225',
                         subtitle: '14 tracks • Mark Knight, Wh0, Rue Jay, Joshwa & more',
