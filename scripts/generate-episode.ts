@@ -457,57 +457,8 @@ const Episode${episode.number} = () => {
 
         <GoogleAds key="episode${episode.number}-ad" slot="6777392184" />
 
-        {/* Track Listing */}
-        <section className="py-12">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-2xl md:text-3xl font-['Orbitron'] font-bold mb-8 text-center">
-                <span className="text-neon-purple">Track Listing</span>
-              </h2>
-              
-              {tracks.length === 0 ? (
-                <Card className="card-cyber p-8 text-center">
-                  <p className="text-muted-foreground">
-                    Track listing will be added soon. Use the CSV importer in the admin panel to add tracks.
-                  </p>
-                </Card>
-              ) : (
-                <div className="grid gap-3">
-                  {tracks.map((track) => (
-                    <Card key={track.position} className="card-cyber p-4 hover:scale-[1.01] transition-all duration-200 group">
-                      <div className="flex items-center gap-4">
-                        {/* Track Number */}
-                        <div className="w-12 h-12 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full flex items-center justify-center text-neon font-['Orbitron'] font-bold text-sm">
-                          {track.position}
-                        </div>
-                        
-                        {/* Track Info */}
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-primary group-hover:text-neon transition-colors truncate">
-                            {track.title}
-                            {track.isUnreleased && (
-                              <span className="ml-2 px-2 py-1 bg-neon/20 text-neon text-xs rounded-full">
-                                UNRELEASED
-                              </span>
-                            )}
-                          </h3>
-                          <p className="text-sm text-muted-foreground truncate">
-                            {track.artist}
-                          </p>
-                        </div>
-                        
-                        {/* Music Icon */}
-                        <div className="w-8 h-8 flex items-center justify-center text-muted-foreground group-hover:text-neon-purple transition-colors">
-                          <Music className="w-4 h-4" />
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
+        <EpisodeTracklist episodeNumber={episodeNumber} />
+
       </main>
 
       <Footer />
