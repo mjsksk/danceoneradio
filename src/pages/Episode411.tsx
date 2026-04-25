@@ -25,6 +25,7 @@ import SocialShare from '@/components/SocialShare';
 import SEO from '@/components/SEO';
 import GoogleAds from '@/components/GoogleAds';
 import { LoginPrompt } from '@/components/LoginPrompt';
+import EpisodeTracklist from '@/components/EpisodeTracklist';
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
