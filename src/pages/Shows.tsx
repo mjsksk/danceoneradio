@@ -38,6 +38,7 @@ const Shows = () => {
   // Use global audio player context
   const { playEpisode, pause, resume, isPlaying, episodeInfo, seek, audioRef: globalAudioRef } = useAudioPlayer();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const fetchEpisodes = async (retryCount = 0) => {
     const maxRetries = 3;
