@@ -505,15 +505,21 @@ const Shows = () => {
                       );
 
                       const episodeCard = hasDedicatedPage ? (
-                        <Link
+                        <Card
                           key={episode.guid || index}
-                          to={`/episode/${episode.episodeNumber}`}
-                          className="block"
+                          role="link"
+                          tabIndex={0}
+                          onClick={() => navigate(`/episode/${episode.episodeNumber}`)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              navigate(`/episode/${episode.episodeNumber}`);
+                            }
+                          }}
+                          className="card-cyber p-5 hover:scale-[1.01] transition-all duration-300 group cursor-pointer hover:border-neon/50"
                         >
-                          <Card className="card-cyber p-5 hover:scale-[1.01] transition-all duration-300 group cursor-pointer hover:border-neon/50">
-                            {cardContent}
-                          </Card>
-                        </Link>
+                          {cardContent}
+                        </Card>
                       ) : (
                         <Card key={episode.guid || index} className="card-cyber p-5 hover:scale-[1.01] transition-all duration-300 group">
                           {cardContent}
