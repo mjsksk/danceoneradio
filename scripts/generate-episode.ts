@@ -259,8 +259,8 @@ const Episode${episode.number} = () => {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
       <SEO 
-        title="Anthems of the week ${episode.number} - Future Dance Anthems with Mario | Dance One Radio"
-        description="${episode.description}"
+        title="Anthems of the Week ${episode.number} | Dance One Radio"
+        description="${episode.description.substring(0, 155)}"
         image="/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png"
         url={window.location.href}
       />
