@@ -155,7 +155,7 @@ const Episode411 = () => {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
       <SEO 
-        title="Anthems of the week 411 - Future Dance Anthems with Mario | Dance One Radio"
+        title="Anthems of the Week 411 | Dance One Radio"
         description="Anthems of the week"
         image="/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png"
         url={window.location.href}

@@ -131,7 +131,7 @@ const Episode390 = () => {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
       <SEO 
-        title="Anthems of the week 390 - Future Dance Anthems with Mario | Dance One Radio"
+        title="Anthems of the Week 390 | Dance One Radio"
         description="Episode 390 featuring 28 tracks of the latest electronic dance music, including exclusive unreleased tracks from top artists."
         image="/lovable-uploads/mario-show.jpg"
         url={window.location.href}

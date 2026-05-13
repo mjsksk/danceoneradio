@@ -1,0 +1,30 @@
+# Dance One Radio
+
+> Live 24/7 dance, electronic, trance, house, and EDM radio station with DJ mixes, weekly podcasts, news, and exclusive shows.
+
+Dance One Radio ("The Castle of Dance") streams electronic dance music around the clock and produces the weekly podcast "Anthems of the Week" hosted by Mario, plus guest mixes, EDM news, and a desktop player app.
+
+## Pages
+
+- [Home](/): Live radio player and featured content.
+- [Live Player](/player): Full-screen live stream player.
+- [Shows](/shows): Weekly podcasts, guest mixes, and episode archive.
+- [News](/news): EDM news — top stories, artists, festivals, industry.
+- [About](/about): Station history, mission, and team.
+- [Apps](/apps): Desktop and mobile player downloads.
+- [Downloads](/downloads): Windows desktop player installer.
+- [Merch](/merch): Official Dance One Radio merchandise.
+- [Contact](/contact): Contact form and demo submissions.
+- [Gallery](/gallery): Event and Love Parade photo galleries.
+- [Advertise](/advertise): Advertising and sponsorship info.
+- [Love](/love): Love Parade history and donations.
+
+## Episodes
+
+- [Latest episode](/episode/411): Anthems of the Week 411.
+- [Episode archive](/shows): Browse all weekly episodes.
+
+## Optional
+
+- [Privacy](/privacy)
+- [DMCA](/dmca)

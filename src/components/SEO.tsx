@@ -7,15 +7,17 @@ interface SEOProps {
   url?: string;
   type?: string;
   keywords?: string;
+  structuredData?: Record<string, any> | Record<string, any>[];
 }
 
 const SEO = ({ 
-  title = "Dance One Radio - The Castle of Dance | Live Electronic & Dance Music Stream",
-  description = "Listen to Dance One Radio - Live streaming the newest dance, electronic, trance, house, and EDM music 24/7. Your ultimate castle of dance music with DJ mixes, podcasts, and exclusive shows.",
+  title = "Dance One Radio | Live Electronic & Dance Music",
+  description = "Live 24/7 dance, electronic, trance, house, and EDM music. DJ mixes, podcasts, and exclusive shows from Dance One Radio.",
   image = "/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png",
   url = window.location.href,
   type = "website",
-  keywords = "dance music radio, electronic music stream, EDM radio, trance radio, house music, live DJ mixes, dance music podcast, online radio station"
+  keywords = "dance music radio, electronic music stream, EDM radio, trance radio, house music, live DJ mixes, dance music podcast, online radio station",
+  structuredData,
 }: SEOProps) => {
   useEffect(() => {
     // Update document title
@@ -83,33 +85,69 @@ const SEO = ({
         existingScript.remove();
       }
 
-      const script = document.createElement('script');
-      script.type = 'application/ld+json';
-      script.setAttribute('data-dynamic', 'true');
-      script.textContent = JSON.stringify({
+      const publisher = {
+        "@type": "RadioStation",
+        "name": "Dance One Radio",
+        "url": "https://danceoneradio.com",
+        "logo": window.location.origin + "/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
+      };
+
+      let payload: any = structuredData ?? {
         "@context": "https://schema.org",
         "@type": "WebPage",
         "name": title,
         "description": description,
         "url": url,
         "image": fullImageUrl,
-        "publisher": {
-          "@type": "RadioStation",
-          "name": "Dance One Radio",
-          "url": "https://danceoneradio.com",
-          "logo": window.location.origin + "/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
+        "publisher": publisher,
+      };
+
+      // Auto-emit richer schema for known route patterns when no override given
+      if (!structuredData) {
+        const path = (() => { try { return new URL(url).pathname; } catch { return ''; } })();
+        const episodeMatch = path.match(/^\/episode\/(\d+)/);
+        if (episodeMatch) {
+          payload = {
+            "@context": "https://schema.org",
+            "@type": "PodcastEpisode",
+            "name": title,
+            "description": description,
+            "url": url,
+            "image": fullImageUrl,
+            "episodeNumber": Number(episodeMatch[1]),
+            "partOfSeries": {
+              "@type": "PodcastSeries",
+              "name": "Future Dance Anthems with Mario",
+              "url": "https://danceoneradio.com/shows"
+            },
+            "publisher": publisher,
+          };
+        } else if (path.startsWith('/news') || path === '/shows') {
+          payload = {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": title,
+            "description": description,
+            "url": url,
+            "image": fullImageUrl,
+            "publisher": publisher,
+          };
         }
-      });
+      }
+
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.setAttribute('data-dynamic', 'true');
+      script.textContent = JSON.stringify(payload);
       document.head.appendChild(script);
     };
 
     addStructuredData();
 
     return () => {
-      // Reset to defaults when component unmounts
-      document.title = "Dance One Radio - The Castle of Dance | Live Electronic & Dance Music Stream";
+      document.title = "Dance One Radio | Live Electronic & Dance Music";
     };
-  }, [title, description, image, url, type, keywords]);
+  }, [title, description, image, url, type, keywords, structuredData]);
 
   return null; // This component doesn't render anything
 };

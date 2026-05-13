@@ -97,7 +97,7 @@ const Episode408 = () => {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
       <SEO 
-        title={`Anthems of the week ${episodeNumber} - Future Dance Anthems with Mario | Dance One Radio`}
+        title={`Anthems of the Week ${episodeNumber} | Dance One Radio`}
         description={`Episode ${episodeNumber} featuring the latest electronic dance music anthems. 22 tracks including Franky Rizardo, Fred again.., Kungs, Boys Noize, Chris Stussy, Sonny Fodera, Topic, and more.`}
         image="/lovable-uploads/mario-show.jpg"
         url={window.location.href}
