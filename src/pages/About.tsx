@@ -12,8 +12,8 @@ const About = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SEO 
-        title="About Dance One Radio - Electronic Dance Music Station"
-        description="Learn about Dance One Radio's history, mission, and the passionate team behind your favorite electronic dance music station. Discover our story and join our global community."
+        title="About Dance One Radio | EDM Station"
+        description="The story, mission, and team behind Dance One Radio — your 24/7 electronic dance music station and global community."
         keywords="about dance one radio, electronic dance music station, edm radio history, dance music community, mario dj, future dance anthems"
         type="website"
       />
