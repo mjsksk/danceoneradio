@@ -7,15 +7,17 @@ interface SEOProps {
   url?: string;
   type?: string;
   keywords?: string;
+  structuredData?: Record<string, any> | Record<string, any>[];
 }
 
 const SEO = ({ 
-  title = "Dance One Radio - The Castle of Dance | Live Electronic & Dance Music Stream",
-  description = "Listen to Dance One Radio - Live streaming the newest dance, electronic, trance, house, and EDM music 24/7. Your ultimate castle of dance music with DJ mixes, podcasts, and exclusive shows.",
+  title = "Dance One Radio | Live Electronic & Dance Music",
+  description = "Live 24/7 dance, electronic, trance, house, and EDM music. DJ mixes, podcasts, and exclusive shows from Dance One Radio.",
   image = "/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png",
   url = window.location.href,
   type = "website",
-  keywords = "dance music radio, electronic music stream, EDM radio, trance radio, house music, live DJ mixes, dance music podcast, online radio station"
+  keywords = "dance music radio, electronic music stream, EDM radio, trance radio, house music, live DJ mixes, dance music podcast, online radio station",
+  structuredData,
 }: SEOProps) => {
   useEffect(() => {
     // Update document title
