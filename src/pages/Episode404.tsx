@@ -103,7 +103,7 @@ const Episode404 = () => {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
       <SEO 
-        title={`Anthems of the week ${episodeNumber} - Future Dance Anthems with Mario | Dance One Radio`}
+        title={`Anthems of the Week ${episodeNumber} | Dance One Radio`}
         description={`Episode ${episodeNumber} featuring the latest electronic dance music anthems. 25 tracks including Swimming Paul, French Pulse, Trilucid, FISHER, Christian Burns, MK, and more.`}
         image="/lovable-uploads/mario-show.jpg"
         url={window.location.href}

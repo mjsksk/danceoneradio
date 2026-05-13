@@ -94,7 +94,7 @@ const Episode403 = () => {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
       <SEO 
-        title={`Anthems of the week ${episodeNumber} - Future Dance Anthems with Mario | Dance One Radio`}
+        title={`Anthems of the Week ${episodeNumber} | Dance One Radio`}
         description={`Episode ${episodeNumber} featuring the latest electronic dance music anthems. 16 tracks including Nala, Josh Baker, Dusky, CHANEY, Kaskade, and more.`}
         image="/lovable-uploads/mario-show.jpg"
         url={window.location.href}

@@ -121,7 +121,7 @@ const Episode394 = () => {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
       <SEO 
-        title="Anthems of the week 394 - Future Dance Anthems with Mario | Dance One Radio"
+        title="Anthems of the Week 394 | Dance One Radio"
         description="Episode 394 featuring 19 tracks of the latest electronic dance music, including tracks from CamelPhat, Kaz James, Nic Fanciulli, and more."
         image="/lovable-uploads/mario-show.jpg"
         url={window.location.href}
