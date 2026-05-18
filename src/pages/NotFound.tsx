@@ -109,6 +109,19 @@ const NotFound = () => {
     setSuggestions(smartSuggestions.slice(0, 6));
   }, [location.pathname]);
 
+  // Tell crawlers not to index 404s (prevents "Soft 404" GSC reports)
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="robots"]') || (() => {
+      const m = document.createElement('meta');
+      m.setAttribute('name', 'robots');
+      document.head.appendChild(m);
+      return m;
+    })();
+    const prev = meta.getAttribute('content');
+    meta.setAttribute('content', 'noindex, follow');
+    return () => { if (prev) meta.setAttribute('content', prev); };
+  }, []);
+
   return (
     <>
       <SEO 

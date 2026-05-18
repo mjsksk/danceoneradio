@@ -14,12 +14,16 @@ const SEO = ({
   title = "Dance One Radio | Live Electronic & Dance Music",
   description = "Live 24/7 dance, electronic, trance, house, and EDM music. DJ mixes, podcasts, and exclusive shows from Dance One Radio.",
   image = "/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png",
-  url = window.location.href,
+  url,
   type = "website",
   keywords = "dance music radio, electronic music stream, EDM radio, trance radio, house music, live DJ mixes, dance music podcast, online radio station",
   structuredData,
 }: SEOProps) => {
   useEffect(() => {
+    // Always canonicalize to the primary domain regardless of which mirror domain served the page.
+    const CANONICAL_HOST = 'https://danceoneradio.com';
+    const resolvedUrl = url ?? (CANONICAL_HOST + window.location.pathname + window.location.search);
+
     // Update document title
     document.title = title;
 
@@ -55,7 +59,7 @@ const SEO = ({
     updateMetaTag('meta[property="og:title"]', title);
     updateMetaTag('meta[property="og:description"]', description);
     updateMetaTag('meta[property="og:image"]', fullImageUrl);
-    updateMetaTag('meta[property="og:url"]', url);
+    updateMetaTag('meta[property="og:url"]', resolvedUrl);
     updateMetaTag('meta[property="og:type"]', type);
     updateMetaTag('meta[property="og:site_name"]', "Dance One Radio");
     
@@ -76,7 +80,7 @@ const SEO = ({
       canonical.setAttribute('rel', 'canonical');
       document.head.appendChild(canonical);
     }
-    canonical.setAttribute('href', url);
+    canonical.setAttribute('href', resolvedUrl);
 
     // Add structured data if not exists
     const addStructuredData = () => {
@@ -97,14 +101,14 @@ const SEO = ({
         "@type": "WebPage",
         "name": title,
         "description": description,
-        "url": url,
+        "url": resolvedUrl,
         "image": fullImageUrl,
         "publisher": publisher,
       };
 
       // Auto-emit richer schema for known route patterns when no override given
       if (!structuredData) {
-        const path = (() => { try { return new URL(url).pathname; } catch { return ''; } })();
+        const path = (() => { try { return new URL(resolvedUrl).pathname; } catch { return ''; } })();
         const episodeMatch = path.match(/^\/episode\/(\d+)/);
         if (episodeMatch) {
           payload = {
@@ -112,7 +116,7 @@ const SEO = ({
             "@type": "PodcastEpisode",
             "name": title,
             "description": description,
-            "url": url,
+            "url": resolvedUrl,
             "image": fullImageUrl,
             "episodeNumber": Number(episodeMatch[1]),
             "partOfSeries": {
@@ -128,7 +132,7 @@ const SEO = ({
             "@type": "CollectionPage",
             "name": title,
             "description": description,
-            "url": url,
+            "url": resolvedUrl,
             "image": fullImageUrl,
             "publisher": publisher,
           };
