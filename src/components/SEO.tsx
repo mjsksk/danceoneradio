@@ -20,6 +20,10 @@ const SEO = ({
   structuredData,
 }: SEOProps) => {
   useEffect(() => {
+    // Always canonicalize to the primary domain regardless of which mirror domain served the page.
+    const CANONICAL_HOST = 'https://danceoneradio.com';
+    const resolvedUrl = url ?? (CANONICAL_HOST + window.location.pathname + window.location.search);
+
     // Update document title
     document.title = title;
 
