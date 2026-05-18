@@ -101,14 +101,14 @@ const SEO = ({
         "@type": "WebPage",
         "name": title,
         "description": description,
-        "url": url,
+        "url": resolvedUrl,
         "image": fullImageUrl,
         "publisher": publisher,
       };
 
       // Auto-emit richer schema for known route patterns when no override given
       if (!structuredData) {
-        const path = (() => { try { return new URL(url).pathname; } catch { return ''; } })();
+        const path = (() => { try { return new URL(resolvedUrl).pathname; } catch { return ''; } })();
         const episodeMatch = path.match(/^\/episode\/(\d+)/);
         if (episodeMatch) {
           payload = {
@@ -116,7 +116,7 @@ const SEO = ({
             "@type": "PodcastEpisode",
             "name": title,
             "description": description,
-            "url": url,
+            "url": resolvedUrl,
             "image": fullImageUrl,
             "episodeNumber": Number(episodeMatch[1]),
             "partOfSeries": {
@@ -132,7 +132,7 @@ const SEO = ({
             "@type": "CollectionPage",
             "name": title,
             "description": description,
-            "url": url,
+            "url": resolvedUrl,
             "image": fullImageUrl,
             "publisher": publisher,
           };
