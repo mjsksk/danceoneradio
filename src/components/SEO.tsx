@@ -59,7 +59,7 @@ const SEO = ({
     updateMetaTag('meta[property="og:title"]', title);
     updateMetaTag('meta[property="og:description"]', description);
     updateMetaTag('meta[property="og:image"]', fullImageUrl);
-    updateMetaTag('meta[property="og:url"]', url);
+    updateMetaTag('meta[property="og:url"]', resolvedUrl);
     updateMetaTag('meta[property="og:type"]', type);
     updateMetaTag('meta[property="og:site_name"]', "Dance One Radio");
     
@@ -80,7 +80,7 @@ const SEO = ({
       canonical.setAttribute('rel', 'canonical');
       document.head.appendChild(canonical);
     }
-    canonical.setAttribute('href', url);
+    canonical.setAttribute('href', resolvedUrl);
 
     // Add structured data if not exists
     const addStructuredData = () => {
