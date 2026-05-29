@@ -9,6 +9,7 @@ interface StreamMetadata {
 
 interface Track {
   id: string;
+  stableKey: string;
   title: string;
   artist: string;
   duration: string;
@@ -278,6 +279,7 @@ export class RadioStreamService {
       // Convert database records to Track interface, limit to 10
       const historyTracks: Track[] = uniqueTracks.slice(0, 10).map((track) => ({
         id: track.id,
+        stableKey: `${track.artist}::${track.title}::${track.played_at}`,
         title: track.title,
         artist: track.artist,
         duration: track.duration || this.generateRandomDuration(),
@@ -348,6 +350,7 @@ export class RadioStreamService {
                     
                     tracks.push({
                       id: String(trackId++),
+                      stableKey: `${artist}::${title}::${playedTime.toISOString()}`,
                       title: title,
                       artist: artist,
                       duration: this.generateRandomDuration(),
@@ -390,6 +393,7 @@ export class RadioStreamService {
               
               tracks.push({
                 id: String(trackId++),
+                stableKey: `${artist}::${title}::${playedTime.toISOString()}`,
                 title,
                 artist,
                 duration: this.generateRandomDuration(),
@@ -425,6 +429,7 @@ export class RadioStreamService {
                 
                 tracks.push({
                   id: String(trackId++),
+                  stableKey: `${artist}::${title}::${playedTime.toISOString()}`,
                   title,
                   artist,
                   duration: this.generateRandomDuration(),
