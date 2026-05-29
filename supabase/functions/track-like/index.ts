@@ -91,11 +91,14 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Fire-and-forget email to admins (only on like, to avoid spam)
+    // Send admin notification email (only on like). Await to ensure delivery
+    // before the edge runtime shuts down — fire-and-forget gets cancelled.
     if (action === "like") {
-      emailAdmins(supabase, title, artist, pagePath).catch((e) =>
-        console.error("emailAdmins error:", e)
-      );
+      try {
+        await emailAdmins(supabase, title, artist, pagePath);
+      } catch (e) {
+        console.error("emailAdmins error:", e);
+      }
     }
 
     return new Response(JSON.stringify({ ok: true }), {
