@@ -58,3 +58,6 @@ verify_jwt = false
 verify_jwt = false
 [functions.track-preview-play]
 verify_jwt = false
+
+[functions.track-like]
+verify_jwt = false

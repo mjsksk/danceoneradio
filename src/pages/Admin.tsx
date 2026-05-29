@@ -10,6 +10,7 @@ import NewsletterCampaign from "@/components/admin/NewsletterCampaign";
 import ManualSubscriberAdd from "@/components/admin/ManualSubscriberAdd";
 import ListenerAnalytics from "@/components/admin/ListenerAnalytics";
 import TrackPlayAnalytics from "@/components/admin/TrackPlayAnalytics";
+import TrackLikeAnalytics from "@/components/admin/TrackLikeAnalytics";
 import VisitorAnalytics from "@/components/admin/VisitorAnalytics";
 import { PushNotificationComposer } from "@/components/admin/PushNotificationComposer";
 import { PushDiagnostics } from "@/components/admin/PushDiagnostics";
@@ -49,6 +50,7 @@ const Admin = () => {
             </Card>
 
             <TrackPlayAnalytics />
+            <TrackLikeAnalytics />
             <PushDiagnostics />
             <PushNotificationComposer />
             <NotificationHistory />
