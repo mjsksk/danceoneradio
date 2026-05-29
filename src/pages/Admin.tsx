@@ -50,6 +50,7 @@ const Admin = () => {
             </Card>
 
             <TrackPlayAnalytics />
+            <TrackLikeAnalytics />
             <PushDiagnostics />
             <PushNotificationComposer />
             <NotificationHistory />
