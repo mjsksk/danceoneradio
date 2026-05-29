@@ -8,6 +8,7 @@ import stationLogo from '@/assets/dance-one-logo.png';
 
 interface Track {
   id: string;
+  stableKey: string;
   title: string;
   artist: string;
   duration: string;
@@ -30,6 +31,8 @@ const TracksSection = () => {
   const [previewErrors, setPreviewErrors] = useState<Record<string, string>>({});
   const [audioRef, setAudioRef] = useState<HTMLAudioElement | null>(null);
   const [likedTracks, setLikedTracks] = useState<Set<string>>(new Set());
+
+  const getTrackLikeKey = (track: Track) => track.stableKey || `${track.artist}::${track.title}::${track.playedAt}`;
   
 
   // Initialize audio element and load liked tracks
@@ -353,13 +356,14 @@ const TracksSection = () => {
   };
 
   const handleLike = (track: Track) => {
+    const likeKey = getTrackLikeKey(track);
     const newLikedTracks = new Set(likedTracks);
-    const isLiking = !likedTracks.has(track.id);
+    const isLiking = !likedTracks.has(likeKey);
 
     if (isLiking) {
-      newLikedTracks.add(track.id);
+      newLikedTracks.add(likeKey);
     } else {
-      newLikedTracks.delete(track.id);
+      newLikedTracks.delete(likeKey);
     }
 
     setLikedTracks(newLikedTracks);
@@ -405,7 +409,7 @@ const TracksSection = () => {
           ) : (
             tracks.filter(track => !track.title.includes("Dance One Radio") && !track.artist.includes("Dance One Radio")).map((track, index) => (
             <div
-              key={track.id}
+              key={track.stableKey}
               className="card-cyber p-6 animate-fade-in group"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
@@ -558,7 +562,7 @@ const TracksSection = () => {
                        variant="ghost"
                        size="icon"
                        className={`transition-colors ${
-                         likedTracks.has(track.id)
+                         likedTracks.has(getTrackLikeKey(track))
                            ? 'text-red-400 hover:text-red-500 bg-red-400/20'
                            : 'text-muted-foreground hover:text-red-400 hover:bg-red-400/20'
                        }`}
@@ -567,9 +571,9 @@ const TracksSection = () => {
                          e.stopPropagation();
                          handleLike(track);
                        }}
-                       title={likedTracks.has(track.id) ? 'Remove from favorites' : 'Add to favorites'}
+                        title={likedTracks.has(getTrackLikeKey(track)) ? 'Remove from favorites' : 'Add to favorites'}
                      >
-                       <Heart className={`w-4 h-4 ${likedTracks.has(track.id) ? 'fill-current' : ''}`} />
+                        <Heart className={`w-4 h-4 ${likedTracks.has(getTrackLikeKey(track)) ? 'fill-current' : ''}`} />
                      </Button>
                      <Button
                        variant="ghost"
