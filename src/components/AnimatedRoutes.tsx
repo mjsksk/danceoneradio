@@ -63,6 +63,7 @@ const Wh0PlaysSession223 = lazy(() => import('@/pages/Wh0PlaysSession223'));
 const Wh0PlaysSession224 = lazy(() => import('@/pages/Wh0PlaysSession224'));
 const Wh0PlaysSession225 = lazy(() => import('@/pages/Wh0PlaysSession225'));
 const Wh0PlaysSession226 = lazy(() => import('@/pages/Wh0PlaysSession226'));
+const Wh0PlaysSession230 = lazy(() => import('@/pages/Wh0PlaysSession230'));
 const SongRequests = lazy(() => import('@/pages/SongRequests'));
 
 export function AnimatedRoutes() {
@@ -127,6 +128,7 @@ export function AnimatedRoutes() {
         <Route path="/show/wh0-plays-sessions/224" element={<PageTransition><Wh0PlaysSession224 /></PageTransition>} />
         <Route path="/show/wh0-plays-sessions/225" element={<PageTransition><Wh0PlaysSession225 /></PageTransition>} />
         <Route path="/show/wh0-plays-sessions/226" element={<PageTransition><Wh0PlaysSession226 /></PageTransition>} />
+        <Route path="/show/wh0-plays-sessions/230" element={<PageTransition><Wh0PlaysSession230 /></PageTransition>} />
         <Route path="/requests" element={<PageTransition><SongRequests /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
