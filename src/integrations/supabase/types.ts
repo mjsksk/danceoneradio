@@ -695,6 +695,51 @@ export type Database = {
         }
         Relationships: []
       }
+      track_likes: {
+        Row: {
+          action: string
+          artist: string
+          country: string | null
+          country_code: string | null
+          id: string
+          liked_at: string
+          page_path: string | null
+          title: string
+          track_history_id: string | null
+          user_agent: string | null
+          user_id: string | null
+          visitor_hash: string
+        }
+        Insert: {
+          action?: string
+          artist: string
+          country?: string | null
+          country_code?: string | null
+          id?: string
+          liked_at?: string
+          page_path?: string | null
+          title: string
+          track_history_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          visitor_hash: string
+        }
+        Update: {
+          action?: string
+          artist?: string
+          country?: string | null
+          country_code?: string | null
+          id?: string
+          liked_at?: string
+          page_path?: string | null
+          title?: string
+          track_history_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          visitor_hash?: string
+        }
+        Relationships: []
+      }
       track_preview_plays: {
         Row: {
           artist: string
@@ -826,6 +871,7 @@ export type Database = {
       cleanup_old_request_logs: { Args: never; Returns: undefined }
       cleanup_old_site_visits: { Args: never; Returns: undefined }
       cleanup_old_subscriber_tracking_data: { Args: never; Returns: undefined }
+      cleanup_old_track_likes: { Args: never; Returns: undefined }
       cleanup_old_track_preview_plays: { Args: never; Returns: undefined }
       cleanup_old_unsubscribe_attempts: { Args: never; Returns: undefined }
       get_download_stats: {
@@ -887,6 +933,24 @@ export type Database = {
         Returns: {
           is_active: boolean
           subscribed_at: string
+        }[]
+      }
+      get_track_like_analytics: {
+        Args: { end_date?: string; start_date?: string }
+        Returns: {
+          artist: string
+          last_liked: string
+          title: string
+          total_likes: number
+          unique_listeners: number
+        }[]
+      }
+      get_track_like_summary: {
+        Args: { end_date?: string; start_date?: string }
+        Returns: {
+          top_country: string
+          total_likes: number
+          unique_listeners: number
         }[]
       }
       get_track_play_analytics: {
