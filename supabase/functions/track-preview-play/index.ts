@@ -99,6 +99,12 @@ Deno.serve(async (req) => {
       console.error("notifyAdmins error:", e)
     );
 
+    // Fire-and-forget: email notify admins
+    emailAdmins(supabase, title, artist, pagePath).catch((e) =>
+      console.error("emailAdmins error:", e)
+    );
+
+
     return new Response(JSON.stringify({ ok: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
