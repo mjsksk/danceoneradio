@@ -176,6 +176,24 @@ const TracksSection = () => {
     };
   }, []);
 
+  const recentlyTrackedRef = useRef<Map<number, number>>(new Map());
+
+  const recordPreviewPlay = (track: Track) => {
+    const now = Date.now();
+    const last = recentlyTrackedRef.current.get(track.id) ?? 0;
+    if (now - last < 5000) return; // debounce 5s per track
+    recentlyTrackedRef.current.set(track.id, now);
+    supabase.functions
+      .invoke('track-preview-play', {
+        body: {
+          title: track.title,
+          artist: track.artist,
+          pagePath: typeof window !== 'undefined' ? window.location.pathname : null,
+        },
+      })
+      .catch((err) => console.warn('🎵 Failed to record preview play:', err));
+  };
+
   const handlePlayPause = async (trackId: number) => {
     if (!audioRef) return;
 
@@ -195,6 +213,8 @@ const TracksSection = () => {
           await audioRef.play();
           setPlayingTrack(trackId);
           console.log(`🎵 Playing Apple Music preview for track ${trackId}`);
+          const track = tracks.find(t => t.id === trackId);
+          if (track) recordPreviewPlay(track);
         } catch (error) {
           console.error('Failed to play Apple Music preview:', error);
           setPlayingTrack(null);
@@ -203,6 +223,8 @@ const TracksSection = () => {
         console.log(`🎵 No Apple Music preview available for track ${trackId}`);
         // For now, just show visual feedback without playing audio
         setPlayingTrack(trackId);
+        const track = tracks.find(t => t.id === trackId);
+        if (track) recordPreviewPlay(track);
         setTimeout(() => setPlayingTrack(null), 3000); // Auto-stop after 3 seconds
       }
     }
