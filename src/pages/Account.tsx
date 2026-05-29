@@ -367,7 +367,7 @@ export default function Account() {
                   <h1 className="text-3xl font-bold text-foreground">Account</h1>
                   <p className="text-muted-foreground">Manage your profile and admin tools</p>
                 </div>
-                <Tabs defaultValue="account" className="w-full">
+                <Tabs defaultValue={isAdmin ? "admin" : "account"} className="w-full">
                   <TabsList className="mb-6">
                     <TabsTrigger value="account">Account</TabsTrigger>
                     <TabsTrigger value="admin" className="flex items-center gap-1.5">
