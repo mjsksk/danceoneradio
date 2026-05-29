@@ -7,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import stationLogo from '@/assets/dance-one-logo.png';
 
 interface Track {
-  id: number;
+  id: string;
   title: string;
   artist: string;
   duration: string;
@@ -19,17 +19,17 @@ interface Track {
 }
 
 const TracksSection = () => {
-  const [playingTrack, setPlayingTrack] = useState<number | null>(null);
+  const [playingTrack, setPlayingTrack] = useState<string | null>(null);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [logoError, setLogoError] = useState<{[key: number]: boolean}>({});
-  const [albumArt, setAlbumArt] = useState<{[key: number]: string | null}>({});
-  const [previewUrls, setPreviewUrls] = useState<{[key: number]: string | null}>({});
-  const [loadingPreviews, setLoadingPreviews] = useState<{[key: number]: boolean}>({});
-  const [previewErrors, setPreviewErrors] = useState<{[key: number]: string}>({});
+  const [logoError, setLogoError] = useState<Record<string, boolean>>({});
+  const [albumArt, setAlbumArt] = useState<Record<string, string | null>>({});
+  const [previewUrls, setPreviewUrls] = useState<Record<string, string | null>>({});
+  const [loadingPreviews, setLoadingPreviews] = useState<Record<string, boolean>>({});
+  const [previewErrors, setPreviewErrors] = useState<Record<string, string>>({});
   const [audioRef, setAudioRef] = useState<HTMLAudioElement | null>(null);
-  const [likedTracks, setLikedTracks] = useState<Set<number>>(new Set());
+  const [likedTracks, setLikedTracks] = useState<Set<string>>(new Set());
   
 
   // Initialize audio element and load liked tracks
@@ -44,8 +44,8 @@ const TracksSection = () => {
     const savedLikes = localStorage.getItem('likedTracks');
     if (savedLikes) {
       try {
-        const likedTrackIds = JSON.parse(savedLikes);
-        setLikedTracks(new Set(likedTrackIds));
+         const likedTrackIds = JSON.parse(savedLikes);
+         setLikedTracks(new Set((Array.isArray(likedTrackIds) ? likedTrackIds : []).map(String)));
       } catch (error) {
         console.error('Failed to load liked tracks:', error);
       }
@@ -176,7 +176,7 @@ const TracksSection = () => {
     };
   }, []);
 
-  const recentlyTrackedRef = useRef<Map<number, number>>(new Map());
+  const recentlyTrackedRef = useRef<Map<string, number>>(new Map());
 
   const recordPreviewPlay = (track: Track) => {
     const now = Date.now();
@@ -194,7 +194,7 @@ const TracksSection = () => {
       .catch((err) => console.warn('🎵 Failed to record preview play:', err));
   };
 
-  const handlePlayPause = async (trackId: number) => {
+  const handlePlayPause = async (trackId: string) => {
     if (!audioRef) return;
 
     if (playingTrack === trackId) {
@@ -372,6 +372,7 @@ const TracksSection = () => {
           title: track.title,
           artist: track.artist,
           action: isLiking ? 'like' : 'unlike',
+          trackHistoryId: track.id,
           pagePath: window.location.pathname,
         },
       })
@@ -561,7 +562,11 @@ const TracksSection = () => {
                            ? 'text-red-400 hover:text-red-500 bg-red-400/20'
                            : 'text-muted-foreground hover:text-red-400 hover:bg-red-400/20'
                        }`}
-                       onClick={() => handleLike(track)}
+                       onClick={(e) => {
+                         e.preventDefault();
+                         e.stopPropagation();
+                         handleLike(track);
+                       }}
                        title={likedTracks.has(track.id) ? 'Remove from favorites' : 'Add to favorites'}
                      >
                        <Heart className={`w-4 h-4 ${likedTracks.has(track.id) ? 'fill-current' : ''}`} />

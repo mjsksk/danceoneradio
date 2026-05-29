@@ -8,7 +8,7 @@ interface StreamMetadata {
 }
 
 interface Track {
-  id: number;
+  id: string;
   title: string;
   artist: string;
   duration: string;
@@ -276,8 +276,8 @@ export class RadioStreamService {
       console.log('✅ Unique tracks after deduplication:', uniqueTracks.length);
 
       // Convert database records to Track interface, limit to 10
-      const historyTracks: Track[] = uniqueTracks.slice(0, 10).map((track, index) => ({
-        id: index + 1,
+      const historyTracks: Track[] = uniqueTracks.slice(0, 10).map((track) => ({
+        id: track.id,
         title: track.title,
         artist: track.artist,
         duration: track.duration || this.generateRandomDuration(),
@@ -347,7 +347,7 @@ export class RadioStreamService {
                     playedTime.setMinutes(playedTime.getMinutes() - tracks.length * 5);
                     
                     tracks.push({
-                      id: trackId++,
+                      id: String(trackId++),
                       title: title,
                       artist: artist,
                       duration: this.generateRandomDuration(),
@@ -389,7 +389,7 @@ export class RadioStreamService {
               playedTime.setMinutes(playedTime.getMinutes() - tracks.length * 5);
               
               tracks.push({
-                id: trackId++,
+                id: String(trackId++),
                 title,
                 artist,
                 duration: this.generateRandomDuration(),
@@ -424,7 +424,7 @@ export class RadioStreamService {
                 playedTime.setMinutes(playedTime.getMinutes() - tracks.length * 5);
                 
                 tracks.push({
-                  id: trackId++,
+                  id: String(trackId++),
                   title,
                   artist,
                   duration: this.generateRandomDuration(),
