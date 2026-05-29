@@ -99,6 +99,12 @@ Deno.serve(async (req) => {
       console.error("notifyAdmins error:", e)
     );
 
+    // Fire-and-forget: email notify admins
+    emailAdmins(supabase, title, artist, pagePath).catch((e) =>
+      console.error("emailAdmins error:", e)
+    );
+
+
     return new Response(JSON.stringify({ ok: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
@@ -166,3 +172,81 @@ async function notifyAdmins(
     }),
   );
 }
+
+async function emailAdmins(
+  supabase: ReturnType<typeof createClient>,
+  title: string,
+  artist: string,
+  pagePath: string | null,
+) {
+  const resendKey = Deno.env.get("RESEND_API_KEY");
+  if (!resendKey) {
+    console.warn("RESEND_API_KEY missing, skipping admin email");
+    return;
+  }
+
+  // Collect admin emails from profiles joined with user_roles
+  const { data: admins, error: adminErr } = await supabase
+    .from("user_roles")
+    .select("user_id")
+    .eq("role", "admin");
+  if (adminErr || !admins?.length) return;
+
+  const adminIds = admins.map((a: { user_id: string }) => a.user_id);
+  const { data: profiles, error: profErr } = await supabase
+    .from("profiles")
+    .select("email")
+    .in("id", adminIds);
+  if (profErr) {
+    console.error("profiles fetch error:", profErr);
+  }
+
+  const emails = new Set<string>();
+  for (const p of profiles ?? []) {
+    if (p?.email) emails.add(p.email as string);
+  }
+  // Fallback / additional ADMIN_EMAIL secret
+  const adminEmailSecret = Deno.env.get("ADMIN_EMAIL");
+  if (adminEmailSecret) emails.add(adminEmailSecret);
+
+  if (!emails.size) return;
+
+  const safeTitle = title.replace(/[<>]/g, "");
+  const safeArtist = artist.replace(/[<>]/g, "");
+  const safePath = (pagePath || "/").replace(/[<>"']/g, "");
+
+  const subject = `🎧 Track preview played: ${safeTitle} — ${safeArtist}`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px;">
+      <h2 style="color:#222;margin:0 0 12px;">New track preview played</h2>
+      <p style="margin:6px 0;"><strong>Title:</strong> ${safeTitle}</p>
+      <p style="margin:6px 0;"><strong>Artist:</strong> ${safeArtist}</p>
+      <p style="margin:6px 0;"><strong>Page:</strong> ${safePath}</p>
+      <p style="margin:6px 0;"><strong>Time:</strong> ${new Date().toISOString()}</p>
+      <hr style="margin:20px 0;border:none;border-top:1px solid #eee;" />
+      <p style="font-size:12px;color:#888;">
+        Automated notification from Dance One Radio.
+      </p>
+    </div>
+  `;
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${resendKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "Dance One Radio <noreply@danceoneradio.com>",
+      to: Array.from(emails),
+      subject,
+      html,
+    }),
+  });
+
+  if (!res.ok) {
+    const txt = await res.text().catch(() => "");
+    console.error("Resend admin email error:", res.status, txt);
+  }
+}
+
