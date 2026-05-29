@@ -555,7 +555,7 @@ const Shows = () => {
                         title: 'Wh0 Plays Sessions Episode 230',
                         subtitle: '14 tracks • Wh0, Rue Jay, Jewel Kid, Mercer, LEFTI & more',
                         link: '/show/wh0-plays-sessions/230',
-                        broadcastDate: '2026-05-22T18:00:00',
+                        broadcastDate: '2026-05-29T18:00:00',
                         genres: 'House • Tech House • Dance',
                       },
                       {
