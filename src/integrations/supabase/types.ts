@@ -692,6 +692,48 @@ export type Database = {
         }
         Relationships: []
       }
+      track_preview_plays: {
+        Row: {
+          artist: string
+          country: string | null
+          country_code: string | null
+          id: string
+          page_path: string | null
+          played_at: string
+          title: string
+          track_history_id: string | null
+          user_agent: string | null
+          user_id: string | null
+          visitor_hash: string
+        }
+        Insert: {
+          artist: string
+          country?: string | null
+          country_code?: string | null
+          id?: string
+          page_path?: string | null
+          played_at?: string
+          title: string
+          track_history_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          visitor_hash: string
+        }
+        Update: {
+          artist?: string
+          country?: string | null
+          country_code?: string | null
+          id?: string
+          page_path?: string | null
+          played_at?: string
+          title?: string
+          track_history_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          visitor_hash?: string
+        }
+        Relationships: []
+      }
       unsubscribe_attempts: {
         Row: {
           attempted_at: string
@@ -781,6 +823,7 @@ export type Database = {
       cleanup_old_request_logs: { Args: never; Returns: undefined }
       cleanup_old_site_visits: { Args: never; Returns: undefined }
       cleanup_old_subscriber_tracking_data: { Args: never; Returns: undefined }
+      cleanup_old_track_preview_plays: { Args: never; Returns: undefined }
       cleanup_old_unsubscribe_attempts: { Args: never; Returns: undefined }
       get_download_stats: {
         Args: { end_date?: string; start_date?: string }
@@ -841,6 +884,24 @@ export type Database = {
         Returns: {
           is_active: boolean
           subscribed_at: string
+        }[]
+      }
+      get_track_play_analytics: {
+        Args: { end_date?: string; start_date?: string }
+        Returns: {
+          artist: string
+          last_played: string
+          title: string
+          total_plays: number
+          unique_listeners: number
+        }[]
+      }
+      get_track_play_summary: {
+        Args: { end_date?: string; start_date?: string }
+        Returns: {
+          top_country: string
+          total_plays: number
+          unique_listeners: number
         }[]
       }
       get_visitor_analytics: {

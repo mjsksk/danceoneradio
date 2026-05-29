@@ -56,3 +56,5 @@ verify_jwt = false
 
 [functions.sam-mark-imported]
 verify_jwt = false
+[functions.track-preview-play]
+verify_jwt = false
