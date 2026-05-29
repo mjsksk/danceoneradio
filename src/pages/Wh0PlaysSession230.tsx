@@ -115,7 +115,7 @@ const Wh0PlaysSession230 = () => {
                 <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-muted-foreground text-sm sm:text-base">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-neon" />
-                    <span>May 22, 2026</span>
+                    <span>May 29, 2026</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="w-5 h-5 text-neon-purple" />
