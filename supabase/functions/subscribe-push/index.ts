@@ -73,12 +73,23 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Optional user_id from auth header (for admin targeting)
+    let userId: string | null = null;
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      try {
+        const { data } = await supabase.auth.getUser(authHeader.slice(7));
+        userId = data.user?.id ?? null;
+      } catch { /* ignore */ }
+    }
+
     // Upsert subscription (endpoint is unique)
     const { error } = await supabase.from("push_subscriptions").upsert(
       {
         endpoint: subscription.endpoint,
         p256dh: subscription.keys.p256dh,
         auth: subscription.keys.auth,
+        user_id: userId,
       },
       { onConflict: "endpoint" }
     );
