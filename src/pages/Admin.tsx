@@ -54,6 +54,7 @@ const Admin = () => {
             <PushSubscriberManager />
             <VisitorAnalytics />
             <ListenerAnalytics />
+            <TrackPlayAnalytics />
             <SubscriberGrowthChart />
             <NewsletterCampaign />
             <ManualSubscriberAdd />
