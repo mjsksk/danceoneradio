@@ -30,6 +30,7 @@ import NotificationHistory from '@/components/admin/NotificationHistory';
 import { PushSubscriberManager } from '@/components/admin/PushSubscriberManager';
 import DownloadAnalytics from '@/components/admin/DownloadAnalytics';
 import SongRequestsManager from '@/components/admin/SongRequestsManager';
+import TrackPlayAnalytics from '@/components/admin/TrackPlayAnalytics';
 
 interface EpisodeProgress {
   id: string;
@@ -332,6 +333,7 @@ export default function Account() {
         </div>
       </Card>
 
+      <TrackPlayAnalytics />
       <PushDiagnostics />
       <PushNotificationComposer />
       <NotificationHistory />
