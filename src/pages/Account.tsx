@@ -31,6 +31,7 @@ import { PushSubscriberManager } from '@/components/admin/PushSubscriberManager'
 import DownloadAnalytics from '@/components/admin/DownloadAnalytics';
 import SongRequestsManager from '@/components/admin/SongRequestsManager';
 import TrackPlayAnalytics from '@/components/admin/TrackPlayAnalytics';
+import TrackLikeAnalytics from '@/components/admin/TrackLikeAnalytics';
 
 interface EpisodeProgress {
   id: string;
