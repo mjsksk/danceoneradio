@@ -1,7 +1,8 @@
-import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { PageTransition } from './PageTransition';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { AdminRoute } from '@/components/AdminRoute';
 
 import { lazy, Suspense } from 'react';
 
@@ -52,6 +53,7 @@ const Advertise = lazy(() => import('@/pages/Advertise'));
 const DesktopPlayer = lazy(() => import('@/pages/DesktopPlayer'));
 const Auth = lazy(() => import('@/pages/Auth'));
 const Account = lazy(() => import('@/pages/Account'));
+const Admin = lazy(() => import('@/pages/Admin'));
 const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
 const Merch = lazy(() => import('@/pages/Merch'));
 const Tracks = lazy(() => import('@/pages/Tracks'));
@@ -112,7 +114,7 @@ export function AnimatedRoutes() {
         <Route path="/news/artists-releases" element={<PageTransition><NewsArtistsReleases /></PageTransition>} />
         <Route path="/news/festivals-events" element={<PageTransition><NewsFestivalsEvents /></PageTransition>} />
         <Route path="/news/industry-culture" element={<PageTransition><NewsIndustryCulture /></PageTransition>} />
-        <Route path="/admin" element={<Navigate to="/account" replace />} />
+        <Route path="/admin" element={<PageTransition><AdminRoute><Admin /></AdminRoute></PageTransition>} />
         <Route path="/desktop" element={<PageTransition><DesktopPlayer /></PageTransition>} />
         <Route path="/auth" element={<PageTransition><Auth /></PageTransition>} />
         <Route path="/account" element={<PageTransition><ProtectedRoute><Account /></ProtectedRoute></PageTransition>} />
