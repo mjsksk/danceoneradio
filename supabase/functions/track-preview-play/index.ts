@@ -93,6 +93,11 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Fire-and-forget: push notify admin subscribers
+    notifyAdmins(supabase, title, artist, pagePath).catch((e) =>
+      console.error("notifyAdmins error:", e)
+    );
+
     return new Response(JSON.stringify({ ok: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
