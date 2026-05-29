@@ -562,7 +562,11 @@ const TracksSection = () => {
                            ? 'text-red-400 hover:text-red-500 bg-red-400/20'
                            : 'text-muted-foreground hover:text-red-400 hover:bg-red-400/20'
                        }`}
-                       onClick={() => handleLike(track)}
+                       onClick={(e) => {
+                         e.preventDefault();
+                         e.stopPropagation();
+                         handleLike(track);
+                       }}
                        title={likedTracks.has(track.id) ? 'Remove from favorites' : 'Add to favorites'}
                      >
                        <Heart className={`w-4 h-4 ${likedTracks.has(track.id) ? 'fill-current' : ''}`} />
