@@ -48,14 +48,15 @@ const Admin = () => {
               </p>
             </Card>
 
+            <TrackPlayAnalytics />
             <PushDiagnostics />
             <PushNotificationComposer />
             <NotificationHistory />
             <PushSubscriberManager />
             <VisitorAnalytics />
             <ListenerAnalytics />
-            <TrackPlayAnalytics />
             <SubscriberGrowthChart />
+
             <NewsletterCampaign />
             <ManualSubscriberAdd />
             <NewsletterSubscribers />
