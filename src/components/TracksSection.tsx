@@ -354,19 +354,28 @@ const TracksSection = () => {
 
   const handleLike = (track: Track) => {
     const newLikedTracks = new Set(likedTracks);
-    
-    if (likedTracks.has(track.id)) {
-      newLikedTracks.delete(track.id);
-      console.log(`🎵 Unliked track: ${track.title} by ${track.artist}`);
-    } else {
+    const isLiking = !likedTracks.has(track.id);
+
+    if (isLiking) {
       newLikedTracks.add(track.id);
-      console.log(`🎵 Liked track: ${track.title} by ${track.artist}`);
+    } else {
+      newLikedTracks.delete(track.id);
     }
-    
+
     setLikedTracks(newLikedTracks);
-    
-    // Save to localStorage
     localStorage.setItem('likedTracks', JSON.stringify(Array.from(newLikedTracks)));
+
+    // Fire-and-forget tracking
+    fetch(`https://upbwlnpycrbhxahjztrf.supabase.co/functions/v1/track-like`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: track.title,
+        artist: track.artist,
+        action: isLiking ? 'like' : 'unlike',
+        pagePath: window.location.pathname,
+      }),
+    }).catch(() => {});
   };
 
   return (
