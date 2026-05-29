@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, UserCircle, LogOut, Settings } from 'lucide-react';
+import { Menu, X, UserCircle, LogOut, Settings, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/hooks/useUserRole';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +17,7 @@ import logo from '@/assets/dance-one-logo.png';
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, profile, signOut } = useAuth();
+  const { isAdmin } = useUserRole();
 
   const navItems = [
     { name: 'Home', href: '/' },
@@ -73,6 +75,14 @@ const Navigation = () => {
                     {profile?.display_name || user.email}
                   </div>
                   <DropdownMenuSeparator />
+                  {isAdmin && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin" className="cursor-pointer">
+                        <Shield className="w-4 h-4 mr-2" aria-hidden="true" />
+                        Admin Tools
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem asChild>
                     <Link to="/account" className="cursor-pointer">
                       <Settings className="w-4 h-4 mr-2" aria-hidden="true" />
@@ -138,6 +148,19 @@ const Navigation = () => {
               <div className="pt-4 mt-2 border-t border-border/50">
                 {user ? (
                   <>
+                    {isAdmin && (
+                      <Link
+                        to="/admin"
+                        className="text-muted-foreground hover:text-primary hover:bg-primary/10 focus:text-primary focus:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary transition-colors duration-300 font-medium text-sm tracking-tight min-h-[44px] flex items-center px-3 py-2 rounded-md -mx-3"
+                        style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+                        onClick={() => setIsMenuOpen(false)}
+                        role="menuitem"
+                        aria-label="Go to admin tools"
+                      >
+                        <Shield className="w-5 h-5 mr-3" aria-hidden="true" />
+                        Admin Tools
+                      </Link>
+                    )}
                     <Link
                       to="/account"
                       className="text-muted-foreground hover:text-primary hover:bg-primary/10 focus:text-primary focus:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary transition-colors duration-300 font-medium text-sm tracking-tight min-h-[44px] flex items-center px-3 py-2 rounded-md -mx-3"
