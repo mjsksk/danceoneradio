@@ -343,6 +343,7 @@ export default function Account() {
       </Card>
 
       <TrackPlayAnalytics />
+      <TrackLikeAnalytics />
       <PushDiagnostics />
       <PushNotificationComposer />
       <NotificationHistory />
