@@ -176,7 +176,7 @@ const TracksSection = () => {
     };
   }, []);
 
-  const recentlyTrackedRef = useRef<Map<number, number>>(new Map());
+  const recentlyTrackedRef = useRef<Map<string, number>>(new Map());
 
   const recordPreviewPlay = (track: Track) => {
     const now = Date.now();
@@ -194,7 +194,7 @@ const TracksSection = () => {
       .catch((err) => console.warn('🎵 Failed to record preview play:', err));
   };
 
-  const handlePlayPause = async (trackId: number) => {
+  const handlePlayPause = async (trackId: string) => {
     if (!audioRef) return;
 
     if (playingTrack === trackId) {
@@ -372,6 +372,7 @@ const TracksSection = () => {
           title: track.title,
           artist: track.artist,
           action: isLiking ? 'like' : 'unlike',
+          trackHistoryId: track.id,
           pagePath: window.location.pathname,
         },
       })
