@@ -365,17 +365,17 @@ const TracksSection = () => {
     setLikedTracks(newLikedTracks);
     localStorage.setItem('likedTracks', JSON.stringify(Array.from(newLikedTracks)));
 
-    // Fire-and-forget tracking
-    fetch(`https://upbwlnpycrbhxahjztrf.supabase.co/functions/v1/track-like`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        title: track.title,
-        artist: track.artist,
-        action: isLiking ? 'like' : 'unlike',
-        pagePath: window.location.pathname,
-      }),
-    }).catch(() => {});
+    // Fire-and-forget tracking (uses supabase client so apikey header is included)
+    supabase.functions
+      .invoke('track-like', {
+        body: {
+          title: track.title,
+          artist: track.artist,
+          action: isLiking ? 'like' : 'unlike',
+          pagePath: window.location.pathname,
+        },
+      })
+      .catch(() => {});
   };
 
   return (
