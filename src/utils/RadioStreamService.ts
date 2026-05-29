@@ -350,6 +350,7 @@ export class RadioStreamService {
                     
                     tracks.push({
                       id: String(trackId++),
+                      stableKey: `${artist}::${title}::${playedTime.toISOString()}`,
                       title: title,
                       artist: artist,
                       duration: this.generateRandomDuration(),
@@ -392,6 +393,7 @@ export class RadioStreamService {
               
               tracks.push({
                 id: String(trackId++),
+                stableKey: `${artist}::${title}::${playedTime.toISOString()}`,
                 title,
                 artist,
                 duration: this.generateRandomDuration(),
@@ -427,6 +429,7 @@ export class RadioStreamService {
                 
                 tracks.push({
                   id: String(trackId++),
+                  stableKey: `${artist}::${title}::${playedTime.toISOString()}`,
                   title,
                   artist,
                   duration: this.generateRandomDuration(),
