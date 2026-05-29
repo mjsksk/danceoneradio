@@ -110,3 +110,59 @@ Deno.serve(async (req) => {
     });
   }
 });
+
+async function notifyAdmins(
+  supabase: ReturnType<typeof createClient>,
+  title: string,
+  artist: string,
+  pagePath: string | null,
+) {
+  const vapidPublic = Deno.env.get("VAPID_PUBLIC_KEY");
+  const vapidPrivate = Deno.env.get("VAPID_PRIVATE_KEY");
+  const vapidEmail = Deno.env.get("VAPID_EMAIL");
+  if (!vapidPublic || !vapidPrivate || !vapidEmail) {
+    console.warn("VAPID config missing, skipping admin push");
+    return;
+  }
+
+  const { data: admins, error: adminErr } = await supabase
+    .from("user_roles")
+    .select("user_id")
+    .eq("role", "admin");
+  if (adminErr || !admins?.length) return;
+
+  const adminIds = admins.map((a: { user_id: string }) => a.user_id);
+  const { data: subs, error: subErr } = await supabase
+    .from("push_subscriptions")
+    .select("endpoint, p256dh, auth")
+    .in("user_id", adminIds);
+  if (subErr || !subs?.length) return;
+
+  const payload = JSON.stringify({
+    title: "🎧 Track preview played",
+    body: `${title} — ${artist}`,
+    icon: "/favicon.png",
+    badge: "/favicon.png",
+    url: pagePath || "/admin",
+  });
+  const cleanEmail = vapidEmail.replace(/[<>\s]/g, "").replace(/^mailto:/, "");
+
+  await Promise.all(
+    subs.map(async (s: { endpoint: string; p256dh: string; auth: string }) => {
+      try {
+        const result = await sendWebPush(
+          { endpoint: s.endpoint, p256dh: s.p256dh, auth: s.auth },
+          payload,
+          vapidPublic,
+          vapidPrivate,
+          cleanEmail,
+        );
+        if (!result.success && (result.status === 410 || result.status === 404)) {
+          await supabase.from("push_subscriptions").delete().eq("endpoint", s.endpoint);
+        }
+      } catch (e) {
+        console.error("admin push send error:", e);
+      }
+    }),
+  );
+}
