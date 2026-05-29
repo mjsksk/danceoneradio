@@ -1,6 +1,6 @@
 /**
  * Wh0 Plays Sessions Episode 230
- * Air date: May 22, 2026 at 6PM
+ * Air date: May 29, 2026 at 6PM
  */
 
 import { ArrowLeft, Calendar, Clock, Music } from 'lucide-react';
