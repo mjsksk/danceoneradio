@@ -319,6 +319,14 @@ export default function Account() {
         <h2 className="text-2xl font-['Orbitron'] font-bold mb-4 text-neon-purple">
           Episode Management
         </h2>
+        <div className="mb-4">
+          <a
+            href="#track-preview-plays"
+            className="inline-flex items-center rounded-md border border-primary/40 bg-background/60 px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/10"
+          >
+            Jump to Track Preview Plays
+          </a>
+        </div>
         <div className="bg-background/50 rounded-lg p-4 space-y-2 font-['Rajdhani']">
           <p className="font-semibold">Quick Guide:</p>
           <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">

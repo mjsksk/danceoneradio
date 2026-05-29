@@ -88,7 +88,7 @@ const TrackPlayAnalytics = () => {
   ];
 
   return (
-    <Card className="p-8 bg-card/50 backdrop-blur-sm border-border/50">
+    <Card id="track-preview-plays" className="p-8 bg-card/50 backdrop-blur-sm border-2 border-primary/40 shadow-[0_0_0_1px_hsl(var(--primary)/0.2)]">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <h2 className="text-2xl font-['Orbitron'] font-bold text-neon-purple">
           Track Preview Plays
