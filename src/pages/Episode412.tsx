@@ -16,7 +16,7 @@
  * - Broken routing configuration
  */
 
-import { ArrowLeft, Calendar, Clock, Play, Pause, Apple } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Play, Pause, Apple, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Navigation from '@/components/Navigation';
