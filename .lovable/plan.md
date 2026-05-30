@@ -1,76 +1,43 @@
-# Track Preview Play Tracking
+Episode 412 is the next "Anthems of the week" podcast episode, which uses the automated episode generator (not the Wh0 Plays Sessions flow). I'll use that automation and then paste in the 20 tracks from the uploaded `412.numbers` file.
 
-Record every time a visitor clicks the play button on a track in the "Last Played Tracks" section (preview play), regardless of login state, and show it in the admin area.
+## Steps
 
-## What gets recorded
+1. **Run the episode generator**
+   - `npm run generate-episode`
+   - This fetches Episode 412 metadata from the Blubrry RSS feed, then creates:
+     - `src/pages/Episode412.tsx` with full SEO, audio player, progress tracking, login prompt, social sharing, ads, and Apple Podcasts link
+     - Adds the lazy import + `/episode/412` route to `src/components/AnimatedRoutes.tsx`
+     - Updates `scripts/generate-prerender.ts` with Episode 412 metadata
 
-For each preview play:
-- Track title + artist (and `radio_track_history.id` when available)
-- Timestamp
-- Anonymous visitor hash (same hash used by `site_visits`, so we can count unique listeners without identifying anyone)
-- Country / country code (from Cloudflare/Edge headers, like `track-visit`)
-- `user_id` if the visitor happens to be logged in (nullable)
-- Page path the play happened on (`/`, `/tracks`, `/desktop`, etc.)
-- User agent (truncated)
+2. **Insert the tracklist** into the generated `Episode412.tsx`, replacing the `{/* TODO: Add track listing here after CSV import */}` block with:
+   ```
+   1. Agoria, Blasé – You're Not Alone (MoBlack, Simone Santagati Remix)
+   2. Wax Motif – Something More (Extended Mix)
+   3. Franky Wah – Down For You (feat. Jyll)
+   4. Whitesquare – Twin Humanities
+   5. Tommy Veanud – Same Man (Extended Mix)
+   6. Brunello – Ghost Dance
+   7. Victor Flash, Ary Sya – Motion
+   8. East Side Beat – Ride Like The Wind (Nick Coles Remix)
+   9. Shimza X Ar:Co X Kasango – Fire Fire (Gil Glaze Remix)
+   10. Wax Motif – You Forget ft. Maeta (Radio Edit)
+   11. Tastexperience – Beach Ball (Extended Club Mix)
+   12. Calvin Harris, Jazzy – Satisfy
+   13. Meduza & RANI – Silence (Extended Mix)
+   14. Kelly Cappuccio – Don't Come Back (Extended Mix)
+   15. Tastexperience – Beach Ball (Club Mix)
+   16. ANOTR & 3DDY – Like It
+   17. Dunmore Brothers feat. Ben Westbeech – TRUST ME
+   18. Peking Duk, Phantogram – Forever (Original Mix)
+   19. M.A.N.D.Y. vs Booka Shade – Body Language
+   20. Cinnamon Chasers – Memories (Nordfold Remix - Radio Edit)
+   ```
+   (Source spreadsheet skipped rows 3 and 5, so the displayed list is renumbered 1–20.)
 
-## Database
+3. **Validate**
+   - `npm run validate-episodes` to confirm no missing tracking parameters, header present, etc.
+   - Verify `/episode/412` loads in the preview.
 
-New table `public.track_preview_plays` with the columns above. RLS:
-- No public SELECT
-- Admin SELECT via `has_role(auth.uid(), 'admin')`
-- No direct INSERT from clients — writes only via edge function using the service role
-
-Two admin RPCs (security definer, admin-gated, like the existing analytics RPCs):
-- `get_track_play_summary(start_date, end_date)` → total plays, unique listeners, top country
-- `get_track_play_analytics(start_date, end_date)` → per-track aggregation: title, artist, total plays, unique listeners, last played
-
-A daily cleanup function `cleanup_old_track_plays()` to drop rows older than 90 days (matches `site_visits` retention).
-
-## Edge function
-
-New `supabase/functions/track-preview-play` (`verify_jwt = false`):
-- Accepts POST `{ trackId?, title, artist, pagePath }`
-- Validates input with Zod
-- Extracts country from `cf-ipcountry` / `x-country` headers (same approach as `track-visit`)
-- Computes visitor hash from IP + UA (same approach as `track-visit`)
-- Reads optional `Authorization` header to capture `user_id` when present
-- Rate-limited per visitor hash (max ~30 plays/min) using `api_request_log`
-- Inserts row via service-role client
-
-## Frontend
-
-`src/components/TracksSection.tsx`:
-- On successful `audioRef.play()`, fire-and-forget call to the edge function with the track info and `window.location.pathname`. No await — must not block the audio.
-- Debounce per `trackId` for 5s so a single click doesn't double-record on replay events.
-
-No other UI changes for visitors.
-
-## Admin UI
-
-New component `src/components/admin/TrackPlayAnalytics.tsx`, mounted on the existing admin page next to `ListenerAnalytics`:
-- Same date-range filter pattern (All / 7d / 30d / 90d / custom)
-- Summary cards: Total Plays, Unique Listeners, Top Country
-- Table: Track, Artist, Plays, Unique Listeners, Last Played
-- Uses the two new RPCs
-
-## Optional notification
-
-You said "I want to receive a notification". The cleanest fit with what's already in the project is a **push notification to admins** via the existing `send-push-notification` flow. I'll add this only if you confirm — otherwise the admin dashboard is the source of truth. Two options:
-
-1. **Dashboard only** (default in this plan) — see plays in admin, no push spam.
-2. **Push to admin on every play** — calls `send-push-notification` from the edge function, targeted to admin push subscriptions only. Can be noisy if traffic is high.
-3. **Hourly digest push** — a cron'd edge function summarizes plays in the last hour and pushes once.
-
-Tell me which notification mode you want and I'll fold it in before building.
-
-## Files
-
-New:
-- `supabase/functions/track-preview-play/index.ts`
-- `src/components/admin/TrackPlayAnalytics.tsx`
-- Migration: `track_preview_plays` table + grants + RLS + RPCs + cleanup function
-
-Edited:
-- `src/components/TracksSection.tsx` — fire tracking call on play
-- `supabase/config.toml` — register new function with `verify_jwt = false`
-- `src/pages/Admin.tsx` — mount the new analytics component
+## Notes
+- If the RSS feed doesn't yet contain Episode 412, the generator will fail — in that case I'll let you know so we can wait for the feed to update or generate manually using Episode 411 as a template.
+- No other files (Shows.tsx, etc.) need changes for the weekly Anthems episodes; routing + prerender are the only integration points.
