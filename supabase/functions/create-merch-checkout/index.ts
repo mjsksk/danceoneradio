@@ -99,8 +99,8 @@ serve(async (req) => {
           },
         },
       ],
-      success_url: `${req.headers.get("origin")}/merch?success=true`,
-      cancel_url: `${req.headers.get("origin")}/merch`,
+      success_url: `https://danceoneradio.com/merch?success=true`,
+      cancel_url: `https://danceoneradio.com/merch`,
     });
 
     return new Response(JSON.stringify({ url: session.url }), {

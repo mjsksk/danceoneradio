@@ -233,7 +233,7 @@ const handler = async (req: Request): Promise<Response> => {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="text-align: center; margin-bottom: 30px;">
-              <img src="${req.headers.get('origin') || 'https://upbwlnpycrbhxahjztrf.supabase.co'}/lovable-uploads/ba6a92fa-e132-4643-8d4c-abc0bab124f1.png" alt="Dance One Radio Logo" style="max-width: 200px; height: auto; display: block; margin: 0 auto;">
+              <img src="https://danceoneradio.com/lovable-uploads/ba6a92fa-e132-4643-8d4c-abc0bab124f1.png" alt="Dance One Radio Logo" style="max-width: 200px; height: auto; display: block; margin: 0 auto;">
             </div>
             <h1 style="color: #333; text-align: center;">Welcome to Dance One Radio!</h1>
             
@@ -253,7 +253,7 @@ const handler = async (req: Request): Promise<Response> => {
             </ul>
             
             <div style="text-align: center; margin: 30px 0;">
-              <a href="${req.headers.get('origin') || 'https://upbwlnpycrbhxahjztrf.supabase.co'}" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+              <a href="https://danceoneradio.com" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
                 Visit Dance One Radio
               </a>
             </div>
@@ -262,7 +262,7 @@ const handler = async (req: Request): Promise<Response> => {
             
             <p style="color: #999; font-size: 12px; text-align: center;">
               You can unsubscribe at any time by clicking 
-              <a href="${req.headers.get('origin') || 'https://upbwlnpycrbhxahjztrf.supabase.co'}/unsubscribe?token=${unsubscribeToken}" style="color: #007bff;">here</a>.
+              <a href="https://danceoneradio.com/unsubscribe?token=${unsubscribeToken}" style="color: #007bff;">here</a>.
             </p>
           </div>
         `,
