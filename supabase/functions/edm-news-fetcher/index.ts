@@ -256,28 +256,42 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    // Rate limiting: 10 requests per minute per IP
-    const identifier = getClientIdentifier(req)
-    const rateLimitResult = await checkRateLimit(supabase, {
-      endpoint: 'edm-news-fetcher',
-      maxRequests: 10,
-      windowMs: 60000 // 1 minute
-    }, identifier, req.headers.get('user-agent') || undefined)
+    // Require authentication: either the service role key (used by the cron job)
+    // or an authenticated admin user. This prevents anyone on the internet from
+    // triggering external RSS/OG fetches as an amplification vector.
+    const authHeader = req.headers.get('Authorization') || ''
+    const token = authHeader.replace(/^Bearer\s+/i, '').trim()
+    const isServiceRole = token && token === supabaseKey
 
-    if (!rateLimitResult.allowed) {
-      console.log(`⚠️ Rate limit exceeded for ${identifier}`)
-      return new Response(
-        JSON.stringify({ error: 'Rate limit exceeded', retryAfter: rateLimitResult.retryAfter }),
-        { 
-          status: 429,
-          headers: { 
-            ...corsHeaders, 
-            'Content-Type': 'application/json',
-            'Retry-After': String(rateLimitResult.retryAfter || 60)
-          } 
-        }
-      )
+    if (!isServiceRole) {
+      if (!token) {
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      const userClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
+        global: { headers: { Authorization: `Bearer ${token}` } }
+      })
+      const { data: userData, error: userErr } = await userClient.auth.getUser()
+      if (userErr || !userData?.user) {
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      const { data: isAdmin } = await supabase.rpc('has_role', {
+        _user_id: userData.user.id,
+        _role: 'admin'
+      })
+      if (!isAdmin) {
+        return new Response(
+          JSON.stringify({ error: 'Forbidden: admin role required' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
     }
+
 
     const allArticles: ParsedArticle[] = []
     const fetchPromises = RSS_SOURCES.map(async (source) => {
