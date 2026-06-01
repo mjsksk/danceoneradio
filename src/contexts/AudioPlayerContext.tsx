@@ -623,6 +623,11 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       clearLivePauseExpiryTimeout();
       clearLiveRecoveryTimeout();
       if (state.source === 'live') {
+        if (liveUserPausedRef.current) {
+          setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
+          return;
+        }
+
         restartLiveStream(currentUrlIndex);
         return;
       }
@@ -673,6 +678,13 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     
     const handleError = () => {
       console.error('Audio error, trying next URL');
+
+      if (state.source === 'live' && liveUserPausedRef.current) {
+        liveReconnectInProgressRef.current = false;
+        setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
+        return;
+      }
+
       liveReconnectInProgressRef.current = true;
       clearLivePauseExpiryTimeout();
       clearLiveRecoveryTimeout();

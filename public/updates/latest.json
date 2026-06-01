@@ -1,7 +1,7 @@
 {
-  "version": "1.0.20",
-  "notes": "Recover tray playback when the hidden renderer has gone stale, rebuild the paused window before replay, and prevent white-screen restores after long tray sessions.",
-  "pub_date": "2026-04-09T16:59:47.021Z",
-  "url": "https://github.com/mjsksk/danceoneradio/releases/download/v1.0.20/dance-one-radio-setup-1.0.20-x64.exe",
-  "signature": "untrusted comment: signature from minisign secret key\nRUSH8mYSkz3Lf/7MAKorIBa7Py5pno1ELK0spkZtMgGaB4VbI8SI3wm1aAL9NNH2KMNX9RTf5tJzOI67eiL9eNf+uaIcATGZUAE=\ntrusted comment: 1775838534\nPuH0Wzees3isMjljqQ4MJm4ePqsUqiWiP6FYgNskVLSkmpDh4miC7DOZyxx8GaqLYOiChelikXJwYS+/JJUQDA=="
+  "version": "1.0.24",
+  "notes": "Stabilize long-running tray playback, prevent stale hidden-window shutdowns, and stop paused live sessions from background reconnect churn.",
+  "pub_date": "2026-06-01T10:07:38.0227230-07:00",
+  "url": "https://github.com/mjsksk/danceoneradio/releases/download/v1.0.24/dance-one-radio-setup-1.0.24-x64.exe",
+  "signature": "untrusted comment: signature from minisign secret key\nRUSH8mYSkz3Lf2uxrgCFNdxnOS9xK0W2GqkYWFSDLTODscmqFAX0mnztI+J9VFjAO5QP+ED/pPi7Of99LqwJDEAn8yI0fiHugAg=\ntrusted comment: 1780333668\nsHamvW6GiH4UA6KhDF9c0+nFKgtSSULtKgunvo+1X9KS9LDkzgFH1lFAU7Lh9cJAf8QQf7u5/+QWfzspnXP6Ag=="
 }

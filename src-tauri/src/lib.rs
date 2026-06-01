@@ -143,11 +143,7 @@ fn is_renderer_stale<R: Runtime>(app: &AppHandle<R>) -> bool {
 }
 
 #[cfg(desktop)]
-fn recreate_main_window<R: Runtime>(app: &AppHandle<R>, should_show: bool) -> tauri::Result<()> {
-  if let Some(window) = app.get_webview_window(MAIN_WINDOW_LABEL) {
-    let _ = window.destroy();
-  }
-
+fn create_main_window<R: Runtime>(app: &AppHandle<R>, should_show: bool) -> tauri::Result<()> {
   let Some(config) = app
     .config()
     .app
@@ -183,6 +179,30 @@ fn recreate_main_window<R: Runtime>(app: &AppHandle<R>, should_show: bool) -> ta
 }
 
 #[cfg(desktop)]
+fn recover_main_window<R: Runtime>(app: &AppHandle<R>, should_show: bool) -> tauri::Result<()> {
+  if let Some(window) = app.get_webview_window(MAIN_WINDOW_LABEL) {
+    if let Some(icon) = app.default_window_icon().cloned() {
+      let _ = window.set_icon(icon);
+    }
+
+    let _ = window.unminimize();
+    let _ = window.reload();
+
+    if should_show {
+      let _ = window.show();
+      let _ = window.set_focus();
+    } else {
+      mark_window_hidden(app);
+      let _ = window.hide();
+    }
+
+    return Ok(());
+  }
+
+  create_main_window(app, should_show)
+}
+
+#[cfg(desktop)]
 fn queue_toggle_playback_for_renderer<R: Runtime>(app: &AppHandle<R>) {
   if let Some(state) = app.try_state::<RendererState>() {
     if let Ok(mut pending_toggle) = state.pending_toggle_playback.lock() {
@@ -204,7 +224,7 @@ fn show_main_window<R: Runtime>(app: &AppHandle<R>) {
     .unwrap_or(false);
 
   if should_recreate {
-    if recreate_main_window(app, true).is_ok() {
+    if recover_main_window(app, true).is_ok() {
       return;
     }
   }
@@ -413,7 +433,7 @@ fn build_tray<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
 
         if !is_playing && hidden_for_long && is_renderer_stale(app) {
           queue_toggle_playback_for_renderer(app);
-          let _ = recreate_main_window(app, false);
+          let _ = recover_main_window(app, false);
           return;
         }
 
