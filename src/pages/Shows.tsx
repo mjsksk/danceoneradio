@@ -551,6 +551,14 @@ const Shows = () => {
                   {(() => {
                     const guestShows = [
                       {
+                        number: 232,
+                        title: 'Wh0 Sessions Episode 232 with Molly Mouse',
+                        subtitle: <span>Guest Mix by <span className="text-primary font-semibold">Molly Mouse</span></span>,
+                        link: '/show/wh0-plays-sessions/232',
+                        broadcastDate: '2026-06-12T18:00:00',
+                        genres: 'House • Tech House • Dance',
+                      },
+                      {
                         number: 230,
                         title: 'Wh0 Plays Sessions Episode 230',
                         subtitle: '14 tracks • Wh0, Rue Jay, Jewel Kid, Mercer, LEFTI & more',
