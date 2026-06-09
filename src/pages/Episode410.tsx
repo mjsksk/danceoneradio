@@ -147,7 +147,7 @@ const Episode410 = () => {
     <div className="min-h-screen bg-background overflow-x-hidden relative">
       <SEO 
         title="Anthems of the Week 410 | Dance One Radio"
-        description="Anthems of the week"
+        description={`Episode ${episodeNumber} - ${episodeTitle}. The latest future dance anthems mixed by Mario, featuring fresh house, tech house, progressive and electronic tracks.`}
         image="/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png"
         url={window.location.href}
       />

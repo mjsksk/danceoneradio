@@ -93,6 +93,7 @@ const HeroSection = () => {
     >
       <div className="mx-auto flex min-h-screen max-w-4xl flex-col justify-center px-4 pt-32 md:pt-36">
         <div className="mb-4 animate-fade-in">
+          <h1 className="sr-only">Dance One Radio — Live Electronic & Dance Music 24/7</h1>
           <div className="hero-logo flex justify-center">
             <picture>
               <source srcSet="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.webp" type="image/webp" />

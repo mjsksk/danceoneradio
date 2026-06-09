@@ -56,7 +56,7 @@ const DesktopPlayer = () => {
             </div>
             <div>
               <p className="text-xs uppercase tracking-[0.35em] text-primary/80">{getDesktopPlayerLabel(desktopPlatform)}</p>
-              <h1 className="font-['Orbitron'] text-2xl font-semibold text-white">Dance One Radio</h1>
+              <h1 className="font-['Orbitron'] text-2xl font-semibold text-white">Dance One Radio Desktop Player</h1>
             </div>
           </div>
           {isDesktop ? (
