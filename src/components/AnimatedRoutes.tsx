@@ -139,6 +139,7 @@ export function AnimatedRoutes() {
         <Route path="/requests" element={<PageTransition><SongRequests /></PageTransition>} />
         <Route path="/genres" element={<PageTransition><Genres /></PageTransition>} />
         <Route path="/genres/:slug" element={<PageTransition><Genre /></PageTransition>} />
+        <Route path="/news/best-progressive-house-tracks-2024" element={<PageTransition><BestProgressiveHouse2024 /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
