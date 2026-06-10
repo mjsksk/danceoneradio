@@ -449,6 +449,7 @@ const TracksSection = () => {
 
                   <Button
                     onClick={() => handlePlayPause(track.id)}
+                    aria-label={playingTrack === track.id ? `Pause preview of ${track.title}` : `Play preview of ${track.title}`}
                     className={`w-16 h-16 rounded-full relative ${
                       playingTrack === track.id
                         ? 'bg-primary text-primary-foreground animate-glow-pulse'

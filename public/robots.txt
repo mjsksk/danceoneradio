@@ -1,8 +1,18 @@
 User-agent: Googlebot
 Allow: /
+Disallow: /admin
+Disallow: /auth
+Disallow: /account
+Disallow: /reset-password
+Disallow: /desktop
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin
+Disallow: /auth
+Disallow: /account
+Disallow: /reset-password
+Disallow: /desktop
 
 User-agent: Twitterbot
 Allow: /
@@ -12,5 +22,10 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /auth
+Disallow: /account
+Disallow: /reset-password
+Disallow: /desktop
 
 Sitemap: https://danceoneradio.com/sitemap.xml

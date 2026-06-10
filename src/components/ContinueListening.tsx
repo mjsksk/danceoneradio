@@ -232,6 +232,7 @@ const ContinueListening = () => {
                     className="ml-2 shrink-0 hover:bg-primary/20"
                     onClick={() => handlePlayPause(episode)}
                     disabled={isLoading}
+                    aria-label={isPlaying ? `Pause episode ${episode.episode_number}` : `Resume episode ${episode.episode_number}`}
                   >
                     {isLoading ? (
                       <Loader2 className="w-5 h-5 text-primary animate-spin" />
