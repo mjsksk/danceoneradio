@@ -69,6 +69,7 @@ const Wh0PlaysSession232 = lazy(() => import('@/pages/Wh0PlaysSession232'));
 const SongRequests = lazy(() => import('@/pages/SongRequests'));
 const Genres = lazy(() => import('@/pages/Genres'));
 const Genre = lazy(() => import('@/pages/Genre'));
+const BestProgressiveHouse2024 = lazy(() => import('@/pages/BestProgressiveHouse2024'));
 
 export function AnimatedRoutes() {
   const location = useLocation();
@@ -138,6 +139,7 @@ export function AnimatedRoutes() {
         <Route path="/requests" element={<PageTransition><SongRequests /></PageTransition>} />
         <Route path="/genres" element={<PageTransition><Genres /></PageTransition>} />
         <Route path="/genres/:slug" element={<PageTransition><Genre /></PageTransition>} />
+        <Route path="/news/best-progressive-house-tracks-2024" element={<PageTransition><BestProgressiveHouse2024 /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
