@@ -15,7 +15,7 @@ const Genres = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Electronic Music Radio by Genre — House, Trance, Techno, EDM | Dance One Radio"
+        title="Radio by Genre: House, Trance, Techno, EDM | Dance One"
         description="Browse Dance One Radio by genre. Dedicated live streams and pages for house, tech house, trance, techno, EDM and dance music — free, 24/7."
         keywords="electronic music radio by genre, house radio, trance radio, techno radio, edm radio, tech house radio, dance music genres"
         url="https://danceoneradio.com/genres"
