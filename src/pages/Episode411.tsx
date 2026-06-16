@@ -26,6 +26,7 @@ import SEO from '@/components/SEO';
 import GoogleAds from '@/components/GoogleAds';
 import { LoginPrompt } from '@/components/LoginPrompt';
 import EpisodeTracklist from '@/components/EpisodeTracklist';
+import { EpisodeEqVisualizer } from '@/components/EpisodeEqVisualizer';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
@@ -197,6 +198,9 @@ const Episode411 = () => {
                       </div>
 
                       {/* Progress Bar */}
+                      <div className="mb-4">
+                        <EpisodeEqVisualizer isActive={isPlaying} />
+                      </div>
                       <div className="space-y-2">
                         <div 
                           className="h-2 bg-primary/40 border border-primary/50 rounded-full cursor-pointer group/progress hover:bg-primary/50 transition-colors"

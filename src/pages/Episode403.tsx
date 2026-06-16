@@ -22,6 +22,7 @@ import GoogleAds from '@/components/GoogleAds';
 import { AD_SLOTS } from '@/config/adSlots';
 import TrackAffiliateLinks from '@/components/TrackAffiliateLinks';
 import { LoginPrompt } from '@/components/LoginPrompt';
+import { EpisodeEqVisualizer } from '@/components/EpisodeEqVisualizer';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -183,6 +184,9 @@ const Episode403 = () => {
                         </div>
                       </div>
 
+                        <div className="mb-4">
+                          <EpisodeEqVisualizer isActive={isPlaying} />
+                        </div>
                         <div className="space-y-2">
                           <div 
                             className="h-2 bg-primary/40 border border-primary/50 rounded-full cursor-pointer group/progress hover:bg-primary/50 transition-colors"
