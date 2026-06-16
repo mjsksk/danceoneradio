@@ -53,7 +53,7 @@ const LiveRadioPlayer = ({
   const lastNotifiedTrackRef = useRef<string | null>(null);
   const titleContainerRef = useRef<HTMLDivElement | null>(null);
   const titleMeasureRef = useRef<HTMLSpanElement | null>(null);
-  const animationActive = isPlaying;
+  const animationActive = audioPlayer.isPlaying;
   const { frequencyData, barCount } = useLiveEqVisualizer({
     audioRef: audioPlayer.audioRef,
     isActive: animationActive,
