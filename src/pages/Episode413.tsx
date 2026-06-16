@@ -75,6 +75,25 @@ const Episode413 = () => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
+  const audioPlayer = useAudioPlayer();
+  const isCurrent = audioPlayer.source === 'episode' && audioPlayer.episodeInfo?.number === episodeNumber;
+  const isPlaying = isCurrent && audioPlayer.isPlaying;
+  const isLoading = isCurrent && audioPlayer.isLoading;
+  const currentTime = isCurrent ? audioPlayer.currentTime : 0;
+  const duration = isCurrent ? audioPlayer.duration : 0;
+
+  const handlePlayPause = () => {
+    if (isCurrent) {
+      if (audioPlayer.isPlaying) {
+        audioPlayer.pause();
+      } else {
+        audioPlayer.resume();
+      }
+    } else {
+      audioPlayer.playEpisode({ number: episodeNumber, title: episodeTitle, audioUrl });
+    }
+  };
+
   const { user } = useAuth();
   
   const { progress, saveProgress } = useListeningProgress(episodeNumber, episodeTitle, audioUrl);

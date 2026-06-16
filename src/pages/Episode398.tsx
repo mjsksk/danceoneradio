@@ -11,6 +11,7 @@ import TrackAffiliateLinks from '@/components/TrackAffiliateLinks';
 import { LoginPrompt } from '@/components/LoginPrompt';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEpisodePlayer } from '@/hooks/useEpisodePlayer';
 
@@ -22,10 +23,48 @@ interface Track {
 }
 
 const Episode398 = () => {
-  const { user } = useAuth();
   const episodeNumber = 398;
   const episodeTitle = "Future Dance Anthems with Mario 398";
   const audioUrl = "https://media.blubrry.com/biggest_tunes_with_mario_135/mc.blubrry.com/biggest_tunes_with_mario_135/Biggest-Tunes-with-Mario-398-streamed.mp3?awCollectionId=673838&awEpisodeId=11880761&aw_0_azn.pgenre=Music&aw_0_1st.ri=blubrry&aw_0_azn.pcountry=US&aw_0_azn.planguage=en-us&cat_exclude=IAB1-8%2CIAB1-9%2CIAB7-41%2CIAB8-5%2CIAB8-18%2CIAB11-4%2CIAB23%2CIAB24%2CIAB25%2CIAB26&aw_0_cnt.rss=https%3A%2F%2Ffeeds.blubrry.com%2Ffeeds%2Fbiggest_tunes_with_mario_135.xml";
+  const audioPlayer = useAudioPlayer();
+  const isCurrent = audioPlayer.source === 'episode' && audioPlayer.episodeInfo?.number === episodeNumber;
+  const isPlaying = isCurrent && audioPlayer.isPlaying;
+  const isLoading = isCurrent && audioPlayer.isLoading;
+  const currentTime = isCurrent ? audioPlayer.currentTime : 0;
+  const duration = isCurrent ? audioPlayer.duration : 0;
+
+  const handlePlayPause = () => {
+    if (isCurrent) {
+      if (audioPlayer.isPlaying) {
+        audioPlayer.pause();
+      } else {
+        audioPlayer.resume();
+      }
+    } else {
+      audioPlayer.playEpisode({ number: episodeNumber, title: episodeTitle, audioUrl });
+    }
+  };
+
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isCurrent || !duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percentage = x / rect.width;
+    audioPlayer.seek(percentage * duration);
+  };
+
+  const formatTime = (timeInSeconds: number) => {
+    if (isNaN(timeInSeconds)) return '0:00';
+    const hours = Math.floor(timeInSeconds / 3600);
+    const minutes = Math.floor((timeInSeconds % 3600) / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  const { user } = useAuth();
   const episodeDate = "December 12, 2025";
   
   const { 
