@@ -81,25 +81,6 @@ const Episode396 = () => {
     img.src = '/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png';
   }, []);
 
-  useEffect(() => {
-    if (progress && audioRef.current && !isPlaying) {
-      audioRef.current.currentTime = progress.playback_position;
-      setCurrentTime(progress.playback_position);
-    }
-  }, [progress, isPlaying]);
-
-  useEffect(() => {
-    if (!user || !isPlaying) return;
-    
-    const interval = setInterval(() => {
-      if (audioRef.current) {
-        saveProgress(audioRef.current.currentTime, audioRef.current.duration);
-      }
-    }, 5000);
-    
-    return () => clearInterval(interval);
-  }, [isPlaying, user, saveProgress]);
-
   const tracks: Track[] = [
     { position: 1, title: "Silver Sun", artist: "Miguel Migs" },
     { position: 2, title: "Too Slow (All Night)", artist: "Eliza Rose & Oppidan" },
