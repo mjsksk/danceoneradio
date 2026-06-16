@@ -12,6 +12,7 @@ import { EpisodeEqVisualizer } from '@/components/EpisodeEqVisualizer';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
+import { useListeningProgress } from '@/hooks/useListeningProgress';
 
 interface Track {
   position: number;
@@ -25,6 +26,7 @@ const Episode389 = () => {
   const episodeTitle = "Anthems of the week 389";
   const audioUrl = "https://media.blubrry.com/biggest_tunes_with_mario_135/content.blubrry.com/biggest_tunes_with_mario_135/ep389-anthems-of-the-week.mp3";
   const audioPlayer = useAudioPlayer();
+  useListeningProgress(episodeNumber, episodeTitle, audioUrl);
   const isCurrent = audioPlayer.source === 'episode' && audioPlayer.episodeInfo?.number === episodeNumber;
   const isPlaying = isCurrent && audioPlayer.isPlaying;
   const isLoading = isCurrent && audioPlayer.isLoading;
