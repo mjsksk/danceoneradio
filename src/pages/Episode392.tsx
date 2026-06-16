@@ -9,7 +9,8 @@ import GoogleAds from '@/components/GoogleAds';
 import { AD_SLOTS } from '@/config/adSlots';
 import TrackAffiliateLinks from '@/components/TrackAffiliateLinks';
 import { Link } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
+import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 
 interface Track {
   position: number;
@@ -19,12 +20,48 @@ interface Track {
 }
 
 const Episode392 = () => {
+  const episodeNumber = 392;
+  const episodeTitle = "Anthems of the week 392";
+  const audioUrl = "https://media.blubrry.com/biggest_tunes_with_mario_135/content.blubrry.com/biggest_tunes_with_mario_135/Biggest-Tunes-with-Mario-392-streamed.mp3";
+  const audioPlayer = useAudioPlayer();
+  const isCurrent = audioPlayer.source === 'episode' && audioPlayer.episodeInfo?.number === episodeNumber;
+  const isPlaying = isCurrent && audioPlayer.isPlaying;
+  const isLoading = isCurrent && audioPlayer.isLoading;
+  const currentTime = isCurrent ? audioPlayer.currentTime : 0;
+  const duration = isCurrent ? audioPlayer.duration : 0;
+
+  const handlePlayPause = () => {
+    if (isCurrent) {
+      if (audioPlayer.isPlaying) {
+        audioPlayer.pause();
+      } else {
+        audioPlayer.resume();
+      }
+    } else {
+      audioPlayer.playEpisode({ number: episodeNumber, title: episodeTitle, audioUrl });
+    }
+  };
+
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isCurrent || !duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percentage = x / rect.width;
+    audioPlayer.seek(percentage * duration);
+  };
+
+  const formatTime = (timeInSeconds: number) => {
+    if (isNaN(timeInSeconds)) return '0:00';
+    const hours = Math.floor(timeInSeconds / 3600);
+    const minutes = Math.floor((timeInSeconds % 3600) / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
   const [bgLoaded, setBgLoaded] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const audioRef = useRef<HTMLAudioElement>(null);
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -37,65 +74,6 @@ const Episode392 = () => {
     img.onload = () => setBgLoaded(true);
     img.src = '/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png';
   }, []);
-
-  const handlePlayPause = async () => {
-    if (!audioRef.current) return;
-    
-    try {
-      setIsLoading(true);
-      
-      if (isPlaying) {
-        audioRef.current.pause();
-        setIsPlaying(false);
-      } else {
-        await audioRef.current.play();
-        setIsPlaying(true);
-      }
-    } catch (error) {
-      console.error('Error playing audio:', error);
-      // Don't automatically redirect on error - let user click the Blubrry button if needed
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration);
-    }
-  };
-
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!audioRef.current) return;
-    
-    const progressBar = e.currentTarget;
-    const rect = progressBar.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const percentage = x / rect.width;
-    const newTime = percentage * duration;
-    
-    audioRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
-  };
-
-  const formatTime = (timeInSeconds: number) => {
-    if (isNaN(timeInSeconds)) return '0:00';
-    
-    const hours = Math.floor(timeInSeconds / 3600);
-    const minutes = Math.floor((timeInSeconds % 3600) / 60);
-    const seconds = Math.floor(timeInSeconds % 60);
-    
-    if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  };
 
   const tracks: Track[] = [
     { position: 1, title: "Real Talk", artist: "My Friend & Simon Doty" },
@@ -199,20 +177,7 @@ const Episode392 = () => {
                   </p>
                   
                   <div className="w-full max-w-2xl mx-auto">
-                    <audio 
-                      ref={audioRef}
-                      preload="metadata"
-                      onEnded={() => setIsPlaying(false)}
-                      onPause={() => setIsPlaying(false)}
-                      onPlay={() => setIsPlaying(true)}
-                      onTimeUpdate={handleTimeUpdate}
-                      onLoadedMetadata={handleLoadedMetadata}
-                    >
-                      <source src="https://media.blubrry.com/biggest_tunes_with_mario_135/content.blubrry.com/biggest_tunes_with_mario_135/Biggest-Tunes-with-Mario-392-streamed.mp3" type="audio/mpeg" />
-                      Your browser does not support the audio element.
-                    </audio>
-                    
-                    <div className="card-cyber p-3 sm:p-6 bg-gradient-to-br from-background/80 to-background/60 backdrop-blur-sm">
+<div className="card-cyber p-3 sm:p-6 bg-gradient-to-br from-background/80 to-background/60 backdrop-blur-sm">
                       <div className="flex items-center gap-2 sm:gap-4 mb-4">
                         <Button 
                           variant="ghost"

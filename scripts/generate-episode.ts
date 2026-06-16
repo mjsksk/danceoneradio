@@ -138,7 +138,8 @@ import GoogleAds from '@/components/GoogleAds';
 import { LoginPrompt } from '@/components/LoginPrompt';
 import EpisodeTracklist from '@/components/EpisodeTracklist';
 import { Link } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
+import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useListeningProgress } from '@/hooks/useListeningProgress';
 
@@ -148,15 +149,17 @@ const Episode${episode.number} = () => {
   const episodeNumber = ${episode.number};
   const episodeTitle = "${episode.title}";
   const audioUrl = "${episode.audioUrl}";
-  
+
   const { progress, saveProgress } = useListeningProgress(episodeNumber, episodeTitle, audioUrl);
-  
+
+  const audioPlayer = useAudioPlayer();
+  const isCurrent = audioPlayer.source === 'episode' && audioPlayer.episodeInfo?.number === episodeNumber;
+  const isPlaying = isCurrent && audioPlayer.isPlaying;
+  const isLoading = isCurrent && audioPlayer.isLoading;
+  const currentTime = isCurrent ? audioPlayer.currentTime : 0;
+  const duration = isCurrent ? audioPlayer.duration : 0;
+
   const [bgLoaded, setBgLoaded] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const audioRef = useRef<HTMLAudioElement>(null);
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -170,76 +173,44 @@ const Episode${episode.number} = () => {
     img.src = '/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png';
   }, []);
 
-  // Restore progress on load
+  // Auto-save listening progress every 5s while this episode plays in the global player
   useEffect(() => {
-    if (progress && audioRef.current && !isPlaying) {
-      audioRef.current.currentTime = progress.playback_position;
-      setCurrentTime(progress.playback_position);
-    }
-  }, [progress, isPlaying]);
-
-  // Auto-save progress every 5 seconds when playing
-  useEffect(() => {
-    if (!user || !isPlaying) return;
-    
+    if (!user || !isCurrent || !isPlaying) return;
     const interval = setInterval(() => {
-      if (audioRef.current) {
-        saveProgress(audioRef.current.currentTime, audioRef.current.duration);
+      if (currentTime > 0 && duration > 0) {
+        saveProgress(currentTime, duration);
       }
     }, 5000);
-    
     return () => clearInterval(interval);
-  }, [isPlaying, user, saveProgress]);
+  }, [user, isCurrent, isPlaying, currentTime, duration, saveProgress]);
 
-  const handlePlayPause = async () => {
-    if (!audioRef.current) return;
-    
-    try {
-      setIsLoading(true);
-      
-      if (isPlaying) {
-        audioRef.current.pause();
-        setIsPlaying(false);
-        
-        // Save progress if user is logged in
-        if (user) {
-          await saveProgress(audioRef.current.currentTime, audioRef.current.duration);
+  const handlePlayPause = () => {
+    if (isCurrent) {
+      if (audioPlayer.isPlaying) {
+        audioPlayer.pause();
+        if (user && currentTime > 0 && duration > 0) {
+          saveProgress(currentTime, duration);
         }
       } else {
-        await audioRef.current.play();
-        setIsPlaying(true);
+        audioPlayer.resume();
       }
-    } catch (error) {
-      console.error('Error playing audio:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration);
+    } else {
+      audioPlayer.playEpisode({ number: episodeNumber, title: episodeTitle, audioUrl });
+      if (progress && progress.playback_position > 0) {
+        setTimeout(() => audioPlayer.seek(progress.playback_position), 500);
+      }
     }
   };
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!audioRef.current) return;
-    
-    const progressBar = e.currentTarget;
-    const rect = progressBar.getBoundingClientRect();
+    if (!isCurrent || !duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const percentage = x / rect.width;
-    const newTime = percentage * duration;
-    
-    audioRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
+    audioPlayer.seek(percentage * duration);
   };
+
+
 
   const formatTime = (timeInSeconds: number) => {
     if (isNaN(timeInSeconds)) return '0:00';
