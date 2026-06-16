@@ -127,7 +127,7 @@ function episodeExists(episodeNumber: number): boolean {
 
 function generateEpisodeFile(episode: Episode): string {
   const header = generateFileHeader(episode);
-  return `${header}import { ArrowLeft, Calendar, Clock, Play, Pause, Apple } from 'lucide-react';
+  return `${header}import { ArrowLeft, Calendar, Clock, Play, Pause, Apple, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Navigation from '@/components/Navigation';
