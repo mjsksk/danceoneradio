@@ -335,6 +335,11 @@ const Episode${episode.number} = () => {
                         </div>
                       </div>
 
+                      {/* Live EQ visualizer */}
+                      <div className="mb-4">
+                        <EpisodeEqVisualizer isActive={isPlaying} />
+                      </div>
+
                       {/* Progress Bar */}
                       <div className="space-y-2">
                         <div 
