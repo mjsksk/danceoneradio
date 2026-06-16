@@ -137,6 +137,7 @@ import SEO from '@/components/SEO';
 import GoogleAds from '@/components/GoogleAds';
 import { LoginPrompt } from '@/components/LoginPrompt';
 import EpisodeTracklist from '@/components/EpisodeTracklist';
+import { EpisodeEqVisualizer } from '@/components/EpisodeEqVisualizer';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
@@ -332,6 +333,11 @@ const Episode${episode.number} = () => {
                           <h3 className="font-semibold text-primary">Future Dance Anthems with Mario</h3>
                           <p className="text-sm text-muted-foreground">Episode ${episode.number} - Anthems of the week</p>
                         </div>
+                      </div>
+
+                      {/* Live EQ visualizer */}
+                      <div className="mb-4">
+                        <EpisodeEqVisualizer isActive={isPlaying} />
                       </div>
 
                       {/* Progress Bar */}
