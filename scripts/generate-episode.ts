@@ -137,6 +137,7 @@ import SEO from '@/components/SEO';
 import GoogleAds from '@/components/GoogleAds';
 import { LoginPrompt } from '@/components/LoginPrompt';
 import EpisodeTracklist from '@/components/EpisodeTracklist';
+import { EpisodeEqVisualizer } from '@/components/EpisodeEqVisualizer';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
