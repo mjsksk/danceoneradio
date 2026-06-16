@@ -142,6 +142,64 @@ export function useListeningProgress(
     }
   }, [user, progress]);
 
+  // Auto-save progress whenever this episode is the active source in the global player.
+  const audioPlayer = useAudioPlayer();
+  const isThisEpisode = audioPlayer.source === 'episode' &&
+    audioPlayer.episodeInfo?.number === episodeNumber;
+  const saveProgressRef = useRef(saveProgress);
+  saveProgressRef.current = saveProgress;
+  const wasPlayingRef = useRef(false);
+  const restoredRef = useRef(false);
+
+  // Restore saved position once playback of this episode begins
+  useEffect(() => {
+    if (!isThisEpisode) {
+      restoredRef.current = false;
+      return;
+    }
+    if (restoredRef.current) return;
+    if (!progress || progress.playback_position <= 5) return;
+    const audio = audioPlayer.audioRef.current;
+    if (!audio) return;
+    if (audioPlayer.duration <= 0) return; // wait until metadata
+    audio.currentTime = progress.playback_position;
+    restoredRef.current = true;
+  }, [isThisEpisode, progress, audioPlayer.duration, audioPlayer.audioRef]);
+
+  // Periodic save while playing
+  useEffect(() => {
+    if (!user || !isThisEpisode || !audioPlayer.isPlaying) return;
+    const interval = setInterval(() => {
+      const audio = audioPlayer.audioRef.current;
+      if (audio && audio.currentTime > 0 && audio.duration > 0) {
+        saveProgressRef.current(audio.currentTime, audio.duration);
+      }
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [user, isThisEpisode, audioPlayer.isPlaying, audioPlayer.audioRef]);
+
+  // Save on pause / unmount
+  useEffect(() => {
+    if (!user || !isThisEpisode) return;
+    const audio = audioPlayer.audioRef.current;
+    if (wasPlayingRef.current && !audioPlayer.isPlaying && audio && audio.currentTime > 0 && audio.duration > 0) {
+      saveProgressRef.current(audio.currentTime, audio.duration);
+    }
+    wasPlayingRef.current = audioPlayer.isPlaying;
+  }, [user, isThisEpisode, audioPlayer.isPlaying, audioPlayer.audioRef]);
+
+  useEffect(() => {
+    return () => {
+      if (!isThisEpisode) return;
+      const audio = audioPlayer.audioRef.current;
+      if (audio && audio.currentTime > 0 && audio.duration > 0) {
+        saveProgressRef.current(audio.currentTime, audio.duration);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
   return {
     progress,
     loading,
