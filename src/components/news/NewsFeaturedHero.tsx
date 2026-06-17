@@ -54,7 +54,9 @@ export function NewsFeaturedHero({ article, isLoading }: NewsFeaturedHeroProps) 
             src={article.image_url}
             alt={article.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-            onError={() = loading="lazy" decoding="async"> setImageError(true)}
+            onError={() => setImageError(true)}
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-primary/20 to-purple-500/20 flex items-center justify-center">
