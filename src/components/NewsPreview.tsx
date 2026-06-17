@@ -142,7 +142,8 @@ function FeaturedHeroCard({ article, isLoading }: FeaturedHeroCardProps) {
                 alt={article.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 loading="lazy"
-                onError={() = decoding="async"> setImageError(true)}
+                decoding="async"
+                onError={() => setImageError(true)}
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-primary/10 via-purple-500/10 to-blue-500/10 flex items-center justify-center">
