@@ -67,6 +67,7 @@ const Wh0PlaysSession225 = lazy(() => import('@/pages/Wh0PlaysSession225'));
 const Wh0PlaysSession226 = lazy(() => import('@/pages/Wh0PlaysSession226'));
 const Wh0PlaysSession230 = lazy(() => import('@/pages/Wh0PlaysSession230'));
 const Wh0PlaysSession232 = lazy(() => import('@/pages/Wh0PlaysSession232'));
+const Wh0PlaysSession233 = lazy(() => import('@/pages/Wh0PlaysSession233'));
 const SongRequests = lazy(() => import('@/pages/SongRequests'));
 const Genres = lazy(() => import('@/pages/Genres'));
 const Genre = lazy(() => import('@/pages/Genre'));
