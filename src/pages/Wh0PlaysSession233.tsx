@@ -1,0 +1,211 @@
+/**
+ * Wh0 Plays Sessions Episode 233 - Wh0 Sessions with Johan S
+ * Air date: June 19, 2026 at 6PM
+ */
+
+import { ArrowLeft, Calendar, Clock, Music } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
+import SocialShare from '@/components/SocialShare';
+import SEO from '@/components/SEO';
+import GoogleAds from '@/components/GoogleAds';
+import { AD_SLOTS } from '@/config/adSlots';
+import TrackAffiliateLinks from '@/components/TrackAffiliateLinks';
+import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+
+interface Track {
+  position: number;
+  title: string;
+  artist: string;
+  timestamp: string;
+  label: string;
+}
+
+const Wh0PlaysSession233 = () => {
+  const [bgLoaded, setBgLoaded] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => setBgLoaded(true);
+    img.src = '/images/wh0-plays-sessions-logo.jpg';
+  }, []);
+
+  const tracks: Track[] = [
+    { position: 1, timestamp: "00:24", artist: "FRUCO FRESH", title: "Sexy (Original Mix)", label: "" },
+    { position: 2, timestamp: "04:15", artist: "Jude & Frank", title: "The Sound Of House (Extended Mix)", label: "" },
+    { position: 3, timestamp: "07:58", artist: "Sam Frandisco", title: "Gotta Have It (Extended Mix)", label: "" },
+    { position: 4, timestamp: "11:16", artist: "FRUCO FRESH", title: "Fresh (Original Mix)", label: "" },
+    { position: 5, timestamp: "15:43", artist: "Lizzie Curious", title: "Hold On (Extended Mix)", label: "" },
+    { position: 6, timestamp: "19:41", artist: "Revival House Project, Anelisa Lamola", title: "Music In Me (Wh0 Remix)", label: "" },
+    { position: 7, timestamp: "23:39", artist: "Illyus Barrientos", title: "Right Here (Extended Mix)", label: "" },
+    { position: 8, timestamp: "27:52", artist: "Reza & JustGio", title: "Back In The Day (Extended Mix)", label: "" },
+    { position: 9, timestamp: "31:35", artist: "Johan S x FRUCO FRESH", title: "Burning Up (Original Mix)", label: "" },
+    { position: 10, timestamp: "35:08", artist: "Michael Gray", title: "Universe (Extended Mix)", label: "" },
+    { position: 11, timestamp: "38:50", artist: "Siege, David LeSal", title: "Burning Down The House (Extended Mix)", label: "" },
+    { position: 12, timestamp: "43:04", artist: "Parker Gordon", title: "Disco Thing (Extended Mix)", label: "" },
+    { position: 13, timestamp: "46:45", artist: "Johan S x Kaleeba", title: "Caught Up With You (Extended Mix)", label: "" },
+    { position: 14, timestamp: "50:19", artist: "Roog", title: "All Of My Days (Extended Mix)", label: "" },
+    { position: 15, timestamp: "52:19", artist: "Johan S & Raffi Habel", title: "Mr. Policeman (Extended Mix)", label: "" },
+    { position: 16, timestamp: "56:09", artist: "Kryder", title: "Eivissa (Extended Mix)", label: "" },
+  ];
+
+  return (
+    <div className="min-h-screen bg-background overflow-x-hidden relative">
+      <SEO 
+        title="Wh0 Sessions Episode 233 with Johan S | Dance One Radio"
+        description="Wh0 Plays Sessions Episode 233 with guest mix from Johan S. 16 house tracks featuring Johan S, FRUCO FRESH, Michael Gray, Kryder, Reza & JustGio and more."
+        image="/lovable-uploads/mario-show.jpg"
+        url={typeof window !== 'undefined' ? window.location.href : ''}
+      />
+      <div 
+        className={`fixed inset-0 z-0 opacity-20 transition-opacity duration-500 ${
+          bgLoaded ? 'opacity-20' : 'opacity-0'
+        }`}
+        style={{
+          backgroundImage: 'url(/images/wh0-plays-sessions-logo.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center center',
+          backgroundRepeat: 'no-repeat',
+          willChange: 'transform',
+          transform: 'translateZ(0)',
+          backfaceVisibility: 'hidden'
+        }}
+      />
+      
+      <div className="relative z-10">
+        <Navigation />
+      
+      <main className="pt-16">
+        <section className="py-6 sm:py-12 relative">
+          <div className="container mx-auto px-4">
+            <div className="mb-8">
+              <Link to="/shows">
+                <Button variant="ghost" className="mb-4 hover:text-primary">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Shows
+                </Button>
+              </Link>
+            </div>
+            
+            <div className="max-w-4xl mx-auto">
+              <div className="flex justify-center mb-8">
+                <img 
+                  src="/images/wh0-plays-sessions-logo.jpg" 
+                  alt="Wh0 Sessions Episode 233 with Johan S"
+                  className="w-64 h-64 sm:w-80 sm:h-80 rounded-2xl object-cover shadow-[0_0_30px_hsl(var(--primary)/0.2)]"
+                  loading="eager"
+                  width="320"
+                  height="320"
+                />
+              </div>
+              <h1 className="text-3xl md:text-5xl font-['Orbitron'] font-bold mb-6 text-center">
+                <span className="text-neon">Wh0 Sessions</span>{" "}
+                <span className="text-neon-purple">233</span>
+              </h1>
+              <p className="text-center text-lg text-muted-foreground font-['Rajdhani'] mb-8">
+                With guest mix from <span className="text-primary font-semibold">Johan S</span>
+              </p>
+              
+              <Card className="card-cyber p-3 sm:p-6 mb-8">
+                <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-muted-foreground text-sm sm:text-base">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-neon" />
+                    <span>June 19, 2026</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-neon-purple" />
+                    <span>6:00 PM</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Music className="w-5 h-5 text-primary" />
+                    <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                      House • Tech House • Dance
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="mt-6 text-center">
+                  <p className="text-muted-foreground mb-4 leading-relaxed">
+                    Wh0 Sessions Episode 233 with a special guest mix from Johan S —
+                    16 tracks of house heat featuring Johan S, FRUCO FRESH, Michael Gray,
+                    Kryder, Reza & JustGio, Roog and more.
+                  </p>
+                  
+                  <div className="mt-4">
+                    <SocialShare 
+                      url={typeof window !== 'undefined' ? window.location.href : ''}
+                      title="Wh0 Sessions Episode 233 with Johan S - Dance One Radio"
+                      description="Wh0 Sessions Episode 233 with guest mix from Johan S. 16 tracks of pure house energy."
+                      image={`${typeof window !== 'undefined' ? window.location.origin : ''}/lovable-uploads/mario-show.jpg`}
+                    />
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        <GoogleAds key="wh0-233-ad" slot={AD_SLOTS.IN_CONTENT} />
+
+        <section className="py-6 sm:py-12">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-['Orbitron'] font-bold mb-4 sm:mb-8 text-center">
+                <span className="text-neon-purple">Track Listing</span>
+              </h2>
+              
+              <div className="grid gap-3">
+                {tracks.map((track) => (
+                  <Card key={track.position} className="card-cyber p-2 sm:p-4 hover:scale-[1.01] transition-all duration-200 group">
+                    <div className="flex items-center gap-2 sm:gap-4">
+                      <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full flex items-center justify-center text-neon font-['Orbitron'] font-bold text-xs sm:text-sm shrink-0">
+                        {track.position}
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-xs sm:text-sm font-semibold text-primary group-hover:text-neon transition-colors break-words sm:truncate">
+                          {track.title}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-muted-foreground break-words sm:truncate">
+                          {track.artist}
+                        </p>
+                        {track.label && (
+                          <p className="text-[10px] sm:text-xs text-muted-foreground/60 mt-0.5">
+                            {track.label}
+                          </p>
+                        )}
+                        <p className="text-[10px] sm:text-xs text-neon/60 font-mono mt-0.5">
+                          {track.timestamp}
+                        </p>
+                        <div className="sm:hidden">
+                          <TrackAffiliateLinks title={track.title} artist={track.artist} variant="mobile" />
+                        </div>
+                      </div>
+                      
+                      <div className="hidden sm:block">
+                        <TrackAffiliateLinks title={track.title} artist={track.artist} />
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+        <GoogleAds key="wh0-233-tracklist-ad" slot={AD_SLOTS.AFTER_TRACKLIST} format="rectangle" />
+      </main>
+
+      <Footer />
+      </div>
+    </div>
+  );
+};
+
+export default Wh0PlaysSession233;
