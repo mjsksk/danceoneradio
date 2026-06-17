@@ -14,6 +14,7 @@ import GoogleAds from '@/components/GoogleAds';
 import { AD_SLOTS } from '@/config/adSlots';
 import TrackAffiliateLinks from '@/components/TrackAffiliateLinks';
 import { Link } from 'react-router-dom';
+import Wh0SessionNav from '@/components/Wh0SessionNav';
 import { useState, useEffect } from 'react';
 
 interface Track {
@@ -92,6 +93,7 @@ const Wh0PlaysSession233 = () => {
                   Back to Shows
                 </Button>
               </Link>
+              <Wh0SessionNav current={233} className="mt-4" />
             </div>
             
             <div className="max-w-4xl mx-auto">
@@ -200,6 +202,11 @@ const Wh0PlaysSession233 = () => {
           </div>
         </section>
         <GoogleAds key="wh0-233-tracklist-ad" slot={AD_SLOTS.AFTER_TRACKLIST} format="rectangle" />
+        <div className="container mx-auto px-4 pb-8">
+          <div className="max-w-4xl mx-auto">
+            <Wh0SessionNav current={233} />
+          </div>
+        </div>
       </main>
 
       <Footer />
