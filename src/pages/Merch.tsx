@@ -44,7 +44,7 @@ const Merch = () => {
 
           {/* Product Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8 justify-items-center max-w-5xl mx-auto">
-            {merchItems.map((item) => (
+            {merchItems.map((item, idx) => (
               <Card
                 key={item.id}
                 className={`overflow-hidden transition-all cursor-pointer group w-full ${
@@ -62,7 +62,7 @@ const Merch = () => {
                       alt={item.name}
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                       style={{ objectPosition: item.imagePosition || 'center' }}
-                     loading="lazy" decoding="async"/>
+                     loading={idx < 3 ? 'eager' : 'lazy'} fetchPriority={idx === 0 ? 'high' : undefined} decoding="async"/>
                   ) : (
                     <ShoppingBag className="w-12 h-12 sm:w-16 sm:h-16 text-muted-foreground/30" />
                   )}
