@@ -440,7 +440,8 @@ const TracksSection = () => {
                             loading="lazy"
                             width="64"
                             height="64"
-                            onError={() = decoding="async"> {
+                            decoding="async"
+                            onError={() => {
                               setLogoError(prev => ({...prev, [track.id]: true}));
                               console.log('Station logo failed to load for track:', track.title);
                             }}
