@@ -106,7 +106,7 @@ const Wh0PlaysSession223 = () => {
                   loading="eager"
                   width="320"
                   height="320"
-                />
+                 decoding="async" srcSet="/images/wh0-plays-bad-intentions-480w.jpg 480w, /images/wh0-plays-bad-intentions-960w.jpg 960w, /images/wh0-plays-bad-intentions.jpg 1080w" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"/>
               </div>
               <h1 className="text-3xl md:text-5xl font-['Orbitron'] font-bold mb-6 text-center">
                 <span className="text-neon">Wh0 Plays Sessions</span>{" "}

@@ -107,7 +107,7 @@ const Downloads = () => {
                       alt="Download on the App Store"
                       className="mx-auto h-14 transition-opacity hover:opacity-80"
                       loading="lazy"
-                    />
+                     decoding="async"/>
                   </a>
                 </div>
               </div>
@@ -131,7 +131,7 @@ const Downloads = () => {
                       alt="Get it on Google Play"
                       className="mx-auto h-14 transition-opacity hover:opacity-80"
                       loading="lazy"
-                    />
+                     decoding="async"/>
                   </a>
                 </div>
               </div>

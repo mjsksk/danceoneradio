@@ -224,7 +224,7 @@ const TrackPage = () => {
                   className="card-cyber p-4 flex items-start gap-4 hover:border-primary/50 transition-colors block"
                 >
                   {article.image_url && (
-                    <img src={article.image_url} alt={article.title} className="w-16 h-16 rounded object-cover flex-shrink-0" loading="lazy" />
+                    <img src={article.image_url} alt={article.title} className="w-16 h-16 rounded object-cover flex-shrink-0" loading="lazy"  decoding="async"/>
                   )}
                   <div>
                     <p className="font-semibold text-foreground text-sm">{article.title}</p>

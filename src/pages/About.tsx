@@ -127,7 +127,7 @@ const About = () => {
                         alt="Mario"
                         className="w-full h-full object-cover"
                         loading="lazy"
-                      />
+                       decoding="async" srcSet="/lovable-uploads/mario-new-480w.jpg 480w, /lovable-uploads/mario-new-960w.jpg 960w, /lovable-uploads/mario-new.jpg 1440w" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"/>
                     </div>
                     <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-primary rounded-full flex items-center justify-center animate-glow-pulse">
                       <Music className="w-3 h-3 text-primary-foreground" />
@@ -156,7 +156,7 @@ const About = () => {
                         alt="Ivan Samel"
                         className="w-full h-full object-cover"
                         loading="lazy"
-                      />
+                       decoding="async"/>
                     </div>
                     <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-accent rounded-full flex items-center justify-center animate-glow-pulse">
                       <Music className="w-3 h-3 text-accent-foreground" />
@@ -184,7 +184,7 @@ const About = () => {
                         alt="DJ Pulse"
                         className="w-full h-full object-cover"
                         loading="lazy"
-                      />
+                       decoding="async"/>
                     </div>
                     <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-primary rounded-full flex items-center justify-center animate-glow-pulse">
                       <Music className="w-3 h-3 text-primary-foreground" />
@@ -213,7 +213,7 @@ const About = () => {
                         alt="DJ Cosmos"
                         className="w-full h-full object-cover"
                         loading="lazy"
-                      />
+                       decoding="async"/>
                     </div>
                     <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-primary rounded-full flex items-center justify-center animate-glow-pulse">
                       <Music className="w-3 h-3 text-primary-foreground" />
@@ -242,7 +242,7 @@ const About = () => {
                         alt="Wh0"
                         className="w-full h-full object-cover"
                         loading="lazy"
-                      />
+                       decoding="async"/>
                     </div>
                     <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-accent rounded-full flex items-center justify-center animate-glow-pulse">
                       <Music className="w-3 h-3 text-accent-foreground" />
@@ -275,7 +275,7 @@ const About = () => {
                       src="/lovable-uploads/mario-new.jpg" 
                       alt="Mario - Host of Future Dance Anthems"
                       className="w-full h-full object-cover"
-                    />
+                     loading="lazy" decoding="async" srcSet="/lovable-uploads/mario-new-480w.jpg 480w, /lovable-uploads/mario-new-960w.jpg 960w, /lovable-uploads/mario-new.jpg 1440w" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"/>
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
                   </div>
                   <div className="p-6">
@@ -296,7 +296,7 @@ const About = () => {
                       src="/lovable-uploads/ivan-samel.jpg" 
                       alt="Ivan Samel - Sound Engineer"
                       className="w-full h-full object-cover"
-                    />
+                     loading="lazy" decoding="async"/>
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
                   </div>
                   <div className="p-6">
@@ -317,7 +317,7 @@ const About = () => {
                       src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&h=450&fit=crop&crop=face" 
                       alt="DJ Pulse - Resident DJ"
                       className="w-full h-full object-cover"
-                    />
+                     loading="lazy" decoding="async"/>
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
                   </div>
                   <div className="p-6">
@@ -338,7 +338,7 @@ const About = () => {
                       src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=450&fit=crop&crop=face" 
                       alt="DJ Cosmos - Deep House Explorer"
                       className="w-full h-full object-cover"
-                    />
+                     loading="lazy" decoding="async"/>
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
                   </div>
                   <div className="p-6">
@@ -359,7 +359,7 @@ const About = () => {
                       src={wh0BioImage} 
                       alt="Wh0 - Who Plays Sessions"
                       className="w-full h-full object-cover object-[center_30%]"
-                    />
+                     loading="lazy" decoding="async"/>
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
                   </div>
                   <div className="p-6">

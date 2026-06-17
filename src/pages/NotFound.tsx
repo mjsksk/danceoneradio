@@ -137,7 +137,7 @@ const NotFound = () => {
             src={danceOneLogo} 
             alt="Dance One Radio" 
             className="w-32 h-32 object-contain opacity-80"
-          />
+           loading="lazy" decoding="async"/>
         </div>
 
         {/* 404 Text with Neon Effect */}

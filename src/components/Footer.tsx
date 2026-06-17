@@ -72,14 +72,14 @@ const Footer = () => {
                   src={appStoreBadge} 
                   alt="Download on the App Store" 
                   className="h-12 transition-opacity hover:opacity-80"
-                />
+                 loading="lazy" decoding="async"/>
               </a>
               <a href="https://play.google.com/store/apps/details?id=com.danceoneradio&hl=en_US&pli=1" target="_blank" rel="noopener noreferrer" className="inline-block">
                 <img 
                   src={googlePlayBadge} 
                   alt="Get it on Google Play" 
                   className="h-12 transition-opacity hover:opacity-80"
-                />
+                 loading="lazy" decoding="async"/>
               </a>
             </div>
           </div>

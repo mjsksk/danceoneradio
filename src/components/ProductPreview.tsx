@@ -53,7 +53,7 @@ const ProductPreviewContent = ({
         (() => {
           const displayImage = (selectedColor && item.colorImages?.[selectedColor]) || item.image;
           return displayImage ? (
-            <img src={displayImage} alt={item.name} className="w-full h-full object-cover" style={{ objectPosition: item.imagePosition || 'center' }} />
+            <img src={displayImage} alt={item.name} className="w-full h-full object-cover" style={{ objectPosition: item.imagePosition || 'center' }}  loading="lazy" decoding="async"/>
           ) : (
             <ShoppingBag className="w-24 h-24 text-muted-foreground/20" />
           );
@@ -82,7 +82,7 @@ const ProductPreviewContent = ({
           className={`w-12 h-12 sm:w-14 sm:h-14 rounded-md overflow-hidden border-2 transition-colors flex-shrink-0 ${activeView === 'image' ? 'border-primary' : 'border-transparent hover:border-primary/40'}`}
         >
           {item.image ? (
-            <img src={item.image} alt="Product" className="w-full h-full object-cover" />
+            <img src={item.image} alt="Product" className="w-full h-full object-cover"  loading="lazy" decoding="async"/>
           ) : (
             <div className="w-full h-full bg-muted flex items-center justify-center">
               <ShoppingBag className="w-4 h-4 text-muted-foreground/40" />

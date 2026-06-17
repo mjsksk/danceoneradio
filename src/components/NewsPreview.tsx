@@ -142,7 +142,7 @@ function FeaturedHeroCard({ article, isLoading }: FeaturedHeroCardProps) {
                 alt={article.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 loading="lazy"
-                onError={() => setImageError(true)}
+                onError={() = decoding="async"> setImageError(true)}
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-primary/10 via-purple-500/10 to-blue-500/10 flex items-center justify-center">
@@ -150,7 +150,7 @@ function FeaturedHeroCard({ article, isLoading }: FeaturedHeroCardProps) {
                   src={stationLogo} 
                   alt="Dance One Radio" 
                   className="w-20 h-20 object-contain opacity-60"
-                />
+                 loading="lazy" decoding="async"/>
               </div>
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:to-background/80" />
@@ -231,7 +231,7 @@ function NewsPreviewCard({ article }: NewsPreviewCardProps) {
               alt={article.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
-              onError={() => setImageError(true)}
+              onError={() = decoding="async"> setImageError(true)}
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-primary/10 via-purple-500/10 to-blue-500/10 flex items-center justify-center">
@@ -239,7 +239,7 @@ function NewsPreviewCard({ article }: NewsPreviewCardProps) {
                 src={stationLogo} 
                 alt="Dance One Radio" 
                 className="w-16 h-16 object-contain opacity-60"
-              />
+               loading="lazy" decoding="async"/>
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />

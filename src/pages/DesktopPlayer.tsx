@@ -52,7 +52,7 @@ const DesktopPlayer = () => {
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4">
           <div className="flex items-center gap-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-primary/25 bg-white/5 shadow-[0_0_35px_rgba(34,211,238,0.16)]">
-              <img src={stationLogo} alt="Dance One Radio" className="h-9 w-9 object-contain" />
+              <img src={stationLogo} alt="Dance One Radio" className="h-9 w-9 object-contain"  loading="lazy" decoding="async"/>
             </div>
             <div>
               <p className="text-xs uppercase tracking-[0.35em] text-primary/80">{getDesktopPlayerLabel(desktopPlatform)}</p>
