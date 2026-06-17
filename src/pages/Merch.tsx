@@ -62,7 +62,7 @@ const Merch = () => {
                       alt={item.name}
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                       style={{ objectPosition: item.imagePosition || 'center' }}
-                    />
+                     loading="lazy" decoding="async"/>
                   ) : (
                     <ShoppingBag className="w-12 h-12 sm:w-16 sm:h-16 text-muted-foreground/30" />
                   )}

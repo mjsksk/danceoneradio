@@ -233,9 +233,9 @@ const LiveRadioPlayer = ({
           <div className="relative">
             <div className="w-40 h-40 bg-gradient-to-r from-primary to-accent rounded-lg flex items-center justify-center pulse-cyber overflow-hidden">
               {albumArt ? (
-                <img src={albumArt} alt="Current Track Album Art" className="w-full h-full object-cover rounded-lg" onError={() => setLocalAlbumArt(null)} />
+                <img src={albumArt} alt="Current Track Album Art" className="w-full h-full object-cover rounded-lg" loading="eager" decoding="async" fetchPriority="high" onError={() => setLocalAlbumArt(null)} />
               ) : (
-                <img src={stationLogo} alt="Dance One Radio Logo" className="w-24 h-24 object-contain filter brightness-0 invert" loading="lazy" />
+                <img src={stationLogo} alt="Dance One Radio Logo" className="w-24 h-24 object-contain filter brightness-0 invert" loading="lazy"  decoding="async"/>
               )}
             </div>
             <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center animate-glow-pulse">

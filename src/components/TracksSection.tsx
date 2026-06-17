@@ -425,11 +425,13 @@ const TracksSection = () => {
                          src={albumArt[track.id]} 
                          alt={`${track.artist} - ${track.title} Album Art`}
                          className="w-full h-full object-cover"
-                         onError={() => {
-                           setLogoError(prev => ({...prev, [track.id]: true}));
-                           console.log('Album art failed to load for track:', track.title);
-                         }}
-                       />
+                          loading="lazy"
+                          decoding="async"
+                          onError={() => {
+                            setLogoError(prev => ({...prev, [track.id]: true}));
+                            console.log('Album art failed to load for track:', track.title);
+                          }}
+                        />
                       ) : (
                         <div className="track-logo">
                           <img 
@@ -438,6 +440,7 @@ const TracksSection = () => {
                             loading="lazy"
                             width="64"
                             height="64"
+                            decoding="async"
                             onError={() => {
                               setLogoError(prev => ({...prev, [track.id]: true}));
                               console.log('Station logo failed to load for track:', track.title);

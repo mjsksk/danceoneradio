@@ -54,7 +54,7 @@ const Gallery = () => {
                       src={loveParade2005}
                       alt="Love Parade 2005 San Francisco"
                       className="w-full h-64 object-contain transition-transform duration-300 hover:scale-110"
-                    />
+                     loading="lazy" decoding="async"/>
                   </div>
                   <p className="text-muted-foreground">
                     View 114 photos from Love Parade 2005
@@ -75,7 +75,7 @@ const Gallery = () => {
                       src={loveParade2006}
                       alt="Love Parade 2006 San Francisco"
                       className="w-full h-64 object-contain transition-transform duration-300 hover:scale-110"
-                    />
+                     loading="lazy" decoding="async"/>
                   </div>
                   <p className="text-muted-foreground">
                     View photos from Love Parade 2006

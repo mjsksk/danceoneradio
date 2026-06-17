@@ -303,6 +303,8 @@ const GalleryLightbox = ({
                       "max-w-full max-h-[90vh] object-contain select-none transition-opacity duration-300",
                       isImageLoaded ? "opacity-100" : "opacity-0"
                     )}
+                    loading="eager"
+                    decoding="async"
                     onLoad={() => setIsImageLoaded(true)}
                     draggable={false}
                   />

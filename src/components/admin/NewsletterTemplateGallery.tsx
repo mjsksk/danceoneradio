@@ -130,7 +130,7 @@ const builtInTemplates: BuiltInTemplate[] = [
 <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr>
     <td style="text-align: center; padding: 20px;">
-      <img src="[ARTIST_IMAGE_URL]" alt="Artist Photo" width="150" height="150" style="border-radius: 50%; border: 3px solid #007bff;">
+      <img src="[ARTIST_IMAGE_URL]" alt="Artist Photo" width="150" height="150" style="border-radius: 50%; border: 3px solid #007bff;" loading="lazy" decoding="async">
     </td>
   </tr>
 </table>

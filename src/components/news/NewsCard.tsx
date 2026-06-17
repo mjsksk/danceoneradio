@@ -42,7 +42,7 @@ export function NewsCard({ article, featured = false }: NewsCardProps) {
         src={stationLogo} 
         alt="Dance One Radio" 
         className="w-24 h-24 object-contain opacity-60"
-      />
+       loading="lazy" decoding="async"/>
       <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
     </div>
   );
@@ -62,6 +62,7 @@ export function NewsCard({ article, featured = false }: NewsCardProps) {
               alt={article.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
+              decoding="async"
               onError={() => setImageError(true)}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />

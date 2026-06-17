@@ -55,6 +55,8 @@ export function NewsFeaturedHero({ article, isLoading }: NewsFeaturedHeroProps) 
             alt={article.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
             onError={() => setImageError(true)}
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-primary/20 to-purple-500/20 flex items-center justify-center">
@@ -62,7 +64,7 @@ export function NewsFeaturedHero({ article, isLoading }: NewsFeaturedHeroProps) 
               src={stationLogo} 
               alt="Dance One Radio" 
               className="w-32 h-32 object-contain opacity-50"
-            />
+             loading="lazy" decoding="async"/>
           </div>
         )}
         
