@@ -55,7 +55,8 @@ export function NewsFeaturedHero({ article, isLoading }: NewsFeaturedHeroProps) 
             alt={article.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
             onError={() => setImageError(true)}
-            loading="lazy"
+            loading="eager"
+            fetchPriority="high"
             decoding="async"
           />
         ) : (
