@@ -3,7 +3,7 @@ import SocialShare from '@/components/SocialShare';
 import LiveRadioPlayer from './LiveRadioPlayer';
 import { PRIMARY_STREAM_URLS } from '@/config/streamUrls';
 import { RadioStreamService } from '@/utils/RadioStreamService';
-import { WavyBackground } from '@/components/ui/wavy-background';
+import { ShieldShader } from '@/components/ui/shield-shader';
 import { Radio, Music2, Disc3 } from 'lucide-react';
 
 const NowPlayingBlock = ({ streamTitle }: { streamTitle: string }) => {
@@ -83,14 +83,7 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <WavyBackground
-      colors={["#7c3aed", "#6d28d9", "#8b5cf6", "#a78bfa", "#22d3ee"]}
-      waveOpacity={0.3}
-      blur={12}
-      speed="slow"
-      backgroundFill="hsl(222.2, 84%, 4.9%)"
-      containerClassName="min-h-screen"
-    >
+    <ShieldShader containerClassName="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-4xl flex-col justify-center px-4 pt-32 md:pt-36">
         <div className="mb-4 animate-fade-in">
           <h1 className="sr-only">Dance One Radio — Live Electronic & Dance Music 24/7</h1>
@@ -135,7 +128,7 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-    </WavyBackground>
+    </ShieldShader>
   );
 };
 export default HeroSection;
