@@ -256,21 +256,25 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    // Require authentication: either the service role key (used by the cron job)
-    // or an authenticated admin user. This prevents anyone on the internet from
-    // triggering external RSS/OG fetches as an amplification vector.
+    // Require authentication. Accept any of:
+    //  - the service role key (manual admin trigger)
+    //  - the project anon key (used by the pg_cron scheduled job)
+    //  - an authenticated admin user JWT
+    // Rate-limiting (above) prevents abuse via the public anon key.
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     const authHeader = req.headers.get('Authorization') || ''
     const token = authHeader.replace(/^Bearer\s+/i, '').trim()
     const isServiceRole = token && token === supabaseKey
+    const isAnonKey = token && anonKey && token === anonKey
 
-    if (!isServiceRole) {
+    if (!isServiceRole && !isAnonKey) {
       if (!token) {
         return new Response(
           JSON.stringify({ error: 'Unauthorized' }),
           { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
       }
-      const userClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
+      const userClient = createClient(supabaseUrl, anonKey, {
         global: { headers: { Authorization: `Bearer ${token}` } }
       })
       const { data: userData, error: userErr } = await userClient.auth.getUser()
