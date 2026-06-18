@@ -9,94 +9,104 @@ const vertexShader = /* glsl */ `
   }
 `;
 
+// Hexagonal portal / shield shader — blue beams radiating between dark hex cells
 const fragmentShader = /* glsl */ `
   precision highp float;
   uniform float iTime;
   uniform vec3 iResolution;
 
-  // Hash & noise helpers
-  float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
-  }
-
-  float noise(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-    vec2 u = f * f * (3.0 - 2.0 * f);
-    return mix(
-      mix(hash(i + vec2(0.0, 0.0)), hash(i + vec2(1.0, 0.0)), u.x),
-      mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
-      u.y
-    );
-  }
-
-  float fbm(vec2 p) {
-    float v = 0.0;
-    float a = 0.5;
-    for (int i = 0; i < 5; i++) {
-      v += a * noise(p);
-      p *= 2.02;
-      a *= 0.5;
-    }
-    return v;
-  }
-
-  // Hex pattern (shield grid)
-  vec2 hexCoord(vec2 p) {
-    vec2 q = vec2(p.x * 1.1547005, p.y + p.x * 0.5);
-    vec2 pi = floor(q);
-    vec2 pf = fract(q);
-    float v = mod(pi.x + pi.y, 3.0);
-    float ca = step(1.0, v);
-    float cb = step(2.0, v);
-    vec2 ma = step(pf.xy, pf.yx);
-    return vec2(length(pf - 0.5 - vec2(ca, cb) + ma * (cb - ca)));
+  // Distance to a hex tile center, plus cell id
+  // Returns vec4(dist_to_center, dist_to_edge, cellId.x, cellId.y)
+  vec4 hexDist(vec2 p) {
+    vec2 s = vec2(1.0, 1.7320508); // sqrt(3)
+    vec4 hC = floor(vec4(p, p - vec2(0.5, 1.0)) / s.xyxy) + 0.5;
+    vec4 h = vec4(p - hC.xy * s, p - (hC.zw + 0.5) * s);
+    vec2 offs = dot(h.xy, h.xy) < dot(h.zw, h.zw) ? h.xy : h.zw;
+    vec2 id   = dot(h.xy, h.xy) < dot(h.zw, h.zw) ? hC.xy : hC.zw + 0.5;
+    // distance to nearest edge of the hex
+    float edge = 0.5 - max(
+      abs(offs.x) * 0.8660254 + offs.y * 0.5,
+      max(abs(offs.y), -offs.y * 0.5 + abs(offs.x) * 0.8660254)
+    ) * 0.0; // placeholder
+    // Use a cleaner hex edge distance:
+    vec2 a = abs(offs);
+    edge = 0.5 - max(a.x * 0.8660254 + a.y * 0.5, a.y);
+    return vec4(length(offs), edge, id);
   }
 
   void main() {
     vec2 fragCoord = gl_FragCoord.xy;
     vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
 
-    float t = iTime * 0.15;
+    float t = iTime * 0.25;
 
-    // Animated plasma background
-    vec2 p = uv * 2.5;
-    float n = fbm(p + vec2(t, -t * 0.7));
-    float n2 = fbm(p * 1.6 - vec2(t * 0.6, t));
+    // Polar coordinates for ray beams
+    float ang = atan(uv.y, uv.x);
+    float rad = length(uv);
 
-    // Radial shield falloff
-    float r = length(uv);
-    float shield = smoothstep(1.2, 0.0, r);
+    // === Hex grid (tunnel: scale with radius for perspective feel) ===
+    // Sample hex grid at fixed scale but modulate brightness by radius
+    vec2 hp = uv * 4.2;
+    vec4 H = hexDist(hp);
+    float dCenter = H.x;           // 0 at center of hex
+    float dEdge   = H.y;           // 0 at edge of hex
 
-    // Hex grid pattern
-    vec2 hp = uv * 8.0 + vec2(t * 0.4, t * 0.2);
-    float hex = hexCoord(hp).x;
-    float hexLine = smoothstep(0.42, 0.48, hex) * (1.0 - smoothstep(0.48, 0.52, hex));
+    // Dark inside hex, glowing toward edge
+    // Edge glow band
+    float edgeGlow = smoothstep(0.18, 0.0, dEdge);     // bright thin line at very edge
+    float edgeBloom = smoothstep(0.35, 0.05, dEdge);   // softer bloom inward
+    // Pure dark hex interior
+    float interior = smoothstep(0.05, 0.18, dEdge);
 
-    // Concentric scan rings
-    float rings = 0.5 + 0.5 * sin(r * 18.0 - iTime * 1.2);
-    rings = pow(rings, 6.0);
+    // === Radial light beams between hexes ===
+    // Beams aligned with the 6 hex vertex directions
+    float beams = 0.0;
+    for (int i = 0; i < 6; i++) {
+      float a = float(i) * 1.0471975512 + 0.5235987756; // 60deg steps, offset 30deg
+      float d = abs(sin(ang - a));
+      beams += pow(1.0 - d, 24.0);
+    }
+    // Add subtle animated flicker
+    beams *= 0.85 + 0.15 * sin(iTime * 1.5 + rad * 8.0);
 
-    // Color palette (electric purple -> cyan)
-    vec3 colA = vec3(0.05, 0.0, 0.18);
-    vec3 colB = vec3(0.49, 0.18, 0.92); // violet
-    vec3 colC = vec3(0.13, 0.83, 0.92); // cyan
-    vec3 colD = vec3(0.96, 0.27, 0.58); // pink edge
+    // Falloff beams from center outward (brighter near mid, fading at extremes)
+    float beamFalloff = smoothstep(0.0, 0.15, rad) * smoothstep(1.4, 0.3, rad);
+    beams *= beamFalloff;
 
-    vec3 col = mix(colA, colB, smoothstep(0.1, 0.9, n));
-    col = mix(col, colC, smoothstep(0.4, 0.95, n2) * 0.6);
+    // === Color composition ===
+    // Deep blue palette
+    vec3 deepBlue = vec3(0.02, 0.05, 0.18);
+    vec3 midBlue  = vec3(0.10, 0.35, 0.95);
+    vec3 hotBlue  = vec3(0.55, 0.80, 1.00);
 
-    // Add hex grid glow
-    col += colC * hexLine * 0.35 * shield;
+    vec3 col = vec3(0.0);
 
-    // Add scan rings
-    col += colD * rings * 0.18 * shield;
+    // Beam light
+    col += midBlue * beams * 1.4;
+    col += hotBlue * pow(beams, 2.0) * 0.8;
 
-    // Vignette dark edges
-    col *= mix(0.25, 1.0, shield);
+    // Hex edge glow (multiplied by beam presence so edges only light where rays hit)
+    float rayMask = beams * 1.2 + 0.15;
+    col += midBlue * edgeBloom * 0.35 * rayMask;
+    col += hotBlue * edgeGlow * 0.9 * rayMask;
 
-    // Subtle grain
-    col += (hash(fragCoord + iTime) - 0.5) * 0.025;
+    // Central dark hex pit
+    float centerPit = smoothstep(0.18, 0.0, rad);
+    col *= mix(1.0, 0.0, centerPit);
+
+    // Outer vignette to push edges to black
+    float vig = smoothstep(1.4, 0.4, rad);
+    col *= mix(0.15, 1.0, vig);
+
+    // Subtle horizontal scan-line shimmer (suggests reflective floor)
+    float scan = 0.5 + 0.5 * sin(fragCoord.y * 3.14159 + iTime * 4.0);
+    col *= 0.97 + 0.03 * scan;
+
+    // Slow color breathing
+    col *= 0.9 + 0.1 * sin(iTime * 0.6);
+
+    // Gamma
+    col = pow(col, vec3(0.95));
 
     gl_FragColor = vec4(col, 1.0);
   }
