@@ -262,10 +262,12 @@ serve(async (req) => {
     //  - an authenticated admin user JWT
     // Rate-limiting (above) prevents abuse via the public anon key.
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    const publishableKey = Deno.env.get('SUPABASE_PUBLISHABLE_KEY') ?? ''
     const authHeader = req.headers.get('Authorization') || ''
     const token = authHeader.replace(/^Bearer\s+/i, '').trim()
-    const isServiceRole = token && token === supabaseKey
-    const isAnonKey = token && anonKey && token === anonKey
+    const isServiceRole = !!token && token === supabaseKey
+    const isAnonKey = !!token && (token === anonKey || token === publishableKey)
+    console.log(`🔐 Auth check: hasToken=${!!token} isServiceRole=${isServiceRole} isAnonKey=${isAnonKey}`)
 
     if (!isServiceRole && !isAnonKey) {
       if (!token) {
