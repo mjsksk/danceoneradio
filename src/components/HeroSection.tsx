@@ -3,7 +3,7 @@ import SocialShare from '@/components/SocialShare';
 import LiveRadioPlayer from './LiveRadioPlayer';
 import { PRIMARY_STREAM_URLS } from '@/config/streamUrls';
 import { RadioStreamService } from '@/utils/RadioStreamService';
-import { WavyBackground } from '@/components/ui/wavy-background';
+import { ShieldShader } from '@/components/ui/shield-shader';
 import { Radio, Music2, Disc3 } from 'lucide-react';
 
 const NowPlayingBlock = ({ streamTitle }: { streamTitle: string }) => {
