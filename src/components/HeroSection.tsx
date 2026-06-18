@@ -83,14 +83,7 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <WavyBackground
-      colors={["#7c3aed", "#6d28d9", "#8b5cf6", "#a78bfa", "#22d3ee"]}
-      waveOpacity={0.3}
-      blur={12}
-      speed="slow"
-      backgroundFill="hsl(222.2, 84%, 4.9%)"
-      containerClassName="min-h-screen"
-    >
+    <ShieldShader containerClassName="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-4xl flex-col justify-center px-4 pt-32 md:pt-36">
         <div className="mb-4 animate-fade-in">
           <h1 className="sr-only">Dance One Radio — Live Electronic & Dance Music 24/7</h1>
