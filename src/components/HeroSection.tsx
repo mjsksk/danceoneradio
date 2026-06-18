@@ -128,7 +128,7 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-    </WavyBackground>
+    </ShieldShader>
   );
 };
 export default HeroSection;
