@@ -1,40 +1,40 @@
 # Downloads Directory
 
-This directory should contain the desktop application installers for distribution.
+This directory contains desktop installers that are served directly from the website.
 
-## Required Files:
+## Current Files
 
-1. **Dance-One-Radio-Setup-1.0.0.exe** - Full installer with uninstaller and shortcuts
-2. **Dance-One-Radio-Portable-1.0.0.exe** - Portable version that runs without installation
+1. `dance-one-radio-<version>-macos-arm64.dmg` - macOS Apple Silicon desktop installer
+2. Windows installers can continue to be hosted from GitHub Releases or copied into this folder if you want fully local hosting
 
-## How to Generate These Files:
+## How to Generate the macOS DMG
 
 1. Build the desktop app using the build script:
    ```bash
-   cd desktop-app
-   node build-script.js
+   npm run build:desktop:mac
    ```
 
-2. The generated files will be in `desktop-app/dist/`
+2. The generated files will be in:
+   - `src-tauri/target/release/bundle/macos/`
+   - `src-tauri/target/release/bundle/dmg/`
 
-3. Copy the installer files to this `public/downloads/` directory:
+3. Copy the DMG into this directory when you want the website to host it directly:
    ```bash
-   cp desktop-app/dist/*.exe public/downloads/
+   cp src-tauri/target/release/bundle/dmg/dance-one-radio-<version>-macos-arm64.dmg public/downloads/
    ```
 
-## File Sizes (Approximate):
-- Full Installer: ~50-60 MB
-- Portable Version: ~45-55 MB
+## File Sizes (Approximate)
+- macOS Apple Silicon DMG: ~6 MB
 
-## Distribution:
+## Distribution
 These files will be served directly from your website when users click the download buttons.
 
-## Security:
-Consider code signing the executables to reduce Windows security warnings during installation.
+## Security
+The current macOS build is unsigned. For the smoothest public release, code signing and notarization should be added before broad distribution.
 
-## Updates:
+## Updates
 When releasing new versions:
-1. Update version numbers in desktop-app/package.json
-2. Rebuild using the build script
-3. Replace files in this directory
-4. Update version references in the download components
+1. Update the version in `src-tauri/tauri.conf.json`
+2. Rebuild using `npm run build:desktop:mac`
+3. Replace the DMG in this directory
+4. Update version references in the download components if the public filename changes

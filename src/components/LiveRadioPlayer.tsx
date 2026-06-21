@@ -49,7 +49,7 @@ const LiveRadioPlayer = ({
   const [titleScrollDuration, setTitleScrollDuration] = useState(18);
   const [titleScrollDistance, setTitleScrollDistance] = useState(0);
 
-  const { showNotification, isElectronDesktop, ensureNotificationPermission } = useDesktopIntegration();
+  const { showNotification, ensureNotificationPermission } = useDesktopIntegration();
   const lastNotifiedTrackRef = useRef<string | null>(null);
   const titleContainerRef = useRef<HTMLDivElement | null>(null);
   const titleMeasureRef = useRef<HTMLSpanElement | null>(null);
@@ -57,7 +57,6 @@ const LiveRadioPlayer = ({
   const { frequencyData, barCount } = useLiveEqVisualizer({
     audioRef: audioPlayer.audioRef,
     isActive: animationActive,
-    isElectronDesktop,
   });
 
   const displayStreamTitle = globalStreamTitle || currentStreamTitle;

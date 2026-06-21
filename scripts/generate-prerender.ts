@@ -55,7 +55,7 @@ const staticRoutes = [
   {
     path: '/downloads',
     title: 'Download Dance One Radio Apps - Desktop & Mobile',
-    description: 'Download Dance One Radio desktop apps for Windows, Mac, and Linux. Listen to live electronic dance music streams on your favorite device.',
+    description: 'Download Dance One Radio desktop apps for Windows and Mac, plus mobile apps for iPhone and Android.',
     image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
   },
   {

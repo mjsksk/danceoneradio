@@ -4,7 +4,7 @@ const EQ_BAR_COUNT = 64;
 const EQ_MIN_HEIGHT = 12;
 const EQ_MAX_HEIGHT = 70;
 const LOW_SIGNAL_THRESHOLD = 0.035;
-const LOW_SIGNAL_FRAME_LIMIT = 18;
+const LOW_SIGNAL_FRAME_LIMIT = 45;
 
 const createIdleFrequencyData = (count = EQ_BAR_COUNT) => new Array(count).fill(EQ_MIN_HEIGHT);
 
@@ -14,24 +14,14 @@ let sharedSourceNode: MediaElementAudioSourceNode | null = null;
 let sharedAnalyserAudio: HTMLAudioElement | null = null;
 let sharedFrequencyBins: Uint8Array | null = null;
 
-const supportsEqFallback = () => {
-  if (typeof window === 'undefined') {
-    return false;
-  }
-
-  return window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
-};
-
 interface UseLiveEqVisualizerOptions {
   audioRef: React.RefObject<HTMLAudioElement>;
   isActive: boolean;
-  isElectronDesktop: boolean;
 }
 
 export const useLiveEqVisualizer = ({
   audioRef,
   isActive,
-  isElectronDesktop,
 }: UseLiveEqVisualizerOptions) => {
   const [frequencyData, setFrequencyData] = useState<number[]>(() => createIdleFrequencyData());
   const animationRef = useRef<number | null>(null);
@@ -86,14 +76,6 @@ export const useLiveEqVisualizer = ({
       animate();
     };
 
-    if (isElectronDesktop) {
-      startSyntheticAnimation();
-      return () => {
-        isCancelled = true;
-        cancelFrame();
-      };
-    }
-
     const audio = audioRef.current;
     const AudioContextCtor = window.AudioContext || (window as Window & typeof globalThis & {
       webkitAudioContext?: typeof AudioContext;
@@ -107,7 +89,29 @@ export const useLiveEqVisualizer = ({
       };
     }
 
-    const prefersSyntheticFallback = supportsEqFallback();
+    if (!audio.currentSrc && !audio.src) {
+      startSyntheticAnimation();
+      return () => {
+        isCancelled = true;
+        cancelFrame();
+      };
+    }
+
+    const resumeAudioContext = async () => {
+      if (!sharedAudioContext || sharedAudioContext.state !== 'suspended') {
+        return;
+      }
+
+      try {
+        await sharedAudioContext.resume();
+      } catch (error) {
+        console.error('Failed to resume live EQ audio context:', error);
+      }
+    };
+
+    const handlePlaybackResume = () => {
+      void resumeAudioContext();
+    };
 
     const setupAnalyser = async () => {
       try {
@@ -154,7 +158,7 @@ export const useLiveEqVisualizer = ({
             return;
           }
 
-          sharedAnalyser.getByteFrequencyData(sharedFrequencyBins as unknown as Uint8Array<ArrayBuffer>);
+          sharedAnalyser.getByteFrequencyData(sharedFrequencyBins);
 
           let signalLevel = 0;
           const nextBars = Array.from({ length: EQ_BAR_COUNT }, (_, index) => {
@@ -177,16 +181,16 @@ export const useLiveEqVisualizer = ({
             return previousHeight + (targetHeight - previousHeight) * smoothing;
           });
 
-          if (prefersSyntheticFallback) {
-            const averageSignal = signalLevel / EQ_BAR_COUNT;
-            lowSignalFramesRef.current = averageSignal < LOW_SIGNAL_THRESHOLD
-              ? lowSignalFramesRef.current + 1
-              : 0;
+          const averageSignal = signalLevel / EQ_BAR_COUNT;
+          const hasUsableAudioSignal = averageSignal >= LOW_SIGNAL_THRESHOLD;
 
-            if (lowSignalFramesRef.current >= LOW_SIGNAL_FRAME_LIMIT) {
-              startSyntheticAnimation();
-              return;
-            }
+          lowSignalFramesRef.current = hasUsableAudioSignal
+            ? 0
+            : lowSignalFramesRef.current + 1;
+
+          if (lowSignalFramesRef.current >= LOW_SIGNAL_FRAME_LIMIT) {
+            startSyntheticAnimation();
+            return;
           }
 
           smoothedBarsRef.current = nextBars;
@@ -203,13 +207,17 @@ export const useLiveEqVisualizer = ({
 
     syntheticModeRef.current = false;
     lowSignalFramesRef.current = 0;
+    audio.addEventListener('play', handlePlaybackResume);
+    audio.addEventListener('playing', handlePlaybackResume);
     void setupAnalyser();
 
     return () => {
       isCancelled = true;
+      audio.removeEventListener('play', handlePlaybackResume);
+      audio.removeEventListener('playing', handlePlaybackResume);
       cancelFrame();
     };
-  }, [audioRef, isActive, isElectronDesktop]);
+  }, [audioRef, isActive]);
 
   return {
     frequencyData,

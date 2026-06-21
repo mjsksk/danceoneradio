@@ -24,23 +24,25 @@ import appStoreBadge from '@/assets/app-store-badge-new.svg';
 import googlePlayBadge from '@/assets/google-play-badge-new.svg';
 
 const Downloads = () => {
-  const downloadUrl = 'https://github.com/mjsksk/danceoneradio/releases/download/v1.0.24/dance-one-radio-setup-1.0.24-x64.exe';
+  const appVersion = '1.0.24';
+  const windowsDownloadUrl = `https://github.com/mjsksk/danceoneradio/releases/download/v${appVersion}/dance-one-radio-setup-${appVersion}-x64.exe`;
+  const macDownloadUrl = `/downloads/dance-one-radio-${appVersion}-macos-arm64.dmg`;
 
-  const handleDownload = () => {
+  const handleDownload = (platform: string, url: string) => {
     supabase
       .from('app_downloads')
-      .insert({ platform: 'windows', version: '1.0.24' })
+      .insert({ platform, version: appVersion })
       .then(() => {});
 
-    window.open(downloadUrl, '_blank');
+    window.open(url, '_blank');
   };
 
   return (
     <div className="min-h-screen bg-background">
       <SEO
         title="Dance One Radio Apps - Desktop & Mobile"
-        description="Download Dance One Radio apps for Windows, iOS, and Android. Listen to live electronic dance music streams on your favorite device."
-        keywords="dance one radio app, radio desktop app, music streaming app, electronic music app, Windows radio app, iOS radio app, Android radio app"
+        description="Download Dance One Radio apps for Windows, macOS, iOS, and Android. Listen to live electronic dance music streams on your favorite device."
+        keywords="dance one radio app, radio desktop app, macOS radio app, Windows radio app, music streaming app, electronic music app, iOS radio app, Android radio app"
       />
       <Navigation />
 
@@ -65,7 +67,7 @@ const Downloads = () => {
                 <SocialShare
                   url={window.location.href}
                   title="Dance One Radio Apps"
-                  description="Download Dance One Radio apps for Windows, iOS, and Android. Experience the ultimate electronic music streaming."
+                  description="Download Dance One Radio apps for Windows, macOS, iOS, and Android. Experience the ultimate electronic music streaming."
                   image={`${window.location.origin}/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png`}
                 />
               </div>
@@ -147,11 +149,11 @@ const Downloads = () => {
                 <h2 className="text-3xl font-bold md:text-4xl">Desktop App</h2>
               </div>
               <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
-                The full-featured experience for your Windows PC
+                The full-featured experience for your Windows PC or Mac
               </p>
             </div>
 
-            <div className="mx-auto mb-12 max-w-md">
+            <div className="mx-auto mb-8 grid max-w-4xl gap-8 md:grid-cols-2">
               <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-background to-primary/5 p-8 text-center">
                 <div className="relative z-10">
                   <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/20">
@@ -165,7 +167,7 @@ const Downloads = () => {
 
                   <Button
                     size="lg"
-                    onClick={handleDownload}
+                    onClick={() => handleDownload('windows', windowsDownloadUrl)}
                     className="gap-2 px-8 py-6 text-lg"
                   >
                     <Download className="h-5 w-5" />
@@ -173,10 +175,40 @@ const Downloads = () => {
                   </Button>
 
                   <div className="mt-4 text-sm text-muted-foreground">
-                    Version 1.0.24 • Windows 10+ (64-bit) • Free
+                    Version {appVersion} • Windows 10+ (64-bit) • Free
                   </div>
                 </div>
               </div>
+
+              <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-background to-primary/5 p-8 text-center">
+                <div className="relative z-10">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/20">
+                    <Monitor className="h-8 w-8 text-primary" />
+                  </div>
+
+                  <h3 className="mb-2 text-xl font-semibold">macOS Desktop</h3>
+                  <p className="mb-6 text-muted-foreground">
+                    Download the Apple Silicon Mac build for a lightweight native player with menu bar controls and live stream playback.
+                  </p>
+
+                  <Button
+                    size="lg"
+                    onClick={() => handleDownload('macos-arm64', macDownloadUrl)}
+                    className="gap-2 px-8 py-6 text-lg"
+                  >
+                    <Download className="h-5 w-5" />
+                    Download for Mac
+                  </Button>
+
+                  <div className="mt-4 text-sm text-muted-foreground">
+                    Version {appVersion} • macOS 13+ • Apple Silicon
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mx-auto mb-12 max-w-3xl rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 text-sm text-muted-foreground">
+              <strong>macOS note:</strong> The current Mac build is an Apple Silicon DMG and is not code signed yet, so macOS may ask you to confirm opening it the first time.
             </div>
 
             <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -184,9 +216,9 @@ const Downloads = () => {
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                   <Settings className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="mb-2 text-xl font-semibold">System Tray Integration</h3>
+                <h3 className="mb-2 text-xl font-semibold">Menu Bar & Tray Controls</h3>
                 <p className="text-muted-foreground">
-                  Control playback directly from your system tray. Play, pause, and see current track without opening the app.
+                  Control playback directly from the Windows tray or macOS menu bar without keeping the full player open.
                 </p>
               </div>
 
@@ -196,7 +228,7 @@ const Downloads = () => {
                 </div>
                 <h3 className="mb-2 text-xl font-semibold">Auto-Launch on Startup</h3>
                 <p className="text-muted-foreground">
-                  Optionally start Dance One Radio automatically when Windows boots up for instant access.
+                  Optionally start Dance One Radio automatically when your desktop boots up for instant access.
                 </p>
               </div>
 
@@ -206,7 +238,7 @@ const Downloads = () => {
                 </div>
                 <h3 className="mb-2 text-xl font-semibold">Native Notifications</h3>
                 <p className="text-muted-foreground">
-                  Get Windows notifications when tracks change, keeping you informed about what&apos;s playing.
+                  Get native desktop notifications when tracks change, keeping you informed about what&apos;s playing.
                 </p>
               </div>
 
@@ -226,7 +258,7 @@ const Downloads = () => {
                 </div>
                 <h3 className="mb-2 text-xl font-semibold">Multiple Window Modes</h3>
                 <p className="text-muted-foreground">
-                  Full-size interface or compact mini-player. Minimize to tray for background listening.
+                  Full-size interface or compact mini-player. Hide to the menu bar or tray for background listening.
                 </p>
               </div>
 
@@ -262,7 +294,7 @@ const Downloads = () => {
                   <ul className="space-y-3">
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-primary" />
-                      Windows 10 (64-bit)
+                      Windows 10 (64-bit) or macOS 13+
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-primary" />
@@ -287,7 +319,7 @@ const Downloads = () => {
                   <ul className="space-y-3">
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-primary" />
-                      Windows 11 (64-bit)
+                      Windows 11 (64-bit) or macOS 14+
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-primary" />
@@ -318,9 +350,9 @@ const Downloads = () => {
                 </p>
               </div>
 
-              <div className="mx-auto max-w-2xl">
+              <div className="grid gap-8 md:grid-cols-2">
                 <div className="rounded-lg border bg-card p-8">
-                  <h3 className="mb-6 text-xl font-semibold">Quick Start Guide</h3>
+                  <h3 className="mb-6 text-xl font-semibold">Windows</h3>
                   <ol className="list-inside list-decimal space-y-4 text-left">
                     <li>Download the installer (.exe) file</li>
                     <li>Double-click the installer and follow the setup wizard</li>
@@ -330,6 +362,21 @@ const Downloads = () => {
                   <div className="mt-6 rounded-lg bg-primary/10 p-4">
                     <p className="text-sm">
                       <strong>Tip:</strong> The installer creates Start Menu and Desktop shortcuts automatically. You can also enable auto-launch on Windows startup from the app settings.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="rounded-lg border bg-card p-8">
+                  <h3 className="mb-6 text-xl font-semibold">macOS</h3>
+                  <ol className="list-inside list-decimal space-y-4 text-left">
+                    <li>Download the Mac disk image (.dmg)</li>
+                    <li>Open the DMG and drag Dance One Radio into Applications</li>
+                    <li>Launch the app from Applications</li>
+                    <li>If macOS warns you, right-click the app and choose Open the first time</li>
+                  </ol>
+                  <div className="mt-6 rounded-lg bg-primary/10 p-4">
+                    <p className="text-sm">
+                      <strong>Tip:</strong> This Mac build currently targets Apple Silicon and is not notarized yet, so the first launch may need manual confirmation in macOS.
                     </p>
                   </div>
                 </div>
