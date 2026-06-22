@@ -15,12 +15,10 @@ export const EpisodeEqVisualizer = ({
   heightClassName = 'h-20',
 }: EpisodeEqVisualizerProps) => {
   const { audioRef } = useAudioPlayer();
-  const { isElectronDesktop } = useDesktopIntegration();
 
   const { frequencyData, barCount } = useLiveEqVisualizer({
     audioRef,
     isActive,
-    isElectronDesktop,
   });
 
   return (
