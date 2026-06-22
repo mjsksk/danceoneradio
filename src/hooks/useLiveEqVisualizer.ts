@@ -149,7 +149,7 @@ export const useLiveEqVisualizer = ({
             sharedSourceNode = sourceNode;
             sharedAnalyser = analyser;
             sharedAnalyserAudio = audio;
-            sharedFrequencyBins = new Uint8Array(analyser.frequencyBinCount);
+            sharedFrequencyBins = new Uint8Array(new ArrayBuffer(analyser.frequencyBinCount));
           }
         }
 
