@@ -24,23 +24,26 @@ function isCacheableAsset(requestUrl) {
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Caching static assets');
-        return cache.addAll(STATIC_ASSETS);
-      })
-      .catch((error) => {
-        console.log('Cache install failed:', error);
-      })
+    caches.open(CACHE_NAME).then((cache) =>
+      // Per-URL allSettled so a single 404 cannot reject the whole install.
+      Promise.allSettled(
+        STATIC_ASSETS.map((url) =>
+          cache.add(url).catch((err) => {
+            console.log('SW precache skip:', url, err?.message || err);
+          })
+        )
+      )
+    )
   );
   self.skipWaiting();
 });
 
-// Activate event - clean up old caches
+// Activate event - clean up old caches and notify clients
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
+    (async () => {
+      const cacheNames = await caches.keys();
+      await Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
             console.log('Deleting old cache:', cacheName);
@@ -48,9 +51,13 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    })
+      await self.clients.claim();
+      const clients = await self.clients.matchAll({ type: 'window' });
+      for (const client of clients) {
+        client.postMessage({ type: 'SW_ACTIVATED', version: CACHE_NAME });
+      }
+    })()
   );
-  return self.clients.claim();
 });
 
 self.addEventListener('message', (event) => {
