@@ -1,10 +1,10 @@
-const CACHE_NAME = 'dance-one-radio-v8';
-console.log('🔔 Service Worker loaded: v8');
+const CACHE_NAME = 'dance-one-radio-v9';
+console.log('🔔 Service Worker loaded: v9');
+// Only precache STABLE paths. Hashed /assets/* files are picked up on demand
+// by the runtime fetch handler; listing them by name here would 404 on every
+// new deploy and reject the entire install, leaving users stuck on the old SW.
 const STATIC_ASSETS = [
-  '/assets/dance-one-logo-DP6h_tTr.png',
-  '/assets/hero-bg-B-ZqE77g.jpg',
-  '/assets/app-store-badge-new-CVyK0T4N.svg',
-  '/assets/google-play-badge-new-DVbUjTfg.svg',
+  '/favicon.png',
   '/lovable-uploads/72d04e54-23af-4f4a-bf39-efcc6c6b2150.png',
   '/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png',
   '/lovable-uploads/f807b27f-9eaf-4d20-b3f5-4bad24538a4e.png'
