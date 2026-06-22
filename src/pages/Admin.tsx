@@ -60,8 +60,6 @@ const Admin = () => {
 
             <NewsletterCampaign />
             <ManualSubscriberAdd />
-            <NewsletterSubscribers />
-            <SAMLibraryManager />
             <SAMBroadcasterSync />
           </div>
         </main>
