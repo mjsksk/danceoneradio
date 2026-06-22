@@ -12,7 +12,7 @@ let sharedAudioContext: AudioContext | null = null;
 let sharedAnalyser: AnalyserNode | null = null;
 let sharedSourceNode: MediaElementAudioSourceNode | null = null;
 let sharedAnalyserAudio: HTMLAudioElement | null = null;
-let sharedFrequencyBins: Uint8Array | null = null;
+let sharedFrequencyBins: Uint8Array<ArrayBuffer> | null = null;
 
 interface UseLiveEqVisualizerOptions {
   audioRef: React.RefObject<HTMLAudioElement>;
