@@ -48,21 +48,39 @@ if ('serviceWorker' in navigator) {
       .then((registration) => {
         console.log('📱 Service Worker registered:', registration.scope);
 
-        registration.update();
-
+        // If a worker is already waiting from a previous session, activate it now.
         if (registration.waiting) {
           registration.waiting.postMessage({ type: 'SKIP_WAITING' });
         }
+
+        registration.update();
 
         registration.addEventListener('updatefound', () => {
           const installingWorker = registration.installing;
           if (!installingWorker) return;
 
           installingWorker.addEventListener('statechange', () => {
-            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              registration.waiting?.postMessage({ type: 'SKIP_WAITING' });
+            // Activate the new SW as soon as it's installed, whether or not
+            // there's already a controller (covers waiting-from-prev-session).
+            if (installingWorker.state === 'installed') {
+              installingWorker.postMessage({ type: 'SKIP_WAITING' });
             }
           });
+        });
+
+        // Periodic update probe — hourly while tab is open.
+        setInterval(() => {
+          registration.update().catch(() => {});
+        }, 60 * 60 * 1000);
+
+        // Check for updates when tab becomes visible, throttled to 5 min.
+        let lastVisibilityCheck = 0;
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState !== 'visible') return;
+          const now = Date.now();
+          if (now - lastVisibilityCheck < 5 * 60 * 1000) return;
+          lastVisibilityCheck = now;
+          registration.update().catch(() => {});
         });
       })
       .catch((error) => {
