@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
-import SAMLibraryManager from "@/components/admin/SAMLibraryManager";
 import SAMBroadcasterSync from "@/components/admin/SAMBroadcasterSync";
 import NewsletterSubscribers from "@/components/admin/NewsletterSubscribers";
 import SubscriberGrowthChart from "@/components/admin/SubscriberGrowthChart";
