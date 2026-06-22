@@ -1,10 +1,10 @@
-const CACHE_NAME = 'dance-one-radio-v8';
-console.log('🔔 Service Worker loaded: v8');
+const CACHE_NAME = 'dance-one-radio-v9';
+console.log('🔔 Service Worker loaded: v9');
+// Only precache STABLE paths. Hashed /assets/* files are picked up on demand
+// by the runtime fetch handler; listing them by name here would 404 on every
+// new deploy and reject the entire install, leaving users stuck on the old SW.
 const STATIC_ASSETS = [
-  '/assets/dance-one-logo-DP6h_tTr.png',
-  '/assets/hero-bg-B-ZqE77g.jpg',
-  '/assets/app-store-badge-new-CVyK0T4N.svg',
-  '/assets/google-play-badge-new-DVbUjTfg.svg',
+  '/favicon.png',
   '/lovable-uploads/72d04e54-23af-4f4a-bf39-efcc6c6b2150.png',
   '/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png',
   '/lovable-uploads/f807b27f-9eaf-4d20-b3f5-4bad24538a4e.png'
@@ -24,23 +24,26 @@ function isCacheableAsset(requestUrl) {
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Caching static assets');
-        return cache.addAll(STATIC_ASSETS);
-      })
-      .catch((error) => {
-        console.log('Cache install failed:', error);
-      })
+    caches.open(CACHE_NAME).then((cache) =>
+      // Per-URL allSettled so a single 404 cannot reject the whole install.
+      Promise.allSettled(
+        STATIC_ASSETS.map((url) =>
+          cache.add(url).catch((err) => {
+            console.log('SW precache skip:', url, err?.message || err);
+          })
+        )
+      )
+    )
   );
   self.skipWaiting();
 });
 
-// Activate event - clean up old caches
+// Activate event - clean up old caches and notify clients
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
+    (async () => {
+      const cacheNames = await caches.keys();
+      await Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
             console.log('Deleting old cache:', cacheName);
@@ -48,9 +51,13 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    })
+      await self.clients.claim();
+      const clients = await self.clients.matchAll({ type: 'window' });
+      for (const client of clients) {
+        client.postMessage({ type: 'SW_ACTIVATED', version: CACHE_NAME });
+      }
+    })()
   );
-  return self.clients.claim();
 });
 
 self.addEventListener('message', (event) => {

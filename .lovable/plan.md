@@ -1,41 +1,36 @@
-## Goal
-Display the same live frequency-bar EQ that the live radio player uses on each individual episode page (`/episode/389` … `/episode/413`), reacting to the audio when that episode is the one currently playing through the global player.
+## Problem
 
-## Approach
-The infrastructure already exists:
-- `src/hooks/useLiveEqVisualizer.ts` produces frequency bars from a shared `AnalyserNode` bound to an `HTMLAudioElement`.
-- `AudioPlayerContext` owns the single global `<audio ref={audioRef} crossOrigin="anonymous" />` that every episode page already plays through.
-- `LiveRadioPlayer` already drives the EQ off `audioPlayer.audioRef`, so reusing the same ref on episode pages won't create a duplicate `MediaElementSourceNode` (the hook caches per element).
+Returning visitors keep seeing the old site after a deploy and have to hard-refresh. Root cause is in our service worker (`public/sw.js`) and how we register it in `src/main.tsx`.
 
-So we only need a small presentational component and wire it into the episode pages.
+Three issues compound:
 
-## Steps
+1. **Install-time precache references hashed filenames** (e.g. `/assets/dance-one-logo-DP6h_tTr.png`). Every new build produces new hashes, so on the very first visit after a deploy `cache.addAll(STATIC_ASSETS)` 404s and the whole install rejects. The new SW never activates, so the auto-reload-on-`controllerchange` path never fires for that user — they stay on the old SW serving old chunks.
+2. **No update check after the initial page load.** We call `registration.update()` once on `window load`. A user who keeps the tab open (or just revisits via bfcache) never asks the server whether a new SW exists, so they keep getting the cached version.
+3. **`SKIP_WAITING` is only posted from the brand-new-install branch.** If a waiting worker was already sitting there from a previous session, it never gets told to activate, so the page keeps booting under the old controller.
 
-1. **Create `src/components/EpisodeEqVisualizer.tsx`**
-   - Props: `isActive: boolean`, optional `height`, `barCount` override, `className`.
-   - Pull `audioRef` from `useAudioPlayer()`.
-   - Detect Electron desktop the same way `LiveRadioPlayer` does (reuse the existing helper / replicate the inline check).
-   - Call `useLiveEqVisualizer({ audioRef, isActive, isElectronDesktop })`.
-   - Render a horizontal row of 64 bars (matches live player styling) with the neon-purple → spectrum gradient already used in `LiveRadioPlayer` (lines ~291–302), wrapped in a card-friendly container. Idle state shows flat low bars (the hook already returns that when `isActive=false`).
-   - Mark `aria-hidden` (decorative).
+## Fix
 
-2. **Mount it on every episode page**
-   - In `src/pages/Episode*.tsx` (Episode389 → Episode413, ~25 files), import `EpisodeEqVisualizer` and render it directly above the existing tracklist / play button block.
-   - Pass `isActive={isCurrent && audioPlayer.isPlaying}` using the variables already in scope (`isCurrent`, `audioPlayer.isPlaying` — see Episode413.tsx lines 40‑42).
-   - Update `scripts/generate-episode.ts` so newly generated episode pages include the visualizer automatically.
+### `public/sw.js`
+- Bump `CACHE_NAME` to `dance-one-radio-v9`.
+- Remove all hashed `/assets/*` filenames from `STATIC_ASSETS`. Keep only stable paths (`/lovable-uploads/...`, favicon). Hashed build assets are already cached on-demand by the runtime `fetch` handler — precaching them by name is what breaks every deploy.
+- Wrap `cache.addAll` in `Promise.allSettled` per-URL so a single 404 can never reject install again.
+- On `activate`, after cleaning old caches, call `self.clients.claim()` (already done) AND notify all clients with `postMessage({ type: 'SW_ACTIVATED' })` so the page can reload deterministically.
 
-3. **(Optional, same change) Shows page hero**
-   - In `src/pages/Shows.tsx`, render `<EpisodeEqVisualizer isActive={isPlaying} />` inside the "now playing" header area so the EQ also shows when an episode is launched from the Shows list. No other Shows logic changes.
+### `src/main.tsx` (registration block)
+- On registration, if `registration.waiting` exists, immediately `postMessage({ type: 'SKIP_WAITING' })` (already done) — keep.
+- Also post `SKIP_WAITING` whenever an `updatefound` worker reaches the `installed` state, regardless of whether `navigator.serviceWorker.controller` is set (covers the "waiting from previous session" case).
+- Add a periodic update probe:
+  - `setInterval(() => registration.update(), 60 * 60 * 1000)` (hourly).
+  - Call `registration.update()` on `visibilitychange` when the tab becomes visible, throttled to once every 5 min.
+- Keep the existing `controllerchange → location.reload()` guard (this is what makes the update visible without a hard refresh).
 
-4. **Memory**
-   - Update `mem://audio/eq-visualizer-configuration` to note the visualizer is now reused on episode pages via `EpisodeEqVisualizer`, driven by the global `audioRef`.
+### No other files change
+No changes to `netlify.toml`, build config, or React code. The CSP, cache headers, and SPA routing already behave correctly; the regression is entirely in the SW lifecycle.
 
-## Files touched
-- New: `src/components/EpisodeEqVisualizer.tsx`
-- Edited: all `src/pages/Episode*.tsx` (~25 files), `src/pages/Shows.tsx`, `scripts/generate-episode.ts`
-- Memory: `mem://audio/eq-visualizer-configuration`, `mem://index.md` (if entry text changes)
+## Result
+After this ships once, the next deploy will:
+1. Install the new SW successfully (no hashed-filename 404s).
+2. Get picked up within an hour, or as soon as the user switches back to the tab.
+3. Auto-reload the page exactly once when the new SW takes control — no hard refresh needed.
 
-## Notes / non-goals
-- No changes to the EQ hook, audio context, or playback logic — the bars are purely a read-only consumer of the existing shared analyser.
-- The EQ only animates while that specific episode is the active playing source; otherwise it shows the idle flat row, matching current UX on the live player.
-- On Electron desktop, the existing synthetic animation fallback is used (CORS-safe).
+Existing users still on `v8` will pick this up on their next normal page load, and from then on updates land automatically.
