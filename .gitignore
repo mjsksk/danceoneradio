@@ -15,6 +15,7 @@ dist-ssr
 desktop-dist
 src-tauri/desktop-dist
 src-tauri/target
+desktop-app/
 
 # Editor directories and files
 .vscode/*
