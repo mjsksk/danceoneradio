@@ -1,5 +1,6 @@
-const CACHE_NAME = 'dance-one-radio-v9';
-console.log('🔔 Service Worker loaded: v9');
+const CACHE_NAME = 'dance-one-radio-v10';
+const APP_CACHE_PREFIX = 'dance-one-radio-';
+console.log('🔔 Service Worker loaded: v10');
 // Only precache STABLE paths. Hashed /assets/* files are picked up on demand
 // by the runtime fetch handler; listing them by name here would 404 on every
 // new deploy and reject the entire install, leaving users stuck on the old SW.
@@ -10,13 +11,18 @@ const STATIC_ASSETS = [
   '/lovable-uploads/f807b27f-9eaf-4d20-b3f5-4bad24538a4e.png'
 ];
 
-const CACHEABLE_ASSET_PATTERN = /\.(?:css|js|png|jpg|jpeg|svg|webp|gif|woff2?)$/i;
+const CACHEABLE_ASSET_PATTERN = /\.(?:png|jpg|jpeg|svg|webp|gif|woff2?)$/i;
+
+function isWorkboxCacheForThisRegistration(name) {
+  const hasWorkboxBucket = /(^|-)precache-v\d+-|(^|-)runtime-|(^|-)googleAnalytics-/.test(name);
+  return hasWorkboxBucket && name.endsWith(self.registration.scope);
+}
 
 function isCacheableAsset(requestUrl) {
   const url = new URL(requestUrl);
   return url.origin === self.location.origin && (
-    url.pathname.startsWith('/assets/') ||
-    url.pathname.startsWith('/lovable-uploads/') ||
+    (url.pathname.startsWith('/assets/') && CACHEABLE_ASSET_PATTERN.test(url.pathname)) ||
+    (url.pathname.startsWith('/lovable-uploads/') && CACHEABLE_ASSET_PATTERN.test(url.pathname)) ||
     CACHEABLE_ASSET_PATTERN.test(url.pathname)
   );
 }
@@ -43,12 +49,16 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
       const cacheNames = await caches.keys();
-      await Promise.all(
+      await Promise.allSettled(
         cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
+          if (
+            cacheName !== CACHE_NAME &&
+            (cacheName.startsWith(APP_CACHE_PREFIX) || isWorkboxCacheForThisRegistration(cacheName))
+          ) {
             console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
+          return Promise.resolve(false);
         })
       );
       await self.clients.claim();
@@ -159,9 +169,12 @@ self.addEventListener('fetch', (event) => {
 
   if (event.request.mode === 'navigate' || event.request.destination === 'document' || acceptsHtml) {
     event.respondWith(
-      fetch(event.request, { cache: 'no-store' }).catch(async () => {
-        return caches.match('/') || caches.match('/index.html');
-      })
+      fetch(event.request, { cache: 'no-store' }).catch(() =>
+        new Response('Dance One Radio is temporarily offline. Please reconnect and refresh.', {
+          status: 503,
+          headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+        })
+      )
     );
     return;
   }
