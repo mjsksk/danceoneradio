@@ -193,17 +193,19 @@ export const useLiveEqVisualizer = ({
             return previousHeight + (targetHeight - previousHeight) * smoothing;
           });
 
-          const averageSignal = signalLevel / EQ_BAR_COUNT;
-          const hasUsableAudioSignal = averageSignal >= LOW_SIGNAL_THRESHOLD;
+          if (prefersSyntheticFallback) {
+            const averageSignal = signalLevel / EQ_BAR_COUNT;
+            lowSignalFramesRef.current = averageSignal < LOW_SIGNAL_THRESHOLD
+              ? lowSignalFramesRef.current + 1
+              : 0;
 
-          lowSignalFramesRef.current = hasUsableAudioSignal
-            ? 0
-            : lowSignalFramesRef.current + 1;
-
-          if (lowSignalFramesRef.current >= LOW_SIGNAL_FRAME_LIMIT) {
-            startSyntheticAnimation();
-            return;
+            if (lowSignalFramesRef.current >= LOW_SIGNAL_FRAME_LIMIT) {
+              startSyntheticAnimation();
+              return;
+            }
           }
+
+
 
           smoothedBarsRef.current = nextBars;
           setFrequencyData(nextBars);
