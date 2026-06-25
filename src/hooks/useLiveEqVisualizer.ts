@@ -105,6 +105,10 @@ export const useLiveEqVisualizer = ({
       };
     }
 
+    const prefersSyntheticFallback = supportsEqFallback();
+
+
+
     const resumeAudioContext = async () => {
       if (!sharedAudioContext || sharedAudioContext.state !== 'suspended') {
         return;
