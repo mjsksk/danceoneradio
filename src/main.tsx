@@ -5,6 +5,8 @@ import { initializeConsentMode } from '@/utils/googleConsentMode'
 import { initializeConsentScripts, getConsent } from '@/utils/consentManager'
 import { updateConsentMode } from '@/utils/googleConsentMode'
 
+declare const __BUILD_VERSION__: string | undefined;
+
 console.log('🚀 Application starting...');
 
 // CRITICAL: Initialize Google Consent Mode FIRST before any scripts
@@ -37,14 +39,32 @@ createRoot(document.getElementById("root")!).render(<App />);
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     let refreshing = false;
+    const hadController = Boolean(navigator.serviceWorker.controller);
+    const appBuildVersion = typeof __BUILD_VERSION__ === 'string' ? __BUILD_VERSION__ : 'dev';
+    const reloadKey = 'dance-one-radio-update-reload';
+
+    const reloadOnce = (reason: string) => {
+      if (!hadController || refreshing) return;
+      const marker = `${reason}:${appBuildVersion}`;
+      if (sessionStorage.getItem(reloadKey) === marker) return;
+      refreshing = true;
+      sessionStorage.setItem(reloadKey, marker);
+      window.location.reload();
+    };
 
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (refreshing) return;
-      refreshing = true;
-      window.location.reload();
+      reloadOnce('controllerchange');
     });
 
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      if (event.data?.type === 'SW_ACTIVATED') {
+        reloadOnce(`activated-${event.data.version || 'unknown'}`);
+      }
+    });
+
+    navigator.serviceWorker.register(`/sw.js?v=${encodeURIComponent(appBuildVersion)}`, {
+      updateViaCache: 'none',
+    })
       .then((registration) => {
         console.log('📱 Service Worker registered:', registration.scope);
 
@@ -68,10 +88,33 @@ if ('serviceWorker' in navigator) {
           });
         });
 
-        // Periodic update probe — hourly while tab is open.
+        const checkForFreshHtml = async () => {
+          if (document.visibilityState === 'hidden') return;
+          const currentModule = document.querySelector<HTMLScriptElement>('script[type="module"][src]')?.getAttribute('src');
+          if (!currentModule || currentModule.startsWith('/src/')) return;
+
+          try {
+            const freshUrl = new URL(window.location.href);
+            freshUrl.searchParams.set('__fresh', Date.now().toString());
+            const response = await fetch(freshUrl.toString(), {
+              cache: 'no-store',
+              headers: { 'Cache-Control': 'no-cache' },
+            });
+            const html = await response.text();
+
+            if (response.ok && html.includes('<script') && !html.includes(currentModule)) {
+              reloadOnce('fresh-html');
+            }
+          } catch {
+            // Ignore transient network failures; service worker update checks still run.
+          }
+        };
+
+        // Periodic update probe — frequent enough that users do not need hard refreshes.
         setInterval(() => {
           registration.update().catch(() => {});
-        }, 60 * 60 * 1000);
+          checkForFreshHtml();
+        }, 5 * 60 * 1000);
 
         // Check for updates when tab becomes visible, throttled to 5 min.
         let lastVisibilityCheck = 0;
@@ -81,7 +124,10 @@ if ('serviceWorker' in navigator) {
           if (now - lastVisibilityCheck < 5 * 60 * 1000) return;
           lastVisibilityCheck = now;
           registration.update().catch(() => {});
+          checkForFreshHtml();
         });
+
+        checkForFreshHtml();
       })
       .catch((error) => {
         console.error('📱 Service Worker registration failed:', error);
