@@ -4,7 +4,7 @@ const EQ_BAR_COUNT = 64;
 const EQ_MIN_HEIGHT = 12;
 const EQ_MAX_HEIGHT = 70;
 const LOW_SIGNAL_THRESHOLD = 0.035;
-const LOW_SIGNAL_FRAME_LIMIT = 45;
+const LOW_SIGNAL_FRAME_LIMIT = 18;
 
 const createIdleFrequencyData = (count = EQ_BAR_COUNT) => new Array(count).fill(EQ_MIN_HEIGHT);
 
@@ -13,6 +13,14 @@ let sharedAnalyser: AnalyserNode | null = null;
 let sharedSourceNode: MediaElementAudioSourceNode | null = null;
 let sharedAnalyserAudio: HTMLAudioElement | null = null;
 let sharedFrequencyBins: Uint8Array<ArrayBuffer> | null = null;
+
+const supportsEqFallback = () => {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  return window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
+};
 
 interface UseLiveEqVisualizerOptions {
   audioRef: React.RefObject<HTMLAudioElement>;
@@ -96,6 +104,10 @@ export const useLiveEqVisualizer = ({
         cancelFrame();
       };
     }
+
+    const prefersSyntheticFallback = supportsEqFallback();
+
+
 
     const resumeAudioContext = async () => {
       if (!sharedAudioContext || sharedAudioContext.state !== 'suspended') {
@@ -181,17 +193,19 @@ export const useLiveEqVisualizer = ({
             return previousHeight + (targetHeight - previousHeight) * smoothing;
           });
 
-          const averageSignal = signalLevel / EQ_BAR_COUNT;
-          const hasUsableAudioSignal = averageSignal >= LOW_SIGNAL_THRESHOLD;
+          if (prefersSyntheticFallback) {
+            const averageSignal = signalLevel / EQ_BAR_COUNT;
+            lowSignalFramesRef.current = averageSignal < LOW_SIGNAL_THRESHOLD
+              ? lowSignalFramesRef.current + 1
+              : 0;
 
-          lowSignalFramesRef.current = hasUsableAudioSignal
-            ? 0
-            : lowSignalFramesRef.current + 1;
-
-          if (lowSignalFramesRef.current >= LOW_SIGNAL_FRAME_LIMIT) {
-            startSyntheticAnimation();
-            return;
+            if (lowSignalFramesRef.current >= LOW_SIGNAL_FRAME_LIMIT) {
+              startSyntheticAnimation();
+              return;
+            }
           }
+
+
 
           smoothedBarsRef.current = nextBars;
           setFrequencyData(nextBars);
