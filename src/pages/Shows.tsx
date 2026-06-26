@@ -551,6 +551,14 @@ const Shows = () => {
                   {(() => {
                     const guestShows = [
                       {
+                        number: 235,
+                        title: 'Wh0 Sessions Episode 235 - Bad Intentions',
+                        subtitle: <span>Guest Mix by <span className="text-primary font-semibold">Bad Intentions</span></span>,
+                        link: '/show/wh0-plays-sessions/235',
+                        broadcastDate: '2026-06-26T18:00:00',
+                        genres: 'House • Tech House • Dance',
+                      },
+                      {
                         number: 233,
                         title: 'Wh0 Sessions Episode 233 with Johan S',
                         subtitle: <span>Guest Mix by <span className="text-primary font-semibold">Johan S</span></span>,
