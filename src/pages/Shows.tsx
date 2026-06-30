@@ -648,6 +648,13 @@ const Shows = () => {
                           <Card className="card-cyber p-5 hover:scale-[1.01] transition-all duration-300 group cursor-pointer hover:border-neon/50">
                             <div className="flex flex-col gap-3">
                               <div className="flex items-start gap-4">
+                                <img
+                                  src="/lovable-uploads/mario-show.jpg"
+                                  alt={`Wh0 Plays Sessions Episode ${show.number}`}
+                                  loading="lazy"
+                                  decoding="async"
+                                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover shrink-0 border border-primary/20 shadow-[0_0_15px_hsl(var(--primary)/0.15)]"
+                                />
                                 <div className={`bg-gradient-to-br ${isUpcoming ? 'from-neon to-neon-purple' : 'from-neon/60 to-neon-purple/60'} text-background rounded-full w-12 h-12 flex items-center justify-center font-['Orbitron'] font-bold text-base shrink-0`}>
                                   #{show.number}
                                 </div>
