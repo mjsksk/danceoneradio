@@ -428,6 +428,13 @@ const Shows = () => {
                       const cardContent = (
                         <div className="flex flex-col gap-4">
                           <div className="flex items-start gap-4">
+                            <img
+                              src="/lovable-uploads/mario-show.jpg"
+                              alt="Future Dance Anthems with Mario"
+                              loading="lazy"
+                              decoding="async"
+                              className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover shrink-0 border border-primary/20 shadow-[0_0_15px_hsl(var(--primary)/0.15)]"
+                            />
                             <div className="bg-gradient-to-br from-neon to-neon-purple text-background rounded-full w-12 h-12 flex items-center justify-center font-['Orbitron'] font-bold text-base shrink-0">
                               #{episodeNumber}
                             </div>
