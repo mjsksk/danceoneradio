@@ -649,7 +649,7 @@ const Shows = () => {
                             <div className="flex flex-col gap-3">
                               <div className="flex items-start gap-4">
                                 <img
-                                  src="/lovable-uploads/mario-show.jpg"
+                                  src="/images/wh0-plays-sessions-logo.jpg"
                                   alt={`Wh0 Plays Sessions Episode ${show.number}`}
                                   loading="lazy"
                                   decoding="async"
