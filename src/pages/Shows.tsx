@@ -420,7 +420,7 @@ const Shows = () => {
                     <p className="text-muted-foreground">No episodes available</p>
                   </div>
                 ) : (
-                  <div className="grid gap-6">
+                  <div className="grid gap-6 content-start">
                     {episodes.map((episode, index) => {
                       const episodeNumber = episode.episodeNumber || (totalEpisodes - index);
                       const hasDedicatedPage = episode.episodeNumber !== undefined && episode.episodeNumber > 0 && availableEpisodePages.includes(episode.episodeNumber);
