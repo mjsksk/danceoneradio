@@ -554,7 +554,7 @@ const Shows = () => {
                   <span className="text-neon">GUEST</span>{" "}
                   <span className="text-neon-purple">SHOWS</span>
                 </h2>
-                <div className="grid gap-4">
+                <div className="grid gap-6 content-start">
                   {(() => {
                     const guestShows = [
                       {
