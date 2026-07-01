@@ -798,7 +798,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
 
         return { ...prev, currentTime: nextTime, duration: nextDuration };
       });
-    }, 500);
+    }, 1000);
 
     return () => window.clearInterval(interval);
   }, [state.source, state.isPlaying]);
