@@ -84,20 +84,36 @@ export const WavyBackground = ({
   };
 
   let animationId: number;
+  let frameToggle = 0;
+  let isPaused = false;
   const render = () => {
-    ctx.fillStyle = backgroundFill || "black";
-    ctx.globalAlpha = waveOpacity || 0.5;
-    ctx.fillRect(0, 0, w, h);
-    drawWave(5);
+    if (isPaused) {
+      animationId = requestAnimationFrame(render);
+      return;
+    }
+    // Throttle to ~30fps — blurred canvas is expensive
+    frameToggle = (frameToggle + 1) % 2;
+    if (frameToggle === 0) {
+      ctx.fillStyle = backgroundFill || "black";
+      ctx.globalAlpha = waveOpacity || 0.5;
+      ctx.fillRect(0, 0, w, h);
+      drawWave(5);
+    }
     animationId = requestAnimationFrame(render);
   };
 
   useEffect(() => {
     init();
+    const handleVisibility = () => {
+      isPaused = document.hidden;
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
     return () => {
       cancelAnimationFrame(animationId);
+      document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, []);
+
 
   const [isSafari, setIsSafari] = useState(false);
   useEffect(() => {
