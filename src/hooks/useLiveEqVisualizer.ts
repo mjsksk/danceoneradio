@@ -56,6 +56,7 @@ export const useLiveEqVisualizer = ({
 
     let isCancelled = false;
     let time = 0;
+    let frameSkip = 0;
 
     const startSyntheticAnimation = () => {
       if (isCancelled || syntheticModeRef.current) {
@@ -70,19 +71,24 @@ export const useLiveEqVisualizer = ({
           return;
         }
 
-        time += 0.05;
-        const bars = Array.from({ length: EQ_BAR_COUNT }, (_, index) => {
-          const base = 25 + Math.sin(time * (0.3 + index * 0.03) + index) * 18;
-          return Math.max(EQ_MIN_HEIGHT, Math.min(EQ_MAX_HEIGHT, base + (Math.random() - 0.5) * 6));
-        });
+        // Throttle to ~30fps to reduce React re-renders
+        frameSkip = (frameSkip + 1) % 2;
+        if (frameSkip === 0) {
+          time += 0.1;
+          const bars = Array.from({ length: EQ_BAR_COUNT }, (_, index) => {
+            const base = 25 + Math.sin(time * (0.3 + index * 0.03) + index) * 18;
+            return Math.max(EQ_MIN_HEIGHT, Math.min(EQ_MAX_HEIGHT, base + (Math.random() - 0.5) * 6));
+          });
 
-        smoothedBarsRef.current = bars;
-        setFrequencyData(bars);
+          smoothedBarsRef.current = bars;
+          setFrequencyData(bars);
+        }
         animationRef.current = requestAnimationFrame(animate);
       };
 
       animate();
     };
+
 
     const audio = audioRef.current;
     const AudioContextCtor = window.AudioContext || (window as Window & typeof globalThis & {
