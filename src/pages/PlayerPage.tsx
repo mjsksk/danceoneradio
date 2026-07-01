@@ -28,8 +28,8 @@ const PlayerPage = () => {
     // Fetch immediately
     fetchStreamMetadata();
 
-    // Update every 2 seconds for real-time updates (less frequent for popup)
-    const interval = setInterval(fetchStreamMetadata, 2000);
+    // Poll every 10s to align with global stream metadata cache
+    const interval = setInterval(fetchStreamMetadata, 10000);
     return () => clearInterval(interval);
   }, []);
 
