@@ -182,6 +182,7 @@
     box-shadow: 
       0 4px 20px hsl(var(--primary) / 0.1),
       inset 0 1px 0 hsl(var(--primary) / 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
   
   .card-cyber:hover {
@@ -189,7 +190,6 @@
       0 8px 40px hsl(var(--primary) / 0.2),
       inset 0 1px 0 hsl(var(--primary) / 0.3);
     transform: translateY(-4px);
-    transition: all 0.3s ease;
   }
   
   /* Pulse animations */

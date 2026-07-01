@@ -104,48 +104,14 @@ const LiveRadioPlayer = ({
   }, [displayStreamTitle, globalAlbumArt]);
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    let isVisible = !document.hidden;
-
-    const handleVisibilityChange = () => {
-      isVisible = !document.hidden;
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    const fetchStreamMetadata = async () => {
-      if (!isVisible) return;
-
-      try {
-        const metadata = await RadioStreamService.getStreamMetadata();
-        const streamIsLive = metadata && metadata.title && !metadata.title.includes('Dance One Radio - The Future');
-        setIsStreamLive(Boolean(streamIsLive));
-
-        const formattedTitle = RadioStreamService.formatTitle(metadata);
-        if (formattedTitle !== currentStreamTitle) {
-          setCurrentStreamTitle(formattedTitle);
-        }
-      } catch (error) {
-        console.error('Error fetching stream metadata:', error);
-        setIsStreamLive(false);
-      }
-    };
-
-    const scheduleNext = () => {
-      timeoutId = setTimeout(() => {
-        fetchStreamMetadata().then(scheduleNext);
-      }, 10000);
-    };
-
-    fetchStreamMetadata().then(scheduleNext);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, [currentStreamTitle]);
+    const streamIsLive = Boolean(
+      globalStreamTitle && !globalStreamTitle.includes('Dance One Radio - The Future')
+    );
+    setIsStreamLive(streamIsLive);
+    if (globalStreamTitle && globalStreamTitle !== currentStreamTitle) {
+      setCurrentStreamTitle(globalStreamTitle);
+    }
+  }, [globalStreamTitle, currentStreamTitle]);
 
   useEffect(() => {
     if (!notificationsEnabled || !isPlaying || !displayStreamTitle || displayStreamTitle.includes('Dance One Radio - The Future')) {
