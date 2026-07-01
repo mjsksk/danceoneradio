@@ -176,6 +176,13 @@ export const useLiveEqVisualizer = ({
             return;
           }
 
+          // Throttle heavy React updates to ~30fps
+          frameSkip = (frameSkip + 1) % 2;
+          if (frameSkip !== 0) {
+            animationRef.current = requestAnimationFrame(animate);
+            return;
+          }
+
           sharedAnalyser.getByteFrequencyData(sharedFrequencyBins);
 
           let signalLevel = 0;
@@ -217,6 +224,7 @@ export const useLiveEqVisualizer = ({
           setFrequencyData(nextBars);
           animationRef.current = requestAnimationFrame(animate);
         };
+
 
         animate();
       } catch (error) {
