@@ -1,5 +1,5 @@
 /**
- * Wh0 Plays Sessions Episode 233 - Wh0 Sessions with Johan S
+ * Wh0 Plays Sessions Episode 233 - Wh0 Plays Sessions with Johan S
  * Air date: June 19, 2026 at 6PM
  */
 
@@ -60,7 +60,7 @@ const Wh0PlaysSession233 = () => {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
       <SEO 
-        title="Wh0 Sessions Episode 233 with Johan S | Dance One Radio"
+        title="Wh0 Plays Sessions Episode 233 with Johan S | Dance One Radio"
         description="Wh0 Plays Sessions Episode 233 with guest mix from Johan S. 16 house tracks featuring Johan S, FRUCO FRESH, Michael Gray, Kryder, Reza & JustGio and more."
         image="/lovable-uploads/mario-show.jpg"
         url={typeof window !== 'undefined' ? window.location.href : ''}
@@ -100,7 +100,7 @@ const Wh0PlaysSession233 = () => {
               <div className="flex justify-center mb-8">
                 <img 
                   src="/images/wh0-plays-sessions-logo.jpg" 
-                  alt="Wh0 Sessions Episode 233 with Johan S"
+                  alt="Wh0 Plays Sessions Episode 233 with Johan S"
                   className="w-64 h-64 sm:w-80 sm:h-80 rounded-2xl object-cover shadow-[0_0_30px_hsl(var(--primary)/0.2)]"
                   loading="eager"
                   width="320"
@@ -108,7 +108,7 @@ const Wh0PlaysSession233 = () => {
                  decoding="async" srcSet="/images/wh0-plays-sessions-logo-480w.jpg 480w, /images/wh0-plays-sessions-logo-960w.jpg 960w, /images/wh0-plays-sessions-logo-1440w.jpg 1440w, /images/wh0-plays-sessions-logo.jpg 1920w" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"/>
               </div>
               <h1 className="text-3xl md:text-5xl font-['Orbitron'] font-bold mb-6 text-center">
-                <span className="text-neon">Wh0 Sessions</span>{" "}
+                <span className="text-neon">Wh0 Plays Sessions</span>{" "}
                 <span className="text-neon-purple">233</span>
               </h1>
               <p className="text-center text-lg text-muted-foreground font-['Rajdhani'] mb-8">
@@ -135,7 +135,7 @@ const Wh0PlaysSession233 = () => {
                 
                 <div className="mt-6 text-center">
                   <p className="text-muted-foreground mb-4 leading-relaxed">
-                    Wh0 Sessions Episode 233 with a special guest mix from Johan S —
+                    Wh0 Plays Sessions Episode 233 with a special guest mix from Johan S —
                     16 tracks of house heat featuring Johan S, FRUCO FRESH, Michael Gray,
                     Kryder, Reza & JustGio, Roog and more.
                   </p>
@@ -143,8 +143,8 @@ const Wh0PlaysSession233 = () => {
                   <div className="mt-4">
                     <SocialShare 
                       url={typeof window !== 'undefined' ? window.location.href : ''}
-                      title="Wh0 Sessions Episode 233 with Johan S - Dance One Radio"
-                      description="Wh0 Sessions Episode 233 with guest mix from Johan S. 16 tracks of pure house energy."
+                      title="Wh0 Plays Sessions Episode 233 with Johan S - Dance One Radio"
+                      description="Wh0 Plays Sessions Episode 233 with guest mix from Johan S. 16 tracks of pure house energy."
                       image={`${typeof window !== 'undefined' ? window.location.origin : ''}/lovable-uploads/mario-show.jpg`}
                     />
                   </div>

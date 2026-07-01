@@ -559,7 +559,7 @@ const Shows = () => {
                     const guestShows = [
                       {
                         number: 236,
-                        title: 'Wh0 Sessions Episode 236',
+                        title: 'Wh0 Plays Sessions Episode 236',
                         subtitle: <span>House • Tech House • Dance</span>,
                         link: '/show/wh0-plays-sessions/236',
                         broadcastDate: '2026-07-03T18:00:00',
@@ -567,7 +567,7 @@ const Shows = () => {
                       },
                       {
                         number: 235,
-                        title: 'Wh0 Sessions Episode 235 - Bad Intentions',
+                        title: 'Wh0 Plays Sessions Episode 235 - Bad Intentions',
                         subtitle: <span>Guest Mix by <span className="text-primary font-semibold">Bad Intentions</span></span>,
                         link: '/show/wh0-plays-sessions/235',
                         broadcastDate: '2026-06-26T18:00:00',
@@ -575,7 +575,7 @@ const Shows = () => {
                       },
                       {
                         number: 233,
-                        title: 'Wh0 Sessions Episode 233 with Johan S',
+                        title: 'Wh0 Plays Sessions Episode 233 with Johan S',
                         subtitle: <span>Guest Mix by <span className="text-primary font-semibold">Johan S</span></span>,
                         link: '/show/wh0-plays-sessions/233',
                         broadcastDate: '2026-06-19T18:00:00',
@@ -583,7 +583,7 @@ const Shows = () => {
                       },
                       {
                         number: 232,
-                        title: 'Wh0 Sessions Episode 232 with Molly Mouse',
+                        title: 'Wh0 Plays Sessions Episode 232 with Molly Mouse',
                         subtitle: <span>Guest Mix by <span className="text-primary font-semibold">Molly Mouse</span></span>,
                         link: '/show/wh0-plays-sessions/232',
                         broadcastDate: '2026-06-12T18:00:00',

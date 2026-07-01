@@ -58,7 +58,7 @@ const Wh0PlaysSession236 = () => {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
       <SEO
-        title="Wh0 Sessions Episode 236 | Dance One Radio"
+        title="Wh0 Plays Sessions Episode 236 | Dance One Radio"
         description="Wh0 Plays Sessions Episode 236. 15 house tracks featuring Costa UK, Milk & Sugar, Wh0 & Chandler McFadden, LEFTI, Mercer, Reza & JustGio and more."
         image="/lovable-uploads/mario-show.jpg"
         url={typeof window !== 'undefined' ? window.location.href : ''}
@@ -98,7 +98,7 @@ const Wh0PlaysSession236 = () => {
               <div className="flex justify-center mb-8">
                 <img
                   src="/images/wh0-plays-sessions-logo.jpg"
-                  alt="Wh0 Sessions Episode 236"
+                  alt="Wh0 Plays Sessions Episode 236"
                   className="w-64 h-64 sm:w-80 sm:h-80 rounded-2xl object-cover shadow-[0_0_30px_hsl(var(--primary)/0.2)]"
                   loading="eager"
                   width="320"
@@ -109,7 +109,7 @@ const Wh0PlaysSession236 = () => {
                 />
               </div>
               <h1 className="text-3xl md:text-5xl font-['Orbitron'] font-bold mb-6 text-center">
-                <span className="text-neon">Wh0 Sessions</span>{" "}
+                <span className="text-neon">Wh0 Plays Sessions</span>{" "}
                 <span className="text-neon-purple">236</span>
               </h1>
 
@@ -133,15 +133,15 @@ const Wh0PlaysSession236 = () => {
 
                 <div className="mt-6 text-center">
                   <p className="text-muted-foreground mb-4 leading-relaxed">
-                    Wh0 Sessions Episode 236. 15 tracks of house heat featuring Costa UK, Milk & Sugar,
+                    Wh0 Plays Sessions Episode 236. 15 tracks of house heat featuring Costa UK, Milk & Sugar,
                     Wh0 & Chandler McFadden, LEFTI, Mercer, Reza & JustGio and more.
                   </p>
 
                   <div className="mt-4">
                     <SocialShare
                       url={typeof window !== 'undefined' ? window.location.href : ''}
-                      title="Wh0 Sessions Episode 236 - Dance One Radio"
-                      description="Wh0 Sessions Episode 236. 15 tracks of pure house energy."
+                      title="Wh0 Plays Sessions Episode 236 - Dance One Radio"
+                      description="Wh0 Plays Sessions Episode 236. 15 tracks of pure house energy."
                       image={`${typeof window !== 'undefined' ? window.location.origin : ''}/lovable-uploads/mario-show.jpg`}
                     />
                   </div>

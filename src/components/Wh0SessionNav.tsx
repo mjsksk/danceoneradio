@@ -17,7 +17,7 @@ const Wh0SessionNav = ({ current, className = '' }: Props) => {
 
   return (
     <nav
-      aria-label="Wh0 Sessions navigation"
+      aria-label="Wh0 Plays Sessions navigation"
       className={`flex items-center justify-between gap-3 ${className}`}
     >
       {prev ? (
