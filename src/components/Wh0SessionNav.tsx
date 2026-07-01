@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 // Ordered ascending. Update when new sessions are added.
-const SESSIONS = [222, 223, 224, 225, 226, 230, 232, 233, 235] as const;
+const SESSIONS = [222, 223, 224, 225, 226, 230, 232, 233, 235, 236] as const;
 
 interface Props {
   current: number;
