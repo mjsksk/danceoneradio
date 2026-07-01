@@ -42,46 +42,8 @@ const NowPlayingBlock = ({ streamTitle }: { streamTitle: string }) => {
 };
 
 const HeroSection = () => {
-  const [streamTitle, setStreamTitle] = useState('🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵');
-  
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    let isVisible = !document.hidden;
-
-    const handleVisibilityChange = () => {
-      isVisible = !document.hidden;
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    const fetchStreamMetadata = async () => {
-      if (!isVisible) return;
-      try {
-        const metadata = await RadioStreamService.getStreamMetadata();
-        const formattedTitle = RadioStreamService.formatTitle(metadata);
-        setStreamTitle(formattedTitle);
-      } catch (error) {
-        console.error('Error fetching stream metadata:', error);
-      }
-    };
-
-    const scheduleNext = () => {
-      timeoutId = setTimeout(() => {
-        fetchStreamMetadata().then(scheduleNext);
-      }, 10000);
-    };
-
-    if (isVisible) {
-      fetchStreamMetadata().then(scheduleNext);
-    } else {
-      scheduleNext();
-    }
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-  }, []);
+  const { streamTitle: contextStreamTitle } = useAudioPlayer();
+  const streamTitle = contextStreamTitle || '🎵 Dance One Radio - The Future of Electronic Music • Live DJ Sets • Progressive House • Trance • Techno • Deep House 🎵';
 
   return (
     <WavyBackground
