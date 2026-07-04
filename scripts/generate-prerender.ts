@@ -347,6 +347,15 @@ ${items}
   </article>`;
 }
 
+function stripDynamicHeadTags(html: string) {
+  // Remove existing tags we override to avoid duplicates.
+  return html
+    .replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '')
+    .replace(/<meta\s+(?:name|property)="(?:description|keywords|robots|googlebot|bingbot|twitter:[^"]+|og:[^"]+|fb:app_id)"[^>]*>/gi, '')
+    .replace(/<link\s+rel="canonical"[^>]*>/gi, '')
+    .replace(/<script\s+type="application\/ld\+json"[^>]*>[\s\S]*?<\/script>/gi, '');
+}
+
 function generateHTMLFromTemplate(templateHtml: string, route: RouteMetadata) {
   const cleaned = stripDynamicHeadTags(templateHtml);
 
