@@ -189,18 +189,7 @@ const Episode416 = () => {
                   </p>
                   
                   <div className="w-full max-w-2xl mx-auto">
-                    <audio 
-                      ref={audioRef}
-                      preload="metadata"
-                      onEnded={() => setIsPlaying(false)}
-                      onPause={() => setIsPlaying(false)}
-                      onPlay={() => setIsPlaying(true)}
-                      onTimeUpdate={handleTimeUpdate}
-                      onLoadedMetadata={handleLoadedMetadata}
-                    >
-                      <source src="https://media.blubrry.com/biggest_tunes_with_mario_135/mc.blubrry.com/biggest_tunes_with_mario_135/stream_2026-07-03_165958.mp3?awCollectionId=673838&amp;awEpisodeId=12156592&amp;aw_0_azn.pgenre=Music&amp;aw_0_1st.ri=blubrry&amp;aw_0_azn.pcountry=US&amp;aw_0_azn.planguage=en-us&amp;cat_exclude=IAB1-8%2CIAB1-9%2CIAB7-41%2CIAB8-5%2CIAB8-18%2CIAB11-4%2CIAB23%2CIAB24%2CIAB25%2CIAB26&amp;aw_0_cnt.rss=https%3A%2F%2Ffeeds.blubrry.com%2Ffeeds%2Fbiggest_tunes_with_mario_135.xml" type="audio/mpeg" />
-                      Your browser does not support the audio element.
-                    </audio>
+
                     
                     <div className="card-cyber p-6 bg-gradient-to-br from-background/80 to-background/60 backdrop-blur-sm">
                       <div className="flex items-center gap-4 mb-4">
