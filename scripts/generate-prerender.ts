@@ -270,31 +270,81 @@ function buildMetaBlock(route: RouteMetadata) {
 
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
-    ${JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      name: route.title,
-      description: route.description,
-      url: fullUrl,
-      image: imageUrl,
-      publisher: {
-        "@type": "RadioStation",
-        name: "Dance One Radio",
-        url: baseUrl,
-        logo: `${baseUrl}/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png`,
-      }
-    }, null, 2)}
+    ${JSON.stringify(buildJsonLd(route, fullUrl, imageUrl, baseUrl), null, 2)}
     </script>
   `;
 }
 
-function stripDynamicHeadTags(html: string) {
-  // Remove existing tags we override to avoid duplicates.
-  return html
-    .replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '')
-    .replace(/<meta\s+(?:name|property)="(?:description|keywords|robots|googlebot|bingbot|twitter:[^"]+|og:[^"]+|fb:app_id)"[^>]*>/gi, '')
-    .replace(/<link\s+rel="canonical"[^>]*>/gi, '')
-    .replace(/<script\s+type="application\/ld\+json"[^>]*>[\s\S]*?<\/script>/gi, '');
+function buildJsonLd(route: RouteMetadata, fullUrl: string, imageUrl: string, baseUrl: string) {
+  const publisher = {
+    "@type": "RadioStation",
+    name: "Dance One Radio",
+    url: baseUrl,
+    logo: `${baseUrl}/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png`,
+  };
+
+  if (route.episodeNumber && route.tracks && route.tracks.length > 0) {
+    return {
+      "@context": "https://schema.org",
+      "@type": "PodcastEpisode",
+      name: route.title,
+      description: route.description,
+      url: fullUrl,
+      image: imageUrl,
+      episodeNumber: route.episodeNumber,
+      partOfSeries: {
+        "@type": "PodcastSeries",
+        name: "Future Dance Anthems with Mario",
+        url: `${baseUrl}/shows`,
+      },
+      publisher,
+      numberOfItems: route.tracks.length,
+      hasPart: route.tracks.map(t => ({
+        "@type": "MusicRecording",
+        position: t.position,
+        name: t.title,
+        byArtist: { "@type": "MusicGroup", name: t.artist },
+      })),
+    };
+  }
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: route.title,
+    description: route.description,
+    url: fullUrl,
+    image: imageUrl,
+    publisher,
+  };
+}
+
+function buildBodyContent(route: RouteMetadata): string {
+  // Rich, unique, server-rendered content so crawlers see real substance
+  // (not just <div id="root">). Placed inside #root so React clears it on hydration
+  // — no visible flash for real users since JS mounts quickly.
+  if (route.episodeNumber && route.tracks && route.tracks.length > 0) {
+    const items = route.tracks.map(t => {
+      const title = escapeAttr(t.title);
+      const artist = escapeAttr(t.artist);
+      return `      <li><span>${title}</span> — <em>${artist}</em></li>`;
+    }).join('\n');
+    return `
+  <article>
+    <h1>Anthems of the Week ${route.episodeNumber} — Future Dance Anthems with Mario</h1>
+    <p>Episode ${route.episodeNumber} of Future Dance Anthems with Mario on Dance One Radio, featuring ${route.tracks.length} tracks of house, techno, progressive, melodic and electronic dance music — including unreleased anthems and extended mixes.</p>
+    <h2>Tracklist</h2>
+    <ol>
+${items}
+    </ol>
+    <p><a href="/shows">Browse all episodes</a> · <a href="/">Listen live to Dance One Radio</a></p>
+  </article>`;
+  }
+  return `
+  <article>
+    <h1>${escapeAttr(route.title)}</h1>
+    <p>${escapeAttr(route.description)}</p>
+  </article>`;
 }
 
 function generateHTMLFromTemplate(templateHtml: string, route: RouteMetadata) {
@@ -307,7 +357,15 @@ function generateHTMLFromTemplate(templateHtml: string, route: RouteMetadata) {
     (match) => `${match}${buildMetaBlock(route)}`
   );
 
-  return headInjected;
+  // Inject unique server-rendered content into #root so crawlers see real
+  // per-page substance and don't classify episodes as Soft 404 / duplicate.
+  const bodyContent = buildBodyContent(route);
+  const bodyInjected = headInjected.replace(
+    /<div id="root">\s*<\/div>/i,
+    `<div id="root">${bodyContent}\n  </div>`
+  );
+
+  return bodyInjected;
 }
 
 // Convert route path to safe filename for root-level share file
