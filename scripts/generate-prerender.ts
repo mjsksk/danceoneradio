@@ -20,16 +20,47 @@ function detectEpisodeNumbers(): number[] {
   return episodes.sort((a, b) => a - b);
 }
 
+// Extract the tracks array from an Episode{N}.tsx source file.
+// Returns [] if the file/format doesn't match — the injected body still gets a title.
+function extractEpisodeTracks(episodeNumber: number): Array<{ position: number; title: string; artist: string }> {
+  const filePath = path.resolve(process.cwd(), `src/pages/Episode${episodeNumber}.tsx`);
+  if (!fs.existsSync(filePath)) return [];
+  const src = fs.readFileSync(filePath, 'utf-8');
+  const arrMatch = src.match(/const\s+tracks\s*:\s*Track\[\]\s*=\s*\[([\s\S]*?)\n\s*\];/);
+  if (!arrMatch) return [];
+  const body = arrMatch[1];
+  const itemRe = /\{\s*position:\s*(\d+)\s*,\s*title:\s*"((?:[^"\\]|\\.)*)"\s*,\s*artist:\s*"((?:[^"\\]|\\.)*)"/g;
+  const tracks: Array<{ position: number; title: string; artist: string }> = [];
+  let m: RegExpExecArray | null;
+  while ((m = itemRe.exec(body)) !== null) {
+    tracks.push({
+      position: Number(m[1]),
+      title: m[2].replace(/\\"/g, '"'),
+      artist: m[3].replace(/\\"/g, '"'),
+    });
+  }
+  return tracks;
+}
+
 // Generate episode route metadata dynamically
-function generateEpisodeRoutes(): Array<{ path: string; title: string; description: string; image: string }> {
+function generateEpisodeRoutes(): Array<RouteMetadata> {
   const episodeNumbers = detectEpisodeNumbers();
-  
-  return episodeNumbers.map(num => ({
-    path: `/episode/${num}`,
-    title: `Anthems of the week ${num} - Future Dance Anthems with Mario | Dance One Radio`,
-    description: `Episode ${num} featuring the latest electronic dance music tracks and unreleased anthems.`,
-    image: '/lovable-uploads/mario-show.jpg'
-  }));
+
+  return episodeNumbers.map(num => {
+    const tracks = extractEpisodeTracks(num);
+    const topArtists = Array.from(new Set(tracks.map(t => t.artist.split(/\s*(?:,|feat\.?|ft\.?|&|x|Feat|\()/i)[0].trim()).filter(Boolean))).slice(0, 4);
+    const artistBlurb = topArtists.length ? ` Featuring ${topArtists.join(', ')} and more.` : '';
+    const trackCount = tracks.length;
+    const countBlurb = trackCount ? ` ${trackCount} tracks of house, techno, progressive and melodic dance music.` : '';
+    return {
+      path: `/episode/${num}`,
+      title: `Anthems of the Week ${num} - Future Dance Anthems with Mario | Dance One Radio`,
+      description: `Anthems of the Week Episode ${num} with Mario.${countBlurb}${artistBlurb}`.trim().slice(0, 300),
+      image: '/lovable-uploads/mario-show.jpg',
+      episodeNumber: num,
+      tracks,
+    };
+  });
 }
 
 // Static routes (non-episode pages)
