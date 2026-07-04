@@ -20,16 +20,47 @@ function detectEpisodeNumbers(): number[] {
   return episodes.sort((a, b) => a - b);
 }
 
+// Extract the tracks array from an Episode{N}.tsx source file.
+// Returns [] if the file/format doesn't match — the injected body still gets a title.
+function extractEpisodeTracks(episodeNumber: number): Array<{ position: number; title: string; artist: string }> {
+  const filePath = path.resolve(process.cwd(), `src/pages/Episode${episodeNumber}.tsx`);
+  if (!fs.existsSync(filePath)) return [];
+  const src = fs.readFileSync(filePath, 'utf-8');
+  const arrMatch = src.match(/const\s+tracks\s*:\s*Track\[\]\s*=\s*\[([\s\S]*?)\n\s*\];/);
+  if (!arrMatch) return [];
+  const body = arrMatch[1];
+  const itemRe = /\{\s*position:\s*(\d+)\s*,\s*title:\s*"((?:[^"\\]|\\.)*)"\s*,\s*artist:\s*"((?:[^"\\]|\\.)*)"/g;
+  const tracks: Array<{ position: number; title: string; artist: string }> = [];
+  let m: RegExpExecArray | null;
+  while ((m = itemRe.exec(body)) !== null) {
+    tracks.push({
+      position: Number(m[1]),
+      title: m[2].replace(/\\"/g, '"'),
+      artist: m[3].replace(/\\"/g, '"'),
+    });
+  }
+  return tracks;
+}
+
 // Generate episode route metadata dynamically
-function generateEpisodeRoutes(): Array<{ path: string; title: string; description: string; image: string }> {
+function generateEpisodeRoutes(): Array<RouteMetadata> {
   const episodeNumbers = detectEpisodeNumbers();
-  
-  return episodeNumbers.map(num => ({
-    path: `/episode/${num}`,
-    title: `Anthems of the week ${num} - Future Dance Anthems with Mario | Dance One Radio`,
-    description: `Episode ${num} featuring the latest electronic dance music tracks and unreleased anthems.`,
-    image: '/lovable-uploads/mario-show.jpg'
-  }));
+
+  return episodeNumbers.map(num => {
+    const tracks = extractEpisodeTracks(num);
+    const topArtists = Array.from(new Set(tracks.map(t => t.artist.split(/\s*(?:,|feat\.?|ft\.?|&|x|Feat|\()/i)[0].trim()).filter(Boolean))).slice(0, 4);
+    const artistBlurb = topArtists.length ? ` Featuring ${topArtists.join(', ')} and more.` : '';
+    const trackCount = tracks.length;
+    const countBlurb = trackCount ? ` ${trackCount} tracks of house, techno, progressive and melodic dance music.` : '';
+    return {
+      path: `/episode/${num}`,
+      title: `Anthems of the Week ${num} - Future Dance Anthems with Mario | Dance One Radio`,
+      description: `Anthems of the Week Episode ${num} with Mario.${countBlurb}${artistBlurb}`.trim().slice(0, 300),
+      image: '/lovable-uploads/mario-show.jpg',
+      episodeNumber: num,
+      tracks,
+    };
+  });
 }
 
 // Static routes (non-episode pages)
@@ -175,7 +206,15 @@ function getAllRoutes() {
   return [...staticRoutes, ...generateEpisodeRoutes()];
 }
 // Route type definition
-type RouteMetadata = { path: string; title: string; description: string; image: string };
+type EpisodeTrack = { position: number; title: string; artist: string };
+type RouteMetadata = {
+  path: string;
+  title: string;
+  description: string;
+  image: string;
+  episodeNumber?: number;
+  tracks?: EpisodeTrack[];
+};
 
 function escapeAttr(value: string) {
   return value
@@ -231,22 +270,81 @@ function buildMetaBlock(route: RouteMetadata) {
 
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
-    ${JSON.stringify({
+    ${JSON.stringify(buildJsonLd(route, fullUrl, imageUrl, baseUrl), null, 2)}
+    </script>
+  `;
+}
+
+function buildJsonLd(route: RouteMetadata, fullUrl: string, imageUrl: string, baseUrl: string) {
+  const publisher = {
+    "@type": "RadioStation",
+    name: "Dance One Radio",
+    url: baseUrl,
+    logo: `${baseUrl}/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png`,
+  };
+
+  if (route.episodeNumber && route.tracks && route.tracks.length > 0) {
+    return {
       "@context": "https://schema.org",
-      "@type": "WebPage",
+      "@type": "PodcastEpisode",
       name: route.title,
       description: route.description,
       url: fullUrl,
       image: imageUrl,
-      publisher: {
-        "@type": "RadioStation",
-        name: "Dance One Radio",
-        url: baseUrl,
-        logo: `${baseUrl}/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png`,
-      }
-    }, null, 2)}
-    </script>
-  `;
+      episodeNumber: route.episodeNumber,
+      partOfSeries: {
+        "@type": "PodcastSeries",
+        name: "Future Dance Anthems with Mario",
+        url: `${baseUrl}/shows`,
+      },
+      publisher,
+      numberOfItems: route.tracks.length,
+      hasPart: route.tracks.map(t => ({
+        "@type": "MusicRecording",
+        position: t.position,
+        name: t.title,
+        byArtist: { "@type": "MusicGroup", name: t.artist },
+      })),
+    };
+  }
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: route.title,
+    description: route.description,
+    url: fullUrl,
+    image: imageUrl,
+    publisher,
+  };
+}
+
+function buildBodyContent(route: RouteMetadata): string {
+  // Rich, unique, server-rendered content so crawlers see real substance
+  // (not just <div id="root">). Placed inside #root so React clears it on hydration
+  // — no visible flash for real users since JS mounts quickly.
+  if (route.episodeNumber && route.tracks && route.tracks.length > 0) {
+    const items = route.tracks.map(t => {
+      const title = escapeAttr(t.title);
+      const artist = escapeAttr(t.artist);
+      return `      <li><span>${title}</span> — <em>${artist}</em></li>`;
+    }).join('\n');
+    return `
+  <article>
+    <h1>Anthems of the Week ${route.episodeNumber} — Future Dance Anthems with Mario</h1>
+    <p>Episode ${route.episodeNumber} of Future Dance Anthems with Mario on Dance One Radio, featuring ${route.tracks.length} tracks of house, techno, progressive, melodic and electronic dance music — including unreleased anthems and extended mixes.</p>
+    <h2>Tracklist</h2>
+    <ol>
+${items}
+    </ol>
+    <p><a href="/shows">Browse all episodes</a> · <a href="/">Listen live to Dance One Radio</a></p>
+  </article>`;
+  }
+  return `
+  <article>
+    <h1>${escapeAttr(route.title)}</h1>
+    <p>${escapeAttr(route.description)}</p>
+  </article>`;
 }
 
 function stripDynamicHeadTags(html: string) {
@@ -268,7 +366,15 @@ function generateHTMLFromTemplate(templateHtml: string, route: RouteMetadata) {
     (match) => `${match}${buildMetaBlock(route)}`
   );
 
-  return headInjected;
+  // Inject unique server-rendered content into #root so crawlers see real
+  // per-page substance and don't classify episodes as Soft 404 / duplicate.
+  const bodyContent = buildBodyContent(route);
+  const bodyInjected = headInjected.replace(
+    /<div id="root">\s*<\/div>/i,
+    `<div id="root">${bodyContent}\n  </div>`
+  );
+
+  return bodyInjected;
 }
 
 // Convert route path to safe filename for root-level share file
