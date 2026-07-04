@@ -47,6 +47,7 @@ const Episode412 = lazy(() => import('@/pages/Episode412'));
 const Episode413 = lazy(() => import('@/pages/Episode413'));
 const Episode414 = lazy(() => import('@/pages/Episode414'));
 const Episode415 = lazy(() => import('@/pages/Episode415'));
+const Episode416 = lazy(() => import('@/pages/Episode416'));
 const News = lazy(() => import('@/pages/News'));
 const NewsTopStories = lazy(() => import('@/pages/NewsTopStories'));
 const NewsArtistsReleases = lazy(() => import('@/pages/NewsArtistsReleases'));
@@ -125,6 +126,7 @@ export function AnimatedRoutes() {
         <Route path="/episode/413" element={<PageTransition><Episode413 /></PageTransition>} />
         <Route path="/episode/414" element={<PageTransition><Episode414 /></PageTransition>} />
         <Route path="/episode/415" element={<PageTransition><Episode415 /></PageTransition>} />
+        <Route path="/episode/416" element={<PageTransition><Episode416 /></PageTransition>} />
         <Route path="/news" element={<PageTransition><News /></PageTransition>} />
         <Route path="/news/top-stories" element={<PageTransition><NewsTopStories /></PageTransition>} />
         <Route path="/news/artists-releases" element={<PageTransition><NewsArtistsReleases /></PageTransition>} />
