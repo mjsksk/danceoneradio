@@ -206,7 +206,15 @@ function getAllRoutes() {
   return [...staticRoutes, ...generateEpisodeRoutes()];
 }
 // Route type definition
-type RouteMetadata = { path: string; title: string; description: string; image: string };
+type EpisodeTrack = { position: number; title: string; artist: string };
+type RouteMetadata = {
+  path: string;
+  title: string;
+  description: string;
+  image: string;
+  episodeNumber?: number;
+  tracks?: EpisodeTrack[];
+};
 
 function escapeAttr(value: string) {
   return value
