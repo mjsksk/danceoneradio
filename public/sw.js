@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dance-one-radio-v10';
+const CACHE_NAME = 'dance-one-radio-v11';
 const APP_CACHE_PREFIX = 'dance-one-radio-';
-console.log('🔔 Service Worker loaded: v10');
+console.log('🔔 Service Worker loaded: v11');
 // Only precache STABLE paths. Hashed /assets/* files are picked up on demand
 // by the runtime fetch handler; listing them by name here would 404 on every
 // new deploy and reject the entire install, leaving users stuck on the old SW.
