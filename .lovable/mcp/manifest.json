@@ -1,0 +1,140 @@
+{
+  "version": 1,
+  "sdk_version": "0.20.0",
+  "path": "/functions/v1/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "dance-one-radio-mcp",
+      "version": "0.1.0",
+      "title": "Dance One Radio"
+    },
+    "tools": [
+      {
+        "name": "get_now_playing",
+        "title": "Get now playing",
+        "description": "Get the track currently playing on the Dance One Radio live stream (title, artist, and album art when available).",
+        "annotations": {
+          "readOnlyHint": true,
+          "openWorldHint": true
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_recent_tracks",
+        "title": "Get recently played tracks",
+        "description": "List the most recent tracks played on the Dance One Radio live stream, newest first.",
+        "annotations": {
+          "readOnlyHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "description": "Number of tracks to return (default 20, max 50)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_episodes",
+        "title": "List podcast episodes",
+        "description": "List Dance One Radio podcast episodes (episode numbers with track counts), newest first. Each episode has a page at https://danceoneradio.com/episode/<episode_number>.",
+        "annotations": {
+          "readOnlyHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "description": "Number of episodes to return (default 20, max 50)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_episode_tracklist",
+        "title": "Get episode tracklist",
+        "description": "Get the full tracklist for a specific Dance One Radio podcast episode, including artist, title, album, and buy/stream links when available.",
+        "annotations": {
+          "readOnlyHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "episode_number": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Episode number, e.g. 416."
+            }
+          },
+          "required": [
+            "episode_number"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "search_edm_news",
+        "title": "Search EDM news",
+        "description": "Search Dance One Radio's aggregated EDM news articles by keyword and/or category. Returns title, summary, source, published date, and article URL.",
+        "annotations": {
+          "readOnlyHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Optional keyword to match in title or summary."
+            },
+            "category": {
+              "type": "string",
+              "enum": [
+                "top_stories",
+                "artists_releases",
+                "festivals_events",
+                "industry_culture"
+              ],
+              "description": "Optional news category filter."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 30,
+              "description": "Number of articles (default 10, max 30)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
