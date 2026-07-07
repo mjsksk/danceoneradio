@@ -168,13 +168,35 @@ self.addEventListener('fetch', (event) => {
   }
 
   if (event.request.mode === 'navigate' || event.request.destination === 'document' || acceptsHtml) {
+    // Force a real origin fetch, bypassing HTTP cache AND any CDN edge cache
+    // by appending a cache-buster and sending no-cache headers.
+    const bustUrl = new URL(event.request.url);
+    bustUrl.searchParams.set('__nc', Date.now().toString());
+    const bustedRequest = new Request(bustUrl.toString(), {
+      method: 'GET',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' },
+      mode: 'same-origin',
+      credentials: 'same-origin',
+      redirect: 'follow',
+    });
     event.respondWith(
-      fetch(event.request, { cache: 'no-store' }).catch(() =>
-        new Response('Dance One Radio is temporarily offline. Please reconnect and refresh.', {
-          status: 503,
-          headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+      fetch(bustedRequest, { cache: 'no-store' })
+        .then((response) => {
+          // Strip cache headers from the response the browser stores.
+          const headers = new Headers(response.headers);
+          headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+          headers.set('Pragma', 'no-cache');
+          headers.set('Expires', '0');
+          return response.blob().then((body) =>
+            new Response(body, { status: response.status, statusText: response.statusText, headers })
+          );
         })
-      )
+        .catch(() =>
+          new Response('Dance One Radio is temporarily offline. Please reconnect and refresh.', {
+            status: 503,
+            headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+          })
+        )
     );
     return;
   }
