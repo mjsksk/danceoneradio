@@ -566,6 +566,14 @@ const Shows = () => {
                         genres: 'House • Tech House • Dance',
                       },
                       {
+                        number: 238,
+                        title: 'Wh0 Plays Sessions Episode 238',
+                        subtitle: <span>House • Tech House • Dance</span>,
+                        link: '/show/wh0-plays-sessions/238',
+                        broadcastDate: '2026-07-14T18:00:00',
+                        genres: 'House • Tech House • Dance',
+                      },
+                      {
                         number: 236,
                         title: 'Wh0 Plays Sessions Episode 236',
                         subtitle: <span>House • Tech House • Dance</span>,
