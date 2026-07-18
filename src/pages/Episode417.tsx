@@ -19,7 +19,7 @@ const Episode417 = () => {
   const { user } = useAuth();
   const episodeNumber = 417;
   const episodeTitle = "Anthems of the week 417";
-  const audioUrl = "";
+  const audioUrl = "https://media.blubrry.com/biggest_tunes_with_mario_135/mc.blubrry.com/biggest_tunes_with_mario_135/stream_2026-07-10_165947.mp3?awCollectionId=673838&amp;awEpisodeId=12164143&amp;aw_0_azn.pgenre=Music&amp;aw_0_1st.ri=blubrry&amp;aw_0_azn.pcountry=US&amp;aw_0_azn.planguage=en-us&amp;cat_exclude=IAB1-8%2CIAB1-9%2CIAB7-41%2CIAB8-5%2CIAB8-18%2CIAB11-4%2CIAB23%2CIAB24%2CIAB25%2CIAB26&amp;aw_0_cnt.rss=https%3A%2F%2Ffeeds.blubrry.com%2Ffeeds%2Fbiggest_tunes_with_mario_135.xml";
 
   const { progress, saveProgress } = useListeningProgress(episodeNumber, episodeTitle, audioUrl);
 
