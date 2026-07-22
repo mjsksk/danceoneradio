@@ -65,14 +65,18 @@ Deno.serve(async (req) => {
     let historyData = '';
     
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
       const currentResponse = await fetch('https://s9.myradiostream.com:14296/currentsong?sid=1', {
         method: 'GET',
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
           'Accept': '*/*',
         },
+        signal: controller.signal,
       });
-      
+      clearTimeout(timeoutId);
+
       if (currentResponse.ok) {
         const currentTrack = await currentResponse.text();
         console.log('🎵 Got current track:', currentTrack);
@@ -81,7 +85,7 @@ Deno.serve(async (req) => {
         console.log('❌ Current track fetch failed with status:', currentResponse.status);
       }
     } catch (error) {
-      console.log('❌ Fetch failed:', error);
+      console.log('❌ Fetch failed or timed out:', error);
     }
 
     // If no data, return success with empty tracks (not an error condition)
