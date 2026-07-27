@@ -729,8 +729,8 @@ const Shows = () => {
                                         <>
                                           <Calendar className="w-3.5 h-3.5 text-neon" />
                                           <span>
-                                            {broadcastDate.toLocaleDateString('en-US', { weekday: 'long' })} at{' '}
-                                            {broadcastDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                                            {formatBroadcastWeekdayTime(broadcastDate)}
+
                                           </span>
                                         </>
                                       ) : (
