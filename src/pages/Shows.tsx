@@ -669,16 +669,13 @@ const Shows = () => {
                     ];
 
                     return guestShows.map((show) => {
-                      const broadcastDate = new Date(show.broadcastDate);
+                      const broadcastDate = parseBroadcastDate(show.broadcastDate);
                       const now = new Date();
                       const isPast = now > broadcastDate;
                       const isUpcoming = !isPast;
 
-                      const formattedDate = broadcastDate.toLocaleDateString('en-US', {
-                        month: 'long',
-                        day: 'numeric',
-                        year: 'numeric',
-                      });
+                      const formattedDate = formatBroadcastDate(broadcastDate);
+
 
                       const shareGuestShow = async (e: React.MouseEvent) => {
                         e.preventDefault();
