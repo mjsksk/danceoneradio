@@ -12,6 +12,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  parseBroadcastDate,
+  formatBroadcastDate,
+  formatBroadcastWeekdayTime,
+} from '@/lib/broadcastTime';
 interface Episode {
   title: string;
   description: string;
@@ -221,7 +226,7 @@ const Shows = () => {
   }, [episodes]);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return formatBroadcastDate(dateString, {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -664,16 +669,13 @@ const Shows = () => {
                     ];
 
                     return guestShows.map((show) => {
-                      const broadcastDate = new Date(show.broadcastDate);
+                      const broadcastDate = parseBroadcastDate(show.broadcastDate);
                       const now = new Date();
                       const isPast = now > broadcastDate;
                       const isUpcoming = !isPast;
 
-                      const formattedDate = broadcastDate.toLocaleDateString('en-US', {
-                        month: 'long',
-                        day: 'numeric',
-                        year: 'numeric',
-                      });
+                      const formattedDate = formatBroadcastDate(broadcastDate);
+
 
                       const shareGuestShow = async (e: React.MouseEvent) => {
                         e.preventDefault();
@@ -727,8 +729,8 @@ const Shows = () => {
                                         <>
                                           <Calendar className="w-3.5 h-3.5 text-neon" />
                                           <span>
-                                            {broadcastDate.toLocaleDateString('en-US', { weekday: 'long' })} at{' '}
-                                            {broadcastDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                                            {formatBroadcastWeekdayTime(broadcastDate)}
+
                                           </span>
                                         </>
                                       ) : (
