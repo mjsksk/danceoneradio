@@ -226,7 +226,7 @@ const Shows = () => {
   }, [episodes]);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return formatBroadcastDate(dateString, {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
