@@ -114,7 +114,7 @@ const Episode396 = () => {
       <SEO 
         title={`Anthems of the Week ${episodeNumber} | Dance One Radio`}
         description={`Episode ${episodeNumber} featuring the latest electronic dance music anthems.`}
-        image="/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png"
+        image="/lovable-uploads/future-dance-anthems.jpg"
         url={window.location.href}
       />
       <div 
@@ -148,6 +148,19 @@ const Episode396 = () => {
             </div>
             
             <div className="max-w-4xl mx-auto">
+              <div className="flex justify-center mb-8">
+                <img
+                  src="/lovable-uploads/future-dance-anthems.jpg"
+                  alt="Future Dance Anthems with Mario - Episode 396"
+                  className="w-64 h-64 sm:w-80 sm:h-80 rounded-2xl object-cover shadow-[0_0_30px_hsl(var(--primary)/0.2)]"
+                  loading="eager"
+                  width="320"
+                  height="320"
+                  decoding="async"
+                  srcSet="/lovable-uploads/future-dance-anthems-480w.jpg 480w, /lovable-uploads/future-dance-anthems-960w.jpg 960w, /lovable-uploads/future-dance-anthems.jpg 1200w"
+                  sizes="(max-width: 640px) 100vw, 320px"
+                />
+              </div>
               <h1 className="text-3xl md:text-5xl font-['Orbitron'] font-bold mb-6 text-center">
                 <span className="text-neon">Anthems of the week</span>{" "}
                 <span className="text-neon-purple">{episodeNumber}</span>
@@ -286,7 +299,7 @@ const Episode396 = () => {
                       url={window.location.href}
                       title={`Anthems of the week ${episodeNumber} - Future Dance Anthems with Mario`}
                       description={`Episode ${episodeNumber} featuring the latest electronic dance music anthems.`}
-                      image={`${window.location.origin}/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png`}
+                      image={`${window.location.origin}/lovable-uploads/future-dance-anthems.jpg`}
                     />
                   </div>
                 </div>
