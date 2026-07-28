@@ -11,7 +11,7 @@
  */
 
 /** The timezone the schedule is authored in. */
-export const STATION_TIMEZONE = 'America/New_York';
+export const STATION_TIMEZONE = 'America/Los_Angeles';
 
 /** The listener's timezone, resolved from the browser. */
 export const getListenerTimeZone = (): string => {
