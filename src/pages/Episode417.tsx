@@ -95,7 +95,7 @@ const Episode417 = () => {
       <SEO
         title="Anthems of the Week 417 | Dance One Radio"
         description="Anthems that shape today's dance scene - Episode 417 tracklist featuring bbyclose, Joshwa, Unfazed, Chicane, ANOTR, Bag Raiders and more."
-        image="/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png"
+        image="/lovable-uploads/future-dance-anthems.jpg"
         url={typeof window !== 'undefined' ? window.location.href : ''}
       />
       <div
@@ -264,7 +264,7 @@ const Episode417 = () => {
                         url={typeof window !== 'undefined' ? window.location.href : ''}
                         title="Anthems of the week 417 - Future Dance Anthems with Mario"
                         description="Anthems that shape today's dance scene..."
-                        image={typeof window !== 'undefined' ? `${window.location.origin}/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png` : ''}
+                        image={typeof window !== 'undefined' ? `${window.location.origin}/lovable-uploads/future-dance-anthems.jpg` : ''}
                       />
                     </div>
                   </div>

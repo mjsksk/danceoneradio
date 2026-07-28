@@ -95,7 +95,7 @@ const Episode418 = () => {
       <SEO
         title="Anthems of the Week 418 | Dance One Radio"
         description="Anthems that shape today's dance scene - Episode 418 tracklist featuring Durante, Emi Galvan, Gorgon City, Oliver Heldens, Kryder, Dusky and more."
-        image="/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png"
+        image="/lovable-uploads/future-dance-anthems.jpg"
         url={typeof window !== 'undefined' ? window.location.href : ''}
       />
       <div
@@ -264,7 +264,7 @@ const Episode418 = () => {
                         url={typeof window !== 'undefined' ? window.location.href : ''}
                         title="Anthems of the week 418 - Future Dance Anthems with Mario"
                         description="Anthems that shape today's dance scene..."
-                        image={typeof window !== 'undefined' ? `${window.location.origin}/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png` : ''}
+                        image={typeof window !== 'undefined' ? `${window.location.origin}/lovable-uploads/future-dance-anthems.jpg` : ''}
                       />
                     </div>
                   </div>

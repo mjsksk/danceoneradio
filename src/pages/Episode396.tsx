@@ -114,7 +114,7 @@ const Episode396 = () => {
       <SEO 
         title={`Anthems of the Week ${episodeNumber} | Dance One Radio`}
         description={`Episode ${episodeNumber} featuring the latest electronic dance music anthems.`}
-        image="/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png"
+        image="/lovable-uploads/future-dance-anthems.jpg"
         url={window.location.href}
       />
       <div 
@@ -299,7 +299,7 @@ const Episode396 = () => {
                       url={window.location.href}
                       title={`Anthems of the week ${episodeNumber} - Future Dance Anthems with Mario`}
                       description={`Episode ${episodeNumber} featuring the latest electronic dance music anthems.`}
-                      image={`${window.location.origin}/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png`}
+                      image={`${window.location.origin}/lovable-uploads/future-dance-anthems.jpg`}
                     />
                   </div>
                 </div>
