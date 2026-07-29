@@ -160,6 +160,7 @@ const FloatingPlayer = () => {
               className="w-10 h-10 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full hover:from-neon/30 hover:to-neon-purple/30"
               onClick={handlePlayPause}
               disabled={isLoading}
+              aria-label={isPlaying ? 'Pause playback' : 'Play audio'}
             >
               {isLoading ? (
                 <div className="w-4 h-4 border-2 border-neon border-t-transparent rounded-full animate-spin" />
@@ -218,6 +219,7 @@ const FloatingPlayer = () => {
               size="icon"
               className="w-8 h-8 text-muted-foreground hover:text-destructive"
               onClick={closePlayer}
+              aria-label="Close player"
             >
               <X className="w-4 h-4" />
             </Button>
