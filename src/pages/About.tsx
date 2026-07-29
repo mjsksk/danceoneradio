@@ -124,7 +124,7 @@ const About = () => {
                     <div className="mx-auto rounded-full overflow-hidden border-2 border-primary/50 hover:border-primary transition-all duration-300 w-32 h-32 flex items-center justify-center bg-background">
                       <img 
                         src="/lovable-uploads/mario-new.jpg"
-                        alt="Mario"
+                        alt="Mario - Host of Future Dance Anthems"
                         className="w-full h-full object-cover"
                         loading="lazy"
                        decoding="async" srcSet="/lovable-uploads/mario-new-480w.jpg 480w, /lovable-uploads/mario-new-960w.jpg 960w, /lovable-uploads/mario-new.jpg 1440w" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"/>
@@ -153,7 +153,7 @@ const About = () => {
                     <div className="mx-auto rounded-full overflow-hidden border-2 border-accent/50 hover:border-accent transition-all duration-300 w-32 h-32 flex items-center justify-center bg-background">
                       <img 
                         src="/lovable-uploads/ivan-samel.jpg" 
-                        alt="Ivan Samel"
+                        alt="Ivan Samel - Sound Engineer"
                         className="w-full h-full object-cover"
                         loading="lazy"
                        decoding="async"/>
@@ -181,7 +181,7 @@ const About = () => {
                     <div className="mx-auto rounded-full overflow-hidden border-2 border-primary/50 hover:border-primary transition-all duration-300 w-32 h-32 flex items-center justify-center bg-background">
                       <img 
                         src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=128&h=128&fit=crop&crop=face" 
-                        alt="DJ Pulse"
+                        alt="DJ Pulse - Resident DJ"
                         className="w-full h-full object-cover"
                         loading="lazy"
                        decoding="async"/>
@@ -210,7 +210,7 @@ const About = () => {
                     <div className="mx-auto rounded-full overflow-hidden border-2 border-primary/50 hover:border-primary transition-all duration-300 w-32 h-32 flex items-center justify-center bg-background">
                       <img 
                         src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=128&h=128&fit=crop&crop=face" 
-                        alt="DJ Cosmos"
+                        alt="DJ Cosmos - Deep House Explorer"
                         className="w-full h-full object-cover"
                         loading="lazy"
                        decoding="async"/>
@@ -239,7 +239,7 @@ const About = () => {
                     <div className="mx-auto rounded-full overflow-hidden border-2 border-accent/50 hover:border-accent transition-all duration-300 w-32 h-32 flex items-center justify-center bg-background">
                       <img 
                         src={wh0Image}
-                        alt="Wh0"
+                        alt="Wh0 - Host of Wh0 Plays Sessions"
                         className="w-full h-full object-cover"
                         loading="lazy"
                        decoding="async"/>
