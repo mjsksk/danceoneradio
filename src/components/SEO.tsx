@@ -48,8 +48,8 @@ const SEO = ({
       }
     };
 
-    // Full image URL
-    const fullImageUrl = image.startsWith('http') ? image : window.location.origin + image;
+    // Full image URL — social crawlers require absolute URLs on the canonical host
+    const fullImageUrl = image.startsWith('http') ? image : CANONICAL_HOST + (image.startsWith('/') ? image : `/${image}`);
 
     // Update essential meta tags
     updateMetaTag('meta[name="description"]', description);
@@ -93,7 +93,7 @@ const SEO = ({
         "@type": "RadioStation",
         "name": "Dance One Radio",
         "url": "https://danceoneradio.com",
-        "logo": window.location.origin + "/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
+        "logo": CANONICAL_HOST + "/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
       };
 
       let payload: any = structuredData ?? {
