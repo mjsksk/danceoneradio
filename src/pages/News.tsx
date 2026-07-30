@@ -4,6 +4,7 @@ import { Newspaper, Music, CalendarDays, Users, TrendingUp, RefreshCw } from 'lu
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import { buildNewsCollectionSchema } from '@/lib/newsSchema';
 import GoogleAds from '@/components/GoogleAds';
 import { AD_SLOTS } from '@/config/adSlots';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -57,6 +58,13 @@ const News = () => {
     }
   };
 
+  const newsSchema = buildNewsCollectionSchema({
+    path: '/news',
+    name: "EDM News & Festival Updates",
+    description: "Latest EDM news, dance music releases, festival announcements, and artist spotlights from Dance One Radio.",
+    articles: [featuredArticle, ...(headlines || []), ...(releases || []), ...(events || []), ...(artistNews || []), ...(industry || [])],
+  });
+
   return (
     <>
       <SEO 
@@ -67,6 +75,7 @@ const News = () => {
         image="/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
         imageAlt="EDM news and festival updates — Dance One Radio"
         type="article"
+        structuredData={newsSchema}
       />
       
       <div className="min-h-screen bg-background">

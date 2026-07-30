@@ -2,6 +2,7 @@ import { Newspaper, TrendingUp } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import { buildNewsCollectionSchema } from '@/lib/newsSchema';
 import GoogleAds from '@/components/GoogleAds';
 import { AD_SLOTS } from '@/config/adSlots';
 import { NewsFeaturedHero } from '@/components/news/NewsFeaturedHero';
@@ -18,6 +19,13 @@ const NewsTopStories = () => {
     ? todayStories.filter(a => a.id !== featuredArticle?.id)
     : allHeadlines?.filter(a => a.id !== featuredArticle?.id) || [];
 
+  const newsSchema = buildNewsCollectionSchema({
+    path: '/news/top-stories',
+    name: "Top EDM Stories Today",
+    description: "Today's top electronic dance music headlines, breaking news, and trending stories.",
+    articles: [featuredArticle, ...displayArticles],
+  });
+
   return (
     <>
       <SEO 
@@ -28,6 +36,7 @@ const NewsTopStories = () => {
         image="/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
         imageAlt="Top EDM stories today — Dance One Radio"
         type="article"
+        structuredData={newsSchema}
       />
       
       <div className="min-h-screen bg-background">
