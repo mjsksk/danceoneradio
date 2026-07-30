@@ -84,20 +84,36 @@ const HouseVsTechHouseVsTechno = () => {
   const structuredData = [
     {
       '@context': 'https://schema.org',
-      '@type': 'Article',
+      '@type': 'NewsArticle',
       headline: 'House vs Tech House vs Techno: The Differences Explained',
       description:
         'A practical guide to telling house, tech house and techno apart — BPM ranges, drum programming, basslines, melody and origins, with examples you can hear live.',
-      image: IMAGE,
+      image: [
+        {
+          '@type': 'ImageObject',
+          url: IMAGE,
+          width: 1200,
+          height: 630,
+          caption: 'House vs tech house vs techno — genre guide from Dance One Radio',
+        },
+      ],
+      thumbnailUrl: IMAGE,
       author: { '@type': 'Organization', name: 'Dance One Radio' },
       publisher: {
         '@type': 'RadioStation',
         name: 'Dance One Radio',
         url: 'https://danceoneradio.com',
-        logo: IMAGE,
+        logo: {
+          '@type': 'ImageObject',
+          url: IMAGE,
+          width: 1200,
+          height: 630,
+        },
       },
-      datePublished: '2026-07-30',
-      dateModified: '2026-07-30',
+      datePublished: '2026-07-30T09:00:00-07:00',
+      dateModified: '2026-07-30T09:00:00-07:00',
+      inLanguage: 'en-US',
+      isAccessibleForFree: true,
       mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
       articleSection: 'Music',
       keywords:

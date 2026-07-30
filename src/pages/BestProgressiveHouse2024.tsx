@@ -111,10 +111,19 @@ const BestProgressiveHouse2024 = () => {
 
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "NewsArticle",
     "headline": "Top 10 Progressive House Tracks of 2024 — Curated by Dance One Radio",
     "description": "The definitive countdown of the best progressive house tracks of 2024. Featuring Calvin Harris, David Guetta, John Summit, Meduza, Martin Garrix and more.",
-    "image": "https://danceoneradio.com/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png",
+    "image": [
+      {
+        "@type": "ImageObject",
+        "url": "https://danceoneradio.com/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png",
+        "width": 1200,
+        "height": 630,
+        "caption": "Top progressive house tracks of 2024 — Dance One Radio"
+      }
+    ],
+    "thumbnailUrl": "https://danceoneradio.com/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png",
     "author": {
       "@type": "Organization",
       "name": "Dance One Radio"
@@ -123,10 +132,17 @@ const BestProgressiveHouse2024 = () => {
       "@type": "RadioStation",
       "name": "Dance One Radio",
       "url": "https://danceoneradio.com",
-      "logo": "https://danceoneradio.com/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://danceoneradio.com/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png",
+        "width": 1200,
+        "height": 630
+      }
     },
-    "datePublished": "2024-12-20",
-    "dateModified": "2024-12-20",
+    "datePublished": "2024-12-20T09:00:00-08:00",
+    "dateModified": "2026-07-30T09:00:00-07:00",
+    "inLanguage": "en-US",
+    "isAccessibleForFree": true,
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": pageUrl
