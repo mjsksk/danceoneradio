@@ -142,6 +142,7 @@ const BestProgressiveHouse2024 = () => {
         description="The definitive countdown of the best progressive house tracks of 2024. Featuring Calvin Harris, David Guetta, John Summit, Meduza, Martin Garrix and more."
         url={pageUrl}
         type="article"
+        imageAlt="Top progressive house tracks of 2024 — Dance One Radio"
         keywords="best progressive house songs, progressive house 2024, top progressive house tracks, dance music recommendations, electronic music guide"
         structuredData={structuredData}
       />
