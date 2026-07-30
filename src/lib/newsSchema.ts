@@ -127,13 +127,22 @@ export const buildNewsCollectionSchema = ({
     {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
+      '@id': `${url}#collection`,
       name,
+      headline: truncateHeadline(name),
       description,
       url,
+      mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+      image: imageObject(null),
       inLanguage: 'en-US',
+      ...(dates.length ? { datePublished: dates[0] } : {}),
+      ...(modifiedDates.length
+        ? { dateModified: modifiedDates[modifiedDates.length - 1] }
+        : {}),
       isPartOf: { '@type': 'WebSite', name: 'Dance One Radio', url: HOST },
       publisher: PUBLISHER,
     },
+
     {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
