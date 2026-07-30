@@ -37,23 +37,43 @@ export const buildNewsCollectionSchema = ({
 }: NewsCollectionOptions): Record<string, unknown>[] => {
   const url = `${HOST}${path}`;
 
-  const items = articles
-    .filter((a): a is NewsArticle => Boolean(a))
-    .slice(0, 20)
-    .map((article, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      item: {
-        '@type': 'NewsArticle',
-        headline: article.title,
-        description: article.summary,
-        url: article.source_url,
-        datePublished: article.published_at,
-        ...(article.image_url ? { image: [article.image_url] } : {}),
-        author: { '@type': 'Organization', name: article.source_name },
-        publisher: PUBLISHER,
-      },
-    }));
+  const usable = articles.filter((a): a is NewsArticle => Boolean(a)).slice(0, 20);
+
+  const items = usable.map((article, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    url: article.source_url,
+    item: {
+      '@type': 'NewsArticle',
+      '@id': `${url}#article-${article.id}`,
+      headline: truncateHeadline(article.title),
+      ...(article.title.length > HEADLINE_MAX ? { alternativeHeadline: article.title } : {}),
+      name: article.title,
+      description: article.summary,
+      url: article.source_url,
+      mainEntityOfPage: { '@type': 'WebPage', '@id': article.source_url },
+      datePublished: toIso(article.published_at),
+      dateModified: toIso(article.fetched_at ?? article.published_at),
+      image: imageObject(article.image_url),
+      thumbnailUrl: article.image_url ?? FALLBACK_IMAGE,
+      author: { '@type': 'Organization', name: article.source_name, url: article.source_url },
+      publisher: PUBLISHER,
+      articleSection: CATEGORY_LABELS[article.category] ?? 'Electronic Music',
+      ...(article.tags?.length ? { keywords: article.tags.join(', ') } : {}),
+      inLanguage: 'en-US',
+      isAccessibleForFree: true,
+    },
+  }));
+
+  const dates = usable
+    .map((a) => toIso(a.published_at))
+    .filter(Boolean)
+    .sort();
+  const modifiedDates = usable
+    .map((a) => toIso(a.fetched_at ?? a.published_at))
+    .filter(Boolean)
+    .sort();
+
 
   const breadcrumbItems = [
     { '@type': 'ListItem', position: 1, name: 'Home', item: `${HOST}/` },
