@@ -7,10 +7,51 @@ import SEO from '@/components/SEO';
 import { Card } from '@/components/ui/card';
 import { GENRES } from '@/data/genres';
 
+const HOST = 'https://danceoneradio.com';
+
 const Genres = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const structuredData = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: 'Radio by Genre — Dance One Radio',
+      description:
+        'Browse Dance One Radio by genre: dedicated live streams for house, tech house, trance, techno, EDM and more.',
+      url: `${HOST}/genres`,
+      inLanguage: 'en-US',
+      isPartOf: { '@type': 'WebSite', name: 'Dance One Radio', url: HOST },
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: 'Dance One Radio genre channels',
+      itemListElement: GENRES.map((g, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: `${g.name} radio`,
+        url: `${HOST}/genres/${g.slug}`,
+        item: {
+          '@type': 'RadioStation',
+          name: `Dance One Radio — ${g.name}`,
+          url: `${HOST}/genres/${g.slug}`,
+          genre: g.name,
+          broadcastFrequency: 'Internet',
+        },
+      })),
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: `${HOST}/` },
+        { '@type': 'ListItem', position: 2, name: 'Genres', item: `${HOST}/genres` },
+      ],
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -21,6 +62,7 @@ const Genres = () => {
         url="https://danceoneradio.com/genres"
         image="/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
         imageAlt="Dance One Radio genre channels — house, trance, techno, EDM"
+        structuredData={structuredData}
       />
       <Navigation />
 

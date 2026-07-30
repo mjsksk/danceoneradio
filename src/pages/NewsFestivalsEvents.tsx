@@ -2,6 +2,7 @@ import { CalendarDays, MapPin, Ticket } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import { buildNewsCollectionSchema } from '@/lib/newsSchema';
 import GoogleAds from '@/components/GoogleAds';
 import { AD_SLOTS } from '@/config/adSlots';
 import { NewsGrid } from '@/components/news/NewsGrid';
@@ -9,6 +10,13 @@ import { useNewsArticles } from '@/hooks/useNewsArticles';
 
 const NewsFestivalsEvents = () => {
   const { data: events, isLoading } = useNewsArticles({ category: 'event', limit: 30 });
+
+  const newsSchema = buildNewsCollectionSchema({
+    path: '/news/festivals-events',
+    name: "Festivals & Events",
+    description: "Festival announcements, EDM event news, concert dates, and tour information.",
+    articles: events || [],
+  });
 
   return (
     <>
@@ -20,6 +28,7 @@ const NewsFestivalsEvents = () => {
         image="/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
         imageAlt="Festival and event announcements — Dance One Radio"
         type="article"
+        structuredData={newsSchema}
       />
       
       <div className="min-h-screen bg-background">

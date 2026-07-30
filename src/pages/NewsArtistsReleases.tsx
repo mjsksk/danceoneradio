@@ -2,6 +2,7 @@ import { Music, Users, Disc3 } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import { buildNewsCollectionSchema } from '@/lib/newsSchema';
 import GoogleAds from '@/components/GoogleAds';
 import { AD_SLOTS } from '@/config/adSlots';
 import { NewsGrid } from '@/components/news/NewsGrid';
@@ -10,6 +11,13 @@ import { useNewsArticles } from '@/hooks/useNewsArticles';
 const NewsArtistsReleases = () => {
   const { data: releases, isLoading: releasesLoading } = useNewsArticles({ category: 'release', limit: 20 });
   const { data: artistNews, isLoading: artistLoading } = useNewsArticles({ category: 'artist', limit: 20 });
+
+  const newsSchema = buildNewsCollectionSchema({
+    path: '/news/artists-releases',
+    name: "Artists & Releases",
+    description: "The latest EDM releases, new singles, albums, and artist news.",
+    articles: [...(releases || []), ...(artistNews || [])],
+  });
 
   return (
     <>
@@ -21,6 +29,7 @@ const NewsArtistsReleases = () => {
         image="/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
         imageAlt="Artist news and new EDM releases — Dance One Radio"
         type="article"
+        structuredData={newsSchema}
       />
       
       <div className="min-h-screen bg-background">

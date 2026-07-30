@@ -2,6 +2,7 @@ import { TrendingUp, Building2, Radio, Globe } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import { buildNewsCollectionSchema } from '@/lib/newsSchema';
 import GoogleAds from '@/components/GoogleAds';
 import { AD_SLOTS } from '@/config/adSlots';
 import { NewsGrid } from '@/components/news/NewsGrid';
@@ -9,6 +10,13 @@ import { useNewsArticles } from '@/hooks/useNewsArticles';
 
 const NewsIndustryCulture = () => {
   const { data: industryNews, isLoading } = useNewsArticles({ category: 'industry', limit: 30 });
+
+  const newsSchema = buildNewsCollectionSchema({
+    path: '/news/industry-culture',
+    name: "Industry & Culture",
+    description: "Electronic music industry trends, streaming updates, label news, and dance music culture.",
+    articles: industryNews || [],
+  });
 
   return (
     <>
@@ -20,6 +28,7 @@ const NewsIndustryCulture = () => {
         image="/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
         imageAlt="EDM industry and culture news — Dance One Radio"
         type="article"
+        structuredData={newsSchema}
       />
       
       <div className="min-h-screen bg-background">
