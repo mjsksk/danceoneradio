@@ -125,23 +125,8 @@
     overflow-x: hidden;
   }
 
-  /* Google Funding Choices is injected outside React. Force its text and surfaces
-     onto accessible theme colors so its upstream defaults cannot regress contrast. */
-  .fc-consent-root .fc-dialog,
-  .fc-consent-root .fc-dialog-content,
-  .fc-consent-root .fc-dialog-scrollable-content {
-    background-color: hsl(var(--background)) !important;
-    color: hsl(var(--foreground)) !important;
-  }
 
-  .fc-consent-root .fc-faq-header,
-  .fc-consent-root .fc-faq-label {
-    color: hsl(var(--foreground)) !important;
-  }
 
-  .fc-consent-root .fc-dialog-overlay {
-    background-color: hsl(var(--background) / 0.9) !important;
-  }
   
   h1, h2, h3, h4, h5, h6 {
     @apply font-['Orbitron'];
@@ -476,4 +461,59 @@ body[data-no-ads] iframe[src*="doubleclick"] {
   max-height: 0 !important;
   overflow: hidden !important;
   visibility: hidden !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Google Funding Choices (consent CMP) contrast overrides.
+   Injected outside React with its own stylesheet, so these rules live outside
+   every @layer (unlayered CSS beats layered CSS) and use !important to make
+   sure the CMP's upstream defaults cannot regress colour contrast.
+--------------------------------------------------------------------------- */
+.fc-consent-root,
+.fc-consent-root .fc-dialog,
+.fc-consent-root .fc-dialog-content,
+.fc-consent-root .fc-dialog-scrollable-content,
+.fc-consent-root .fc-dialog-headline,
+.fc-consent-root .fc-dialog-restricted-content,
+.fc-consent-root .fc-faq-header,
+.fc-consent-root .fc-faq-label,
+.fc-consent-root .fc-faq-content,
+.fc-consent-root p,
+.fc-consent-root span,
+.fc-consent-root li,
+.fc-consent-root h1,
+.fc-consent-root h2,
+.fc-consent-root h3 {
+  color: hsl(0 0% 100%) !important;
+}
+
+.fc-consent-root .fc-dialog,
+.fc-consent-root .fc-dialog-content,
+.fc-consent-root .fc-dialog-scrollable-content,
+.fc-consent-root .fc-faq-header {
+  background-color: hsl(222 47% 8%) !important;
+}
+
+.fc-consent-root .fc-dialog-overlay {
+  background-color: hsl(222 47% 4% / 0.92) !important;
+}
+
+.fc-consent-root a,
+.fc-consent-root .fc-dialog a {
+  color: hsl(258 90% 78%) !important;
+  text-decoration: underline;
+}
+
+/* Buttons keep an explicit pairing so label text always clears 4.5:1. */
+.fc-consent-root .fc-button.fc-cta-consent,
+.fc-consent-root .fc-button.fc-cta-manage-options,
+.fc-consent-root .fc-button.fc-cta-do-not-consent {
+  background-color: hsl(258 90% 66%) !important;
+  border-color: hsl(258 90% 66%) !important;
+}
+
+.fc-consent-root .fc-button.fc-cta-consent .fc-button-label,
+.fc-consent-root .fc-button.fc-cta-manage-options .fc-button-label,
+.fc-consent-root .fc-button.fc-cta-do-not-consent .fc-button-label {
+  color: hsl(0 0% 100%) !important;
 }
