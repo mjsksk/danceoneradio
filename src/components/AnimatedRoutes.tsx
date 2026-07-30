@@ -84,6 +84,7 @@ const SongRequests = lazy(() => import('@/pages/SongRequests'));
 const Genres = lazy(() => import('@/pages/Genres'));
 const Genre = lazy(() => import('@/pages/Genre'));
 const BestProgressiveHouse2024 = lazy(() => import('@/pages/BestProgressiveHouse2024'));
+const HistoryOfProgressiveHouse = lazy(() => import('@/pages/HistoryOfProgressiveHouse'));
 
 // These utility routes are deliberately excluded from the public sitemap and blocked in robots.txt.
 // Keeping them in one explicit map prevents automated sitemap checks from treating them as indexable pages.
