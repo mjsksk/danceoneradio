@@ -48,8 +48,8 @@ const SEO = ({
       }
     };
 
-    // Full image URL
-    const fullImageUrl = image.startsWith('http') ? image : window.location.origin + image;
+    // Full image URL — social crawlers require absolute URLs on the canonical host
+    const fullImageUrl = image.startsWith('http') ? image : CANONICAL_HOST + (image.startsWith('/') ? image : `/${image}`);
 
     // Update essential meta tags
     updateMetaTag('meta[name="description"]', description);
