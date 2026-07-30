@@ -61,15 +61,19 @@ const SEO = ({
     updateMetaTag('meta[property="og:title"]', title);
     updateMetaTag('meta[property="og:description"]', description);
     updateMetaTag('meta[property="og:image"]', fullImageUrl);
+    updateMetaTag('meta[property="og:image:secure_url"]', fullImageUrl);
+    updateMetaTag('meta[property="og:image:alt"]', imageAlt);
     updateMetaTag('meta[property="og:url"]', resolvedUrl);
     updateMetaTag('meta[property="og:type"]', type);
     updateMetaTag('meta[property="og:site_name"]', "Dance One Radio");
+    updateMetaTag('meta[property="og:locale"]', "en_US");
     
     // Twitter Card meta tags
     updateMetaTag('meta[name="twitter:card"]', "summary_large_image");
     updateMetaTag('meta[name="twitter:title"]', title);
     updateMetaTag('meta[name="twitter:description"]', description);
     updateMetaTag('meta[name="twitter:image"]', fullImageUrl);
+    updateMetaTag('meta[name="twitter:image:alt"]', imageAlt);
     updateMetaTag('meta[name="twitter:site"]', "@DanceOneRadio");
     
     // SEO robots meta tags
