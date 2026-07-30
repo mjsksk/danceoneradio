@@ -107,7 +107,7 @@ const BestProgressiveHouse2024 = () => {
     }
   ];
 
-  const pageUrl = typeof window !== 'undefined' ? window.location.href : 'https://danceoneradio.com/news/best-progressive-house-tracks-2024';
+  const pageUrl = 'https://danceoneradio.com/news/best-progressive-house-tracks-2024';
 
   const structuredData = {
     "@context": "https://schema.org",
