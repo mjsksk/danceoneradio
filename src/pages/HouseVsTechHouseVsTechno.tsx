@@ -135,6 +135,7 @@ const HouseVsTechHouseVsTechno = () => {
         description="How to tell house, tech house and techno apart — BPM, drums, basslines, melody and origins, explained by the DJs at Dance One Radio."
         url={PAGE_URL}
         type="article"
+        imageAlt="House vs tech house vs techno — genre guide from Dance One Radio"
         keywords="tech house vs house, techno vs house, house vs techno, what is tech house, difference between house and techno, dance music genres explained"
         structuredData={structuredData}
       />

@@ -10,6 +10,9 @@ export interface Genre {
   highlights: string[];
   artists: string[];
   faq: { q: string; a: string }[];
+  /** Absolute-from-root path used for og:image / twitter:image on this genre page. */
+  ogImage?: string;
+  ogImageAlt?: string;
 }
 
 export const GENRES: Genre[] = [

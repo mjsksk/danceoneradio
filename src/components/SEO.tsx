@@ -4,6 +4,7 @@ interface SEOProps {
   title?: string;
   description?: string;
   image?: string;
+  imageAlt?: string;
   url?: string;
   type?: string;
   keywords?: string;
@@ -14,6 +15,7 @@ const SEO = ({
   title = "Dance One Radio | Live Electronic & Dance Music",
   description = "Live 24/7 dance, electronic, trance, house, and EDM music. DJ mixes, podcasts, and exclusive shows from Dance One Radio.",
   image = "/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png",
+  imageAlt = "Dance One Radio — live electronic and dance music",
   url,
   type = "website",
   keywords = "dance music radio, electronic music stream, EDM radio, trance radio, house music, live DJ mixes, dance music podcast, online radio station",
@@ -59,15 +61,19 @@ const SEO = ({
     updateMetaTag('meta[property="og:title"]', title);
     updateMetaTag('meta[property="og:description"]', description);
     updateMetaTag('meta[property="og:image"]', fullImageUrl);
+    updateMetaTag('meta[property="og:image:secure_url"]', fullImageUrl);
+    updateMetaTag('meta[property="og:image:alt"]', imageAlt);
     updateMetaTag('meta[property="og:url"]', resolvedUrl);
     updateMetaTag('meta[property="og:type"]', type);
     updateMetaTag('meta[property="og:site_name"]', "Dance One Radio");
+    updateMetaTag('meta[property="og:locale"]', "en_US");
     
     // Twitter Card meta tags
     updateMetaTag('meta[name="twitter:card"]', "summary_large_image");
     updateMetaTag('meta[name="twitter:title"]', title);
     updateMetaTag('meta[name="twitter:description"]', description);
     updateMetaTag('meta[name="twitter:image"]', fullImageUrl);
+    updateMetaTag('meta[name="twitter:image:alt"]', imageAlt);
     updateMetaTag('meta[name="twitter:site"]', "@DanceOneRadio");
     
     // SEO robots meta tags
@@ -151,7 +157,7 @@ const SEO = ({
     return () => {
       document.title = "Dance One Radio | Live Electronic & Dance Music";
     };
-  }, [title, description, image, url, type, keywords, structuredData]);
+  }, [title, description, image, imageAlt, url, type, keywords, structuredData]);
 
   return null; // This component doesn't render anything
 };

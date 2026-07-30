@@ -63,6 +63,8 @@ const Genre = () => {
         description={genre.metaDescription}
         keywords={genre.keywords}
         url={url}
+        image={genre.ogImage}
+        imageAlt={genre.ogImageAlt ?? `${genre.name} radio — live 24/7 on Dance One Radio`}
         structuredData={structuredData}
       />
       <Navigation />
