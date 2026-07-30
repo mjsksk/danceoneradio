@@ -59,18 +59,23 @@ const HeroSection = () => {
           <h1 className="sr-only">Dance One Radio — Live Electronic & Dance Music 24/7</h1>
           <div className="hero-logo flex justify-center">
             <picture>
-              <source srcSet="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.webp" type="image/webp" />
+              <source
+                type="image/webp"
+                srcSet="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662-240w.webp 240w, /lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662-480w.webp 480w, /lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662-960w.webp 960w"
+                sizes="(max-width: 767px) 224px, 368px"
+              />
               <img 
-                src="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png" 
+                src="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662-480w.png" 
                 alt="Dance One Radio" 
                 className="h-56 md:h-[23rem] w-auto object-contain"
                 loading="eager"
                 fetchPriority="high"
                 width="640"
                 height="640"
-                decoding="async"
-               srcSet="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662-480w.png 480w, /lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662-960w.png 960w, /lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662-1440w.png 1440w, /lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png 1920w" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"/>
+                decoding="sync"
+               srcSet="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662-480w.png 480w, /lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662-960w.png 960w" sizes="(max-width: 767px) 224px, 368px"/>
             </picture>
+
           </div>
         </div>
 
