@@ -103,12 +103,14 @@ export const WavyBackground = ({
   };
 
   useEffect(() => {
-    init();
+    // Let the hero image paint first; the decorative canvas is not part of the critical path.
+    const startTimer = window.setTimeout(init, 1200);
     const handleVisibility = () => {
       isPaused = document.hidden;
     };
     document.addEventListener("visibilitychange", handleVisibility);
     return () => {
+      window.clearTimeout(startTimer);
       cancelAnimationFrame(animationId);
       document.removeEventListener("visibilitychange", handleVisibility);
     };
@@ -127,7 +129,7 @@ export const WavyBackground = ({
   return (
     <div
       className={cn(
-        "h-screen flex flex-col items-center justify-center",
+        "min-h-dvh flex flex-col items-center justify-center bg-background",
         containerClassName
       )}
     >

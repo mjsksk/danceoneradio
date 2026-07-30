@@ -60,7 +60,7 @@ const News = () => {
   return (
     <>
       <SEO 
-        title="EDM News - Dance Music Updates & Festival Announcements | Dance One Radio"
+        title="EDM News & Festival Updates | Dance One Radio"
         description="Stay updated with the latest EDM news, dance music releases, festival announcements, and artist spotlights. Your daily source for electronic music culture."
         keywords="EDM news, dance music updates, festival announcements, electronic music news, DJ news, music releases"
       />
