@@ -124,6 +124,24 @@
     @apply bg-background text-foreground font-['Rajdhani'];
     overflow-x: hidden;
   }
+
+  /* Google Funding Choices is injected outside React. Force its text and surfaces
+     onto accessible theme colors so its upstream defaults cannot regress contrast. */
+  .fc-consent-root .fc-dialog,
+  .fc-consent-root .fc-dialog-content,
+  .fc-consent-root .fc-dialog-scrollable-content {
+    background-color: hsl(var(--background)) !important;
+    color: hsl(var(--foreground)) !important;
+  }
+
+  .fc-consent-root .fc-faq-header,
+  .fc-consent-root .fc-faq-label {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  .fc-consent-root .fc-dialog-overlay {
+    background-color: hsl(var(--background) / 0.9) !important;
+  }
   
   h1, h2, h3, h4, h5, h6 {
     @apply font-['Orbitron'];

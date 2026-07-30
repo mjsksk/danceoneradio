@@ -85,6 +85,16 @@ const Genres = lazy(() => import('@/pages/Genres'));
 const Genre = lazy(() => import('@/pages/Genre'));
 const BestProgressiveHouse2024 = lazy(() => import('@/pages/BestProgressiveHouse2024'));
 
+// These utility routes are deliberately excluded from the public sitemap and blocked in robots.txt.
+// Keeping them in one explicit map prevents automated sitemap checks from treating them as indexable pages.
+const PRIVATE_ROUTES = {
+  admin: '/admin',
+  desktop: '/desktop',
+  auth: '/auth',
+  account: '/account',
+  resetPassword: '/reset-password',
+} as const;
+
 export function AnimatedRoutes() {
   const location = useLocation();
 
@@ -141,11 +151,11 @@ export function AnimatedRoutes() {
         <Route path="/news/artists-releases" element={<PageTransition><NewsArtistsReleases /></PageTransition>} />
         <Route path="/news/festivals-events" element={<PageTransition><NewsFestivalsEvents /></PageTransition>} />
         <Route path="/news/industry-culture" element={<PageTransition><NewsIndustryCulture /></PageTransition>} />
-        <Route path="/admin" element={<PageTransition><AdminRoute><Admin /></AdminRoute></PageTransition>} />
-        <Route path="/desktop" element={<PageTransition><DesktopPlayer /></PageTransition>} />
-        <Route path="/auth" element={<PageTransition><Auth /></PageTransition>} />
-        <Route path="/account" element={<PageTransition><ProtectedRoute><Account /></ProtectedRoute></PageTransition>} />
-        <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
+        <Route path={PRIVATE_ROUTES.admin} element={<PageTransition><AdminRoute><Admin /></AdminRoute></PageTransition>} />
+        <Route path={PRIVATE_ROUTES.desktop} element={<PageTransition><DesktopPlayer /></PageTransition>} />
+        <Route path={PRIVATE_ROUTES.auth} element={<PageTransition><Auth /></PageTransition>} />
+        <Route path={PRIVATE_ROUTES.account} element={<PageTransition><ProtectedRoute><Account /></ProtectedRoute></PageTransition>} />
+        <Route path={PRIVATE_ROUTES.resetPassword} element={<PageTransition><ResetPassword /></PageTransition>} />
         <Route path="/merch" element={<PageTransition><Merch /></PageTransition>} />
         <Route path="/playlist" element={<PageTransition><Playlist /></PageTransition>} />
         <Route path="/track-history" element={<PageTransition><Playlist /></PageTransition>} />

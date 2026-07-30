@@ -55,7 +55,7 @@ const HeroSection = () => {
       containerClassName="min-h-screen"
     >
       <div className="mx-auto flex min-h-screen max-w-4xl flex-col justify-center px-4 pt-32 md:pt-36">
-        <div className="mb-4 animate-fade-in">
+        <div className="mb-4">
           <h1 className="sr-only">Dance One Radio — Live Electronic & Dance Music 24/7</h1>
           <div className="hero-logo flex justify-center">
             <picture>
@@ -68,7 +68,7 @@ const HeroSection = () => {
                 fetchPriority="high"
                 width="640"
                 height="640"
-                decoding="sync"
+                decoding="async"
                srcSet="/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662-480w.png 480w, /lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662-960w.png 960w, /lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662-1440w.png 1440w, /lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662.png 1920w" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"/>
             </picture>
           </div>
