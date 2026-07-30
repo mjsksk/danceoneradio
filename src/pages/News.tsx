@@ -63,6 +63,10 @@ const News = () => {
         title="EDM News & Festival Updates | Dance One Radio"
         description="Stay updated with the latest EDM news, dance music releases, festival announcements, and artist spotlights. Your daily source for electronic music culture."
         keywords="EDM news, dance music updates, festival announcements, electronic music news, DJ news, music releases"
+        url="https://danceoneradio.com/news"
+        image="/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
+        imageAlt="EDM news and festival updates — Dance One Radio"
+        type="article"
       />
       
       <div className="min-h-screen bg-background">

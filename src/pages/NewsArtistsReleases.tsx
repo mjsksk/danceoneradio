@@ -17,6 +17,10 @@ const NewsArtistsReleases = () => {
         title="Artist News & New Releases - EDM Music Updates | Dance One Radio"
         description="Discover the latest EDM releases, new singles, albums, and artist news. Stay updated with DJ spotlights and producer announcements."
         keywords="EDM releases, new dance music, DJ news, producer spotlight, electronic music singles, album releases"
+        url="https://danceoneradio.com/news/artists-releases"
+        image="/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
+        imageAlt="Artist news and new EDM releases — Dance One Radio"
+        type="article"
       />
       
       <div className="min-h-screen bg-background">
