@@ -19,6 +19,8 @@ const Genres = () => {
         description="Browse Dance One Radio by genre. Dedicated live streams and pages for house, tech house, trance, techno, EDM and dance music — free, 24/7."
         keywords="electronic music radio by genre, house radio, trance radio, techno radio, edm radio, tech house radio, dance music genres"
         url="https://danceoneradio.com/genres"
+        image="/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
+        imageAlt="Dance One Radio genre channels — house, trance, techno, EDM"
       />
       <Navigation />
 
