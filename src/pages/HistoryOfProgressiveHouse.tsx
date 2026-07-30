@@ -173,6 +173,7 @@ const HistoryOfProgressiveHouse = () => {
         description="How progressive house began in the UK in 1990, grew through Sasha, Digweed and Global Underground, crossed into EDM, and returned as melodic house. A full genre guide."
         url={pageUrl}
         type="article"
+        imageAlt="History of progressive house — genre guide from Dance One Radio"
         keywords="progressive house history, what is progressive house, progressive house origins, Sasha Digweed progressive house, melodic house and techno, best progressive house eras"
         structuredData={structuredData}
       />
