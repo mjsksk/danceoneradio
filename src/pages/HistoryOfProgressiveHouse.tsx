@@ -127,20 +127,36 @@ const HistoryOfProgressiveHouse = () => {
   const structuredData = [
     {
       '@context': 'https://schema.org',
-      '@type': 'Article',
+      '@type': 'NewsArticle',
       headline: 'The History of Progressive House: From 1990 to Today',
       description:
         'A complete guide to progressive house history — its UK origins, the Sasha and Digweed era, the Global Underground years, the EDM crossover, and the modern melodic revival.',
-      image: heroImage,
+      image: [
+        {
+          '@type': 'ImageObject',
+          url: heroImage,
+          width: 1200,
+          height: 630,
+          caption: 'History of progressive house — genre guide from Dance One Radio',
+        },
+      ],
+      thumbnailUrl: heroImage,
       author: { '@type': 'Organization', name: 'Dance One Radio' },
       publisher: {
         '@type': 'RadioStation',
         name: 'Dance One Radio',
         url: 'https://danceoneradio.com',
-        logo: heroImage,
+        logo: {
+          '@type': 'ImageObject',
+          url: heroImage,
+          width: 1200,
+          height: 630,
+        },
       },
-      datePublished: '2026-07-30',
-      dateModified: '2026-07-30',
+      datePublished: '2026-07-30T09:00:00-07:00',
+      dateModified: '2026-07-30T09:00:00-07:00',
+      inLanguage: 'en-US',
+      isAccessibleForFree: true,
       mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
       articleSection: 'Music',
       keywords:
