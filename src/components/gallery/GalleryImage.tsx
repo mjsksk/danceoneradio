@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { getResponsive } from "@/lib/responsiveImage";
 
 interface GalleryImageProps {
   src: string;
@@ -58,6 +59,8 @@ const GalleryImage = ({ src, alt, explicit, onClick, className }: GalleryImagePr
     };
   }, [src]);
 
+  const responsive = getResponsive(src);
+
   return (
     <div
       ref={containerRef}
@@ -80,6 +83,10 @@ const GalleryImage = ({ src, alt, explicit, onClick, className }: GalleryImagePr
       {imageSrc && (
         <img
           src={imageSrc}
+          srcSet={responsive?.srcset}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          width={responsive?.w}
+          height={responsive?.h}
           alt={alt}
           className={cn(
             "w-full h-64 object-cover transition-all duration-500",
