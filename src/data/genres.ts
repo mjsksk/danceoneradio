@@ -209,7 +209,116 @@ export const GENRES: Genre[] = [
       },
     ],
   },
+  {
+    slug: 'progressive-house',
+    name: 'Progressive House',
+    h1: 'Progressive House Radio — Live 24/7',
+    tagline: 'Long builds, big breakdowns and melodic peak-time energy, streaming non-stop.',
+    metaTitle: 'Progressive House Radio — Live 24/7 | Dance One Radio',
+    metaDescription:
+      'Free progressive house radio streaming 24/7. Melodic builds, euphoric breakdowns and 126–130 BPM club cuts. Listen live on Dance One Radio.',
+    keywords:
+      'progressive house radio, progressive house stream, prog house radio, melodic house radio, progressive house music online, listen progressive house',
+    intro:
+      'Progressive house is the patient side of dance music: tracks unfold over six or seven minutes, layering pads, arpeggios and vocals until the breakdown pays everything off. Dance One Radio streams it continuously at the 126–130 BPM sweet spot, mixing the current wave of melodic releases with the Sasha, Digweed and early-Deadmau5 records the sound was built on. Press play — it is free, no signup, and it runs around the clock.',
+    highlights: [
+      'Full-length progressive cuts, not radio edits — the builds stay intact',
+      'Modern releases alongside the 1990s and 2000s records that defined the genre',
+      'Beat-matched by working DJs for continuous listening',
+      'Free on web, desktop and mobile',
+    ],
+    artists: [
+      'Sasha', 'John Digweed', 'Cristoph', 'Yotto', 'Lane 8', 'Meduza', 'Martin Garrix', 'Above & Beyond',
+    ],
+    faq: [
+      {
+        q: 'What BPM is progressive house?',
+        a: 'Most progressive house sits between 124 and 130 BPM — slower than trance, a touch steadier than tech house, which gives the arrangements room to build.',
+      },
+      {
+        q: 'How is progressive house different from trance?',
+        a: 'Trance runs faster (typically 136–142 BPM) and leans on a big, obvious lead melody. Progressive house is slower, groove-first, and reveals its melody gradually instead of announcing it.',
+      },
+      {
+        q: 'Is the progressive house stream free?',
+        a: 'Yes. It plays free in any modern browser with no signup, and the live audio stream carries no injected ads.',
+      },
+    ],
+  },
+  {
+    slug: 'deep-house',
+    name: 'Deep House',
+    h1: 'Deep House Radio — Live 24/7',
+    tagline: 'Warm chords, rolling basslines and late-night grooves, all day long.',
+    metaTitle: 'Deep House Radio — Live 24/7 | Dance One Radio',
+    metaDescription:
+      'Free deep house radio streaming 24/7. Warm chords, soulful vocals and rolling 120–125 BPM grooves. Listen live on Dance One Radio.',
+    keywords:
+      'deep house radio, deep house stream, deep house music online, soulful deep house radio, chill house radio, listen deep house',
+    intro:
+      'Deep house came out of Chicago in the mid-1980s, when producers slowed house down and swapped its raw drum-machine edge for jazz chords, soul vocals and a heavier, rounder bass. Dance One Radio streams that lineage continuously — classic Larry Heard-inspired warmth, the 2010s melodic wave, and the current crop of deep and organic releases — at a steady 120–125 BPM.',
+    highlights: [
+      'Warm, chord-led deep house rather than generic lounge filler',
+      'Classic Chicago and New York cuts mixed with current releases',
+      'Ideal for working, driving and late-night listening',
+      'Free in the browser, plus desktop and mobile apps',
+    ],
+    artists: [
+      'Larry Heard', 'Kerri Chandler', 'Lane 8', 'Purple Disco Machine', 'Yotto', 'Ben Böhmer', 'Sonny Fodera',
+    ],
+    faq: [
+      {
+        q: 'What is deep house music?',
+        a: 'Deep house is a subgenre of house built on jazz- and soul-influenced chords, muted percussion and a prominent, rounded bassline, usually around 120–125 BPM. It trades peak-time aggression for atmosphere and groove.',
+      },
+      {
+        q: 'What is the difference between house and deep house?',
+        a: 'House is the broader genre and tends to be brighter and more direct. Deep house is slower, chord-heavier and moodier, with vocals used as texture more often than as a hook.',
+      },
+      {
+        q: 'Can I listen to deep house radio for free?',
+        a: 'Yes. The deep house stream plays free in any browser with no account required.',
+      },
+    ],
+  },
+  {
+    slug: 'melodic-house-techno',
+    name: 'Melodic House & Techno',
+    h1: 'Melodic House & Techno Radio — Live 24/7',
+    tagline: 'Emotional, hypnotic, driving — the Afterlife and Anjunadeep sound, non-stop.',
+    metaTitle: 'Melodic House & Techno Radio — Live 24/7 | Dance One Radio',
+    metaDescription:
+      'Free melodic house and techno radio streaming 24/7. Afterlife, Anjunadeep and All Day I Dream flavoured sets on Dance One Radio.',
+    keywords:
+      'melodic techno radio, melodic house radio, afterlife radio stream, anjunadeep radio, organic house radio, melodic techno online',
+    intro:
+      'Melodic house and techno is what happens when techno keeps its hypnotic drive but hands the lead to a synth line with real emotional weight. It is the sound of Afterlife, Anjunadeep and All Day I Dream — long arrangements, cinematic pads, and drops that swell rather than explode. Dance One Radio streams it continuously, from sunrise-set organic house through to darker, faster peak-time melodic techno.',
+    highlights: [
+      'The full melodic spectrum — organic house through to driving melodic techno',
+      'Label-led curation: Afterlife, Anjunadeep, All Day I Dream, Siamese',
+      'Extended arrangements that keep the hypnotic flow intact',
+      'Free 24/7 on web, desktop and mobile',
+    ],
+    artists: [
+      'Tale Of Us', 'Anyma', 'Ben Böhmer', 'Yotto', 'Massano', 'Argy', 'Kevin de Vries', 'Lane 8',
+    ],
+    faq: [
+      {
+        q: 'What is melodic techno?',
+        a: 'Melodic techno keeps techno\'s steady, hypnotic four-to-the-floor pulse but foregrounds emotive synth melodies and long, cinematic builds. It usually runs around 120–126 BPM.',
+      },
+      {
+        q: 'Is melodic house the same as melodic techno?',
+        a: 'They are close relatives and often programmed together. Melodic house is generally warmer and groovier; melodic techno is darker, more driving and more machine-like.',
+      },
+      {
+        q: 'Where can I listen to melodic techno radio?',
+        a: 'Right here — the Dance One Radio stream plays melodic house and techno free, 24 hours a day, in your browser or through the apps.',
+      },
+    ],
+  },
 ];
+
 
 export const getGenreBySlug = (slug?: string) =>
   GENRES.find((g) => g.slug === slug);
