@@ -24,7 +24,18 @@ const SEO = ({
   useEffect(() => {
     // Always canonicalize to the primary domain regardless of which mirror domain served the page.
     const CANONICAL_HOST = 'https://danceoneradio.com';
-    const resolvedUrl = url ?? (CANONICAL_HOST + window.location.pathname + window.location.search);
+    const resolveCanonicalUrl = (input?: string) => {
+      if (!input) {
+        return CANONICAL_HOST + window.location.pathname + window.location.search;
+      }
+      try {
+        const parsed = new URL(input);
+        return CANONICAL_HOST + parsed.pathname + parsed.search;
+      } catch {
+        return input.startsWith('/') ? CANONICAL_HOST + input : input;
+      }
+    };
+    const resolvedUrl = resolveCanonicalUrl(url);
 
     // Update document title
     document.title = title;
