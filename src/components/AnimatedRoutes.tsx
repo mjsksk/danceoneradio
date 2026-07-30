@@ -64,6 +64,7 @@ const Admin = lazy(() => import('@/pages/Admin'));
 const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
 const Merch = lazy(() => import('@/pages/Merch'));
 const Tracks = lazy(() => import('@/pages/Tracks'));
+const Playlist = lazy(() => import('@/pages/Playlist'));
 const TrackPage = lazy(() => import('@/pages/TrackPage'));
 const Wh0PlaysSession222 = lazy(() => import('@/pages/Wh0PlaysSession222'));
 const Wh0PlaysSession223 = lazy(() => import('@/pages/Wh0PlaysSession223'));
@@ -146,6 +147,8 @@ export function AnimatedRoutes() {
         <Route path="/account" element={<PageTransition><ProtectedRoute><Account /></ProtectedRoute></PageTransition>} />
         <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
         <Route path="/merch" element={<PageTransition><Merch /></PageTransition>} />
+        <Route path="/playlist" element={<PageTransition><Playlist /></PageTransition>} />
+        <Route path="/track-history" element={<PageTransition><Playlist /></PageTransition>} />
         <Route path="/tracks" element={<PageTransition><Tracks /></PageTransition>} />
         <Route path="/track/:slug" element={<PageTransition><TrackPage /></PageTransition>} />
         <Route path="/show/wh0-plays-sessions/222" element={<PageTransition><Wh0PlaysSession222 /></PageTransition>} />
