@@ -36,6 +36,10 @@ const Tracks = () => {
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Explore the latest tracks played on Dance One Radio. Every track links to streaming platforms where you can listen, buy, and discover more.
           </p>
+          <p className="text-muted-foreground mt-3">
+            Looking for a song you just heard? Check the{' '}
+            <Link to="/playlist" className="text-primary hover:underline">live playlist from the last 24 hours</Link>.
+          </p>
         </div>
 
         {isLoading ? (
