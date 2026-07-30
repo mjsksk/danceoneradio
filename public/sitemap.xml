@@ -345,6 +345,27 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://danceoneradio.com/genres/progressive-house</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://danceoneradio.com/genres/deep-house</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://danceoneradio.com/genres/melodic-house-techno</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://danceoneradio.com/news/house-vs-tech-house-vs-techno</loc>
+    <lastmod>2026-07-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://danceoneradio.com/genres/dance</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>monthly</changefreq>

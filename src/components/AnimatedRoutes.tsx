@@ -85,6 +85,7 @@ const Genres = lazy(() => import('@/pages/Genres'));
 const Genre = lazy(() => import('@/pages/Genre'));
 const BestProgressiveHouse2024 = lazy(() => import('@/pages/BestProgressiveHouse2024'));
 const HistoryOfProgressiveHouse = lazy(() => import('@/pages/HistoryOfProgressiveHouse'));
+const HouseVsTechHouseVsTechno = lazy(() => import('@/pages/HouseVsTechHouseVsTechno'));
 
 // These utility routes are deliberately excluded from the public sitemap and blocked in robots.txt.
 // Keeping them in one explicit map prevents automated sitemap checks from treating them as indexable pages.
@@ -181,6 +182,7 @@ export function AnimatedRoutes() {
         <Route path="/genres/:slug" element={<PageTransition><Genre /></PageTransition>} />
         <Route path="/news/best-progressive-house-tracks-2024" element={<PageTransition><BestProgressiveHouse2024 /></PageTransition>} />
         <Route path="/news/history-of-progressive-house" element={<PageTransition><HistoryOfProgressiveHouse /></PageTransition>} />
+        <Route path="/news/house-vs-tech-house-vs-techno" element={<PageTransition><HouseVsTechHouseVsTechno /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
 
       </Routes>
