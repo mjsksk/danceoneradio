@@ -2,15 +2,50 @@ import type { NewsArticle } from '@/hooks/useNewsArticles';
 
 const HOST = 'https://danceoneradio.com';
 
+const FALLBACK_IMAGE = `${HOST}/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png`;
+
+/** Google truncates headlines past ~110 chars in rich results. */
+const HEADLINE_MAX = 110;
+
+const CATEGORY_LABELS: Record<string, string> = {
+  headline: 'Top Stories',
+  release: 'New Releases',
+  event: 'Festivals & Events',
+  artist: 'Artists',
+  industry: 'Industry & Culture',
+};
+
 const PUBLISHER = {
   '@type': 'RadioStation',
   name: 'Dance One Radio',
   url: HOST,
   logo: {
     '@type': 'ImageObject',
-    url: `${HOST}/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png`,
+    url: FALLBACK_IMAGE,
+    width: 1200,
+    height: 630,
   },
 };
+
+/** Normalizes a date string to ISO 8601; returns '' when unparseable. */
+const toIso = (value?: string | null): string => {
+  if (!value) return '';
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? '' : d.toISOString();
+};
+
+const truncateHeadline = (title: string): string =>
+  title.length <= HEADLINE_MAX ? title : `${title.slice(0, HEADLINE_MAX - 1).trimEnd()}…`;
+
+/** Google prefers ImageObject (or an array of them) with explicit dimensions. */
+const imageObject = (src?: string | null) => [
+  {
+    '@type': 'ImageObject',
+    url: src || FALLBACK_IMAGE,
+    ...(src ? {} : { width: 1200, height: 630 }),
+  },
+];
+
 
 export interface NewsCollectionOptions {
   /** Route path, e.g. "/news/top-stories" */
