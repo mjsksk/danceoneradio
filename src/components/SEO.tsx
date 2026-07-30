@@ -157,7 +157,7 @@ const SEO = ({
     return () => {
       document.title = "Dance One Radio | Live Electronic & Dance Music";
     };
-  }, [title, description, image, url, type, keywords, structuredData]);
+  }, [title, description, image, imageAlt, url, type, keywords, structuredData]);
 
   return null; // This component doesn't render anything
 };
