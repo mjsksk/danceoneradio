@@ -352,6 +352,17 @@ const BestProgressiveHouse2024 = () => {
                     </div>
                   </Card>
                 </Link>
+                <Link to="/news/history-of-progressive-house">
+                  <Card className="card-cyber p-5 hover:border-primary/50 transition-all group h-full">
+                    <div className="flex items-center gap-3">
+                      <Star className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+                      <div>
+                        <h3 className="font-semibold text-primary group-hover:text-neon transition-colors">History of Progressive House</h3>
+                        <p className="text-sm text-muted-foreground">How the genre evolved from 1990 to today</p>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
               </div>
             </div>
           </div>
