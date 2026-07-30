@@ -93,7 +93,7 @@ const SEO = ({
         "@type": "RadioStation",
         "name": "Dance One Radio",
         "url": "https://danceoneradio.com",
-        "logo": window.location.origin + "/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
+        "logo": CANONICAL_HOST + "/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
       };
 
       let payload: any = structuredData ?? {
