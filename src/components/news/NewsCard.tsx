@@ -97,9 +97,10 @@ export function NewsCard({ article, featured = false }: NewsCardProps) {
               </div>
               
               <div className="flex items-center gap-1 text-primary group-hover:underline">
-                <span>Read More</span>
+                <span>Read full article<span className="sr-only">: {article.title}</span></span>
                 <ExternalLink className="w-3 h-3" />
               </div>
+
             </div>
             
             {article.tags.length > 0 && (
