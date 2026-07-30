@@ -168,6 +168,87 @@ const staticRoutes = [
     description: 'Explore the business and culture of electronic dance music. Industry insights, trends, and cultural commentary.',
     image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
   },
+  // Genre guides / evergreen news articles
+  {
+    path: '/news/history-of-progressive-house',
+    title: 'History of Progressive House: 1990 to Today | Dance One Radio',
+    description: 'How progressive house began in the UK in 1990, grew through Sasha, Digweed and Global Underground, crossed into EDM, and returned as melodic house.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  {
+    path: '/news/house-vs-tech-house-vs-techno',
+    title: 'House vs Tech House vs Techno: Differences Explained | Dance One Radio',
+    description: 'How to tell house, tech house and techno apart — BPM, drums, basslines, melody and origins, explained by the DJs at Dance One Radio.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  {
+    path: '/news/best-progressive-house-tracks-2024',
+    title: 'Top 10 Progressive House Tracks of 2024 | Dance One Radio',
+    description: 'The definitive countdown of the best progressive house tracks of 2024. Featuring Calvin Harris, David Guetta, John Summit, Meduza, Martin Garrix and more.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  // Genre hub
+  {
+    path: '/genres',
+    title: 'Radio by Genre: House, Trance, Techno, EDM | Dance One',
+    description: 'Browse Dance One Radio by genre. Dedicated live streams and pages for house, tech house, trance, techno, EDM and dance music — free, 24/7.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  // Individual genre streams
+  {
+    path: '/genres/house',
+    title: 'House Music Radio — Live 24/7 | Dance One Radio',
+    description: 'Free house music radio streaming live 24/7. Soulful, vocal, classic and modern house — no signup, no ads on stream. Listen now on Dance One Radio.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  {
+    path: '/genres/tech-house',
+    title: 'Tech House Radio — Live 24/7 | Dance One Radio',
+    description: 'Live tech house radio streaming 24/7. Toolroom, Defected, Solä and beyond — driving grooves and peak-time energy on Dance One Radio.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  {
+    path: '/genres/trance',
+    title: 'Trance Radio — Live 24/7 | Dance One Radio',
+    description: 'Free trance radio streaming 24/7. Uplifting, vocal and progressive trance from Anjunabeats, Armada and beyond. Listen live on Dance One Radio.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  {
+    path: '/genres/techno',
+    title: 'Techno Radio — Live 24/7 | Dance One Radio',
+    description: 'Live techno radio streaming 24/7. Driving, melodic and peak-time techno from Drumcode, Afterlife and beyond on Dance One Radio.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  {
+    path: '/genres/edm',
+    title: 'EDM Radio — Live 24/7 | Dance One Radio',
+    description: 'Free EDM radio streaming 24/7. Big-room, electro and main-stage EDM from Spinnin\', Revealed, Musical Freedom and beyond on Dance One Radio.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  {
+    path: '/genres/dance',
+    title: 'Dance Music Radio — Live 24/7 | Dance One Radio',
+    description: 'Free dance music radio streaming 24/7. House, trance, techno and EDM in one continuous mix on Dance One Radio.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  {
+    path: '/genres/progressive-house',
+    title: 'Progressive House Radio — Live 24/7 | Dance One Radio',
+    description: 'Free progressive house radio streaming 24/7. Melodic builds, euphoric breakdowns and 126–130 BPM club cuts. Listen live on Dance One Radio.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  {
+    path: '/genres/deep-house',
+    title: 'Deep House Radio — Live 24/7 | Dance One Radio',
+    description: 'Free deep house radio streaming 24/7. Warm chords, soulful vocals and rolling 120–125 BPM grooves. Listen live on Dance One Radio.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
+  {
+    path: '/genres/melodic-house-techno',
+    title: 'Melodic House & Techno Radio — Live 24/7 | Dance One Radio',
+    description: 'Free melodic house and techno radio streaming 24/7. Afterlife, Anjunadeep and All Day I Dream flavoured sets on Dance One Radio.',
+    image: '/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png'
+  },
   // Auth and Account pages
   {
     path: '/auth',
