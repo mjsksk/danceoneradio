@@ -291,6 +291,16 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://danceoneradio.com/episode/419</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://danceoneradio.com/episode/420</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://danceoneradio.com/privacy</loc>
     <lastmod>2026-03-10</lastmod>
     <changefreq>yearly</changefreq>
