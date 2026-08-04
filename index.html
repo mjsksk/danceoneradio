@@ -72,6 +72,22 @@
       })();
     </script>
     
+    <!-- Prevent unstyled prerendered content from flashing before React hydrates -->
+    <style>
+      #root:not(.app-loaded) {
+        opacity: 0;
+      }
+      #root.app-loaded {
+        opacity: 1;
+        transition: opacity 0.2s ease-out;
+      }
+    </style>
+    <noscript>
+      <style>
+        #root:not(.app-loaded) { opacity: 1 !important; }
+      </style>
+    </noscript>
+    
     <!-- Google Analytics and AdSense scripts are now loaded conditionally based on user consent -->
     <!-- See src/utils/consentManager.ts for implementation -->
 
