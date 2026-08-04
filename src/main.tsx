@@ -35,6 +35,10 @@ if (existingConsent) {
 console.log('🚀 Step 4: Rendering React app');
 createRoot(document.getElementById("root")!).render(<App />);
 
+// Reveal the prerendered UI now that React has taken over
+document.getElementById("root")?.classList.add("app-loaded");
+
+
 // Register service worker for push notifications and caching
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
