@@ -571,6 +571,14 @@ const Shows = () => {
                         genres: 'House • Tech House • Dance',
                       },
                       {
+                        number: 241,
+                        title: 'Wh0 Plays Sessions Episode 241',
+                        subtitle: <span>House • Tech House • Dance</span>,
+                        link: '/show/wh0-plays-sessions/241',
+                        broadcastDate: '2026-08-07T18:00:00',
+                        genres: 'House • Tech House • Dance',
+                      },
+                      {
                         number: 240,
                         title: 'Wh0 Plays Sessions Episode 240 with Johan S',
                         subtitle: <span>Guest Mix by <span className="text-primary font-semibold">Johan S</span></span>,
