@@ -465,11 +465,19 @@
   </url>
   <url>
     <loc>https://danceoneradio.com/show/wh0-plays-sessions/240</loc>
+    <lastmod>2026-08-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://danceoneradio.com/show/wh0-plays-sessions/241</loc>
+    <lastmod>2026-08-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://danceoneradio.com/show/wh0-plays-sessions/242</loc>
+    <lastmod>2026-08-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

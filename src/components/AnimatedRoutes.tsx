@@ -81,6 +81,7 @@ const Wh0PlaysSession236 = lazy(() => import('@/pages/Wh0PlaysSession236'));
 const Wh0PlaysSession238 = lazy(() => import('@/pages/Wh0PlaysSession238'));
 const Wh0PlaysSession239 = lazy(() => import('@/pages/Wh0PlaysSession239'));
 const Wh0PlaysSession240 = lazy(() => import('@/pages/Wh0PlaysSession240'));
+const Wh0PlaysSession241 = lazy(() => import('@/pages/Wh0PlaysSession241'));
 const Wh0PlaysSession242 = lazy(() => import('@/pages/Wh0PlaysSession242'));
 const SongRequests = lazy(() => import('@/pages/SongRequests'));
 const Genres = lazy(() => import('@/pages/Genres'));
@@ -180,6 +181,7 @@ export function AnimatedRoutes() {
         <Route path="/show/wh0-plays-sessions/238" element={<PageTransition><Wh0PlaysSession238 /></PageTransition>} />
         <Route path="/show/wh0-plays-sessions/239" element={<PageTransition><Wh0PlaysSession239 /></PageTransition>} />
         <Route path="/show/wh0-plays-sessions/240" element={<PageTransition><Wh0PlaysSession240 /></PageTransition>} />
+        <Route path="/show/wh0-plays-sessions/241" element={<PageTransition><Wh0PlaysSession241 /></PageTransition>} />
         <Route path="/show/wh0-plays-sessions/242" element={<PageTransition><Wh0PlaysSession242 /></PageTransition>} />
         <Route path="/requests" element={<PageTransition><SongRequests /></PageTransition>} />
         <Route path="/genres" element={<PageTransition><Genres /></PageTransition>} />
