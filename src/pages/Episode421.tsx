@@ -95,7 +95,7 @@ const Episode421 = () => {
     <div className="min-h-screen bg-background overflow-x-hidden relative">
       <SEO
         title="Anthems of the Week 421 | Dance One Radio"
-        description="Episode 421 tracklist featuring Swedish House Mafia, Solomun, Skrillex, KSHMR, Cloonee and more."
+        description="Episode 421 tracklist featuring Kyau & Albert, Gorgon City, Jimi Jules, Tobtok, Goldroom, Sister Sledge and more."
         image="/lovable-uploads/future-dance-anthems.jpg"
         url={typeof window !== 'undefined' ? window.location.href : ''}
       />
