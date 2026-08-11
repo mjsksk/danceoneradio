@@ -63,35 +63,58 @@ const Shows = () => {
     const maxRetries = 3;
     let success = false;
     setLoading(true);
+    // Add cache busting to get fresh RSS data
+    const rssUrl = `https://feeds.blubrry.com/feeds/biggest_tunes_with_mario_135.xml?t=${Date.now()}`;
 
     try {
       console.log('🔄 Fetching RSS feed via Supabase Edge Function with cache bust...', new Date().toISOString());
 
       const { supabase } = await import('@/integrations/supabase/client');
 
-      const { data, error } = await supabase.functions.invoke('rss-proxy', {
-        body: { t: Date.now() },
+      const { data, error } = await supabase.functions.invoke('rss-feed-fetch', {
+        body: { url: rssUrl },
       });
 
-      if (error) throw error;
-      if (!data) throw new Error('No RSS data returned');
+      if (error) {
+        throw new Error(`Supabase function error: ${error.message}`);
+      }
 
-      const xmlText = typeof data === 'string' ? data : (data as { xml?: string }).xml || '';
+      if (!data || !data.content) {
+        throw new Error('No RSS content received');
+      }
+
+      const xmlContent = data.content;
       const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-      const items = xmlDoc.querySelectorAll('item');
+      const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
 
-      const extractEpisodeNumber = (title: string): number | undefined => {
+      const parserError = xmlDoc.querySelector('parsererror');
+      if (parserError) {
+        console.error('XML parsing error:', parserError.textContent);
+        throw new Error('Failed to parse RSS feed');
+      }
+
+      const items = xmlDoc.querySelectorAll('item');
+      console.log(`🎵 Found ${items.length} episodes in RSS feed`);
+
+      // Helper function to extract episode number from title
+      const extractEpisodeNumber = (title: string): number => {
         const patterns = [
-          /(?:episode|ep\.?)\s*#?(\d+)/i,
-          /#(\d+)/,
-          /\b(\d{3,4})\b/,
+          /Future Dance Anthems with Mario\s+(\d+)/i,
+          /(?:episode|anthems|show)\s*#?(\d+)/i,
+          /(\d+)(?:\s*-|\s*:|$)/,
+          /\b(\d{1,4})\b/,
         ];
+
         for (const pattern of patterns) {
           const match = title.match(pattern);
-          if (match) return parseInt(match[1], 10);
+          if (match && match[1]) {
+            const num = parseInt(match[1]);
+            if (num >= 1 && num <= 1000) {
+              return num;
+            }
+          }
         }
-        return undefined;
+        return 0;
       };
 
       const episodeList: Episode[] = Array.from(items).map((item, index) => {
