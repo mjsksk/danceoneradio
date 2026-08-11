@@ -9,6 +9,8 @@ interface SEOProps {
   type?: string;
   keywords?: string;
   structuredData?: Record<string, any> | Record<string, any>[];
+  /** When true, emit robots "noindex, follow" (e.g. paginated listing views) */
+  noindex?: boolean;
 }
 
 const SEO = ({ 
