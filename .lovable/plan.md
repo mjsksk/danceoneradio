@@ -1,36 +1,28 @@
-## Problem
+# Shows Page: Tabbed + Paginated Feed
 
-Returning visitors keep seeing the old site after a deploy and have to hard-refresh. Root cause is in our service worker (`public/sw.js`) and how we register it in `src/main.tsx`.
+Restructure `/shows` from a two-column dump (10 Mario episodes on the left, all 15 Wh0 Plays Sessions on the right) into a single, focused feed with brand tabs and pagination.
 
-Three issues compound:
+## What the page will look like
 
-1. **Install-time precache references hashed filenames** (e.g. `/assets/dance-one-logo-DP6h_tTr.png`). Every new build produces new hashes, so on the very first visit after a deploy `cache.addAll(STATIC_ASSETS)` 404s and the whole install rejects. The new SW never activates, so the auto-reload-on-`controllerchange` path never fires for that user — they stay on the old SW serving old chunks.
-2. **No update check after the initial page load.** We call `registration.update()` once on `window load`. A user who keeps the tab open (or just revisits via bfcache) never asks the server whether a new SW exists, so they keep getting the cached version.
-3. **`SKIP_WAITING` is only posted from the brand-new-install branch.** If a waiting worker was already sitting there from a previous session, it never gets told to activate, so the page keeps booting under the old controller.
+- One heading, then a tab bar: **All** · **Future Dance Anthems** · **Wh0 Plays Sessions**
+- Below it, a single full-width grid of episode cards (2 columns on desktop, 1 on mobile)
+- **10 episodes per page** with numbered pagination (Previous · 1 2 3 … · Next) at the bottom
+- "All" merges both shows sorted newest first, so the newest content is always the first thing visible
+- Each card keeps its existing look: artwork, episode number badge, title, date, duration, share button, and link to the dedicated episode page
 
-## Fix
+## Behaviour details
 
-### `public/sw.js`
-- Bump `CACHE_NAME` to `dance-one-radio-v9`.
-- Remove all hashed `/assets/*` filenames from `STATIC_ASSETS`. Keep only stable paths (`/lovable-uploads/...`, favicon). Hashed build assets are already cached on-demand by the runtime `fetch` handler — precaching them by name is what breaks every deploy.
-- Wrap `cache.addAll` in `Promise.allSettled` per-URL so a single 404 can never reject install again.
-- On `activate`, after cleaning old caches, call `self.clients.claim()` (already done) AND notify all clients with `postMessage({ type: 'SW_ACTIVATED' })` so the page can reload deterministically.
+- The active tab and page are stored in the URL (`/shows?show=wh0&page=2`) so links are shareable and the browser back button works
+- Switching tabs resets to page 1 and scrolls back to the top of the list
+- Mario episodes are pulled from the RSS feed as today, but the page will keep the full list instead of trimming to the latest 10 (pagination handles the volume)
+- Wh0 Plays Sessions stay a hard-coded list for now; adding a new one is still a single entry
+- In-feed ads keep appearing after every 5th card within a page
+- Upcoming (not yet aired) episodes keep their existing status badge and sort to the top of their show
 
-### `src/main.tsx` (registration block)
-- On registration, if `registration.waiting` exists, immediately `postMessage({ type: 'SKIP_WAITING' })` (already done) — keep.
-- Also post `SKIP_WAITING` whenever an `updatefound` worker reaches the `installed` state, regardless of whether `navigator.serviceWorker.controller` is set (covers the "waiting from previous session" case).
-- Add a periodic update probe:
-  - `setInterval(() => registration.update(), 60 * 60 * 1000)` (hourly).
-  - Call `registration.update()` on `visibilitychange` when the tab becomes visible, throttled to once every 5 min.
-- Keep the existing `controllerchange → location.reload()` guard (this is what makes the update visible without a hard refresh).
+## Technical notes
 
-### No other files change
-No changes to `netlify.toml`, build config, or React code. The CSP, cache headers, and SPA routing already behave correctly; the regression is entirely in the SW lifecycle.
-
-## Result
-After this ships once, the next deploy will:
-1. Install the new SW successfully (no hashed-filename 404s).
-2. Get picked up within an hour, or as soon as the user switches back to the tab.
-3. Auto-reload the page exactly once when the new SW takes control — no hard refresh needed.
-
-Existing users still on `v8` will pick this up on their next normal page load, and from then on updates land automatically.
+- All work stays in `src/pages/Shows.tsx`; extract the episode card and the Wh0 session list into small local components/data files so the page file stops growing
+- Move the inline `guestShows` array into `src/data/wh0Sessions.ts` and the shared card markup into `src/components/shows/ShowEpisodeCard.tsx`
+- Use the existing shadcn `Tabs` and `Pagination` components; tab/page state read from `useSearchParams`
+- SEO: `/shows` keeps its canonical URL; paginated views (`?page=2+`) get `noindex, follow` via the existing `SEO` component so the sitemap and index stay clean, while individual episode pages remain the indexable targets
+- No database or routing changes; existing `/episode/:n` and `/show/wh0-plays-sessions/:n` routes are untouched
