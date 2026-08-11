@@ -91,7 +91,12 @@ const SEO = ({
     updateMetaTag('meta[name="twitter:site"]', "@DanceOneRadio");
     
     // SEO robots meta tags
-    updateMetaTag('meta[name="robots"]', "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1");
+    updateMetaTag(
+      'meta[name="robots"]',
+      noindex
+        ? 'noindex, follow'
+        : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+    );
     
     // Update or create canonical link
     let canonical = document.querySelector('link[rel="canonical"]');
