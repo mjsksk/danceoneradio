@@ -9,6 +9,8 @@ interface SEOProps {
   type?: string;
   keywords?: string;
   structuredData?: Record<string, any> | Record<string, any>[];
+  /** When true, emit robots "noindex, follow" (e.g. paginated listing views) */
+  noindex?: boolean;
 }
 
 const SEO = ({ 
@@ -20,6 +22,7 @@ const SEO = ({
   type = "website",
   keywords = "dance music radio, electronic music stream, EDM radio, trance radio, house music, live DJ mixes, dance music podcast, online radio station",
   structuredData,
+  noindex = false,
 }: SEOProps) => {
   useEffect(() => {
     // Always canonicalize to the primary domain regardless of which mirror domain served the page.
@@ -88,7 +91,12 @@ const SEO = ({
     updateMetaTag('meta[name="twitter:site"]', "@DanceOneRadio");
     
     // SEO robots meta tags
-    updateMetaTag('meta[name="robots"]', "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1");
+    updateMetaTag(
+      'meta[name="robots"]',
+      noindex
+        ? 'noindex, follow'
+        : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+    );
     
     // Update or create canonical link
     let canonical = document.querySelector('link[rel="canonical"]');
@@ -168,7 +176,7 @@ const SEO = ({
     return () => {
       document.title = "Dance One Radio | Live Electronic & Dance Music";
     };
-  }, [title, description, image, imageAlt, url, type, keywords, structuredData]);
+  }, [title, description, image, imageAlt, url, type, keywords, structuredData, noindex]);
 
   return null; // This component doesn't render anything
 };
