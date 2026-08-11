@@ -22,6 +22,7 @@ const SEO = ({
   type = "website",
   keywords = "dance music radio, electronic music stream, EDM radio, trance radio, house music, live DJ mixes, dance music podcast, online radio station",
   structuredData,
+  noindex = false,
 }: SEOProps) => {
   useEffect(() => {
     // Always canonicalize to the primary domain regardless of which mirror domain served the page.
