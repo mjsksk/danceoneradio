@@ -331,18 +331,19 @@ const Shows = () => {
     scrollToFeed();
   };
 
-  const goToPage = (page: number, scroll = true) => {
+  const goToPage = (page: number, opts?: { scroll?: boolean; replace?: boolean }) => {
     const params = new URLSearchParams(searchParams);
     if (page <= 1) {
       params.delete('page');
     } else {
       params.set('page', String(page));
     }
-    setSearchParams(params, { replace: false });
-    if (scroll) scrollToFeed();
+    setSearchParams(params, { replace: opts?.replace ?? false });
+    if (opts?.scroll) scrollToFeed();
   };
 
-  const loadMore = () => goToPage(currentPage + 1, false);
+  const loadMore = () => goToPage(currentPage + 1);
+
 
 
   const activeTabLabel = SHOW_TABS.find((t) => t.value === activeTab)?.label ?? 'All Shows';
