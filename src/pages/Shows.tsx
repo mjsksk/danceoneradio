@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, Fragment } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SocialShare from '@/components/SocialShare';
@@ -14,15 +14,8 @@ import { WH0_SESSIONS } from '@/data/wh0Sessions';
 import Wh0SessionCard from '@/components/shows/Wh0SessionCard';
 import MarioEpisodeCard, { type MarioEpisode } from '@/components/shows/MarioEpisodeCard';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationEllipsis,
-} from '@/components/ui/pagination';
+import { Button } from '@/components/ui/button';
+
 
 type Episode = MarioEpisode;
 
@@ -314,7 +307,9 @@ const Shows = () => {
 
   const totalPages = Math.max(1, Math.ceil(feedItems.length / PAGE_SIZE));
   const currentPage = Math.min(requestedPage, totalPages);
-  const pageItems = feedItems.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  // Cumulative "load more" feed: page N shows the first N * PAGE_SIZE items
+  const pageItems = feedItems.slice(0, currentPage * PAGE_SIZE);
+  const hasMore = currentPage < totalPages;
 
   const scrollToFeed = () => {
     const el = document.getElementById('shows-feed');
@@ -336,7 +331,7 @@ const Shows = () => {
     scrollToFeed();
   };
 
-  const goToPage = (page: number) => {
+  const goToPage = (page: number, scroll = true) => {
     const params = new URLSearchParams(searchParams);
     if (page <= 1) {
       params.delete('page');
@@ -344,25 +339,11 @@ const Shows = () => {
       params.set('page', String(page));
     }
     setSearchParams(params, { replace: false });
-    scrollToFeed();
+    if (scroll) scrollToFeed();
   };
 
-  const pageNumbers = useMemo(() => {
-    const pages: (number | 'ellipsis')[] = [];
-    const push = (p: number | 'ellipsis') => pages.push(p);
-    if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) push(i);
-      return pages;
-    }
-    push(1);
-    if (currentPage > 3) push('ellipsis');
-    for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
-      push(i);
-    }
-    if (currentPage < totalPages - 2) push('ellipsis');
-    push(totalPages);
-    return pages;
-  }, [currentPage, totalPages]);
+  const loadMore = () => goToPage(currentPage + 1, false);
+
 
   const activeTabLabel = SHOW_TABS.find((t) => t.value === activeTab)?.label ?? 'All Shows';
 
@@ -455,12 +436,12 @@ const Shows = () => {
                 ) : (
                   <>
                     <p className="text-center text-sm text-muted-foreground mb-6 font-['Rajdhani']">
-                      Showing {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, feedItems.length)} of {feedItems.length} episodes
+                      Showing {pageItems.length} of {feedItems.length} episodes
                     </p>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 auto-rows-fr items-stretch">
                       {pageItems.map((item, index) => (
-                        <div key={item.key} className="contents">
+                        <Fragment key={item.key}>
                           <div className="h-full">
                             {item.kind === 'fda' ? (
                               <MarioEpisodeCard
@@ -479,70 +460,43 @@ const Shows = () => {
                               <Wh0SessionCard show={item.session} />
                             )}
                           </div>
-                          {(index + 1) % 5 === 0 && index < pageItems.length - 1 && (
-                            <div className="lg:col-span-2">
+                          {(index + 1) % 10 === 0 && index < pageItems.length - 1 && (
+                            <div className="lg:col-span-2 row-auto">
                               <GoogleAds
-                                key={`shows-between-${currentPage}-${index}`}
+                                key={`shows-between-${index}`}
                                 slot={AD_SLOTS.BETWEEN_EPISODES}
                                 format="fluid"
                                 layout="in-article"
                               />
                             </div>
                           )}
-                        </div>
+                        </Fragment>
                       ))}
                     </div>
 
-                    {totalPages > 1 && (
-                      <Pagination className="mt-12">
-                        <PaginationContent className="flex-wrap">
-                          <PaginationItem>
-                            <PaginationPrevious
-                              href="#"
-                              aria-disabled={currentPage === 1}
-                              className={currentPage === 1 ? 'pointer-events-none opacity-40' : ''}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                if (currentPage > 1) goToPage(currentPage - 1);
-                              }}
-                            />
-                          </PaginationItem>
+                    <div className="mt-12 flex flex-col items-center gap-3">
+                      {hasMore ? (
+                        <>
+                          <Button
+                            onClick={loadMore}
+                            size="lg"
+                            className="font-['Rajdhani'] font-bold bg-gradient-to-r from-neon to-neon-purple text-background hover:opacity-90"
+                          >
+                            Load more episodes
+                          </Button>
+                          <p className="text-xs text-muted-foreground font-['Rajdhani']">
+                            Page {currentPage} of {totalPages}
+                          </p>
+                        </>
+                      ) : (
+                        totalPages > 1 && (
+                          <p className="text-sm text-muted-foreground font-['Rajdhani']">
+                            You&apos;ve reached the end of the archive
+                          </p>
+                        )
+                      )}
+                    </div>
 
-                          {pageNumbers.map((p, i) =>
-                            p === 'ellipsis' ? (
-                              <PaginationItem key={`ellipsis-${i}`}>
-                                <PaginationEllipsis />
-                              </PaginationItem>
-                            ) : (
-                              <PaginationItem key={p}>
-                                <PaginationLink
-                                  href="#"
-                                  isActive={p === currentPage}
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    goToPage(p);
-                                  }}
-                                >
-                                  {p}
-                                </PaginationLink>
-                              </PaginationItem>
-                            )
-                          )}
-
-                          <PaginationItem>
-                            <PaginationNext
-                              href="#"
-                              aria-disabled={currentPage === totalPages}
-                              className={currentPage === totalPages ? 'pointer-events-none opacity-40' : ''}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                if (currentPage < totalPages) goToPage(currentPage + 1);
-                              }}
-                            />
-                          </PaginationItem>
-                        </PaginationContent>
-                      </Pagination>
-                    )}
                   </>
                 )}
               </div>
