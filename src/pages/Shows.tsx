@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, Fragment } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef, Fragment } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SocialShare from '@/components/SocialShare';
@@ -42,6 +42,8 @@ const Shows = () => {
   const [loading, setLoading] = useState(true);
   const [bgLoaded, setBgLoaded] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [infiniteScroll, setInfiniteScroll] = useState(true);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   // Use global audio player context
   const { playEpisode, pause, resume, isPlaying, episodeInfo, seek } = useAudioPlayer();
@@ -331,18 +333,39 @@ const Shows = () => {
     scrollToFeed();
   };
 
-  const goToPage = (page: number, scroll = true) => {
+  const goToPage = (page: number, opts?: { scroll?: boolean; replace?: boolean }) => {
     const params = new URLSearchParams(searchParams);
     if (page <= 1) {
       params.delete('page');
     } else {
       params.set('page', String(page));
     }
-    setSearchParams(params, { replace: false });
-    if (scroll) scrollToFeed();
+    setSearchParams(params, { replace: opts?.replace ?? false });
+    if (opts?.scroll) scrollToFeed();
   };
 
-  const loadMore = () => goToPage(currentPage + 1, false);
+  const loadMore = () => goToPage(currentPage + 1);
+
+  // ---- Infinite scroll (appends pages, keeps ?show= and ?page= in the URL) ----
+  const loadMoreRef = useRef<() => void>(() => {});
+  loadMoreRef.current = () => goToPage(currentPage + 1, { replace: true });
+
+  useEffect(() => {
+    if (!infiniteScroll || !hasMore || loading) return;
+    const el = sentinelRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) loadMoreRef.current();
+      },
+      { rootMargin: '600px 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [infiniteScroll, hasMore, loading, currentPage, activeTab]);
+
+
 
 
   const activeTabLabel = SHOW_TABS.find((t) => t.value === activeTab)?.label ?? 'All Shows';
@@ -474,19 +497,35 @@ const Shows = () => {
                       ))}
                     </div>
 
+                    <div ref={sentinelRef} aria-hidden="true" className="h-px w-full" />
+
                     <div className="mt-12 flex flex-col items-center gap-3">
                       {hasMore ? (
                         <>
-                          <Button
-                            onClick={loadMore}
-                            size="lg"
-                            className="font-['Rajdhani'] font-bold bg-gradient-to-r from-neon to-neon-purple text-background hover:opacity-90"
-                          >
-                            Load more episodes
-                          </Button>
+                          {infiniteScroll ? (
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Rajdhani']">
+                              <span className="h-4 w-4 animate-spin rounded-full border-b-2 border-primary" />
+                              Loading more episodes…
+                            </div>
+                          ) : (
+                            <Button
+                              onClick={loadMore}
+                              size="lg"
+                              className="font-['Rajdhani'] font-bold bg-gradient-to-r from-neon to-neon-purple text-background hover:opacity-90"
+                            >
+                              Load more episodes
+                            </Button>
+                          )}
                           <p className="text-xs text-muted-foreground font-['Rajdhani']">
                             Page {currentPage} of {totalPages}
                           </p>
+                          <button
+                            type="button"
+                            onClick={() => setInfiniteScroll((v) => !v)}
+                            className="text-xs underline text-muted-foreground hover:text-foreground font-['Rajdhani']"
+                          >
+                            {infiniteScroll ? 'Switch to manual loading' : 'Switch to infinite scroll'}
+                          </button>
                         </>
                       ) : (
                         totalPages > 1 && (
@@ -496,6 +535,7 @@ const Shows = () => {
                         )
                       )}
                     </div>
+
 
                   </>
                 )}
