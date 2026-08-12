@@ -46,7 +46,7 @@ const Wh0SessionCard = ({ show }: Wh0SessionCardProps) => {
   };
 
   return (
-    <Link to={show.link} className="block">
+    <Link to={show.link} className="block h-full">
       <Card className="card-cyber p-5 hover:scale-[1.01] transition-all duration-300 group cursor-pointer hover:border-neon/50 h-full">
         <div className="flex flex-col gap-4 h-full">
           <div className="flex items-start gap-4">
@@ -93,7 +93,7 @@ const Wh0SessionCard = ({ show }: Wh0SessionCardProps) => {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2 mt-auto">
+          <div className="flex flex-wrap gap-2">
             <Button
               size="sm"
               className="flex items-center gap-2 hover:scale-105 transition-all duration-200 bg-gradient-to-r from-neon to-neon-purple text-background hover:shadow-lg hover:shadow-neon/25"

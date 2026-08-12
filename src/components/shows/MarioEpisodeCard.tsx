@@ -73,7 +73,7 @@ const MarioEpisodeCard = ({
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2 mt-auto">
+      <div className="flex flex-wrap gap-2">
         {episode.enclosure.url && (
           <Button
             size="sm"
