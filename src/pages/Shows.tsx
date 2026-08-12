@@ -42,6 +42,8 @@ const Shows = () => {
   const [loading, setLoading] = useState(true);
   const [bgLoaded, setBgLoaded] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [infiniteScroll, setInfiniteScroll] = useState(true);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   // Use global audio player context
   const { playEpisode, pause, resume, isPlaying, episodeInfo, seek } = useAudioPlayer();
