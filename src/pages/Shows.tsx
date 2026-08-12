@@ -462,10 +462,10 @@ const Shows = () => {
                       Showing {pageItems.length} of {feedItems.length} episodes
                     </p>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 auto-rows-fr items-stretch">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 auto-rows-min items-stretch">
                       {pageItems.map((item, index) => (
                         <Fragment key={item.key}>
-                          <div className="h-full">
+                          <div>
                             {item.kind === 'fda' ? (
                               <MarioEpisodeCard
                                 episode={item.episode}
