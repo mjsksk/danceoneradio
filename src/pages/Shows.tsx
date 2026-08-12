@@ -443,12 +443,12 @@ const Shows = () => {
                 ) : (
                   <>
                     <p className="text-center text-sm text-muted-foreground mb-6 font-['Rajdhani']">
-                      Showing {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, feedItems.length)} of {feedItems.length} episodes
+                      Showing {pageItems.length} of {feedItems.length} episodes
                     </p>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 auto-rows-fr items-stretch">
                       {pageItems.map((item, index) => (
-                        <div key={item.key} className="contents">
+                        <Fragment key={item.key}>
                           <div className="h-full">
                             {item.kind === 'fda' ? (
                               <MarioEpisodeCard
@@ -467,70 +467,43 @@ const Shows = () => {
                               <Wh0SessionCard show={item.session} />
                             )}
                           </div>
-                          {(index + 1) % 5 === 0 && index < pageItems.length - 1 && (
-                            <div className="lg:col-span-2">
+                          {(index + 1) % 10 === 0 && index < pageItems.length - 1 && (
+                            <div className="lg:col-span-2 row-auto">
                               <GoogleAds
-                                key={`shows-between-${currentPage}-${index}`}
+                                key={`shows-between-${index}`}
                                 slot={AD_SLOTS.BETWEEN_EPISODES}
                                 format="fluid"
                                 layout="in-article"
                               />
                             </div>
                           )}
-                        </div>
+                        </Fragment>
                       ))}
                     </div>
 
-                    {totalPages > 1 && (
-                      <Pagination className="mt-12">
-                        <PaginationContent className="flex-wrap">
-                          <PaginationItem>
-                            <PaginationPrevious
-                              href="#"
-                              aria-disabled={currentPage === 1}
-                              className={currentPage === 1 ? 'pointer-events-none opacity-40' : ''}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                if (currentPage > 1) goToPage(currentPage - 1);
-                              }}
-                            />
-                          </PaginationItem>
+                    <div className="mt-12 flex flex-col items-center gap-3">
+                      {hasMore ? (
+                        <>
+                          <Button
+                            onClick={loadMore}
+                            size="lg"
+                            className="font-['Rajdhani'] font-bold bg-gradient-to-r from-neon to-neon-purple text-background hover:opacity-90"
+                          >
+                            Load more episodes
+                          </Button>
+                          <p className="text-xs text-muted-foreground font-['Rajdhani']">
+                            Page {currentPage} of {totalPages}
+                          </p>
+                        </>
+                      ) : (
+                        totalPages > 1 && (
+                          <p className="text-sm text-muted-foreground font-['Rajdhani']">
+                            You&apos;ve reached the end of the archive
+                          </p>
+                        )
+                      )}
+                    </div>
 
-                          {pageNumbers.map((p, i) =>
-                            p === 'ellipsis' ? (
-                              <PaginationItem key={`ellipsis-${i}`}>
-                                <PaginationEllipsis />
-                              </PaginationItem>
-                            ) : (
-                              <PaginationItem key={p}>
-                                <PaginationLink
-                                  href="#"
-                                  isActive={p === currentPage}
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    goToPage(p);
-                                  }}
-                                >
-                                  {p}
-                                </PaginationLink>
-                              </PaginationItem>
-                            )
-                          )}
-
-                          <PaginationItem>
-                            <PaginationNext
-                              href="#"
-                              aria-disabled={currentPage === totalPages}
-                              className={currentPage === totalPages ? 'pointer-events-none opacity-40' : ''}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                if (currentPage < totalPages) goToPage(currentPage + 1);
-                              }}
-                            />
-                          </PaginationItem>
-                        </PaginationContent>
-                      </Pagination>
-                    )}
                   </>
                 )}
               </div>
