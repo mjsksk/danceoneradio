@@ -497,19 +497,35 @@ const Shows = () => {
                       ))}
                     </div>
 
+                    <div ref={sentinelRef} aria-hidden="true" className="h-px w-full" />
+
                     <div className="mt-12 flex flex-col items-center gap-3">
                       {hasMore ? (
                         <>
-                          <Button
-                            onClick={loadMore}
-                            size="lg"
-                            className="font-['Rajdhani'] font-bold bg-gradient-to-r from-neon to-neon-purple text-background hover:opacity-90"
-                          >
-                            Load more episodes
-                          </Button>
+                          {infiniteScroll ? (
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground font-['Rajdhani']">
+                              <span className="h-4 w-4 animate-spin rounded-full border-b-2 border-primary" />
+                              Loading more episodes…
+                            </div>
+                          ) : (
+                            <Button
+                              onClick={loadMore}
+                              size="lg"
+                              className="font-['Rajdhani'] font-bold bg-gradient-to-r from-neon to-neon-purple text-background hover:opacity-90"
+                            >
+                              Load more episodes
+                            </Button>
+                          )}
                           <p className="text-xs text-muted-foreground font-['Rajdhani']">
                             Page {currentPage} of {totalPages}
                           </p>
+                          <button
+                            type="button"
+                            onClick={() => setInfiniteScroll((v) => !v)}
+                            className="text-xs underline text-muted-foreground hover:text-foreground font-['Rajdhani']"
+                          >
+                            {infiniteScroll ? 'Switch to manual loading' : 'Switch to infinite scroll'}
+                          </button>
                         </>
                       ) : (
                         totalPages > 1 && (
@@ -519,6 +535,7 @@ const Shows = () => {
                         )
                       )}
                     </div>
+
 
                   </>
                 )}
