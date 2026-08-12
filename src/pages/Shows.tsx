@@ -314,7 +314,9 @@ const Shows = () => {
 
   const totalPages = Math.max(1, Math.ceil(feedItems.length / PAGE_SIZE));
   const currentPage = Math.min(requestedPage, totalPages);
-  const pageItems = feedItems.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  // Cumulative "load more" feed: page N shows the first N * PAGE_SIZE items
+  const pageItems = feedItems.slice(0, currentPage * PAGE_SIZE);
+  const hasMore = currentPage < totalPages;
 
   const scrollToFeed = () => {
     const el = document.getElementById('shows-feed');
