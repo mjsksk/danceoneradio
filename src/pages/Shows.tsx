@@ -344,6 +344,26 @@ const Shows = () => {
 
   const loadMore = () => goToPage(currentPage + 1);
 
+  // ---- Infinite scroll (appends pages, keeps ?show= and ?page= in the URL) ----
+  const loadMoreRef = useRef<() => void>(() => {});
+  loadMoreRef.current = () => goToPage(currentPage + 1, { replace: true });
+
+  useEffect(() => {
+    if (!infiniteScroll || !hasMore || loading) return;
+    const el = sentinelRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) loadMoreRef.current();
+      },
+      { rootMargin: '600px 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [infiniteScroll, hasMore, loading, currentPage, activeTab]);
+
+
 
 
   const activeTabLabel = SHOW_TABS.find((t) => t.value === activeTab)?.label ?? 'All Shows';
