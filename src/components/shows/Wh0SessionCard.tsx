@@ -48,7 +48,7 @@ const Wh0SessionCard = ({ show }: Wh0SessionCardProps) => {
   return (
     <Link to={show.link} className="block h-full">
       <Card className="card-cyber p-5 hover:scale-[1.01] transition-all duration-300 group cursor-pointer hover:border-neon/50 h-full">
-        <div className="flex flex-col gap-4 h-full">
+        <div className="flex flex-col gap-4">
           <div className="flex items-start gap-4">
             <img
               src="/images/wh0-plays-sessions-logo.jpg"
