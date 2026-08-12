@@ -14,15 +14,8 @@ import { WH0_SESSIONS } from '@/data/wh0Sessions';
 import Wh0SessionCard from '@/components/shows/Wh0SessionCard';
 import MarioEpisodeCard, { type MarioEpisode } from '@/components/shows/MarioEpisodeCard';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationEllipsis,
-} from '@/components/ui/pagination';
+import { Button } from '@/components/ui/button';
+
 
 type Episode = MarioEpisode;
 
