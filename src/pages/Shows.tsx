@@ -338,7 +338,7 @@ const Shows = () => {
     scrollToFeed();
   };
 
-  const goToPage = (page: number) => {
+  const goToPage = (page: number, scroll = true) => {
     const params = new URLSearchParams(searchParams);
     if (page <= 1) {
       params.delete('page');
@@ -346,25 +346,11 @@ const Shows = () => {
       params.set('page', String(page));
     }
     setSearchParams(params, { replace: false });
-    scrollToFeed();
+    if (scroll) scrollToFeed();
   };
 
-  const pageNumbers = useMemo(() => {
-    const pages: (number | 'ellipsis')[] = [];
-    const push = (p: number | 'ellipsis') => pages.push(p);
-    if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) push(i);
-      return pages;
-    }
-    push(1);
-    if (currentPage > 3) push('ellipsis');
-    for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
-      push(i);
-    }
-    if (currentPage < totalPages - 2) push('ellipsis');
-    push(totalPages);
-    return pages;
-  }, [currentPage, totalPages]);
+  const loadMore = () => goToPage(currentPage + 1, false);
+
 
   const activeTabLabel = SHOW_TABS.find((t) => t.value === activeTab)?.label ?? 'All Shows';
 
