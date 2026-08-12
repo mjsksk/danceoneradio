@@ -34,7 +34,7 @@ const MarioEpisodeCard = ({
   const navigate = useNavigate();
 
   const cardContent = (
-    <div className="flex flex-col gap-4 h-full">
+    <div className="flex flex-col gap-4">
       <div className="flex items-start gap-4">
         <img
           src="/lovable-uploads/mario-show.jpg"
@@ -73,7 +73,7 @@ const MarioEpisodeCard = ({
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2 mt-auto">
+      <div className="flex flex-wrap gap-2">
         {episode.enclosure.url && (
           <Button
             size="sm"
