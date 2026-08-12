@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, Fragment } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef, Fragment } from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SocialShare from '@/components/SocialShare';
