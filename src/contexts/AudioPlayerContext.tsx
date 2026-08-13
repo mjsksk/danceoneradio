@@ -155,7 +155,8 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
 
   // Fetch stream metadata for live stream
   useEffect(() => {
-    if (state.source !== 'live') return;
+    // Keep "Now Playing" live info fresh even when nothing is playing yet
+    if (state.source === 'episode') return;
     
     const fetchMetadata = async () => {
       try {
