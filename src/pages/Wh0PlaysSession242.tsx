@@ -1,5 +1,5 @@
 /**
- * Wh0 Plays Sessions Episode 242 - Guest Mix: Rue Jay
+ * Wh0 Plays Sessions Episode 242
  */
 
 import { ArrowLeft, Calendar, Clock, Music } from 'lucide-react';
@@ -38,26 +38,28 @@ const Wh0PlaysSession242 = () => {
   }, []);
 
   const tracks: Track[] = [
-    { position: 1, timestamp: "00:00", artist: "Jules Vic", title: "Save Me", label: "Wh0 Plays" },
-    { position: 2, timestamp: "06:10", artist: "Kroose", title: "UNVRS", label: "Wh0 Plays" },
-    { position: 3, timestamp: "10:40", artist: "4Tune500", title: "Dancing In The Dark (Rue Jay Remix)", label: "Wh0 Plays" },
-    { position: 4, timestamp: "14:53", artist: "Reflekt", title: "Got To Feel Loved (Rue Jay Bootleg)", label: "Wh0 Plays" },
-    { position: 5, timestamp: "19:07", artist: "Harry Romero", title: "Tania (Rue Jay Bootleg)", label: "Wh0 Plays" },
-    { position: 6, timestamp: "23:38", artist: "Rue Jay & Kim Fai", title: "Let Me Tell You Something", label: "Wh0 Plays" },
-    { position: 7, timestamp: "27:35", artist: "Sam Frandisco", title: "Gotta Have It", label: "Wh0 Plays" },
-    { position: 8, timestamp: "31:12", artist: "DJ Lora", title: "Shine On", label: "Wh0 Plays" },
-    { position: 9, timestamp: "36:08", artist: "Rue Jay & Nicole Powell", title: "Set U Free", label: "Wh0 Plays" },
-    { position: 10, timestamp: "41:20", artist: "Y-Trax", title: "Mystery Land (Reza & Rue Jay Bootleg)", label: "Wh0 Plays" },
-    { position: 11, timestamp: "46:00", artist: "Kerri Chandler", title: "Inside Your System (Philip George Remix)", label: "Wh0 Plays" },
-    { position: 12, timestamp: "52:10", artist: "Rue Jay & DJ Rae", title: "You Gotta Know", label: "Wh0 Plays" },
-    { position: 13, timestamp: "56:45", artist: "Weiss", title: "Feel My Needs (Rue Jay & Cash Only Remix)", label: "Wh0 Plays" },
+    { position: 1, timestamp: "00:45", artist: "Alexander Som", title: "Out Of My Head", label: "Wh0 Plays" },
+    { position: 2, timestamp: "04:36", artist: "Carta, Mixed Signals", title: "Groove P (Extended Mix)", label: "Wh0 Plays" },
+    { position: 3, timestamp: "08:21", artist: "Dario Nunez, Alex Now (ES)", title: "Pumping Vibes", label: "Wh0 Plays" },
+    { position: 4, timestamp: "11:56", artist: "Illyus Barrientos, MALU (BR)", title: "Right Here", label: "Wh0 Plays" },
+    { position: 5, timestamp: "16:15", artist: "Jus' Darko", title: "We Could've", label: "Wh0 Plays" },
+    { position: 6, timestamp: "20:09", artist: "Carlita, Malive", title: "Solar Skin", label: "Wh0 Plays" },
+    { position: 7, timestamp: "24:08", artist: "Ordonez", title: "What Is Salsa", label: "Wh0 Plays" },
+    { position: 8, timestamp: "29:06", artist: "Wh0", title: "House of Wh0 (Jewel Kid Remix)", label: "Wh0 Plays" },
+    { position: 9, timestamp: "32:21", artist: "Earth n Days", title: "El Ritmo (Extended Mix)", label: "Wh0 Plays" },
+    { position: 10, timestamp: "36:36", artist: "Wh0", title: "Wh0 Can Dance", label: "Wh0 Plays" },
+    { position: 11, timestamp: "40:49", artist: "Milk & Sugar, James Hurr", title: "I Like It", label: "Wh0 Plays" },
+    { position: 12, timestamp: "44:11", artist: "Jonas Blue", title: "Girl (Extended Mix)", label: "Wh0 Plays" },
+    { position: 13, timestamp: "48:20", artist: "Jamie James", title: "Babylon (Extended Mix)", label: "Wh0 Plays" },
+    { position: 14, timestamp: "52:00", artist: "Zsak", title: "The Underground", label: "Wh0 Plays" },
+    { position: 15, timestamp: "56:50", artist: "Kristofson", title: "Amante (Cómprame La Ciudad)", label: "Wh0 Plays" },
   ];
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
       <SEO
-        title="Wh0 Plays Sessions Episode 242 - Rue Jay Guest Mix | Dance One Radio"
-        description="Wh0 Plays Sessions Episode 242 with guest DJ Rue Jay. 13 house tracks featuring Jules Vic, Kroose, Harry Romero, Kerri Chandler, Weiss and exclusive Rue Jay remixes and bootlegs."
+        title="Wh0 Plays Sessions Episode 242 Tracklist | Dance One Radio"
+        description="Wh0 Plays Sessions Episode 242 full tracklist. 15 house and tech house tracks featuring Wh0, Jonas Blue, Milk & Sugar, Earth n Days, Carlita, Illyus Barrientos and more."
         image="/lovable-uploads/mario-show.jpg"
         url={typeof window !== 'undefined' ? window.location.href : ''}
       />
@@ -96,7 +98,7 @@ const Wh0PlaysSession242 = () => {
               <div className="flex justify-center mb-8">
                 <img
                   src="/images/wh0-plays-sessions-logo.jpg"
-                  alt="Wh0 Plays Sessions Episode 242 - Rue Jay Guest Mix"
+                  alt="Wh0 Plays Sessions Episode 242"
                   className="w-64 h-64 sm:w-80 sm:h-80 rounded-2xl object-cover shadow-[0_0_30px_hsl(var(--primary)/0.2)]"
                   loading="eager"
                   width="320"
@@ -110,9 +112,6 @@ const Wh0PlaysSession242 = () => {
                 <span className="text-neon">Wh0 Plays Sessions</span>{" "}
                 <span className="text-neon-purple">242</span>
               </h1>
-              <p className="text-center text-lg sm:text-xl text-muted-foreground mb-6">
-                Guest Mix: <span className="text-neon-purple font-semibold">Rue Jay</span>
-              </p>
 
               <Card className="card-cyber p-3 sm:p-6 mb-8">
                 <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-muted-foreground text-sm sm:text-base">
@@ -134,15 +133,15 @@ const Wh0PlaysSession242 = () => {
 
                 <div className="mt-6 text-center">
                   <p className="text-muted-foreground mb-4 leading-relaxed">
-                    Wh0 Plays Sessions Episode 242 with special guest Rue Jay. 13 tracks of pure house energy featuring
-                    Jules Vic, Kroose, Harry Romero, Kerri Chandler, Weiss and exclusive Rue Jay remixes and bootlegs.
+                    Wh0 Plays Sessions Episode 242. 15 tracks of pure house energy featuring Wh0, Jonas Blue,
+                    Milk & Sugar, Earth n Days, Carlita, Illyus Barrientos, Zsak and more.
                   </p>
 
                   <div className="mt-4">
                     <SocialShare
                       url={typeof window !== 'undefined' ? window.location.href : ''}
-                      title="Wh0 Plays Sessions Episode 242 - Rue Jay Guest Mix - Dance One Radio"
-                      description="Wh0 Plays Sessions Episode 242 featuring guest DJ Rue Jay. 13 tracks of house heat."
+                      title="Wh0 Plays Sessions Episode 242 - Dance One Radio"
+                      description="Wh0 Plays Sessions Episode 242 - 15 tracks of house heat."
                       image={`${typeof window !== 'undefined' ? window.location.origin : ''}/lovable-uploads/mario-show.jpg`}
                     />
                   </div>
