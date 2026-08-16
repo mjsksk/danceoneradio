@@ -311,11 +311,14 @@ const Shows = () => {
     return merged.sort((a, b) => b.date - a.date);
   }, [episodes, totalEpisodes, activeTab]);
 
-  const totalPages = Math.max(1, Math.ceil(feedItems.length / PAGE_SIZE));
+  const totalPages = Math.max(
+    1,
+    1 + Math.ceil(Math.max(0, feedItems.length - PAGE_SIZE) / LOAD_MORE_SIZE)
+  );
   const currentPage = Math.min(requestedPage, totalPages);
-  // Cumulative "load more" feed: page N shows the first N * PAGE_SIZE items
-  const pageItems = feedItems.slice(0, currentPage * PAGE_SIZE);
-  const hasMore = currentPage < totalPages;
+  // Cumulative feed: first page shows PAGE_SIZE items, each step adds LOAD_MORE_SIZE
+  const pageItems = feedItems.slice(0, visibleCountForPage(currentPage));
+  const hasMore = pageItems.length < feedItems.length;
 
   const scrollToFeed = () => {
     const el = document.getElementById('shows-feed');
