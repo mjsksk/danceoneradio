@@ -382,8 +382,8 @@ const Shows = () => {
       />
       {/* Optimized Background Image with lazy loading */}
       <div
-        className={`fixed inset-0 z-0 opacity-20 transition-opacity duration-500 ${
-          bgLoaded ? 'opacity-20' : 'opacity-0'
+        className={`fixed inset-0 z-0 transition-opacity duration-500 ${
+          bgLoaded ? 'opacity-60' : 'opacity-0'
         }`}
         style={{
           backgroundImage: 'url(/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png)',
@@ -395,6 +395,9 @@ const Shows = () => {
           backfaceVisibility: 'hidden',
         }}
       />
+      {/* Readability scrim over the background */}
+      <div className="fixed inset-0 z-0 bg-gradient-to-b from-background/50 via-background/70 to-background pointer-events-none" />
+
 
       {/* Content overlay */}
       <div className="relative z-10">
