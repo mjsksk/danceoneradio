@@ -23,6 +23,10 @@ type Episode = MarioEpisode;
 const availableEpisodePages = [0, 389, 390, 391, 392, 393, 394, 395, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 419, 420, 421, 422];
 
 const PAGE_SIZE = 10;
+// Each "load more" step reveals this many additional shows
+const LOAD_MORE_SIZE = 30;
+const visibleCountForPage = (page: number) =>
+  page <= 1 ? PAGE_SIZE : PAGE_SIZE + (page - 1) * LOAD_MORE_SIZE;
 
 type ShowFilter = 'all' | 'fda' | 'wh0';
 
