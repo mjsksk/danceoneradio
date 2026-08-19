@@ -41,6 +41,10 @@ const Gallery = () => {
 
           <GoogleAds key="gallery-ad" slot={AD_SLOTS.SIDEBAR} />
 
+          <h2 className="font-['Orbitron'] text-2xl md:text-3xl font-bold text-foreground text-center mb-8">
+            Featured Event Galleries
+          </h2>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <Link to="/gallery/love-parade-2005">
               <Card className="card-cyber hover:shadow-glow-cyber transition-all duration-300 cursor-pointer h-full">
