@@ -33,10 +33,15 @@ if (existingConsent) {
 }
 
 console.log('🚀 Step 4: Rendering React app');
-createRoot(document.getElementById("root")!).render(<App />);
+const rootEl = document.getElementById("root")!;
+// Prerendered HTML ships with an inline opacity:0 so the raw crawler markup
+// never flashes before hydration. Drop it now that React controls the DOM.
+rootEl.removeAttribute('style');
+createRoot(rootEl).render(<App />);
 
 // Reveal the prerendered UI now that React has taken over
-document.getElementById("root")?.classList.add("app-loaded");
+rootEl.classList.add("app-loaded");
+
 
 
 // Register service worker for push notifications and caching
