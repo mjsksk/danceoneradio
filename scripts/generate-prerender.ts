@@ -452,8 +452,9 @@ function generateHTMLFromTemplate(templateHtml: string, route: RouteMetadata) {
   const bodyContent = buildBodyContent(route);
   const bodyInjected = headInjected.replace(
     /<div id="root">\s*<\/div>/i,
-    `<div id="root">${bodyContent}\n  </div>`
+    `<div id="root" style="opacity:0">${bodyContent}\n  </div>`
   );
+
 
   return bodyInjected;
 }
