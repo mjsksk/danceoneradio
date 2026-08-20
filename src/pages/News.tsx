@@ -219,7 +219,7 @@ const News = () => {
 
           {/* Quick Links */}
           <section className="mt-12 p-6 bg-card/50 rounded-xl border border-border/50">
-            <h3 className="text-lg font-semibold mb-4">Browse by Category</h3>
+            <h2 className="text-lg font-semibold mb-4">Browse by Category</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <Link to="/news/top-stories" className="flex items-center gap-2 p-3 rounded-lg bg-background/50 hover:bg-primary/10 transition-colors">
                 <Newspaper className="w-5 h-5 text-primary" />
