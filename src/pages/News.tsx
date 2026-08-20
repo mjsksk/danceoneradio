@@ -107,8 +107,10 @@ const News = () => {
 
           {/* Featured Story */}
           <section className="mb-12">
+            <h2 className="text-2xl font-bold mb-4">Featured Story</h2>
             <NewsFeaturedHero article={featuredArticle || null} isLoading={featuredLoading} />
           </section>
+
 
           <GoogleAds key="news-in-content" slot={AD_SLOTS.NEWS} />
 
