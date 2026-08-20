@@ -43,7 +43,11 @@ const Merch = () => {
           <GoogleAds key="merch-ad" slot={AD_SLOTS.SIDEBAR} />
 
           {/* Product Grid */}
+          <h2 className="text-xl sm:text-2xl font-['Orbitron'] font-bold text-primary mb-4 mt-8 text-center">
+            Shop Official Gear
+          </h2>
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8 justify-items-center max-w-5xl mx-auto">
+
             {merchItems.map((item, idx) => (
               <Card
                 key={item.id}
