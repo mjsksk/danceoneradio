@@ -77,7 +77,11 @@ const HeroSection = () => {
             </picture>
 
           </div>
+          <h1 className="mt-3 text-center font-['Orbitron'] text-lg font-bold tracking-wide text-primary sm:text-xl md:text-2xl">
+            Dance One Radio — Live Electronic &amp; Dance Music 24/7
+          </h1>
         </div>
+
 
         <NowPlayingBlock streamTitle={streamTitle} />
 
