@@ -206,6 +206,8 @@ const FloatingPlayer = () => {
                       }`}
                       onClick={toggleAutoplay}
                       title={autoplayEnabled ? 'Autoplay ON' : 'Autoplay OFF'}
+                      aria-label={autoplayEnabled ? 'Turn autoplay off' : 'Turn autoplay on'}
+
                     >
                       <ListMusic className="w-4 h-4" />
                     </Button>
