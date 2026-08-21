@@ -145,6 +145,8 @@ const FloatingPlayer = () => {
                 className="w-8 h-8 text-muted-foreground hover:text-primary relative group"
                 onClick={() => seek(Math.max(0, currentTime - 20))}
                 title="Skip back 20 seconds"
+                aria-label="Skip back 20 seconds"
+
               >
                 <RotateCcw className="w-4 h-4" />
                 <span className="absolute -top-1 -left-1 text-[9px] font-bold text-neon-purple bg-background/80 rounded px-0.5">
