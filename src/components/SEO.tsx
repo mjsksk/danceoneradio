@@ -14,13 +14,13 @@ interface SEOProps {
 }
 
 const SEO = ({ 
-  title = "Dance One Radio | Live Electronic & Dance Music",
-  description = "Live 24/7 dance, electronic, trance, house, and EDM music. DJ mixes, podcasts, and exclusive shows from Dance One Radio.",
-  image = "/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png",
+  title = "Dance Music Radio Station | Free Electronic Music Stream 24/7",
+  description = "Dance One Radio is a free dance music radio station streaming electronic music 24/7 — house, trance, techno and EDM, plus DJ mixes, podcasts and live shows.",
+  image = "https://danceoneradio.com/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png",
   imageAlt = "Dance One Radio — live electronic and dance music",
   url,
   type = "website",
-  keywords = "dance music radio, electronic music stream, EDM radio, trance radio, house music, live DJ mixes, dance music podcast, online radio station",
+  keywords = "dance music radio station, electronic music stream, free online radio, EDM radio, trance radio, house music radio, live DJ mixes, dance music podcast",
   structuredData,
   noindex = false,
 }: SEOProps) => {
