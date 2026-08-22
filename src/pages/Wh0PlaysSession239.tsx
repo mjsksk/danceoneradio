@@ -60,7 +60,7 @@ const Wh0PlaysSession239 = () => {
       <SEO
         title="Wh0 Plays Sessions Episode 239 | Dance One Radio"
         description="Wh0 Plays Sessions Episode 239. 15 house tracks featuring MARTA, Milk & Sugar, Wh0, Joel Corry, Tom Novy, Mercer, LEFTI and more."
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={typeof window !== 'undefined' ? window.location.href : ''}
       />
       <div

@@ -98,7 +98,7 @@ const Episode409 = () => {
       <SEO 
         title={`Anthems of the Week ${episodeNumber} | Dance One Radio`}
         description={`Episode ${episodeNumber} featuring the latest electronic dance music anthems. ${tracks.length} tracks including Alok & Khalid, Prospa, Cloonee, Trilucid, Lenny Fontana, Manuel De La Mare, and more.`}
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={window.location.href}
       />
       <div 

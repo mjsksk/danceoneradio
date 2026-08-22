@@ -14,7 +14,7 @@ const Love = () => {
       <SEO 
         title="About Love Parade - Dance One Radio"
         description="Learn about the history of Love Parade, the iconic electronic music festival that celebrated peace, love, and electronic dance music."
-        image="/assets/love-parade-2006.png"
+        image="https://danceoneradio.com/assets/love-parade-2006.png"
         keywords="love parade, electronic music festival, techno parade, dance music history, Love Parade San Francisco"
       />
       <Navigation />

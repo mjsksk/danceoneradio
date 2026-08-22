@@ -97,7 +97,7 @@ const Episode405 = () => {
       <SEO 
         title={`Anthems of the Week ${episodeNumber} | Dance One Radio`}
         description={`Episode ${episodeNumber} featuring the latest electronic dance music anthems. 18 tracks including The Young Punx, KREAM, Armand Van Helden, ZHU, Odd Mob, Redlight, and more.`}
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={window.location.href}
       />
       <div 

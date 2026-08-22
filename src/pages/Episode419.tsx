@@ -96,7 +96,7 @@ const Episode419 = () => {
       <SEO
         title="Anthems of the Week 419 | Dance One Radio"
         description="Episode 419 tracklist featuring Hot Since 82, KETTAMA, Dom Dolla, Adriatique, Cassius and more."
-        image="/lovable-uploads/future-dance-anthems.jpg"
+        image="https://danceoneradio.com/lovable-uploads/future-dance-anthems.jpg"
         url={typeof window !== 'undefined' ? window.location.href : ''}
       />
       <div

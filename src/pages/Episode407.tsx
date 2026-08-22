@@ -97,7 +97,7 @@ const Episode407 = () => {
       <SEO 
         title={`Anthems of the Week ${episodeNumber} | Dance One Radio`}
         description={`Episode ${episodeNumber} featuring the latest electronic dance music anthems. 18 tracks including S.P.Y, Bob Sinclar & Kiesza, Hot Since 82, Jayda G, KREAM, Sonny Fodera, and more.`}
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={window.location.href}
       />
       <div 

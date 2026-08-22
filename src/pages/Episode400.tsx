@@ -101,7 +101,7 @@ const Episode400 = () => {
       <SEO 
         title={`Anthems of the Week ${episodeNumber} | Dance One Radio`}
         description={`Episode ${episodeNumber} featuring the latest electronic dance music anthems.`}
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={window.location.href}
       />
       <div 

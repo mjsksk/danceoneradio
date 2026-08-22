@@ -58,7 +58,7 @@ const Wh0PlaysSession243 = () => {
       <SEO
         title="Wh0 Plays Sessions Episode 243 with Rue Jay Tracklist | Dance One Radio"
         description="Wh0 Plays Sessions Episode 243 full tracklist with guest Rue Jay. 13 house and tech house tracks featuring Sonny Kane, ANOTR, Wh0, Alaia & Gallo, Alexander Som, Kolter, Guy Burns and more."
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={typeof window !== 'undefined' ? window.location.href : ''}
       />
       <div

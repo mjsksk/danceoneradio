@@ -97,7 +97,7 @@ const Episode406 = () => {
       <SEO 
         title={`Anthems of the Week ${episodeNumber} | Dance One Radio`}
         description={`Episode ${episodeNumber} featuring the latest electronic dance music anthems. 18 tracks including Rossi., Simon Doty, Mau P, Tinlicker, Danny L Harle ft Dua Lipa, Joy Anonymous, and more.`}
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={window.location.href}
       />
       <div 

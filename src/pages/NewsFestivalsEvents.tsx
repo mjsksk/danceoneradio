@@ -25,7 +25,7 @@ const NewsFestivalsEvents = () => {
         description="Stay updated with the latest festival announcements, EDM event news, concert dates, and tour information. Never miss a show!"
         keywords="EDM festivals, dance music events, concert announcements, DJ tours, rave events, festival lineup"
         url="https://danceoneradio.com/news/festivals-events"
-        image="/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
+        image="https://danceoneradio.com/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
         imageAlt="Festival and event announcements — Dance One Radio"
         type="article"
         structuredData={newsSchema}

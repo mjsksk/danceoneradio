@@ -63,7 +63,7 @@ const Wh0PlaysSession223 = () => {
       <SEO 
         title="Wh0 Plays Sessions Episode 223 - Bad Intentions | Dance One Radio"
         description="Wh0 Plays Sessions Episode 223 'Bad Intentions'. 17 tracks featuring Mark Knight, Afrojack, Lucas & Steve, LP Giobbi, Wh0 & Low Steppa, and more."
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={window.location.href}
       />
       <div 

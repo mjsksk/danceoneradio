@@ -96,7 +96,7 @@ const Episode420 = () => {
       <SEO
         title="Anthems of the Week 420 | Dance One Radio"
         description="Episode 420 tracklist featuring Swedish House Mafia, Solomun, Skrillex, KSHMR, Cloonee and more."
-        image="/lovable-uploads/future-dance-anthems.jpg"
+        image="https://danceoneradio.com/lovable-uploads/future-dance-anthems.jpg"
         url={typeof window !== 'undefined' ? window.location.href : ''}
       />
       <div

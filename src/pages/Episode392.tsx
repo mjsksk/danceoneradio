@@ -111,7 +111,7 @@ const Episode392 = () => {
       <SEO 
         title="Anthems of the Week 392 | Dance One Radio"
         description="Episode 392 featuring 25 tracks of the latest electronic dance music, including tracks from John Summit, KETTAMA, Hot Since 82, and more."
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={window.location.href}
       />
       {/* Optimized Background Image with lazy loading */}
