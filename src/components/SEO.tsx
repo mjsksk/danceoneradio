@@ -134,8 +134,13 @@ const SEO = ({
       // Auto-emit richer schema for known route patterns when no override given
       if (!structuredData) {
         const path = (() => { try { return new URL(resolvedUrl).pathname; } catch { return ''; } })();
-        const episodeMatch = path.match(/^\/episode\/(\d+)/);
+        // Episodes live at /episode/:n (Future Dance Anthems)
+        // and /show/wh0-plays-sessions/:n (Wh0 Plays Sessions)
+        const episodeMatch =
+          path.match(/^\/episode\/(\d+)/) ||
+          path.match(/^\/show\/wh0-plays-sessions\/(\d+)/);
         if (episodeMatch) {
+          const isWh0 = path.startsWith('/show/wh0-plays-sessions/');
           payload = {
             "@context": "https://schema.org",
             "@type": "PodcastEpisode",
@@ -146,7 +151,7 @@ const SEO = ({
             "episodeNumber": Number(episodeMatch[1]),
             "partOfSeries": {
               "@type": "PodcastSeries",
-              "name": "Future Dance Anthems with Mario",
+              "name": isWh0 ? "Wh0 Plays Sessions" : "Future Dance Anthems with Mario",
               "url": "https://danceoneradio.com/shows"
             },
             "publisher": publisher,
