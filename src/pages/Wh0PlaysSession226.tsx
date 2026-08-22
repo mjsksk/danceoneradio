@@ -61,7 +61,7 @@ const Wh0PlaysSession226 = () => {
       <SEO 
         title="Wh0 Plays Sessions Episode 226 | Dance One Radio"
         description="Wh0 Plays Sessions Episode 226. 15 tracks featuring Mark Knight, Wh0, Cristoph, CASSIMM, Route 94, Oden & Fatzo and more."
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={window.location.href}
       />
       <div 

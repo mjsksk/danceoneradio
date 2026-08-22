@@ -63,7 +63,7 @@ const Wh0PlaysSession238 = () => {
       <SEO
         title="Wh0 Plays Sessions Episode 238 | Dance One Radio"
         description="Wh0 Plays Sessions Episode 238. 18 house tracks featuring Wh0, Alexander Som, Jonas Blue, KDA, Mele, Milk & Sugar, LEFTI and more."
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={typeof window !== 'undefined' ? window.location.href : ''}
       />
       <div

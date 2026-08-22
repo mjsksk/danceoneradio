@@ -114,7 +114,7 @@ const Episode390 = () => {
       <SEO 
         title="Anthems of the Week 390 | Dance One Radio"
         description="Episode 390 featuring 28 tracks of the latest electronic dance music, including exclusive unreleased tracks from top artists."
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={window.location.href}
       />
       {/* Optimized Background Image with lazy loading */}

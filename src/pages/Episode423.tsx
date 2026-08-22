@@ -95,7 +95,7 @@ const Episode423 = () => {
       <SEO
         title="Anthems of the Week 423 | Dance One Radio"
         description="Episode 423 tracklist featuring Tom Crane, Peking Duk, Eli & Fur, Jonas Blue, J. Worra, D.O.D and more."
-        image="/lovable-uploads/future-dance-anthems.jpg"
+        image="https://danceoneradio.com/lovable-uploads/future-dance-anthems.jpg"
         url={typeof window !== 'undefined' ? window.location.href : ''}
       />
       <div

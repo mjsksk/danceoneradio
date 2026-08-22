@@ -62,7 +62,7 @@ const Wh0PlaysSession241 = () => {
       <SEO
         title="Wh0 Plays Sessions Episode 241 | Dance One Radio"
         description="Wh0 Plays Sessions Episode 241. 17 tracks of house and tech house heat featuring Alexander Som, Groove Armada, David Penn, Marco Lys, Rue Jay & DJ Rae and more."
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={typeof window !== 'undefined' ? window.location.href : ''}
       />
       <div

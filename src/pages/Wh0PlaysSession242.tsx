@@ -60,7 +60,7 @@ const Wh0PlaysSession242 = () => {
       <SEO
         title="Wh0 Plays Sessions Episode 242 Tracklist | Dance One Radio"
         description="Wh0 Plays Sessions Episode 242 full tracklist. 15 house and tech house tracks featuring Wh0, Jonas Blue, Milk & Sugar, Earth n Days, Carlita, Illyus Barrientos and more."
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={typeof window !== 'undefined' ? window.location.href : ''}
       />
       <div

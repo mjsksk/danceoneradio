@@ -25,7 +25,7 @@ const NewsIndustryCulture = () => {
         description="Deep dives into electronic music industry trends, streaming updates, label news, and dance music culture. Understand the business behind the beats."
         keywords="EDM industry news, dance music culture, music streaming, record labels, electronic music trends"
         url="https://danceoneradio.com/news/industry-culture"
-        image="/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
+        image="https://danceoneradio.com/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
         imageAlt="EDM industry and culture news — Dance One Radio"
         type="article"
         structuredData={newsSchema}

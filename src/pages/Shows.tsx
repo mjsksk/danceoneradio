@@ -383,7 +383,7 @@ const Shows = () => {
         title="DJ Shows & Podcasts - Dance One Radio"
         description="Listen to exclusive DJ mixes, podcasts, and radio shows from Dance One Radio. New episodes weekly featuring the best electronic and dance music."
         keywords="DJ shows, dance music podcast, electronic music mixes, radio shows, DJ mixes, Future Dance Anthems, Wh0 Plays Sessions"
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={`${window.location.origin}/shows`}
         noindex={currentPage > 1}
       />

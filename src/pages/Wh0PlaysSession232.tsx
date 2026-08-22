@@ -61,7 +61,7 @@ const Wh0PlaysSession232 = () => {
       <SEO 
         title="Wh0 Plays Sessions Episode 232 with Molly Mouse | Dance One Radio"
         description="Wh0 Plays Sessions Episode 232 with guest mix from Molly Mouse. 15 house tracks featuring Wh0, Molly Mouse, Calvin Harris (LAWZ Edit), Ben Dooks, James Hurr and more."
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={typeof window !== 'undefined' ? window.location.href : ''}
       />
       <div 

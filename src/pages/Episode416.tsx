@@ -122,7 +122,7 @@ const Episode416 = () => {
       <SEO 
         title="Anthems of the Week 416 | Dance One Radio"
         description="Anthems that shape today's dance scene"
-        image="/lovable-uploads/future-dance-anthems.jpg"
+        image="https://danceoneradio.com/lovable-uploads/future-dance-anthems.jpg"
         url={window.location.href}
       />
       {/* Optimized Background Image with lazy loading */}

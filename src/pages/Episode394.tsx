@@ -105,7 +105,7 @@ const Episode394 = () => {
       <SEO 
         title="Anthems of the Week 394 | Dance One Radio"
         description="Episode 394 featuring 19 tracks of the latest electronic dance music, including tracks from CamelPhat, Kaz James, Nic Fanciulli, and more."
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={window.location.href}
       />
       {/* Optimized Background Image with lazy loading */}

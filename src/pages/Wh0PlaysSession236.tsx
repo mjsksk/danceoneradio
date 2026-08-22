@@ -60,7 +60,7 @@ const Wh0PlaysSession236 = () => {
       <SEO
         title="Wh0 Plays Sessions Episode 236 | Dance One Radio"
         description="Wh0 Plays Sessions Episode 236. 15 house tracks featuring Costa UK, Milk & Sugar, Wh0 & Chandler McFadden, LEFTI, Mercer, Reza & JustGio and more."
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={typeof window !== 'undefined' ? window.location.href : ''}
       />
       <div

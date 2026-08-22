@@ -15,7 +15,7 @@ const Gallery = () => {
       <SEO
         title="Photo Galleries - Love Parade Events | Dance One Radio"
         description="Explore our collection of photo galleries from Love Parade events in San Francisco. Relive the energy and creativity of electronic music culture."
-        image="/assets/love-parade-2006.png"
+        image="https://danceoneradio.com/assets/love-parade-2006.png"
         keywords="love parade photos, electronic music festival photos, techno parade gallery, dance music events, Love Parade San Francisco"
       />
       <div className="min-h-screen bg-background">

@@ -62,7 +62,7 @@ const Wh0PlaysSession222 = () => {
       <SEO 
         title="Wh0 Plays Sessions Episode 222 with Johan S | Dance One Radio"
         description="Wh0 Plays Sessions Episode 222 featuring guest mix by Johan S. 17 tracks including John Newman, Piero Pirupa, Mark Knight, Low Steppa, Thomas Newson, and more."
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={window.location.href}
       />
       <div 

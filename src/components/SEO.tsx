@@ -14,13 +14,13 @@ interface SEOProps {
 }
 
 const SEO = ({ 
-  title = "Dance One Radio | Live Electronic & Dance Music",
-  description = "Live 24/7 dance, electronic, trance, house, and EDM music. DJ mixes, podcasts, and exclusive shows from Dance One Radio.",
-  image = "/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png",
+  title = "Dance Music Radio Station | Free Electronic Music Stream 24/7",
+  description = "Dance One Radio is a free dance music radio station streaming electronic music 24/7 — house, trance, techno and EDM, plus DJ mixes, podcasts and live shows.",
+  image = "https://danceoneradio.com/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png",
   imageAlt = "Dance One Radio — live electronic and dance music",
   url,
   type = "website",
-  keywords = "dance music radio, electronic music stream, EDM radio, trance radio, house music, live DJ mixes, dance music podcast, online radio station",
+  keywords = "dance music radio station, electronic music stream, free online radio, EDM radio, trance radio, house music radio, live DJ mixes, dance music podcast",
   structuredData,
   noindex = false,
 }: SEOProps) => {
@@ -134,8 +134,13 @@ const SEO = ({
       // Auto-emit richer schema for known route patterns when no override given
       if (!structuredData) {
         const path = (() => { try { return new URL(resolvedUrl).pathname; } catch { return ''; } })();
-        const episodeMatch = path.match(/^\/episode\/(\d+)/);
+        // Episodes live at /episode/:n (Future Dance Anthems)
+        // and /show/wh0-plays-sessions/:n (Wh0 Plays Sessions)
+        const episodeMatch =
+          path.match(/^\/episode\/(\d+)/) ||
+          path.match(/^\/show\/wh0-plays-sessions\/(\d+)/);
         if (episodeMatch) {
+          const isWh0 = path.startsWith('/show/wh0-plays-sessions/');
           payload = {
             "@context": "https://schema.org",
             "@type": "PodcastEpisode",
@@ -146,7 +151,7 @@ const SEO = ({
             "episodeNumber": Number(episodeMatch[1]),
             "partOfSeries": {
               "@type": "PodcastSeries",
-              "name": "Future Dance Anthems with Mario",
+              "name": isWh0 ? "Wh0 Plays Sessions" : "Future Dance Anthems with Mario",
               "url": "https://danceoneradio.com/shows"
             },
             "publisher": publisher,

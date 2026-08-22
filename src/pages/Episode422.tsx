@@ -95,7 +95,7 @@ const Episode422 = () => {
       <SEO
         title="Anthems of the Week 422 | Dance One Radio"
         description="Episode 422 tracklist featuring Hot Since 82, Monkey Safari, Max Styler, Bora Uzer, Karretero, EBTG and more."
-        image="/lovable-uploads/future-dance-anthems.jpg"
+        image="https://danceoneradio.com/lovable-uploads/future-dance-anthems.jpg"
         url={typeof window !== 'undefined' ? window.location.href : ''}
       />
       <div

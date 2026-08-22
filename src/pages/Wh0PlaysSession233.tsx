@@ -62,7 +62,7 @@ const Wh0PlaysSession233 = () => {
       <SEO 
         title="Wh0 Plays Sessions Episode 233 with Johan S | Dance One Radio"
         description="Wh0 Plays Sessions Episode 233 with guest mix from Johan S. 16 house tracks featuring Johan S, FRUCO FRESH, Michael Gray, Kryder, Reza & JustGio and more."
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={typeof window !== 'undefined' ? window.location.href : ''}
       />
       <div 

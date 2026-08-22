@@ -106,7 +106,7 @@ const Episode395 = () => {
       <SEO 
         title="Anthems of the Week 395 | Dance One Radio"
         description="Episode 395 featuring 15 tracks of the latest electronic dance music, including tracks from Durante, Faithless, Above & Beyond, and more."
-        image="/lovable-uploads/mario-show.jpg"
+        image="https://danceoneradio.com/lovable-uploads/mario-show.jpg"
         url={window.location.href}
       />
       {/* Optimized Background Image with lazy loading */}

@@ -33,7 +33,7 @@ const NewsTopStories = () => {
         description="Today's top electronic dance music headlines. Breaking news, major announcements, and trending stories from the EDM world."
         keywords="EDM news today, dance music headlines, electronic music breaking news, DJ announcements"
         url="https://danceoneradio.com/news/top-stories"
-        image="/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
+        image="https://danceoneradio.com/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
         imageAlt="Top EDM stories today — Dance One Radio"
         type="article"
         structuredData={newsSchema}
