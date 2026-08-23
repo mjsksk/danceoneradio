@@ -80,6 +80,10 @@ const HeroSection = () => {
           <h1 className="mt-3 text-center font-['Orbitron'] text-lg font-bold tracking-wide text-primary sm:text-xl md:text-2xl">
             Dance One Radio — Live Electronic &amp; Dance Music 24/7
           </h1>
+          <p className="mx-auto mt-3 max-w-2xl text-center font-['Rajdhani'] text-sm text-muted-foreground sm:text-base">
+            Online dance music radio streaming free, 24/7 — live DJ sets and continuous mixes of house,
+            progressive, trance, techno and EDM, plus weekly shows and full episode tracklists.
+          </p>
         </div>
 
 
