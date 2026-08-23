@@ -56,7 +56,7 @@ const HeroSection = () => {
     >
       <div className="mx-auto flex min-h-screen max-w-4xl flex-col justify-center px-4 pt-32 md:pt-36">
         <div className="mb-4">
-          <h2 className="sr-only">Live Stream</h2>
+          <p className="sr-only">Live Stream</p>
           <div className="hero-logo flex justify-center">
             <picture>
               <source

@@ -218,7 +218,7 @@ const SocialShare = ({
         {allowNativeShare && (
           <DropdownMenuItem onClick={handleNativeShare} className="cursor-pointer">
             <Share2 className="w-4 h-4 mr-2" />
-            More...
+            Share via other apps
           </DropdownMenuItem>
         )}
         <DropdownMenuItem onClick={handleCopyLink} className="cursor-pointer">
