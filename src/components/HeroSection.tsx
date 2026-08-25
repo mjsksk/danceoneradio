@@ -54,7 +54,7 @@ const HeroSection = () => {
       backgroundFill="hsl(222.2, 84%, 4.9%)"
       containerClassName="min-h-screen"
     >
-      <div className="mx-auto flex min-h-screen max-w-4xl flex-col justify-center px-4 pt-32 md:pt-36">
+    <div className="mx-auto flex min-h-screen max-w-4xl flex-col justify-center px-4 pt-32 md:pt-36">
         <div className="mb-4">
           <p className="sr-only">Live Stream</p>
           <div className="hero-logo flex justify-center">
@@ -77,15 +77,7 @@ const HeroSection = () => {
             </picture>
 
           </div>
-          <h1 className="mt-3 text-center font-['Orbitron'] text-lg font-bold tracking-wide text-primary sm:text-xl md:text-2xl">
-            Dance One Radio — Live Electronic &amp; Dance Music 24/7
-          </h1>
-          <p className="mx-auto mt-3 max-w-2xl text-center font-['Rajdhani'] text-sm text-muted-foreground sm:text-base">
-            Online dance music radio streaming free, 24/7 — live DJ sets and continuous mixes of house,
-            progressive, trance, techno and EDM, plus weekly shows and full episode tracklists.
-          </p>
         </div>
-
 
         <NowPlayingBlock streamTitle={streamTitle} />
 
@@ -102,6 +94,17 @@ const HeroSection = () => {
               className="bg-background/10 backdrop-blur-sm border-primary/30 hover:border-primary hover:bg-primary/10"
             />
           </div>
+        </div>
+
+        {/* Intro text kept visible below the player for SEO */}
+        <div className="mb-8 animate-fade-in">
+          <h1 className="text-center font-['Orbitron'] text-lg font-bold tracking-wide text-primary sm:text-xl md:text-2xl">
+            Dance One Radio — Live Electronic &amp; Dance Music 24/7
+          </h1>
+          <p className="mx-auto mt-3 max-w-2xl text-center font-['Rajdhani'] text-sm text-muted-foreground sm:text-base">
+            Online dance music radio streaming free, 24/7 — live DJ sets and continuous mixes of house,
+            progressive, trance, techno and EDM, plus weekly shows and full episode tracklists.
+          </p>
         </div>
 
         {/* Scroll Indicator */}
