@@ -13,6 +13,14 @@ export interface Wh0Session {
 
 export const WH0_SESSIONS: Wh0Session[] = [
   {
+    number: 244,
+    title: 'Wh0 Plays Sessions Episode 244',
+    blurb: '14 tracks • Kristofson, Carta, Milk & Sugar, Wh0, Earth n Days & more',
+    link: '/show/wh0-plays-sessions/244',
+    broadcastDate: '2026-08-28T18:00:00',
+    genres: 'House • Tech House • Dance',
+  },
+  {
     number: 243,
     title: 'Wh0 Plays Sessions Episode 243 with Rue Jay',
     guest: 'Rue Jay',
