@@ -32,7 +32,7 @@ const Merch = () => {
           <div className="text-center mb-8 sm:mb-12">
             <Store className="w-12 h-12 sm:w-16 sm:h-16 text-primary mx-auto mb-3 sm:mb-4" />
             <h1 className="text-2xl sm:text-4xl font-['Orbitron'] font-bold text-primary mb-3 sm:mb-4">
-              Merch Store
+              Dance One Radio Official Merch Store
             </h1>
             <p className="text-base sm:text-lg text-muted-foreground font-['Rajdhani'] max-w-2xl mx-auto px-2">
               Represent the electronic music lifestyle with exclusive Dance One Radio gear.
