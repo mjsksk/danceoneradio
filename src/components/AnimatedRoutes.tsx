@@ -193,7 +193,8 @@ export function AnimatedRoutes() {
         <Route path="/show/wh0-plays-sessions/240" element={<PageTransition><Wh0PlaysSession240 /></PageTransition>} />
         <Route path="/show/wh0-plays-sessions/241" element={<PageTransition><Wh0PlaysSession241 /></PageTransition>} />
         <Route path="/show/wh0-plays-sessions/242" element={<PageTransition><Wh0PlaysSession242 /></PageTransition>} />
-        <Route path="/show/wh0-plays-sessions/243" element={<PageTransition><Wh0PlaysSession243 /></PageTransition>} />
+<Route path="/show/wh0-plays-sessions/243" element={<PageTransition><Wh0PlaysSession243 /></PageTransition>} />
+        <Route path="/show/wh0-plays-sessions/244" element={<PageTransition><Wh0PlaysSession244 /></PageTransition>} />
         <Route path="/requests" element={<PageTransition><SongRequests /></PageTransition>} />
         <Route path="/genres" element={<PageTransition><Genres /></PageTransition>} />
         <Route path="/genres/:slug" element={<PageTransition><Genre /></PageTransition>} />
