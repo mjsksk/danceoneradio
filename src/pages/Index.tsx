@@ -17,7 +17,11 @@ const Index = () => {
   return (
     <div className="relative min-h-screen overflow-x-hidden">
       <div className="relative z-10 flex flex-col min-h-screen">
-        <SEO />
+        <SEO
+          title="Dance One Radio — Electronic Dance Music Radio Station Streaming Live 24/7"
+          description="Dance One Radio is a live electronic dance music radio station streaming free 24/7 — house, trance, techno, progressive and EDM mixes, weekly DJ shows and full episode tracklists."
+          keywords="dance music radio, electronic dance music radio, live dance radio station, edm radio online, free electronic music stream, house music radio, trance radio, techno radio"
+        />
         <Navigation />
         <main className="flex-grow">
           <HeroSection />

@@ -119,7 +119,7 @@ const Contact = () => {
       <Navigation />
       <main className="container mx-auto px-4 py-8 pt-24">
         <div className="max-w-2xl mx-auto">
-          <h1 className="text-4xl font-bold text-center mb-4 text-foreground">Contact Us</h1>
+          <h1 className="text-4xl font-bold text-center mb-4 text-foreground">Contact Dance One Radio — Demos &amp; Inquiries</h1>
           <div className="flex justify-center mb-8">
             <SocialShare 
               url={window.location.href}
