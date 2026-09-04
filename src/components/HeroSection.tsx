@@ -99,12 +99,13 @@ const HeroSection = () => {
         {/* Intro text kept visible below the player for SEO */}
         <div className="mb-8 animate-fade-in">
           <h1 className="text-center font-['Orbitron'] text-lg font-bold tracking-wide text-primary sm:text-xl md:text-2xl">
-            Dance One Radio — Live Electronic &amp; Dance Music 24/7
+            Live Dance Music Radio — Electronic Music Streaming 24/7
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-center font-['Rajdhani'] text-sm text-muted-foreground sm:text-base">
-            Online dance music radio streaming free, 24/7 — live DJ sets and continuous mixes of house,
-            progressive, trance, techno and EDM, plus weekly shows and full episode tracklists.
+            Dance One Radio is a free live dance radio station streaming electronic music 24/7 — house,
+            progressive, trance, techno and EDM, with live DJ sets, weekly shows and full tracklists.
           </p>
+
         </div>
 
         {/* Scroll Indicator */}
