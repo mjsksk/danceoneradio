@@ -37,7 +37,7 @@ const DesktopPlayer = () => {
   }, []);
 
   useEffect(() => {
-    document.title = 'Dance One Radio';
+    document.title = 'Dance One Radio Desktop Player — Live Electronic Music';
   }, []);
 
   const HistoryPanel = () => {
