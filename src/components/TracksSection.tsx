@@ -575,17 +575,21 @@ const TracksSection = () => {
                          e.stopPropagation();
                          handleLike(track);
                        }}
-                        title={likedTracks.has(getTrackLikeKey(track)) ? 'Remove from favorites' : 'Add to favorites'}
-                     >
-                        <Heart className={`w-4 h-4 ${likedTracks.has(getTrackLikeKey(track)) ? 'fill-current' : ''}`} />
-                     </Button>
-                     <Button
-                       variant="ghost"
-                       size="icon"
-                       className="text-muted-foreground hover:text-primary hover:bg-primary/20"
-                       onClick={() => handleShare(track)}
-                     >
-                       <Share2 className="w-4 h-4" />
+                         title={likedTracks.has(getTrackLikeKey(track)) ? 'Remove from favorites' : 'Add to favorites'}
+                         aria-label={likedTracks.has(getTrackLikeKey(track)) ? `Remove ${track.title} from favorites` : `Add ${track.title} to favorites`}
+                      >
+                         <Heart className={`w-4 h-4 ${likedTracks.has(getTrackLikeKey(track)) ? 'fill-current' : ''}`} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-muted-foreground hover:text-primary hover:bg-primary/20"
+                        onClick={() => handleShare(track)}
+                        title={`Share ${track.title}`}
+                        aria-label={`Share ${track.title}`}
+                      >
+                        <Share2 className="w-4 h-4" />
+
                      </Button>
                   </div>
                 </div>
