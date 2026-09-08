@@ -99,7 +99,7 @@ const HeroSection = () => {
         {/* Intro text kept visible below the player for SEO */}
         <div className="mb-8 animate-fade-in">
           <h1 className="text-center font-['Orbitron'] text-lg font-bold tracking-wide text-primary sm:text-xl md:text-2xl">
-            Live Dance Music Radio — Electronic Music Streaming 24/7
+            Live Dance Radio Station — Electronic Music Streaming 24/7
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-center font-['Rajdhani'] text-sm text-muted-foreground sm:text-base">
             Dance One Radio is a free live dance radio station streaming electronic music 24/7 — house,
