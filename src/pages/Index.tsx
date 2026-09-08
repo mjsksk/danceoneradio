@@ -18,10 +18,10 @@ const Index = () => {
     <div className="relative min-h-screen overflow-x-hidden">
       <div className="relative z-10 flex flex-col min-h-screen">
         <SEO
-          title="Live Dance Radio Station — Electronic Music Streaming 24/7 | Dance One"
-          description="Stream live dance radio and electronic music 24/7 — house, trance, techno and EDM mixes, weekly DJ shows and full episode tracklists."
+          title="Live Dance Radio Station | Free Electronic Music Streaming 24/7"
+          description="Listen free to Dance One Radio — commercial-free house, trance, techno and EDM streaming 24/7, with live DJ sets, weekly shows and full episode tracklists."
 
-          keywords="dance music radio, live dance radio, electronic music streaming, edm radio online, free dance radio station, house music radio, trance radio, techno radio"
+          keywords="dance music radio, live dance radio, electronic music streaming, edm radio online, free dance radio station, house music radio, trance radio, techno radio, internet radio, live dj sets"
         />
 
         <Navigation />
