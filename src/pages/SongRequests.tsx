@@ -156,12 +156,10 @@ export default function SongRequests() {
             {/* Form */}
             <Card className="bg-card/50 backdrop-blur-sm border-border/50">
               <CardHeader>
-                <CardTitle asChild className="flex items-center gap-2 font-['Orbitron'] text-lg">
-                  <h2>
-                    <Music className="w-5 h-5 text-primary" />
-                    Your Request
-                  </h2>
-                </CardTitle>
+                <h2 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2 font-['Orbitron'] text-lg">
+                  <Music className="w-5 h-5 text-primary" />
+                  Your Request
+                </h2>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-5">
