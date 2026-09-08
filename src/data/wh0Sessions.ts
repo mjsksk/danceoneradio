@@ -13,6 +13,14 @@ export interface Wh0Session {
 
 export const WH0_SESSIONS: Wh0Session[] = [
   {
+    number: 246,
+    title: 'Wh0 Plays Sessions Episode 246 with Johan S',
+    guest: 'Johan S',
+    link: '/show/wh0-plays-sessions/246',
+    broadcastDate: '2026-09-11T18:00:00',
+    genres: 'House • Tech House • Dance',
+  },
+  {
     number: 245,
     title: 'Wh0 Plays Sessions Episode 245',
     blurb: '19 tracks • Low Steppa, Jewel Kid, Sam Frandisco, Yomanda, Sophia Guerrero, Harry Fitsch, Inner City, Mark Knight, Cristoph, Supernova, Piem, Illyus Barrientos, Mochakk, Wh0 & more',
