@@ -126,6 +126,7 @@ const ProductPreviewContent = ({
                 }`}
                 style={{ backgroundColor: COLOR_MAP[color] || color }}
                 title={color}
+                aria-label={`Select color ${color}`}
               />
             ))}
           </div>
