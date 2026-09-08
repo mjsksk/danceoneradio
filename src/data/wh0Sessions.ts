@@ -13,6 +13,14 @@ export interface Wh0Session {
 
 export const WH0_SESSIONS: Wh0Session[] = [
   {
+    number: 247,
+    title: 'Wh0 Plays Sessions Episode 247 with Test Guest',
+    guest: 'Test Guest',
+    link: '/show/wh0-plays-sessions/247',
+    broadcastDate: '2026-09-18T18:00:00',
+    genres: 'House • Tech House • Dance',
+  },
+  {
     number: 246,
     title: 'Wh0 Plays Sessions Episode 246 with Johan S',
     guest: 'Johan S',
