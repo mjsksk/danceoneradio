@@ -6,6 +6,7 @@ import LiveRadioPlayer from '@/components/LiveRadioPlayer';
 import { useDesktopIntegration } from '@/hooks/useDesktopIntegration';
 import { useTrackHistoryUpdater } from '@/hooks/useTrackHistoryUpdater';
 import { RadioStreamService } from '@/utils/RadioStreamService';
+import SEO from '@/components/SEO';
 import { PRIMARY_STREAM_URLS } from '@/config/streamUrls';
 import stationLogo from '@/assets/dance-one-logo.png';
 import {

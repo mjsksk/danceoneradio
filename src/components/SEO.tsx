@@ -179,7 +179,33 @@ const SEO = ({
     addStructuredData();
 
     return () => {
-      document.title = "Dance One Radio | Live Electronic & Dance Music";
+      // Reset all mutable head tags so stale metadata from this page never
+      // persists onto routes that don't define their own SEO.
+      const DEFAULT_TITLE = "Dance One Radio | Live Electronic & Dance Music";
+      const DEFAULT_DESCRIPTION = "Dance One Radio is a free dance music radio station streaming electronic music 24/7 — house, trance, techno and EDM, plus DJ mixes, podcasts and live shows.";
+      const DEFAULT_IMAGE = "https://danceoneradio.com/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png";
+
+      document.title = DEFAULT_TITLE;
+
+      const setContent = (selector: string, content: string) => {
+        const tag = document.querySelector(selector);
+        if (tag) tag.setAttribute('content', content);
+      };
+
+      setContent('meta[name="description"]', DEFAULT_DESCRIPTION);
+      setContent('meta[name="keywords"]', "dance music radio station, electronic music stream, free online radio, EDM radio, trance radio, house music radio, live DJ mixes, dance music podcast");
+      setContent('meta[property="og:title"]', DEFAULT_TITLE);
+      setContent('meta[property="og:description"]', DEFAULT_DESCRIPTION);
+      setContent('meta[property="og:image"]', DEFAULT_IMAGE);
+      setContent('meta[property="og:image:secure_url"]', DEFAULT_IMAGE);
+      setContent('meta[name="twitter:title"]', DEFAULT_TITLE);
+      setContent('meta[name="twitter:description"]', DEFAULT_DESCRIPTION);
+      setContent('meta[name="twitter:image"]', DEFAULT_IMAGE);
+      setContent('meta[name="robots"]', 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
+
+      // Remove the dynamic JSON-LD script so structured data never leaks
+      // onto pages that don't define their own.
+      document.querySelector('script[type="application/ld+json"][data-dynamic]')?.remove();
     };
   }, [title, description, image, imageAlt, url, type, keywords, structuredData, noindex]);
 
