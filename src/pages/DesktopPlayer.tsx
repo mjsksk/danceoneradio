@@ -46,6 +46,14 @@ const DesktopPlayer = () => {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.16),_transparent_35%),linear-gradient(180deg,_#05070d_0%,_#09111d_42%,_#05070d_100%)] text-foreground">
+      <SEO
+        title="Dance One Radio Desktop Player — Live Electronic Music"
+        description="The Dance One Radio desktop player: stream live electronic dance music 24/7 and browse recently played tracks from your desktop."
+        image="https://danceoneradio.com/lovable-uploads/c8f83eb5-b5ed-4bfd-88eb-604ca3cd2fe8.png"
+        imageAlt="Dance One Radio desktop player"
+        url="https://danceoneradio.com/desktop"
+        noindex
+      />
       <div className="shrink-0 border-b border-primary/20 bg-background/70 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4">
           <div className="flex items-center gap-4">
