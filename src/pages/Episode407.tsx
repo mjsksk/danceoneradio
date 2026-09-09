@@ -192,7 +192,7 @@ const Episode407 = () => {
                           )}
                         </Button>
                         <div className="flex-1">
-                          <h3 className="font-semibold text-primary">Future Dance Anthems with Mario</h3>
+                          <h2 className="font-semibold text-primary">Future Dance Anthems with Mario</h2>
                           <p className="text-sm text-muted-foreground">Episode {episodeNumber} - Anthems of the week</p>
                         </div>
                       </div>

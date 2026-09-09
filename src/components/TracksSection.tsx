@@ -436,7 +436,7 @@ const TracksSection = () => {
                         <div className="track-logo">
                           <img 
                             src={stationLogo} 
-                            alt="Dance One Radio Logo" 
+                            alt="Dance One Radio station logo shown when track artwork is unavailable" 
                             loading="lazy"
                             width="64"
                             height="64"
