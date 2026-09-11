@@ -168,6 +168,7 @@ export function AnimatedRoutes() {
 <Route path="/episode/423" element={<PageTransition><Episode423 /></PageTransition>} />
         <Route path="/episode/424" element={<PageTransition><Episode424 /></PageTransition>} />
         <Route path="/episode/425" element={<PageTransition><Episode425 /></PageTransition>} />
+        <Route path="/episode/426" element={<PageTransition><Episode426 /></PageTransition>} />
         <Route path="/news" element={<PageTransition><News /></PageTransition>} />
         <Route path="/news/top-stories" element={<PageTransition><NewsTopStories /></PageTransition>} />
         <Route path="/news/artists-releases" element={<PageTransition><NewsArtistsReleases /></PageTransition>} />
