@@ -40,6 +40,20 @@ type FeedItem =
   | { kind: 'fda'; key: string; date: number; episode: Episode; episodeNumber: number }
   | { kind: 'wh0'; key: string; date: number; session: (typeof WH0_SESSIONS)[number] };
 
+// Upcoming FDA pages appear here until their RSS item is published. The
+// episode-number check below prevents a duplicate as soon as RSS catches up.
+const UPCOMING_FDA_EPISODES: Episode[] = [
+  {
+    title: 'Anthems of the week 426',
+    description: 'Future Dance Anthems with Mario, broadcasting Friday at 5 PM Pacific. View the full episode tracklist now; audio will be available after broadcast.',
+    pubDate: '2026-09-11T17:00:00-07:00',
+    enclosure: { url: '', type: 'audio/mpeg' },
+    duration: 'Coming soon',
+    guid: 'upcoming-fda-426',
+    episodeNumber: 426,
+  },
+];
+
 const Shows = () => {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [totalEpisodes, setTotalEpisodes] = useState<number>(0);
@@ -290,7 +304,13 @@ const Shows = () => {
 
   // ---- Unified, sorted feed -------------------------------------------------
   const feedItems: FeedItem[] = useMemo(() => {
-    const fdaItems: FeedItem[] = episodes.map((episode, index) => ({
+    const rssEpisodeNumbers = new Set(episodes.map((episode) => episode.episodeNumber));
+    const upcomingEpisodes = UPCOMING_FDA_EPISODES.filter(
+      (episode) => !rssEpisodeNumbers.has(episode.episodeNumber)
+    );
+    const displayedEpisodes = [...episodes, ...upcomingEpisodes];
+
+    const fdaItems: FeedItem[] = displayedEpisodes.map((episode, index) => ({
       kind: 'fda',
       key: episode.guid || `fda-${index}`,
       date: new Date(episode.pubDate).getTime() || 0,
