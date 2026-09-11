@@ -57,6 +57,7 @@ const Episode422 = lazy(() => import('@/pages/Episode422'));
 const Episode423 = lazy(() => import('@/pages/Episode423'));
 const Episode424 = lazy(() => import('@/pages/Episode424'));
 const Episode425 = lazy(() => import('@/pages/Episode425'));
+const Episode426 = lazy(() => import('@/pages/Episode426'));
 const News = lazy(() => import('@/pages/News'));
 const NewsTopStories = lazy(() => import('@/pages/NewsTopStories'));
 const NewsArtistsReleases = lazy(() => import('@/pages/NewsArtistsReleases'));
