@@ -95,7 +95,7 @@ const Episode426 = () => {
       <SEO
         title="Anthems of the Week 426 | Dance One Radio"
         description="Episode 426 tracklist featuring MK, Hot Since 82, Adriatique, Route 94, Jayda G, CASSIMM, Marshall Jefferson, Kanine and more."
-        image="https://danceoneradio.com/lovable-uploads/future-dance-anthems.jpg"
+        image="https://danceoneradio.com/lovable-uploads/episode-426-header.jpg"
         url={typeof window !== 'undefined' ? window.location.href : ''}
       />
       <div
@@ -129,14 +129,14 @@ const Episode426 = () => {
               <div className="max-w-4xl mx-auto">
                 <div className="flex justify-center mb-8">
                   <img
-                    src="/lovable-uploads/future-dance-anthems.jpg"
+                    src="/lovable-uploads/episode-426-header-square.jpg"
                     alt="Future Dance Anthems with Mario - Episode 426"
                     className="w-64 h-64 sm:w-80 sm:h-80 rounded-2xl object-cover shadow-[0_0_30px_hsl(var(--primary)/0.2)]"
                     loading="eager"
-                    width="320"
-                    height="320"
+                    width="628"
+                    height="628"
                     decoding="async"
-                    srcSet="/lovable-uploads/future-dance-anthems-480w.jpg 480w, /lovable-uploads/future-dance-anthems-960w.jpg 960w, /lovable-uploads/future-dance-anthems.jpg 1200w"
+                    srcSet="/lovable-uploads/episode-426-header-square-480w.jpg 480w, /lovable-uploads/episode-426-header-square-960w.jpg 960w, /lovable-uploads/episode-426-header-square.jpg 628w"
                     sizes="(max-width: 640px) 100vw, 320px"
                   />
                 </div>
@@ -263,12 +263,12 @@ const Episode426 = () => {
                     </div>
 
                     <div className="mt-4">
-                      <SocialShare
-                        url={typeof window !== 'undefined' ? window.location.href : ''}
-                        title="Anthems of the week 426 - Future Dance Anthems with Mario"
-                        description="Anthems that shape today's dance scene..."
-                        image={typeof window !== 'undefined' ? `${window.location.origin}/lovable-uploads/future-dance-anthems.jpg` : ''}
-                      />
+                    <SocialShare
+                      url={typeof window !== 'undefined' ? window.location.href : ''}
+                      title="Anthems of the week 426 - Future Dance Anthems with Mario"
+                      description="Anthems that shape today's dance scene..."
+                      image={typeof window !== 'undefined' ? `${window.location.origin}/lovable-uploads/episode-426-header.jpg` : ''}
+                    />
                     </div>
                   </div>
                 </Card>
