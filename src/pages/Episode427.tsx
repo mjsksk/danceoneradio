@@ -126,18 +126,18 @@ const Episode427 = () => {
                 </Link>
               </div>
 
-              <div className="max-w-4xl mx-auto">
+              <div className="max-w-md mx-auto">
                 <div className="flex justify-center mb-8">
                   <img
                     src="/lovable-uploads/future-dance-anthems.jpg"
                     alt="Future Dance Anthems with Mario - Episode 427"
-                    className="w-full max-w-4xl rounded-2xl object-cover shadow-[0_0_30px_hsl(var(--primary)/0.2)]"
+                    className="w-full max-w-md rounded-2xl object-cover shadow-[0_0_30px_hsl(var(--primary)/0.2)]"
                     loading="eager"
                     width="1200"
                     height="1200"
                     decoding="async"
                     srcSet="/lovable-uploads/future-dance-anthems-480w.jpg 480w, /lovable-uploads/future-dance-anthems-960w.jpg 960w, /lovable-uploads/future-dance-anthems.jpg 1200w"
-                    sizes="(max-width: 640px) 100vw, 896px"
+                    sizes="(max-width: 640px) 100vw, 448px"
                   />
                 </div>
                 <h1 className="text-3xl md:text-5xl font-['Orbitron'] font-bold mb-6 text-center">
