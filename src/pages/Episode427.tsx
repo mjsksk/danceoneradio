@@ -126,7 +126,7 @@ const Episode427 = () => {
                 </Link>
               </div>
 
-              <div className="max-w-md mx-auto">
+              <div className="max-w-4xl mx-auto">
                 <div className="flex justify-center mb-8">
                   <img
                     src="/lovable-uploads/future-dance-anthems.jpg"
