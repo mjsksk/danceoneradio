@@ -19,7 +19,7 @@ const Episode427 = () => {
   const { user } = useAuth();
   const episodeNumber = 427;
   const episodeTitle = "Anthems of the week 427";
-  const audioUrl = "https://media.blubrry.com/biggest_tunes_with_mario_135/mc.blubrry.com/biggest_tunes_with_mario_135/stream_2026-09-18_165953.mp3?awCollectionId=673838&amp;awEpisodeId=12242196&amp;aw_0_azn.pgenre=Music&amp;aw_0_1st.ri=blubrry&amp;aw_0_azn.pcountry=US&amp;aw_0_azn.planguage=en-us&amp;cat_exclude=IAB1-8%2CIAB1-9%2CIAB7-41%2CIAB8-5%2CIAB8-18%2CIAB11-4%2CIAB23%2CIAB24%2CIAB25%2CIAB26&amp;aw_0_cnt.rss=https%3A%2F%2Ffeeds.blubrry.com%2Ffeeds%2Fbiggest_tunes_with_mario_135.xml";
+  const audioUrl = "https://media.blubrry.com/biggest_tunes_with_mario_135/mc.blubrry.com/biggest_tunes_with_mario_135/stream_2026-09-18_165953.mp3?awCollectionId=673838&awEpisodeId=12242196&aw_0_azn.pgenre=Music&aw_0_1st.ri=blubrry&aw_0_azn.pcountry=US&aw_0_azn.planguage=en-us&cat_exclude=IAB1-8%2CIAB1-9%2CIAB7-41%2CIAB8-5%2CIAB8-18%2CIAB11-4%2CIAB23%2CIAB24%2CIAB25%2CIAB26&aw_0_cnt.rss=https%3A%2F%2Ffeeds.blubrry.com%2Ffeeds%2Fbiggest_tunes_with_mario_135.xml";
 
   const { progress, saveProgress } = useListeningProgress(episodeNumber, episodeTitle, audioUrl);
 
@@ -95,7 +95,7 @@ const Episode427 = () => {
       <SEO
         title="Anthems of the Week 427 | Dance One Radio"
         description="Episode 427 tracklist featuring Low Steppa, Roel, Cedric Gervais, Carla Monroe, ERAN, GrooveGeneration, Terri B!, Y U QT and more."
-        image="https://danceoneradio.com/lovable-uploads/episode-427-header.jpg"
+        image="https://danceoneradio.com/lovable-uploads/future-dance-anthems.jpg"
         url={typeof window !== 'undefined' ? window.location.href : ''}
       />
       <div
