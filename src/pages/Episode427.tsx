@@ -129,14 +129,14 @@ const Episode427 = () => {
               <div className="max-w-4xl mx-auto">
                 <div className="flex justify-center mb-8">
                   <img
-                    src="/lovable-uploads/episode-427-header.jpg"
+                    src="/lovable-uploads/future-dance-anthems.jpg"
                     alt="Future Dance Anthems with Mario - Episode 427"
                     className="w-full max-w-4xl rounded-2xl object-cover shadow-[0_0_30px_hsl(var(--primary)/0.2)]"
                     loading="eager"
                     width="1200"
-                    height="628"
+                    height="1200"
                     decoding="async"
-                    srcSet="/lovable-uploads/episode-427-header-480w.jpg 480w, /lovable-uploads/episode-427-header-960w.jpg 960w, /lovable-uploads/episode-427-header.jpg 1200w"
+                    srcSet="/lovable-uploads/future-dance-anthems-480w.jpg 480w, /lovable-uploads/future-dance-anthems-960w.jpg 960w, /lovable-uploads/future-dance-anthems.jpg 1200w"
                     sizes="(max-width: 640px) 100vw, 896px"
                   />
                 </div>
@@ -149,7 +149,7 @@ const Episode427 = () => {
                   <div className="flex flex-wrap items-center justify-center gap-6 text-muted-foreground">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-5 h-5 text-neon" />
-                      <span>September 25, 2026</span>
+                      <span>September 18, 2026</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Clock className="w-5 h-5 text-neon-purple" />
@@ -267,7 +267,7 @@ const Episode427 = () => {
                       url={typeof window !== 'undefined' ? window.location.href : ''}
                       title="Anthems of the week 427 - Future Dance Anthems with Mario"
                       description="Anthems that shape today's dance scene..."
-                      image={typeof window !== 'undefined' ? `${window.location.origin}/lovable-uploads/episode-427-header.jpg` : ''}
+                      image={typeof window !== 'undefined' ? `${window.location.origin}/lovable-uploads/future-dance-anthems.jpg` : ''}
                     />
                     </div>
                   </div>
