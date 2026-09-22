@@ -9,43 +9,59 @@ declare const __BUILD_VERSION__: string | undefined;
 
 console.log('🚀 Application starting...');
 
-// CRITICAL: Initialize Google Consent Mode FIRST before any scripts
-console.log('🍪 Step 1: Initializing Consent Mode');
-initializeConsentMode();
+const rootEl = document.getElementById("root");
 
-// Then initialize scripts (they will respect consent mode)
-console.log('📢 Step 2: Loading Google scripts');
-initializeConsentScripts();
-
-// Update consent mode if user has previously given consent
-const existingConsent = getConsent();
-console.log('🍪 Step 3: Checking existing consent', existingConsent);
-
-if (existingConsent) {
-  console.log('🍪 Found existing consent, updating consent mode');
-  updateConsentMode({
-    analytics: existingConsent.analytics,
-    advertising: existingConsent.advertising,
-    functional: existingConsent.functional,
-  });
-} else {
-  console.log('🍪 No existing consent found, user will see consent banner');
+if (!rootEl) {
+  throw new Error('App root element was not found');
 }
 
-console.log('🚀 Step 4: Rendering React app');
-const rootEl = document.getElementById("root")!;
 // Prerendered HTML ships with an inline opacity:0 so the raw crawler markup
-// never flashes before hydration. Drop it now that React controls the DOM.
+// never flashes before hydration. Remove it and reveal the app before loading
+// optional third-party scripts so a blocked ad/consent script can never leave
+// the page visually blank.
 rootEl.removeAttribute('style');
+rootEl.classList.add("app-loaded");
+
+// Register the app first; ad and analytics setup should not block the page.
 createRoot(rootEl).render(<App />);
 
-// Reveal the prerendered UI now that React has taken over
-rootEl.classList.add("app-loaded");
+try {
+  // CRITICAL: Initialize Google Consent Mode before any Google scripts
+  console.log('🍪 Step 1: Initializing Consent Mode');
+  initializeConsentMode();
+
+  // Update consent mode if user has previously given consent
+  const existingConsent = getConsent();
+  console.log('🍪 Step 2: Checking existing consent', existingConsent);
+
+  if (existingConsent) {
+    console.log('🍪 Found existing consent, updating consent mode');
+    updateConsentMode({
+      analytics: existingConsent.analytics,
+      advertising: existingConsent.advertising,
+      functional: existingConsent.functional,
+    });
+  } else {
+    console.log('🍪 No existing consent found, user will see consent banner');
+  }
+
+  // Then initialize scripts (they will respect consent mode)
+  console.log('📢 Step 3: Loading Google scripts');
+  initializeConsentScripts();
+} catch (error) {
+  console.error('Optional consent/ad initialization failed:', error);
+}
 
 
 
 // Register service worker for push notifications and caching
-if ('serviceWorker' in navigator) {
+if (import.meta.env.DEV && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.getRegistrations()
+      .then((registrations) => registrations.forEach((registration) => registration.unregister()))
+      .catch((error) => console.warn('Service Worker cleanup failed:', error));
+  });
+} else if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     let refreshing = false;
     const hadController = Boolean(navigator.serviceWorker.controller);
