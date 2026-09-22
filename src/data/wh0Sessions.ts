@@ -13,6 +13,14 @@ export interface Wh0Session {
 
 export const WH0_SESSIONS: Wh0Session[] = [
   {
+    number: 248,
+    title: 'Wh0 Plays Sessions Episode 248',
+    blurb: '15 tracks • Costa UK, Earth n Days, Leon, Shaf Huse, Franky D.P., Matthew Sax, Bad Intentions, Claptone, Sammy Dean, Jewel Kid, Low Steppa, Yomanda & more',
+    link: '/show/wh0-plays-sessions/248',
+    broadcastDate: '2026-09-25T18:00:00',
+    genres: 'House • Tech House • Dance',
+  },
+  {
     number: 247,
     title: 'Wh0 Plays Sessions Episode 247 with Bad Intentions',
     guest: 'Bad Intentions',
