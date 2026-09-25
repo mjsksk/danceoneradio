@@ -42,7 +42,16 @@ type FeedItem =
 
 // Upcoming FDA pages appear here until their RSS item is published. The
 // episode-number check below prevents a duplicate as soon as RSS catches up.
-const UPCOMING_FDA_EPISODES: Episode[] = [];
+const UPCOMING_FDA_EPISODES: Episode[] = [
+  {
+    title: 'Anthems of the week 428',
+    description: "Anthems that shape today's dance scene...",
+    pubDate: 'Fri, 25 Sep 2026 17:00:00 -0700',
+    enclosure: { url: '', type: 'audio/mpeg' },
+    guid: 'upcoming-fda-428',
+    episodeNumber: 428,
+  },
+];
 
 const Shows = () => {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
