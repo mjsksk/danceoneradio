@@ -366,7 +366,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       isVisible: true,
       episodeInfo: info,
       streamTitle: info.title,
-      albumArt: '/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png',
+      albumArt: '/lovable-uploads/fda-background.jpg',
     }));
 
     audioRef.current.src = info.audioUrl;
