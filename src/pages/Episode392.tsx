@@ -75,7 +75,7 @@ const Episode392 = () => {
   useEffect(() => {
     const img = new Image();
     img.onload = () => setBgLoaded(true);
-    img.src = '/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png';
+    img.src = '/lovable-uploads/fda-background.jpg';
   }, []);
 
   const tracks: Track[] = [
@@ -120,7 +120,7 @@ const Episode392 = () => {
           bgLoaded ? 'opacity-20' : 'opacity-0'
         }`}
         style={{
-          backgroundImage: 'url(/lovable-uploads/39bbc48a-9525-463e-bca3-5c21e59f1db7.png)',
+          backgroundImage: 'url(/lovable-uploads/fda-background.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'top center',
           backgroundRepeat: 'no-repeat',
