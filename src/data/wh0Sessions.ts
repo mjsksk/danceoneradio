@@ -13,6 +13,14 @@ export interface Wh0Session {
 
 export const WH0_SESSIONS: Wh0Session[] = [
   {
+    number: 250,
+    title: 'Wh0 Plays Sessions Episode 250 with Molly Mouse',
+    guest: 'Molly Mouse',
+    link: '/show/wh0-plays-sessions/250',
+    broadcastDate: '2026-10-09T18:00:00',
+    genres: 'House • Tech House • Dance',
+  },
+  {
     number: 249,
     title: 'Wh0 Plays Sessions Episode 249',
     blurb: '13 tracks • Mighty Mouse, Mochakk, Matt Caseli, Matthew Sax, Bad Intentions, Nicole Powell, Jus\' Darko, Low Steppa, Jewel Kid, Rue Jay, Cloonee, Weiss & more',
