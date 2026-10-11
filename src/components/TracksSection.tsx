@@ -7,6 +7,8 @@ import { supabase } from '@/integrations/supabase/client';
 import stationLogo from '@/assets/dance-one-logo.png';
 
 interface Track {
+  albumArtUrl?: string | null;
+  previewUrl?: string | null;
   id: string;
   stableKey: string;
   title: string;
