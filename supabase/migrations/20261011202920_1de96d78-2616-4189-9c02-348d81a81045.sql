@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Public can read software downloads" ON storage.objects;
