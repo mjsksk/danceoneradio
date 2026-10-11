@@ -91,7 +91,16 @@ const TracksSection = () => {
   // Fetch album art AND preview URLs when tracks change - batched and parallelized
   useEffect(() => {
     const fetchAlbumArtBatched = async () => {
-      const tracksNeedingArt = tracks.filter(track => albumArt[track.id] === undefined);
+      // Use artwork saved server-side with each track; only look up older rows without it
+      const stored: Record<string, string | null> = {};
+      const storedPreviews: Record<string, string | null> = {};
+      tracks.forEach(t => {
+        if (albumArt[t.id] === undefined && t.albumArtUrl) stored[t.id] = t.albumArtUrl;
+        if (t.previewUrl) storedPreviews[t.id] = t.previewUrl;
+      });
+      if (Object.keys(stored).length) setAlbumArt(prev => ({ ...prev, ...stored }));
+      if (Object.keys(storedPreviews).length) setPreviewUrls(prev => ({ ...prev, ...storedPreviews }));
+      const tracksNeedingArt = tracks.filter(track => albumArt[track.id] === undefined && !track.albumArtUrl);
       if (tracksNeedingArt.length === 0) return;
 
       console.log(`🎵 Fetching album art + previews for ${tracksNeedingArt.length} tracks`);
@@ -170,7 +179,7 @@ const TracksSection = () => {
       .subscribe();
     
     // Also refresh tracks every 2 minutes as backup
-    const interval = setInterval(fetchRecentTracks, 2 * 60 * 1000);
+    const interval = setInterval(fetchRecentTracks, 10 * 60 * 1000);
     
     return () => {
       console.log('🎵 Cleaning up real-time subscription');

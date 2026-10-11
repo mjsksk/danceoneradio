@@ -18,6 +18,8 @@ interface Track {
   waveform: number[];
   likes: number;
   downloads: number;
+  albumArtUrl?: string | null;
+  previewUrl?: string | null;
 }
 
 type NowPlayingRow = {
@@ -292,22 +294,7 @@ export class RadioStreamService {
       // Import supabase client first
       const { supabase } = await import('@/integrations/supabase/client');
       
-      // Trigger the track history updater edge function (which handles HTTPS/CORS on server-side)
-      try {
-        const updateResponse = await fetch('https://upbwlnpycrbhxahjztrf.supabase.co/functions/v1/track-history-updater', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        });
-        
-        if (updateResponse.ok) {
-          const updateResult = await updateResponse.json();
-          console.log('✅ Track history updater result:', updateResult);
-        }
-      } catch (updateError) {
-        console.log('⚠️ Track history updater failed:', updateError);
-      }
+      // Track history is updated server-side by a scheduled job (no client trigger).
 
       // Fetch track history from database
       const { data: tracks, error } = await supabase
@@ -342,6 +329,8 @@ export class RadioStreamService {
       const historyTracks: Track[] = uniqueTracks.slice(0, 10).map((track) => ({
         id: track.id,
         stableKey: `${track.artist}::${track.title}::${track.played_at}`,
+        albumArtUrl: (track as any).album_art_url ?? null,
+        previewUrl: (track as any).preview_url ?? null,
         title: track.title,
         artist: track.artist,
         duration: track.duration || this.generateRandomDuration(),
