@@ -164,12 +164,10 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
         const formattedTitle = RadioStreamService.formatTitle(metadata);
         setState(prev => ({ ...prev, streamTitle: formattedTitle }));
         
-        // Fetch album art
-        if (formattedTitle && !formattedTitle.includes('Dance One Radio - The Future')) {
-          const result = await AlbumArtService.getAlbumArt(formattedTitle);
-          if (result.imageUrl) {
-            setState(prev => ({ ...prev, albumArt: result.imageUrl }));
-          }
+        // Album art comes with the shared now-playing row (looked up once server-side)
+        const art = (metadata as any)?.albumArt;
+        if (art) {
+          setState(prev => ({ ...prev, albumArt: art }));
         }
       } catch (error) {
         console.error('Error fetching stream metadata:', error);

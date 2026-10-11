@@ -18,10 +18,63 @@ interface Track {
   waveform: number[];
   likes: number;
   downloads: number;
+  albumArtUrl?: string | null;
+  previewUrl?: string | null;
 }
+
+type NowPlayingRow = {
+  raw_title: string | null;
+  album_art_url: string | null;
+  status: string | null;
+};
 
 export class RadioStreamService {
   private static streamUrl = 'https://s9.myradiostream.com:14296/';
+  private static nowPlaying: NowPlayingRow | null = null;
+  private static nowPlayingPromise: Promise<NowPlayingRow | null> | null = null;
+  private static nowPlayingFetchedAt = 0;
+
+  /** Shared now-playing row: fetched once, then kept live via a single Realtime channel. */
+  static async getNowPlayingRow(): Promise<NowPlayingRow | null> {
+    // Safety refresh every 5 min in case Realtime drops silently
+    if (this.nowPlaying && Date.now() - this.nowPlayingFetchedAt < 5 * 60 * 1000) {
+      return this.nowPlaying;
+    }
+    if (this.nowPlayingPromise) return this.nowPlayingPromise;
+
+    this.nowPlayingPromise = (async () => {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data } = await (supabase as any)
+          .from('now_playing')
+          .select('raw_title, album_art_url, status')
+          .eq('id', 1)
+          .maybeSingle();
+        if (data) {
+          this.nowPlaying = data;
+          this.nowPlayingFetchedAt = Date.now();
+        }
+        if (!(this as any)._npChannel) {
+          (this as any)._npChannel = supabase
+            .channel('now-playing')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'now_playing' }, (payload: any) => {
+              if (payload.new) {
+                this.nowPlaying = payload.new as NowPlayingRow;
+                this.nowPlayingFetchedAt = Date.now();
+                import('@/utils/CacheService').then(({ cacheService }) => cacheService.clear?.());
+              }
+            })
+            .subscribe();
+        }
+        return this.nowPlaying;
+      } catch {
+        return this.nowPlaying;
+      } finally {
+        this.nowPlayingPromise = null;
+      }
+    })();
+    return this.nowPlayingPromise;
+  }
   
   static async getStreamMetadata(): Promise<StreamMetadata | null> {
     const startTime = Date.now();
@@ -36,9 +89,20 @@ export class RadioStreamService {
     }
     
     try {
-      // Try our Supabase Edge Function first (bypasses CORS)
-      console.log('🔍 Trying Supabase Edge Function...');
-      
+      // Read the shared now_playing row (updated server-side by a scheduled job).
+      // One Realtime subscription per tab keeps it fresh — no edge function calls.
+      const np = await this.getNowPlayingRow();
+      if (np?.raw_title) {
+        const data: StreamMetadata & { albumArt?: string | null } = {
+          title: `🎵 ${np.raw_title} 🎵`,
+          status: np.status || 'live',
+          albumArt: np.album_art_url,
+        };
+        cacheService.setStreamMetadata(data, 10000);
+        return data;
+      }
+
+      // Fallback: edge function (only if the shared row is empty/unavailable)
       const { supabase } = await import('@/integrations/supabase/client');
       const { data, error } = await supabase.functions.invoke('stream-metadata', {
         body: {}
@@ -230,22 +294,7 @@ export class RadioStreamService {
       // Import supabase client first
       const { supabase } = await import('@/integrations/supabase/client');
       
-      // Trigger the track history updater edge function (which handles HTTPS/CORS on server-side)
-      try {
-        const updateResponse = await fetch('https://upbwlnpycrbhxahjztrf.supabase.co/functions/v1/track-history-updater', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        });
-        
-        if (updateResponse.ok) {
-          const updateResult = await updateResponse.json();
-          console.log('✅ Track history updater result:', updateResult);
-        }
-      } catch (updateError) {
-        console.log('⚠️ Track history updater failed:', updateError);
-      }
+      // Track history is updated server-side by a scheduled job (no client trigger).
 
       // Fetch track history from database
       const { data: tracks, error } = await supabase
@@ -280,6 +329,8 @@ export class RadioStreamService {
       const historyTracks: Track[] = uniqueTracks.slice(0, 10).map((track) => ({
         id: track.id,
         stableKey: `${track.artist}::${track.title}::${track.played_at}`,
+        albumArtUrl: (track as any).album_art_url ?? null,
+        previewUrl: (track as any).preview_url ?? null,
         title: track.title,
         artist: track.artist,
         duration: track.duration || this.generateRandomDuration(),

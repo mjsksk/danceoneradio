@@ -106,6 +106,35 @@ Deno.serve(async (req) => {
     const tracks = parseHistoryData(historyData);
     console.log('🎯 Parsed tracks:', tracks.length);
 
+    // Update the shared "now playing" row (clients read it / subscribe via Realtime)
+    let art: { imageUrl: string | null; previewUrl: string | null } = { imageUrl: null, previewUrl: null };
+    try {
+      const raw = historyData.trim();
+      const { data: current } = await supabase
+        .from('now_playing')
+        .select('raw_title, album_art_url, preview_url')
+        .eq('id', 1)
+        .maybeSingle();
+      if (current && current.raw_title === raw) {
+        art = { imageUrl: current.album_art_url, previewUrl: current.preview_url };
+      } else if (tracks[0]) {
+        art = await searchItunes(`${tracks[0].artist} ${tracks[0].title}`);
+        await supabase.from('now_playing').upsert({
+          id: 1,
+          raw_title: raw,
+          artist: tracks[0].artist,
+          title: tracks[0].title,
+          album_art_url: art.imageUrl,
+          preview_url: art.previewUrl,
+          status: 'live',
+          updated_at: new Date().toISOString(),
+        });
+        console.log('📻 now_playing updated:', raw);
+      }
+    } catch (npError) {
+      console.log('⚠️ now_playing update failed:', npError);
+    }
+
     if (tracks.length === 0) {
       console.log('ℹ️ No tracks parsed from data');
       return new Response(JSON.stringify({ 
@@ -165,7 +194,7 @@ Deno.serve(async (req) => {
         if (shouldAdd) {
           const { error: insertError } = await supabase
             .from('radio_track_history')
-            .insert([track]);
+            .insert([{ ...track, album_art_url: art.imageUrl, preview_url: art.previewUrl }]);
 
           if (!insertError) {
             newTracksAdded++;
@@ -204,6 +233,25 @@ Deno.serve(async (req) => {
     });
   }
 });
+
+async function searchItunes(query: string): Promise<{ imageUrl: string | null; previewUrl: string | null }> {
+  try {
+    const cleaned = query.replace(/\(.*?\)|\[.*?\]/g, '').replace(/feat\..*$|ft\..*$/gi, '').trim();
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), 5000);
+    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(cleaned)}&media=music&limit=1`, { signal: controller.signal });
+    clearTimeout(t);
+    if (!res.ok) return { imageUrl: null, previewUrl: null };
+    const data = await res.json();
+    const r = data.results?.[0];
+    return {
+      imageUrl: r?.artworkUrl100?.replace('100x100', '600x600') ?? null,
+      previewUrl: r?.previewUrl ?? null,
+    };
+  } catch {
+    return { imageUrl: null, previewUrl: null };
+  }
+}
 
 function parseHistoryData(data: string): Track[] {
   const tracks: Track[] = [];

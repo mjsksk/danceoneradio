@@ -329,6 +329,39 @@ export type Database = {
         }
         Relationships: []
       }
+      now_playing: {
+        Row: {
+          album_art_url: string | null
+          artist: string | null
+          id: number
+          preview_url: string | null
+          raw_title: string | null
+          status: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          album_art_url?: string | null
+          artist?: string | null
+          id?: number
+          preview_url?: string | null
+          raw_title?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          album_art_url?: string | null
+          artist?: string | null
+          id?: number
+          preview_url?: string | null
+          raw_title?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -412,32 +445,38 @@ export type Database = {
       }
       radio_track_history: {
         Row: {
+          album_art_url: string | null
           artist: string
           created_at: string
           duration: string | null
           genre: string | null
           id: string
           played_at: string
+          preview_url: string | null
           source_url: string | null
           title: string
         }
         Insert: {
+          album_art_url?: string | null
           artist: string
           created_at?: string
           duration?: string | null
           genre?: string | null
           id?: string
           played_at?: string
+          preview_url?: string | null
           source_url?: string | null
           title: string
         }
         Update: {
+          album_art_url?: string | null
           artist?: string
           created_at?: string
           duration?: string | null
           genre?: string | null
           id?: string
           played_at?: string
+          preview_url?: string | null
           source_url?: string | null
           title?: string
         }
