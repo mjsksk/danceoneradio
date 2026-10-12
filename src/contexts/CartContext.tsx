@@ -200,6 +200,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const handleCheckout = async () => {
     if (cart.length === 0) return;
     setCheckingOut(true);
+    // Open the tab during the click so popup blockers allow it
+    const checkoutTab = window.open('', '_blank');
     try {
       const { supabase } = await import('@/integrations/supabase/client');
       const lineItems = cart.map((item) => ({
@@ -212,9 +214,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (error || !data?.url) {
         throw new Error(error?.message || 'Failed to create checkout session');
       }
-      // Same-tab redirect: popups opened after an await get blocked
-      window.location.assign(data.url);
+      if (checkoutTab && !checkoutTab.closed) {
+        checkoutTab.location.href = data.url;
+      } else {
+        window.location.assign(data.url);
+      }
     } catch (err) {
+      checkoutTab?.close();
       const msg = err instanceof Error ? err.message : 'Checkout failed';
       toast({ title: 'Checkout error', description: msg, variant: 'destructive' });
     } finally {
