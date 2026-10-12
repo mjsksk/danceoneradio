@@ -28,6 +28,21 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseKey)
 
+    // Only the scheduled job (shared cron secret) or the service role may run this
+    const bearer = (req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '').trim();
+    const cronSecret = req.headers.get('x-cron-secret');
+    let authorized = !!bearer && bearer === supabaseKey;
+    if (!authorized && cronSecret) {
+      const { data: ok } = await supabase.rpc('verify_cron_secret', { _secret: cronSecret });
+      authorized = ok === true;
+    }
+    if (!authorized) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Rate limiting - 10 requests per minute per IP
     const clientIp = req.headers.get('x-forwarded-for') || 'unknown';
     const rateLimitResult = await checkRateLimit(

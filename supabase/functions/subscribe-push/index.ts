@@ -91,7 +91,7 @@ Deno.serve(async (req) => {
         auth: subscription.keys.auth,
         user_id: userId,
       },
-      { onConflict: "endpoint" }
+      { onConflict: "endpoint", ignoreDuplicates: true }
     );
 
     if (error) {

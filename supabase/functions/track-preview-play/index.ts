@@ -28,6 +28,16 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Only accept plays sent from the station's own websites/apps
+  const origin = req.headers.get("origin") || req.headers.get("referer") || "";
+  const allowedOrigin = /^(https:\/\/([a-z0-9-]+\.)*(danceoneradio\.(com|live)|dance1live\.com|lovable\.app|lovableproject\.com)|http:\/\/localhost(:\d+)?|tauri:\/\/localhost|https?:\/\/tauri\.localhost)(\/|$)/i;
+  if (!allowedOrigin.test(origin)) {
+    return new Response(JSON.stringify({ error: "Forbidden" }), {
+      status: 403,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   try {
     const body = await req.json().catch(() => ({}));
     const title = clean(body.title);

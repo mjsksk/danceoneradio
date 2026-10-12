@@ -1,3 +1,4 @@
+const escapeHtmlNotify = (v: string) => String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 // Resend via direct fetch (avoids npm: import issues in Deno edge runtime)
@@ -288,13 +289,13 @@ const handler = async (req: Request): Promise<Response> => {
             
             <div style="background-color: #f4f4f4; padding: 20px; border-radius: 8px; margin: 20px 0;">
               <h3 style="margin: 0 0 15px 0; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 10px;">📧 Subscriber Info</h3>
-              <p style="margin: 0 0 8px 0; color: #333; font-size: 16px;"><strong>Email:</strong> ${email}</p>
+              <p style="margin: 0 0 8px 0; color: #333; font-size: 16px;"><strong>Email:</strong> ${escapeHtmlNotify(email)}</p>
               <p style="margin: 0; color: #666; font-size: 14px;"><strong>Subscribed at:</strong> ${new Date().toLocaleString('en-US', { timeZone: 'UTC' })} UTC</p>
             </div>
             
             <div style="background-color: #e8f4fd; padding: 20px; border-radius: 8px; margin: 20px 0;">
               <h3 style="margin: 0 0 15px 0; color: #333; border-bottom: 1px solid #cce5f7; padding-bottom: 10px;">🌍 Region</h3>
-              <p style="margin: 0; color: #333; font-size: 14px;"><strong>Country:</strong> ${geoLocation.country}</p>
+              <p style="margin: 0; color: #333; font-size: 14px;"><strong>Country:</strong> ${escapeHtmlNotify(String(geoLocation.country))}</p>
             </div>
             
             <p style="color: #999; font-size: 12px; margin-top: 30px;">

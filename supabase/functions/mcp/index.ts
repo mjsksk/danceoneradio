@@ -160,7 +160,10 @@ var search_news_default = defineTool5({
     );
     let q = supabase.from("edm_news_articles").select("title, summary, category, source_name, source_url, published_at, slug").order("published_at", { ascending: false }).limit(limit ?? 10);
     if (category) q = q.eq("category", category);
-    if (query) q = q.or(`title.ilike.%${query}%,summary.ilike.%${query}%`);
+    if (query) {
+      const safe = query.replace(/[^\p{L}\p{N}\s'&-]/gu, " ").trim().slice(0, 100);
+      if (safe) q = q.or(`title.ilike.%${safe}%,summary.ilike.%${safe}%`);
+    }
     const { data, error } = await q;
     if (error) {
       return { content: [{ type: "text", text: error.message }], isError: true };

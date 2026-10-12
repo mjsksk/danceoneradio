@@ -188,6 +188,16 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const isTestMode = !!test_email;
+    if (isTestMode) {
+      const allowedTest = [user.email, Deno.env.get("ADMIN_EMAIL")]
+        .filter(Boolean).map((e) => String(e).toLowerCase());
+      if (!allowedTest.includes(String(test_email).trim().toLowerCase())) {
+        return new Response(
+          JSON.stringify({ error: "Test emails can only be sent to your own admin address" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
     
     if (isTestMode) {
       console.log(`🧪 TEST MODE: Sending newsletter only to ${test_email}`);
@@ -284,7 +294,7 @@ const handler = async (req: Request): Promise<Response> => {
         }
         return { email: recipient.email, status: "sent" };
       } catch (error) {
-        console.error(`Failed to send email to ${recipient.email}:`, error);
+        console.error(`Failed to send email to ${String(recipient.email).replace(/^(.).*(@.*)$/, '$1***$2')}:`, error?.message ?? error);
         return { email: recipient.email, status: "failed", error: error.message };
       }
     });
