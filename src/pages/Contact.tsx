@@ -41,25 +41,9 @@ const Contact = () => {
       email: formData.get('email') as string,
       subject: `Demo Submission: ${artistName}`,
       message: `Artist Name: ${artistName}\nTrack Link: ${trackLink}\n\n${formData.get('message') as string}`,
-      created_at: new Date().toISOString()
     };
 
     try {
-      // Store in Supabase database
-      const { error } = await supabase
-        .from('contact_messages')
-        .insert([contactData]);
-
-      if (error) {
-        console.error('Supabase error:', error);
-        toast({
-          title: "Error",
-          description: "Failed to send message. Please try again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
       // If newsletter opt-in, subscribe them
       if (newsletterOptIn) {
         try {

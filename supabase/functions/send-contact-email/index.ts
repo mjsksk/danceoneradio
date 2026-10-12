@@ -129,6 +129,18 @@ const handler = async (req: Request): Promise<Response> => {
       origin: req.headers.get('origin')
     });
 
+    // Store the submission (server-side; browsers can't write this table)
+    const { error: insertError } = await supabase.from('contact_messages').insert({
+      name: requestData.name.trim().slice(0, 100),
+      email: email.slice(0, 254),
+      subject: requestData.subject.trim().slice(0, 300),
+      message: requestData.message.trim().slice(0, 5000),
+    });
+    if (insertError) {
+      console.error('Failed to store contact message:', insertError.message);
+      throw new Error('store failed');
+    }
+
     // Send confirmation email to the user
     const confirmationEmail = await resend.emails.send({
       from: "Dance One Radio <noreply@danceoneradio.com>",
