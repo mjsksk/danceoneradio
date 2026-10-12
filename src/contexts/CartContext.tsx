@@ -212,7 +212,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (error || !data?.url) {
         throw new Error(error?.message || 'Failed to create checkout session');
       }
-      window.open(data.url, '_blank');
+      // Same-tab redirect: popups opened after an await get blocked
+      window.location.assign(data.url);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Checkout failed';
       toast({ title: 'Checkout error', description: msg, variant: 'destructive' });
