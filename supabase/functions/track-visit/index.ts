@@ -16,6 +16,10 @@ async function sha256(message: string): Promise<string> {
 }
 
 Deno.serve(async (req) => {
+  const __origin = req.headers.get("origin") || req.headers.get("referer") || "";
+  if (req.method !== "OPTIONS" && !/^(https:\/\/([a-z0-9-]+\.)*(danceoneradio\.(com|live)|dance1live\.com|lovable\.app|lovableproject\.com)|http:\/\/localhost(:\d+)?|tauri:\/\/localhost|https?:\/\/tauri\.localhost)(\/|$)/i.test(__origin)) {
+    return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+  }
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

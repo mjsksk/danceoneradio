@@ -266,7 +266,12 @@ serve(async (req) => {
     const authHeader = req.headers.get('Authorization') || ''
     const token = authHeader.replace(/^Bearer\s+/i, '').trim()
     const isServiceRole = !!token && token === supabaseKey
-    const isAnonKey = !!token && (token === anonKey || token === publishableKey)
+    let isAnonKey = false // anon key no longer accepted; scheduled job uses the cron secret
+    const cronSecret = req.headers.get('x-cron-secret')
+    if (cronSecret) {
+      const { data: ok } = await supabase.rpc('verify_cron_secret', { _secret: cronSecret })
+      isAnonKey = ok === true
+    }
     console.log(`🔐 Auth check: hasToken=${!!token} isServiceRole=${isServiceRole} isAnonKey=${isAnonKey}`)
 
     if (!isServiceRole && !isAnonKey) {

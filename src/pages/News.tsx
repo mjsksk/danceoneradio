@@ -1,3 +1,4 @@
+import { useUserRole } from '@/hooks/useUserRole';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Newspaper, Music, CalendarDays, Users, TrendingUp, RefreshCw } from 'lucide-react';
@@ -18,6 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 const News = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { toast } = useToast();
+  const { isAdmin } = useUserRole();
   
   const { data: featuredArticle, isLoading: featuredLoading } = useFeaturedArticle();
   const { data: headlines, isLoading: headlinesLoading, refetch: refetchHeadlines } = useNewsArticles({ category: 'headline', limit: 4 });
@@ -93,7 +95,7 @@ const News = () => {
               </p>
             </div>
             
-            <Button
+            {isAdmin && <Button
               variant="outline"
               size="sm"
               onClick={handleRefresh}
@@ -102,7 +104,7 @@ const News = () => {
             >
               <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               Refresh
-            </Button>
+            </Button>}
           </div>
 
           {/* Featured Story */}
