@@ -140,9 +140,6 @@ const handler = async (req: Request): Promise<Response> => {
           <p>We have received your message and will get back to you as soon as possible.</p>
           
           <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3>Your message:</h3>
-            <p><strong>Subject:</strong> ${subject}</p>
-            <p><strong>Message:</strong><br>${message}</p>
           </div>
           
           <p>Best regards,<br>The Dance One Radio Team</p>
