@@ -136,11 +136,9 @@ const handler = async (req: Request): Promise<Response> => {
       subject: "We received your message!",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #333;">Thank you for contacting us, ${name}!</h1>
+          <h1 style="color: #333;">Thank you for contacting us!</h1>
           <p>We have received your message and will get back to you as soon as possible.</p>
           
-          <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-          </div>
           
           <p>Best regards,<br>The Dance One Radio Team</p>
           
