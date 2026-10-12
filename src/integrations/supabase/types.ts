@@ -1048,6 +1048,7 @@ export type Database = {
         Args: { token_input: string }
         Returns: boolean
       }
+      verify_cron_secret: { Args: { _secret: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
