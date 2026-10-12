@@ -32,6 +32,16 @@ serve(async (req) => {
       throw new Error("Either lineItems or priceId is required");
     }
 
+    // Only allow known catalog prices and sane quantities
+    const ALLOWED_PRICES = new Set(["price_1T21CHGFAEKGp8KzxXkemnMb", "price_1T2zlSGFAEKGp8KzUFCpExls"]);
+    if (lineItems.length > 20) throw new Error("Too many items");
+    lineItems = lineItems.map((li) => {
+      const qty = Number(li?.quantity);
+      if (typeof li?.price !== "string" || !ALLOWED_PRICES.has(li.price)) throw new Error("Invalid product");
+      if (!Number.isInteger(qty) || qty < 1 || qty > 20) throw new Error("Invalid quantity");
+      return { price: li.price, quantity: qty };
+    });
+
     // Optionally authenticate user (guest checkout supported)
     let customerEmail: string | undefined;
     let customerId: string | undefined;

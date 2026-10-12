@@ -284,7 +284,7 @@ const handler = async (req: Request): Promise<Response> => {
         }
         return { email: recipient.email, status: "sent" };
       } catch (error) {
-        console.error(`Failed to send email to ${recipient.email}:`, error);
+        console.error(`Failed to send email to ${String(recipient.email).replace(/^(.).*(@.*)$/, '$1***$2')}:`, error?.message ?? error);
         return { email: recipient.email, status: "failed", error: error.message };
       }
     });
