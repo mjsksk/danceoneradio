@@ -13,6 +13,14 @@ export interface Wh0Session {
 
 export const WH0_SESSIONS: Wh0Session[] = [
   {
+    number: 251,
+    title: 'Wh0 Plays Sessions Episode 251',
+    blurb: '18 tracks • Wh0, Todd Terry, Reza, Greg Myers, Leigh Bradley, Butch, Milk, Sugar & more',
+    link: '/show/wh0-plays-sessions/251',
+    broadcastDate: '2026-10-16T18:00:00',
+    genres: 'House • Tech House • Dance',
+  },
+  {
     number: 250,
     title: 'Wh0 Plays Sessions Episode 250 with Molly Mouse',
     guest: 'Molly Mouse',
