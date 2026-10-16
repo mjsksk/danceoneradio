@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import type { CSSProperties } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Play, Pause } from 'lucide-react';
+import { Play, Pause, Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { AlbumArtService } from '@/utils/AlbumArtService';
 import { RadioStreamService } from '@/utils/RadioStreamService';
 import { useDesktopIntegration } from '@/hooks/useDesktopIntegration';
@@ -292,6 +293,12 @@ const LiveRadioPlayer = ({
             </Button>
             {!hidePopupButton && <PopupPlayerButton variant="outline" size="lg" />}
           </div>
+
+          {!hidePopupButton && (
+            <Button asChild variant="outline" className="w-full">
+              <Link to="/stage"><Sparkles className="w-4 h-4 mr-2" />Launch Live Stage</Link>
+            </Button>
+          )}
 
           <DesktopPlayerControls
             isPlaying={isPlaying}

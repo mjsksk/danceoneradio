@@ -1309,4 +1309,5 @@
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
+  <url><loc>https://danceoneradio.com/stage</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
 </urlset>

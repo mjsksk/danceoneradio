@@ -20,6 +20,7 @@ const Love = lazy(() => import('@/pages/Love'));
 const Dmca = lazy(() => import('@/pages/Dmca'));
 const Contact = lazy(() => import('@/pages/Contact'));
 const PlayerPage = lazy(() => import('@/pages/PlayerPage'));
+const Stage = lazy(() => import('@/pages/Stage'));
 const Episode389 = lazy(() => import('@/pages/Episode389'));
 const Episode390 = lazy(() => import('@/pages/Episode390'));
 const Episode391 = lazy(() => import('@/pages/Episode391'));
@@ -140,6 +141,7 @@ export function AnimatedRoutes() {
         <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
         <Route path="/advertise" element={<PageTransition><Advertise /></PageTransition>} />
         <Route path="/player" element={<PageTransition><PlayerPage /></PageTransition>} />
+        <Route path="/stage" element={<Stage />} />
         <Route path="/episode/389" element={<PageTransition><Episode389 /></PageTransition>} />
         <Route path="/episode/390" element={<PageTransition><Episode390 /></PageTransition>} />
         <Route path="/episode/391" element={<PageTransition><Episode391 /></PageTransition>} />
