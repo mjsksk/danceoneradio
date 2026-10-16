@@ -455,7 +455,12 @@ body[data-no-ads] [id^="google_ads"],
 body[data-no-ads] [id^="aswift_"],
 body[data-no-ads] iframe[id^="aswift_"],
 body[data-no-ads] iframe[src*="googlesyndication"],
-body[data-no-ads] iframe[src*="doubleclick"] {
+body[data-no-ads] iframe[src*="doubleclick"],
+body[data-no-ads] .google-auto-placed,
+body[data-no-ads] div[class*="google-auto-placed"],
+body[data-no-ads] .adsbygoogle-noablate,
+body[data-no-ads] [data-anchor-status],
+body[data-no-ads] [data-vignette-loaded] {
   display: none !important;
   height: 0 !important;
   max-height: 0 !important;
