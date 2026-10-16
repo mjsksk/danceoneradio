@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { Environment, Lightformer, MeshDistortMaterial, Sparkles, Stars } from '@react-three/drei';
+import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import { Play, Pause, ArrowLeft, Maximize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import SEO from '@/components/SEO';
@@ -12,99 +14,176 @@ import { PRIMARY_STREAM_URLS } from '@/config/streamUrls';
 
 type Levels = { bars: number[]; bass: number; mid: number; high: number };
 
-const BAR_COUNT = 64;
+const BAR_COUNT = 96;
+const RADIUS = 8;
+const hueFor = (i: number) => ((i / BAR_COUNT) * 300) / 360; // same rainbow sweep as the classic EQ
 
-function StageScene({ levels }: { levels: React.MutableRefObject<Levels> }) {
-  const barsRef = useRef<THREE.InstancedMesh>(null);
-  const floorRef = useRef<THREE.Mesh>(null);
-  const beamsRef = useRef<THREE.Group>(null);
-  const ringRef = useRef<THREE.Mesh>(null);
+function SpectrumRing({ levels }: { levels: React.MutableRefObject<Levels> }) {
+  const bodyRef = useRef<THREE.InstancedMesh>(null);
+  const capRef = useRef<THREE.InstancedMesh>(null);
+  const reflRef = useRef<THREE.InstancedMesh>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const color = useMemo(() => new THREE.Color(), []);
   const smooth = useRef<number[]>(new Array(BAR_COUNT).fill(0));
+  const peaks = useRef<number[]>(new Array(BAR_COUNT).fill(0));
 
   useFrame((state, raw) => {
     const dt = Math.min(raw, 0.05);
     const t = state.clock.elapsedTime;
-    const { bars, bass, mid, high } = levels.current;
+    const src = levels.current.bars;
+    for (let i = 0; i < BAR_COUNT; i++) {
+      // mirror the 64-band spectrum around the ring so bass sits front and back
+      const half = BAR_COUNT / 2;
+      const k = i < half ? i : BAR_COUNT - 1 - i;
+      const target = src[Math.floor((k / half) * (src.length || 1))] ?? 0;
+      smooth.current[i] += (target - smooth.current[i]) * (1 - Math.exp(-14 * dt));
+      peaks.current[i] = Math.max(smooth.current[i], peaks.current[i] - dt * 0.35);
+      const h = 0.3 + smooth.current[i] * 7;
+      const angle = (i / BAR_COUNT) * Math.PI * 2 + t * 0.05;
+      const x = Math.cos(angle) * RADIUS, z = Math.sin(angle) * RADIUS;
+      color.setHSL((hueFor(i) + t * 0.02) % 1, 0.95, 0.55);
 
-    if (barsRef.current) {
-      for (let i = 0; i < BAR_COUNT; i++) {
-        const target = bars[i] ?? 0;
-        smooth.current[i] += (target - smooth.current[i]) * (1 - Math.exp(-12 * dt));
-        const h = 0.2 + smooth.current[i] * 6;
-        const angle = (i / BAR_COUNT) * Math.PI * 2;
-        dummy.position.set(Math.cos(angle) * 7, h / 2, Math.sin(angle) * 7);
-        dummy.rotation.set(0, -angle, 0);
-        dummy.scale.set(1, h, 1);
-        dummy.updateMatrix();
-        barsRef.current.setMatrixAt(i, dummy.matrix);
-        color.setHSL((i / BAR_COUNT + t * 0.03) % 1, 0.85, 0.45 + smooth.current[i] * 0.3);
-        barsRef.current.setColorAt(i, color);
-      }
-      barsRef.current.instanceMatrix.needsUpdate = true;
-      if (barsRef.current.instanceColor) barsRef.current.instanceColor.needsUpdate = true;
+      dummy.position.set(x, h / 2, z); dummy.rotation.set(0, -angle, 0); dummy.scale.set(1, h, 1); dummy.updateMatrix();
+      bodyRef.current?.setMatrixAt(i, dummy.matrix); bodyRef.current?.setColorAt(i, color);
+      dummy.position.set(x, -h / 2, z); dummy.updateMatrix();
+      reflRef.current?.setMatrixAt(i, dummy.matrix); reflRef.current?.setColorAt(i, color);
+      dummy.position.set(x, 0.45 + peaks.current[i] * 7, z); dummy.scale.set(1, 1, 1); dummy.updateMatrix();
+      capRef.current?.setMatrixAt(i, dummy.matrix);
+      capRef.current?.setColorAt(i, color.clone().multiplyScalar(3));
     }
-
-    if (ringRef.current) {
-      const s = 1 + bass * 0.6;
-      ringRef.current.scale.set(s, s, s);
-      ringRef.current.rotation.z += dt * (0.3 + mid);
-      (ringRef.current.material as THREE.MeshStandardMaterial).emissiveIntensity = 0.6 + bass * 3;
-    }
-
-    if (beamsRef.current) {
-      beamsRef.current.children.forEach((beam, i) => {
-        beam.rotation.z = Math.sin(t * (0.5 + i * 0.13) + i) * 0.6;
-        beam.rotation.x = Math.cos(t * 0.4 + i) * 0.2;
-        const m = (beam as THREE.Mesh).material as THREE.MeshBasicMaterial;
-        m.opacity = 0.08 + high * 0.35;
-      });
-    }
-
-    if (floorRef.current) {
-      (floorRef.current.material as THREE.MeshStandardMaterial).emissiveIntensity = 0.1 + bass * 0.6;
-    }
-
-    state.camera.position.x = Math.sin(t * 0.08) * 16;
-    state.camera.position.z = Math.cos(t * 0.08) * 16;
-    state.camera.position.y = 6 + Math.sin(t * 0.2) * 1.5;
-    state.camera.lookAt(0, 2, 0);
+    [bodyRef, capRef, reflRef].forEach((r) => {
+      if (!r.current) return;
+      r.current.instanceMatrix.needsUpdate = true;
+      if (r.current.instanceColor) r.current.instanceColor.needsUpdate = true;
+    });
   });
-
-  const beamColors = ['#ff3d9a', '#3dd6ff', '#ffd23d', '#9b5cff', '#3dff9e', '#ff7a3d'];
 
   return (
     <>
-      <color attach="background" args={['#07060d']} />
-      <fog attach="fog" args={['#07060d', 18, 45]} />
-      <ambientLight intensity={0.35} />
-      <pointLight position={[0, 8, 0]} intensity={60} color="#c9a2ff" />
-
-      <mesh ref={floorRef} rotation-x={-Math.PI / 2} receiveShadow>
-        <circleGeometry args={[30, 64]} />
-        <meshStandardMaterial color="#120f1f" emissive="#3b1d6e" emissiveIntensity={0.2} roughness={0.35} metalness={0.6} />
-      </mesh>
-      <gridHelper args={[60, 60, '#3a2a66', '#1d1733']} position={[0, 0.01, 0]} />
-
-      <instancedMesh ref={barsRef} args={[undefined, undefined, BAR_COUNT]}>
-        <boxGeometry args={[0.45, 1, 0.45]} />
-        <meshStandardMaterial roughness={0.3} metalness={0.2} emissive="#ffffff" emissiveIntensity={0.15} />
+      <instancedMesh ref={bodyRef} args={[undefined, undefined, BAR_COUNT]}>
+        <boxGeometry args={[0.32, 1, 0.32]} />
+        <meshPhysicalMaterial roughness={0.15} metalness={0.1} transmission={0.2} clearcoat={1} emissive="#222" toneMapped={false} />
       </instancedMesh>
+      <instancedMesh ref={capRef} args={[undefined, undefined, BAR_COUNT]}>
+        <boxGeometry args={[0.36, 0.12, 0.36]} />
+        <meshBasicMaterial toneMapped={false} />
+      </instancedMesh>
+      <instancedMesh ref={reflRef} args={[undefined, undefined, BAR_COUNT]}>
+        <boxGeometry args={[0.32, 1, 0.32]} />
+        <meshBasicMaterial transparent opacity={0.12} toneMapped={false} depthWrite={false} />
+      </instancedMesh>
+    </>
+  );
+}
 
-      <mesh ref={ringRef} position={[0, 3.2, 0]}>
-        <torusGeometry args={[2.2, 0.12, 16, 96]} />
-        <meshStandardMaterial color="#ffffff" emissive="#b07cff" emissiveIntensity={1} />
+function Core({ levels }: { levels: React.MutableRefObject<Levels> }) {
+  const orb = useRef<THREE.Mesh>(null);
+  const rings = useRef<THREE.Group>(null);
+  useFrame((state, raw) => {
+    const dt = Math.min(raw, 0.05);
+    const t = state.clock.elapsedTime;
+    const { bass, mid, high } = levels.current;
+    if (orb.current) {
+      const s = 1.3 + bass * 0.9;
+      orb.current.scale.setScalar(s);
+      orb.current.rotation.y += dt * (0.2 + mid);
+      const m = orb.current.material as THREE.MeshStandardMaterial & { distort: number };
+      m.distort = 0.25 + bass * 0.5;
+      m.color.setHSL((t * 0.05) % 1, 0.9, 0.55);
+      m.emissive.setHSL((t * 0.05 + 0.5) % 1, 0.9, 0.25 + high * 0.4);
+    }
+    rings.current?.children.forEach((r, i) => {
+      r.rotation.x += dt * (0.3 + i * 0.2) * (1 + mid * 2);
+      r.rotation.y += dt * (0.2 + i * 0.1);
+      r.scale.setScalar(1 + bass * 0.25 * (i + 1) * 0.5);
+    });
+  });
+  return (
+    <group position={[0, 3.4, 0]}>
+      <mesh ref={orb}>
+        <icosahedronGeometry args={[1, 24]} />
+        <MeshDistortMaterial speed={3} distort={0.3} roughness={0.1} metalness={0.4} />
       </mesh>
-
-      <group ref={beamsRef} position={[0, 12, -6]}>
-        {beamColors.map((c, i) => (
-          <mesh key={c} position={[(i - 2.5) * 2.5, 0, 0]}>
-            <coneGeometry args={[1.6, 18, 24, 1, true]} />
-            <meshBasicMaterial color={c} transparent opacity={0.15} side={THREE.DoubleSide} depthWrite={false} blending={THREE.AdditiveBlending} />
+      <group ref={rings}>
+        {['#ff3d9a', '#3dd6ff', '#ffd23d'].map((c, i) => (
+          <mesh key={c}>
+            <torusGeometry args={[2.3 + i * 0.55, 0.035, 12, 128]} />
+            <meshBasicMaterial color={c} toneMapped={false} />
           </mesh>
         ))}
       </group>
+    </group>
+  );
+}
+
+function Lasers({ levels }: { levels: React.MutableRefObject<Levels> }) {
+  const group = useRef<THREE.Group>(null);
+  const colors = ['#ff2e88', '#22d3ee', '#a855f7', '#facc15', '#34d399', '#fb7185', '#60a5fa', '#f97316'];
+  useFrame((state) => {
+    const t = state.clock.elapsedTime;
+    const { high, bass } = levels.current;
+    group.current?.children.forEach((beam, i) => {
+      beam.rotation.z = Math.sin(t * (0.6 + i * 0.11) + i) * 0.9;
+      beam.rotation.x = -0.5 + Math.cos(t * 0.5 + i) * 0.35;
+      ((beam as THREE.Mesh).material as THREE.MeshBasicMaterial).opacity = 0.05 + high * 0.5 + bass * 0.15;
+    });
+  });
+  return (
+    <group ref={group} position={[0, 14, -10]}>
+      {colors.map((c, i) => (
+        <mesh key={c} position={[(i - 3.5) * 3, 0, 0]}>
+          <cylinderGeometry args={[0.05, 0.6, 30, 12, 1, true]} />
+          <meshBasicMaterial color={c} transparent opacity={0.2} side={THREE.DoubleSide} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function CameraRig({ levels }: { levels: React.MutableRefObject<Levels> }) {
+  useFrame((state) => {
+    const t = state.clock.elapsedTime;
+    const b = levels.current.bass;
+    const r = 17 - b * 1.5;
+    state.camera.position.set(Math.sin(t * 0.07) * r, 5 + Math.sin(t * 0.17) * 2, Math.cos(t * 0.07) * r);
+    state.camera.lookAt(0, 2.5, 0);
+  });
+  return null;
+}
+
+function StageScene({ levels }: { levels: React.MutableRefObject<Levels> }) {
+  return (
+    <>
+      <color attach="background" args={['#05040b']} />
+      <fog attach="fog" args={['#05040b', 22, 55]} />
+      <ambientLight intensity={0.25} />
+      <pointLight position={[0, 6, 0]} intensity={80} color="#c084fc" />
+      <pointLight position={[10, 4, 10]} intensity={40} color="#22d3ee" />
+      <pointLight position={[-10, 4, -10]} intensity={40} color="#ff2e88" />
+      <Environment resolution={64}>
+        <Lightformer intensity={2} position={[0, 6, 0]} scale={[10, 10, 1]} rotation-x={Math.PI / 2} />
+        <Lightformer intensity={1.5} color="#ff2e88" position={[-8, 2, 0]} rotation-y={Math.PI / 2} scale={[20, 2, 1]} />
+        <Lightformer intensity={1.5} color="#22d3ee" position={[8, 2, 0]} rotation-y={-Math.PI / 2} scale={[20, 2, 1]} />
+      </Environment>
+
+      <mesh rotation-x={-Math.PI / 2} position={[0, -0.01, 0]}>
+        <circleGeometry args={[40, 96]} />
+        <meshStandardMaterial color="#0b0814" roughness={0.25} metalness={0.8} transparent opacity={0.92} />
+      </mesh>
+      <gridHelper args={[80, 80, '#4c1d95', '#1e1036']} position={[0, 0, 0]} />
+
+      <Stars radius={60} depth={30} count={2500} factor={3} fade speed={0.6} />
+      <Sparkles count={120} scale={[24, 10, 24]} position={[0, 5, 0]} size={3} speed={0.5} color="#e9d5ff" />
+
+      <SpectrumRing levels={levels} />
+      <Core levels={levels} />
+      <Lasers levels={levels} />
+      <CameraRig levels={levels} />
+
+      <EffectComposer multisampling={0}>
+        <Bloom intensity={1.4} luminanceThreshold={0.25} luminanceSmoothing={0.3} mipmapBlur />
+        <Vignette offset={0.3} darkness={0.7} />
+      </EffectComposer>
     </>
   );
 }
@@ -131,6 +210,11 @@ const Stage = () => {
   };
 
   useEffect(() => {
+    document.body.setAttribute('data-no-ads', 'stage');
+    return () => { if (document.body.getAttribute('data-no-ads') === 'stage') document.body.removeAttribute('data-no-ads'); };
+  }, []);
+
+  useEffect(() => {
     pokeUi();
     return () => { if (hideTimer.current) window.clearTimeout(hideTimer.current); };
   }, []);
@@ -149,7 +233,7 @@ const Stage = () => {
         description="Watch Dance One Radio come alive on a 3D audio-reactive stage. Lights, beams and bars move to the live electronic music stream."
         url="https://danceoneradio.com/stage"
       />
-      <Canvas dpr={[1, 1.75]} camera={{ position: [0, 6, 16], fov: 55 }}>
+      <Canvas dpr={[1, 1.75]} camera={{ position: [0, 6, 17], fov: 55 }} gl={{ antialias: true, powerPreference: 'high-performance' }}>
         <StageScene levels={levels} />
       </Canvas>
 
