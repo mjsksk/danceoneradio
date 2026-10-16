@@ -6,9 +6,9 @@ import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 
 export const StageEnvironment = () =>
   h(Environment, { resolution: 64 },
-    h(Lightformer, { intensity: 2, position: [0, 6, 0], scale: [10, 10, 1], 'rotation-x': Math.PI / 2 }),
-    h(Lightformer, { intensity: 1.5, color: '#ff2e88', position: [-8, 2, 0], 'rotation-y': Math.PI / 2, scale: [20, 2, 1] }),
-    h(Lightformer, { intensity: 1.5, color: '#22d3ee', position: [8, 2, 0], 'rotation-y': -Math.PI / 2, scale: [20, 2, 1] }),
+    h(Lightformer, { intensity: 2, position: [0, 6, 0], scale: [10, 10, 1], rotation: [Math.PI / 2, 0, 0] }),
+    h(Lightformer, { intensity: 1.5, color: '#ff2e88', position: [-8, 2, 0], rotation: [0, Math.PI / 2, 0], scale: [20, 2, 1] }),
+    h(Lightformer, { intensity: 1.5, color: '#22d3ee', position: [8, 2, 0], rotation: [0, -Math.PI / 2, 0], scale: [20, 2, 1] }),
   );
 
 export const StageSky = () => [
@@ -19,7 +19,10 @@ export const StageSky = () => [
 export const StageDistortMaterial = () => h(MeshDistortMaterial, { speed: 3, distort: 0.3, roughness: 0.1, metalness: 0.4 });
 
 export const StagePost = () =>
-  h(EffectComposer, { multisampling: 0 },
-    h(Bloom, { intensity: 1.4, luminanceThreshold: 0.25, luminanceSmoothing: 0.3, mipmapBlur: true }),
-    h(Vignette, { offset: 0.3, darkness: 0.7 }),
-  );
+  h(EffectComposer, {
+    multisampling: 0,
+    children: [
+      h(Bloom, { key: 'b', intensity: 1.4, luminanceThreshold: 0.25, luminanceSmoothing: 0.3, mipmapBlur: true }),
+      h(Vignette, { key: 'v', offset: 0.3, darkness: 0.7 }),
+    ],
+  });
