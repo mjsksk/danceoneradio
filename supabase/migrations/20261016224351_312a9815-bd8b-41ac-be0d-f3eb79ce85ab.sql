@@ -1,0 +1,17 @@
+INSERT INTO public.show_tracks (episode_number, track_order, artist, title) VALUES
+(431, 1, 'Swimming Paul, LP Giobbi', 'Stay Cool'),
+(431, 2, 'Mablak, Karmaloft', 'Endless Love'),
+(431, 3, 'Bob Sinclar', 'Kiss My Eyes (Nico Zandolino Remix)'),
+(431, 4, 'Dam Swindle', 'I Want You (DJ-Kicks)'),
+(431, 5, 'Mita Gami', 'Looking For You'),
+(431, 6, 'Cloonee & Chris Lake', 'Paradise'),
+(431, 7, 'Beave', '1997'),
+(431, 8, 'Honey Luv', 'Good Measure (I Like It)'),
+(431, 9, 'PIXEL', 'Stay Until the Morning'),
+(431, 10, 'Revival House Project, Emeli Sande, Jools Holland & GeO Gospel Choir', 'Brighter Days (Felix Baumgartner Remix) [Extended]'),
+(431, 11, 'Josh Gigante, Prana Flow feat. True Motion', 'Secrets'),
+(431, 12, 'Mike B. Lancero', 'Beleza (Extended Version)'),
+(431, 13, 'Sam Divine', 'Paradise'),
+(431, 14, 'Obskür', 'Speechless'),
+(431, 15, 'KETTAMA, Prospa, Rohan Pinnock-Hamilton', 'Think Of You (Extended Mix)'),
+(431, 16, 'Josh Gigante, Kimonos', 'Feel So Right');
