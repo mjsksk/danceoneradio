@@ -2,8 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { Environment, Lightformer, MeshDistortMaterial, Sparkles, Stars } from '@react-three/drei';
-import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
+import { StageEnvironment, StageSky, StageDistortMaterial, StagePost } from '@/components/stage/stageFx';
 import { Play, Pause, ArrowLeft, Maximize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import SEO from '@/components/SEO';
@@ -102,7 +101,7 @@ function Core({ levels }: { levels: React.MutableRefObject<Levels> }) {
     <group position={[0, 3.4, 0]}>
       <mesh ref={orb}>
         <icosahedronGeometry args={[1, 24]} />
-        <MeshDistortMaterial speed={3} distort={0.3} roughness={0.1} metalness={0.4} />
+        <StageDistortMaterial />
       </mesh>
       <group ref={rings}>
         {['#ff3d9a', '#3dd6ff', '#ffd23d'].map((c, i) => (
@@ -160,11 +159,7 @@ function StageScene({ levels }: { levels: React.MutableRefObject<Levels> }) {
       <pointLight position={[0, 6, 0]} intensity={80} color="#c084fc" />
       <pointLight position={[10, 4, 10]} intensity={40} color="#22d3ee" />
       <pointLight position={[-10, 4, -10]} intensity={40} color="#ff2e88" />
-      <Environment resolution={64}>
-        <Lightformer intensity={2} position={[0, 6, 0]} scale={[10, 10, 1]} rotation-x={Math.PI / 2} />
-        <Lightformer intensity={1.5} color="#ff2e88" position={[-8, 2, 0]} rotation-y={Math.PI / 2} scale={[20, 2, 1]} />
-        <Lightformer intensity={1.5} color="#22d3ee" position={[8, 2, 0]} rotation-y={-Math.PI / 2} scale={[20, 2, 1]} />
-      </Environment>
+      <StageEnvironment />
 
       <mesh rotation-x={-Math.PI / 2} position={[0, -0.01, 0]}>
         <circleGeometry args={[40, 96]} />
@@ -172,18 +167,14 @@ function StageScene({ levels }: { levels: React.MutableRefObject<Levels> }) {
       </mesh>
       <gridHelper args={[80, 80, '#4c1d95', '#1e1036']} position={[0, 0, 0]} />
 
-      <Stars radius={60} depth={30} count={2500} factor={3} fade speed={0.6} />
-      <Sparkles count={120} scale={[24, 10, 24]} position={[0, 5, 0]} size={3} speed={0.5} color="#e9d5ff" />
+      <StageSky />
 
       <SpectrumRing levels={levels} />
       <Core levels={levels} />
       <Lasers levels={levels} />
       <CameraRig levels={levels} />
 
-      <EffectComposer multisampling={0}>
-        <Bloom intensity={1.4} luminanceThreshold={0.25} luminanceSmoothing={0.3} mipmapBlur />
-        <Vignette offset={0.3} darkness={0.7} />
-      </EffectComposer>
+      <StagePost />
     </>
   );
 }
