@@ -140,6 +140,12 @@ const Contact = () => {
                 careers and the dance community as a whole.
               </p>
               <p className="text-base text-foreground leading-relaxed mt-3">
+                When you send music, please use direct download links only —
+                files we can pull straight down. We can't review links that
+                require a subscription or sign-in to listen, such as Spotify
+                or Apple Music.
+              </p>
+              <p className="text-base text-foreground leading-relaxed mt-3">
                 After we've reviewed your materials, we can then fill you in on
                 more of the particulars of how our networks might be able to assist you.
                 To send us your demo contact us via email for further instructions.
