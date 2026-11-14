@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Create Future Dance Anthems 432 with all 26 tracks, official RSS audio/date/duration, routing and sitemap; verify playback and Shows navigation
 - [x] Create Future Dance Anthems 431 with 16 tracks, October 16 date, safe pending-audio player, routing and sitemap; verify the page
 - [x] Link official episode 431 audio from the RSS feed
 - [x] Create Wh0 Plays Sessions 251 for October 16, 2026 with 18 timestamped tracks and verify navigation
