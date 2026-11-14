@@ -20,7 +20,7 @@ const Episode432 = () => {
   const { user } = useAuth();
   const episodeNumber = 432;
   const episodeTitle = "Anthems of the week 432";
-  const audioUrl = "https://media.blubrry.com/biggest_tunes_with_mario_135/mc.blubrry.com/biggest_tunes_with_mario_135/stream_2026-11-14_120000.mp3?awCollectionId=673838&amp;awEpisodeId=12318297&amp;aw_0_azn.pgenre=Music&amp;aw_0_1st.ri=blubrry&amp;aw_0_azn.pcountry=US&amp;aw_0_azn.planguage=en-us&amp;cat_exclude=IAB1-8%2CIAB1-9%2CIAB7-41%2CIAB8-5%2CIAB8-18%2CIAB11-4%2CIAB23%2CIAB24%2CIAB25%2CIAB26&amp;aw_0_cnt.rss=https%3A%2F%2Ffeeds.blubrry.com%2Ffeeds%2Fbiggest_tunes_with_mario_135.xml";
+  const audioUrl = "https://media.blubrry.com/biggest_tunes_with_mario_135/mc.blubrry.com/biggest_tunes_with_mario_135/stream_2026-11-14_120000.mp3?awCollectionId=673838&awEpisodeId=12318297&aw_0_azn.pgenre=Music&aw_0_1st.ri=blubrry&aw_0_azn.pcountry=US&aw_0_azn.planguage=en-us&cat_exclude=IAB1-8%2CIAB1-9%2CIAB7-41%2CIAB8-5%2CIAB8-18%2CIAB11-4%2CIAB23%2CIAB24%2CIAB25%2CIAB26&aw_0_cnt.rss=https%3A%2F%2Ffeeds.blubrry.com%2Ffeeds%2Fbiggest_tunes_with_mario_135.xml";
 
   const { progress, saveProgress } = useListeningProgress(episodeNumber, episodeTitle, audioUrl);
 
@@ -154,7 +154,7 @@ const Episode432 = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <Clock className="w-5 h-5 text-neon-purple" />
-                      <span>{duration > 0 ? formatTime(duration) : 'Coming soon'}</span>
+                      <span>{duration > 0 ? formatTime(duration) : '1:32:57'}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Music className="w-5 h-5 text-primary" />
@@ -277,7 +277,7 @@ const Episode432 = () => {
             </div>
           </section>
 
-          <GoogleAds key="episode431-ad" slot="6777392184" />
+          <GoogleAds key="episode432-ad" slot="6777392184" />
 
           <EpisodeTracklist episodeNumber={episodeNumber} />
         </main>
