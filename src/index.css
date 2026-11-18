@@ -476,11 +476,13 @@ body[data-no-ads] [data-vignette-loaded] {
 }
 
 .fc-consent-root.fc-consent-root .fc-dialog {
-  background: hsl(var(--card) / 0.98) !important;
+  background: hsl(var(--card) / 0.95) !important;
   color: hsl(var(--foreground)) !important;
   border: 2px solid hsl(var(--primary) / 0.4) !important;
   border-radius: var(--radius) !important;
-  box-shadow: var(--glow-cyber) !important;
+  box-shadow: 0 25px 50px -12px hsl(var(--primary) / 0.2) !important;
+  width: min(42rem, calc(100vw - 2rem)) !important;
+  backdrop-filter: blur(16px);
   max-width: min(42rem, calc(100vw - 2rem)) !important;
   max-height: calc(100dvh - 2rem) !important;
   overflow: auto !important;
@@ -511,7 +513,7 @@ body[data-no-ads] [data-vignette-loaded] {
 .fc-consent-root.fc-consent-root .fc-dialog :is(h1, .fc-dialog-headline) {
   color: hsl(var(--primary)) !important;
   font-family: 'Orbitron', sans-serif !important;
-  font-size: 20px !important;
+  font-size: 24px !important;
   line-height: 1.5 !important;
 }
 
@@ -624,4 +626,92 @@ body[data-no-ads] [data-vignette-loaded] {
 .fc-consent-root.fc-consent-root .fc-dialog .fc-preference-divider {
   background: hsl(var(--secondary)) !important;
   color: hsl(var(--foreground)) !important;
+}
+
+/* Use the current station mark, not the old image stored in AdSense. */
+.fc-consent-root.fc-consent-root .fc-dialog .fc-header-image-container {
+  background: url('/lovable-uploads/1aabd155-f35e-415e-981a-c390b613e662-480w.webp') center / contain no-repeat !important;
+  height: 96px !important;
+  min-height: 96px !important;
+  width: 100% !important;
+  margin: 0 auto 24px !important;
+}
+
+.fc-consent-root.fc-consent-root .fc-header-image {
+  opacity: 0 !important;
+  height: 96px !important;
+}
+
+.fc-consent-root.fc-consent-root .fc-dialog .fc-dialog-scrollable-content {
+  padding: 24px 32px !important;
+  box-sizing: border-box !important;
+}
+
+.fc-consent-root.fc-consent-root .fc-dialog .fc-dialog-content {
+  min-height: 0 !important;
+}
+
+.fc-consent-root.fc-consent-root .fc-dialog .fc-footer-buttons-container {
+  padding: 16px 32px 24px !important;
+}
+
+.fc-consent-root.fc-consent-root .fc-dialog .fc-footer-buttons {
+  display: flex !important;
+}
+
+.fc-consent-root.fc-consent-root .fc-dialog .fc-cta-manage-options {
+  text-align: center !important;
+}
+
+.fc-consent-root.fc-consent-root .fc-dialog .fc-manage-options-third-button-label {
+  width: 100% !important;
+  text-align: center !important;
+}
+
+.consent-design-preview .fc-dialog {
+  display: flex;
+  flex-direction: column;
+}
+
+.consent-design-preview .fc-dialog-content {
+  overflow-y: auto;
+}
+
+.consent-design-preview .fc-footer-buttons-container {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 480px) {
+  .fc-consent-root.fc-consent-root .fc-dialog .fc-dialog-scrollable-content {
+    padding: 20px !important;
+  }
+  .fc-consent-root.fc-consent-root .fc-dialog .fc-footer-buttons-container {
+    padding: 12px 20px 20px !important;
+  }
+  .fc-consent-root.fc-consent-root .fc-dialog :is(h1, .fc-dialog-headline) {
+    font-size: 20px !important;
+  }
+}
+
+.fc-consent-root.fc-consent-root .fc-dialog,
+.fc-consent-root.fc-consent-root .fc-dialog-content,
+.fc-consent-root.fc-consent-root .fc-dialog-scrollable-content,
+.fc-consent-root.fc-consent-root .fc-footer-buttons-container {
+  box-sizing: border-box !important;
+}
+
+.fc-consent-root.fc-consent-root .fc-dialog .fc-dialog-restricted-content {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.fc-consent-root.fc-consent-root .fc-dialog .fc-dialog-content,
+.fc-consent-root.fc-consent-root .fc-dialog .fc-dialog-scrollable-content {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.consent-design-preview .fc-footer-buttons .fc-button {
+  flex: 1 1 0 !important;
 }

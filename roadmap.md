@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Match European consent logo and layout to US and add an isolated mobile preview
 - [x] Create Future Dance Anthems 432 with all 26 tracks, official RSS audio/date/duration, routing and sitemap; verify playback and Shows navigation
 - [x] Create Future Dance Anthems 431 with 16 tracks, October 16 date, safe pending-audio player, routing and sitemap; verify the page
 - [x] Link official episode 431 audio from the RSS feed

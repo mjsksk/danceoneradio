@@ -28,6 +28,8 @@ export const CookieConsent = ({ forceShow = false, onClose }: CookieConsentProps
   });
 
   useEffect(() => {
+    // The isolated design preview must not prompt for or alter real consent.
+    if (window.location.pathname === '/consent-preview') return;
     // Check if we should show the consent banner
     if (forceShow || shouldShowConsent()) {
       setShowBanner(true);
