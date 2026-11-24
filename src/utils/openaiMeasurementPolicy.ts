@@ -8,6 +8,21 @@ export function permitsOpenAIMeasurement(
     && consent.measurementNoticeVersion === OPENAI_MEASUREMENT_NOTICE_VERSION;
 }
 
+/**
+ * What Google's consent tool says about measurement, or `undefined` while it
+ * has not decided. Outside GDPR regions it reports `gdprApplies: false` with
+ * no event status at all, so that case must be answered before the status check.
+ */
+export function googleCmpMeasurementDecision(data: {
+  gdprApplies?: boolean;
+  eventStatus?: string | null;
+  purpose?: { consents?: Record<number, boolean> };
+}): boolean | undefined {
+  if (data.gdprApplies === false) return true;
+  if (data.eventStatus !== 'tcloaded' && data.eventStatus !== 'useractioncomplete') return undefined;
+  return data.purpose?.consents?.[1] === true && data.purpose?.consents?.[7] === true;
+}
+
 export function pixelDebugEnabled(development: boolean, hostname: string): boolean {
   return development || /^(?:id-)?preview--/.test(hostname);
 }

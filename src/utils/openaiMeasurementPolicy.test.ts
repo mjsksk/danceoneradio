@@ -1,7 +1,7 @@
 import { describe, it as test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  LiveStreamStartIntent, OPENAI_MEASUREMENT_NOTICE_VERSION,
+  LiveStreamStartIntent, googleCmpMeasurementDecision, OPENAI_MEASUREMENT_NOTICE_VERSION,
   permitsOpenAIMeasurement, pixelDebugEnabled,
 } from './openaiMeasurementPolicy';
 
@@ -66,5 +66,21 @@ describe('measurement consent and environment', () => {
     assert.equal(pixelDebugEnabled(false, 'id-preview--8bc93317.lovable.app'), true);
     assert.equal(pixelDebugEnabled(false, 'danceoneradio.com'), false);
     assert.equal(pixelDebugEnabled(false, 'danceoneradio.lovable.app'), false);
+  });
+});
+
+describe('Google consent tool outside and inside GDPR regions', () => {
+  test('gdprApplies false with no event status does not block measurement', () => {
+    assert.equal(googleCmpMeasurementDecision({ gdprApplies: false, eventStatus: null }), true);
+    assert.equal(googleCmpMeasurementDecision({ gdprApplies: false }), true);
+  });
+  test('GDPR visitors need both storage and measurement purposes', () => {
+    const granted = { gdprApplies: true, eventStatus: 'useractioncomplete', purpose: { consents: { 1: true, 7: true } } };
+    assert.equal(googleCmpMeasurementDecision(granted), true);
+    assert.equal(googleCmpMeasurementDecision({ ...granted, purpose: { consents: { 1: true, 7: false } } }), false);
+    assert.equal(googleCmpMeasurementDecision({ gdprApplies: true, eventStatus: 'tcloaded' }), false);
+  });
+  test('GDPR visitors stay undecided while the dialog is still open', () => {
+    assert.equal(googleCmpMeasurementDecision({ gdprApplies: true, eventStatus: 'cmpuishown' }), undefined);
   });
 });

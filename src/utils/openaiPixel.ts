@@ -1,5 +1,5 @@
 import { getConsent } from './consentManager';
-import { permitsOpenAIMeasurement, pixelDebugEnabled } from './openaiMeasurementPolicy';
+import { googleCmpMeasurementDecision, permitsOpenAIMeasurement, pixelDebugEnabled } from './openaiMeasurementPolicy';
 
 const PIXEL_ID = 'QZs8QQBioHa6mexdc3fU2L';
 const SDK_URL = 'https://bzrcdn.openai.com/sdk/oaiq.min.js';
@@ -12,7 +12,7 @@ type PixelCommand = ((...args: unknown[]) => void) & {
 
 interface GoogleConsentData {
   gdprApplies?: boolean;
-  eventStatus?: string;
+  eventStatus?: string | null;
   purpose?: { consents?: Record<number, boolean> };
 }
 
@@ -116,12 +116,13 @@ function registerGoogleConsent() {
   void syncMeasurementConsent();
   try {
     window.__tcfapi('addEventListener', 2, (data, success) => {
-      if (!success || !['tcloaded', 'useractioncomplete'].includes(data.eventStatus ?? '')) return;
+      if (!success) return;
       // Google's CMP cannot grant OpenAI consent; it can additionally deny
       // storage (purpose 1) or ad measurement (purpose 7). Our own choice is
       // always required, including where GDPR does not apply.
-      cmpAllowsMeasurement = data.gdprApplies === false
-        || (data.purpose?.consents?.[1] === true && data.purpose?.consents?.[7] === true);
+      const decision = googleCmpMeasurementDecision(data);
+      if (decision === undefined) return;
+      cmpAllowsMeasurement = decision;
       void syncMeasurementConsent();
     });
   } catch {
