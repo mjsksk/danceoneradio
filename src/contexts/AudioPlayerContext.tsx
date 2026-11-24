@@ -3,6 +3,8 @@ import { RadioStreamService } from '@/utils/RadioStreamService';
 import { AlbumArtService } from '@/utils/AlbumArtService';
 import { PRIMARY_STREAM_URLS } from '@/config/streamUrls';
 import { toast } from 'sonner';
+import { canMeasureOpenAIAds, openAIPixelDebugEnabled } from '@/utils/openaiPixel';
+import { LiveStreamStartIntent } from '@/utils/openaiMeasurementPolicy';
 
 interface EpisodeInfo {
   number: number;
@@ -61,6 +63,8 @@ const AVAILABLE_EPISODES = [403, 402, 401, 400, 399, 398, 397, 396, 395, 394, 39
 
 export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const liveStartIntentRef = useRef(new LiveStreamStartIntent());
+  const playbackSourceRef = useRef<'live' | 'episode' | null>(null);
   
   // Load autoplay preference from localStorage
   const [autoplayEnabled, setAutoplayEnabled] = useState(() => {
@@ -137,6 +141,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const cancelStreamAttempts = useCallback(() => {
+    liveStartIntentRef.current.cancel();
     streamAttemptTokenRef.current += 1;
     liveReconnectInProgressRef.current = false;
     manualPauseRequestedRef.current = false;
@@ -243,8 +248,12 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       });
   }, [clearLivePauseExpiryTimeout, clearStreamStartTimeout, markLiveProgress]);
 
-  const restartLiveStream = useCallback((preferredUrlIndex = 0) => {
+  const restartLiveStream = useCallback((preferredUrlIndex = 0, intentionalStart = false) => {
     if (!audioRef.current) return;
+
+    playbackSourceRef.current = 'live';
+    if (intentionalStart) liveStartIntentRef.current.arm();
+    else liveStartIntentRef.current.cancel();
 
     const nextStreamUrls = streamUrls.length > 0 ? streamUrls : [...PRIMARY_STREAM_URLS];
     const safeUrlIndex = Math.max(0, Math.min(preferredUrlIndex, Math.max(0, nextStreamUrls.length - 1)));
@@ -326,6 +335,9 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
   const playLiveStream = useCallback((urls: string[]) => {
     if (!audioRef.current) return;
 
+    playbackSourceRef.current = 'live';
+    liveStartIntentRef.current.arm();
+
     const nextStreamUrls = urls.length > 0 ? urls : [...PRIMARY_STREAM_URLS];
     const attemptToken = streamAttemptTokenRef.current + 1;
     streamAttemptTokenRef.current = attemptToken;
@@ -355,6 +367,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     if (!audioRef.current) return;
 
     cancelStreamAttempts();
+    playbackSourceRef.current = 'episode';
     liveUserPausedRef.current = false;
     
     setState(prev => ({
@@ -398,7 +411,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     if (state.source === 'live') {
       // Always restart live stream fresh to avoid stale buffered audio
       liveUserPausedRef.current = false;
-      restartLiveStream(0);
+      restartLiveStream(0, true);
       return;
     }
 
@@ -426,6 +439,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
   const closePlayer = useCallback(() => {
     if (!audioRef.current) return;
     cancelStreamAttempts();
+    playbackSourceRef.current = null;
     liveUserPausedRef.current = false;
     audioRef.current.pause();
     audioRef.current.src = '';
@@ -516,6 +530,26 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
         audio.pause();
         setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
         return;
+      }
+
+      // Consume before checking consent/availability: denied or blocked starts
+      // must never be replayed when consent changes or buffering ends later.
+      if (!audio.paused && audio.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA
+        && liveStartIntentRef.current.consume(playbackSourceRef.current)) {
+        try {
+          if (canMeasureOpenAIAds()) {
+            window.oaiq?.(
+              'measure',
+              'custom',
+              { type: 'custom' },
+              { custom_event_name: 'live_stream_started' },
+            );
+            if (openAIPixelDebugEnabled()) console.debug('[OpenAI Pixel] live_stream_started');
+          }
+        } catch {
+          // Optional measurement must never interrupt live playback.
+          if (openAIPixelDebugEnabled()) console.debug('[OpenAI Pixel] Event unavailable; playback continues.');
+        }
       }
 
       liveReconnectInProgressRef.current = false;

@@ -12,6 +12,7 @@ import {
   initializeConsentScripts,
 } from '@/utils/consentManager';
 import { updateConsentMode } from '@/utils/googleConsentMode';
+import { permitsOpenAIMeasurement } from '@/utils/openaiMeasurementPolicy';
 
 interface CookieConsentProps {
   forceShow?: boolean;
@@ -21,10 +22,13 @@ interface CookieConsentProps {
 export const CookieConsent = ({ forceShow = false, onClose }: CookieConsentProps) => {
   const [showBanner, setShowBanner] = useState(false);
   const [showCustomize, setShowCustomize] = useState(false);
-  const [preferences, setPreferences] = useState({
-    functional: false,
-    analytics: false,
-    advertising: false,
+  const [preferences, setPreferences] = useState(() => {
+    const consent = getConsent();
+    return {
+      functional: consent?.functional ?? false,
+      analytics: consent?.analytics ?? false,
+      advertising: permitsOpenAIMeasurement(consent, false),
+    };
   });
 
   useEffect(() => {
@@ -50,8 +54,6 @@ export const CookieConsent = ({ forceShow = false, onClose }: CookieConsentProps
     setShowBanner(false);
     setShowCustomize(false);
     onClose?.();
-    // Reload to initialize ads properly
-    window.location.reload();
   };
 
   const handleRejectNonEssential = () => {
@@ -81,10 +83,6 @@ export const CookieConsent = ({ forceShow = false, onClose }: CookieConsentProps
     setShowBanner(false);
     setShowCustomize(false);
     onClose?.();
-    // Reload if advertising was enabled to initialize ads
-    if (preferences.advertising) {
-      window.location.reload();
-    }
   };
 
   const handleCloseCustomize = () => {
@@ -107,7 +105,7 @@ export const CookieConsent = ({ forceShow = false, onClose }: CookieConsentProps
                 🍪 Cookie Consent
               </h3>
               <p className="text-base text-foreground/90 font-['Rajdhani'] leading-relaxed">
-                We use cookies to enhance your experience, analyze site traffic, and serve personalized content. 
+                We use cookies to enhance your experience, analyze site traffic, serve personalized content, and measure advertisements.
                 Accepting cookies helps keep Dance One Radio free and supports our community.
               </p>
               <a href="/privacy" className="text-sm text-primary hover:underline mt-2 inline-block font-['Rajdhani']">
@@ -214,13 +212,14 @@ export const CookieConsent = ({ forceShow = false, onClose }: CookieConsentProps
             <div className="flex items-start justify-between space-x-4 p-4 rounded-lg border border-border hover:border-primary/30 transition-colors">
               <div className="flex-1">
                 <h4 className="font-['Orbitron'] font-semibold text-foreground mb-2">
-                  Advertising Cookies
+                  Advertising Cookies & Measurement
                 </h4>
                 <p className="text-sm text-muted-foreground font-['Rajdhani']">
-                  Used to deliver relevant advertisements and support our free service. These cookies may track your browsing activity to show you personalized ads.
+                  Used for relevant advertisements and ad measurement, provided by Google and OpenAI. OpenAI measures when live listening begins and may detect and hash customer details entered on this site to match conversions to ads. Declining keeps OpenAI measurement off without affecting listening.
                 </p>
               </div>
               <Switch
+                aria-label="Advertising Cookies & Measurement"
                 checked={preferences.advertising}
                 onCheckedChange={(checked) =>
                   setPreferences({ ...preferences, advertising: checked })
@@ -256,12 +255,13 @@ export const CookieSettingsButton = () => {
 
   return (
     <>
-      <button
+      <Button
+        variant="link"
         onClick={() => setShowConsent(true)}
         className="text-muted-foreground hover:text-primary transition-colors font-['Rajdhani'] text-sm"
       >
         Cookie Settings
-      </button>
+      </Button>
       {showConsent && (
         <CookieConsent forceShow={true} onClose={() => setShowConsent(false)} />
       )}

@@ -1,3 +1,5 @@
+import { OPENAI_MEASUREMENT_NOTICE_VERSION } from './openaiMeasurementPolicy';
+
 export interface CookieConsent {
   necessary: true;
   functional: boolean;
@@ -5,6 +7,8 @@ export interface CookieConsent {
   advertising: boolean;
   timestamp: number;
   version: string;
+  measurementNoticeVersion?: string;
+  measurementAcceptance?: { timestamp: number; noticeVersion: string };
 }
 
 const CONSENT_KEY = 'cookie_consent';
@@ -42,11 +46,17 @@ export const getConsent = (): CookieConsent | null => {
 // Save consent preferences
 export const setConsent = (consent: Omit<CookieConsent, 'timestamp' | 'version' | 'necessary'>): void => {
   try {
+    const previous = getConsent();
+    const timestamp = Date.now();
     const fullConsent: CookieConsent = {
       ...consent,
       necessary: true, // Always true
-      timestamp: Date.now(),
+      timestamp,
       version: CONSENT_VERSION,
+      measurementNoticeVersion: OPENAI_MEASUREMENT_NOTICE_VERSION,
+      measurementAcceptance: consent.advertising
+        ? { timestamp, noticeVersion: OPENAI_MEASUREMENT_NOTICE_VERSION }
+        : previous?.measurementAcceptance,
     };
     
     localStorage.setItem(CONSENT_KEY, JSON.stringify(fullConsent));
@@ -85,7 +95,8 @@ export const rejectNonEssential = (): void => {
 
 // Check if consent banner should be shown
 export const shouldShowConsent = (): boolean => {
-  return getConsent() === null;
+  const consent = getConsent();
+  return consent === null || consent.measurementNoticeVersion !== OPENAI_MEASUREMENT_NOTICE_VERSION;
 };
 
 // Load Google Analytics if consent given

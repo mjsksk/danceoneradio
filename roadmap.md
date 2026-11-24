@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Install the existing OpenAI Ads pixel after advertising consent, stop on withdrawal, preserve its account settings, and verify intentional live starts, exclusions, and blocked-pixel playback in preview only.
 - [x] Create Wh0 Plays Sessions 256 with Molly Mouse for November 20, 2026, mirror all 14 tracks, and verify cue times and Shows navigation.
 - [x] Match European consent logo and layout to US and add an isolated mobile preview
 - [x] Create Future Dance Anthems 432 with all 26 tracks, official RSS audio/date/duration, routing and sitemap; verify playback and Shows navigation

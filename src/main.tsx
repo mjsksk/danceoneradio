@@ -4,6 +4,7 @@ import './index.css'
 import { initializeConsentMode } from '@/utils/googleConsentMode'
 import { initializeConsentScripts, getConsent } from '@/utils/consentManager'
 import { updateConsentMode } from '@/utils/googleConsentMode'
+import { initializeOpenAIPixel } from '@/utils/openaiPixel'
 
 declare const __BUILD_VERSION__: string | undefined;
 
@@ -52,6 +53,8 @@ try {
   console.error('Optional consent/ad initialization failed:', error);
 }
 
+// Independent of Google setup and playback; no SDK is loaded before permission.
+initializeOpenAIPixel();
 
 
 // Register service worker for push notifications and caching

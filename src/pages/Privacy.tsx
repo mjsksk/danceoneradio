@@ -119,6 +119,20 @@ const Privacy = () => {
               </section>
 
               <section>
+                <h2 className="text-2xl font-semibold text-accent mb-4">OpenAI Advertising Measurement</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  With your Advertising Cookies &amp; Measurement consent, the OpenAI Pixel reports when you intentionally start our live radio and audio begins. It does not report podcast playback, buffering recoveries, or automatic reconnects as new live starts. This helps measure and improve the performance of our OpenAI advertisements.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  OpenAI receives the event name and time, page and referring-page information, browser and device information, and, when available, an ad click reference and first-party measurement identifiers. The existing pixel has automatic advanced matching enabled: after advertising consent, it may detect supported customer details on this site, normalize and hash them in your browser, and include those hashes with conversion events. We do not manually add your account information or song requests to the live-start event.
+                </p>
+                <p className="text-muted-foreground leading-relaxed">
+                  You can decline or withdraw this consent using Cookie Settings in the footer. General analytics consent does not enable OpenAI advertising measurement. Global Privacy Control also keeps it off. Refused or blocked live starts are not replayed after you accept, and your radio playback is unaffected. For OpenAI's practices, see its{' '}
+                  <a href="https://openai.com/policies/privacy-policy/" className="text-primary underline" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.
+                </p>
+              </section>
+
+              <section>
                 <h2 className="text-2xl font-semibold text-accent mb-4">International Data Transfers</h2>
                 <p className="text-muted-foreground leading-relaxed">
                   Your data may be transferred to and processed in countries outside the European Economic Area. 
@@ -181,7 +195,7 @@ const Privacy = () => {
               </section>
 
               <div className="text-sm text-muted-foreground/80 mt-12 pt-8 border-t border-primary/20">
-                Last updated: October 2025
+                Last updated: November 24, 2026
               </div>
             </div>
           </div>
