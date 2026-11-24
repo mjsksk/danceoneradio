@@ -1,7 +1,7 @@
 import { describe, it as test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  LiveStreamStartIntent, googleCmpMeasurementDecision, OPENAI_MEASUREMENT_NOTICE_VERSION,
+  LiveStreamStartIntent, googleCmpMeasurementDecision, googleDecisionAllowsPixel, OPENAI_MEASUREMENT_NOTICE_VERSION,
   permitsOpenAIMeasurement, pixelDebugEnabled,
 } from './openaiMeasurementPolicy';
 
@@ -82,5 +82,16 @@ describe('Google consent tool outside and inside GDPR regions', () => {
   });
   test('GDPR visitors stay undecided while the dialog is still open', () => {
     assert.equal(googleCmpMeasurementDecision({ gdprApplies: true, eventStatus: 'cmpuishown' }), undefined);
+  });
+});
+
+describe('Pixel waits for Google\'s consent decision', () => {
+  test('nothing loads while the decision is pending or refused', () => {
+    assert.equal(googleDecisionAllowsPixel('pending'), false);
+    assert.equal(googleDecisionAllowsPixel('denied'), false);
+  });
+  test('an affirmative or not-applicable decision lets the site choice decide', () => {
+    assert.equal(googleDecisionAllowsPixel('allowed'), true);
+    assert.equal(googleDecisionAllowsPixel('not-applicable'), true);
   });
 });

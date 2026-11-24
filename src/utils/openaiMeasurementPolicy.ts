@@ -23,6 +23,13 @@ export function googleCmpMeasurementDecision(data: {
   return data.purpose?.consents?.[1] === true && data.purpose?.consents?.[7] === true;
 }
 
+export type GoogleConsentState = 'pending' | 'not-applicable' | 'allowed' | 'denied';
+
+/** The Pixel may load only once Google's tool has answered or is known not to apply. */
+export function googleDecisionAllowsPixel(state: GoogleConsentState): boolean {
+  return state === 'allowed' || state === 'not-applicable';
+}
+
 export function pixelDebugEnabled(development: boolean, hostname: string): boolean {
   return development || /^(?:id-)?preview--/.test(hostname);
 }

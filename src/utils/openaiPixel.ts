@@ -1,9 +1,15 @@
 import { getConsent } from './consentManager';
-import { googleCmpMeasurementDecision, permitsOpenAIMeasurement, pixelDebugEnabled } from './openaiMeasurementPolicy';
+import {
+  googleCmpMeasurementDecision, googleDecisionAllowsPixel, permitsOpenAIMeasurement, pixelDebugEnabled,
+  type GoogleConsentState,
+} from './openaiMeasurementPolicy';
 
 const PIXEL_ID = 'QZs8QQBioHa6mexdc3fU2L';
 const SDK_URL = 'https://bzrcdn.openai.com/sdk/oaiq.min.js';
 const SCRIPT_ID = 'openai-measurement-pixel';
+// Google's tool normally appears ~2s after its ad script; wait this long for it.
+const GOOGLE_TOOL_GRACE_MS = 10000;
+const GOOGLE_TOOL_MAX_WAIT_MS = 20000;
 
 type PixelCommand = ((...args: unknown[]) => void) & {
   q?: unknown[][];
@@ -19,6 +25,7 @@ interface GoogleConsentData {
 declare global {
   interface Window {
     oaiq?: PixelCommand;
+    __d1AdSenseScript?: 'loaded' | 'failed';
     __tcfapi?: (
       command: string, version: number,
       callback: (data: GoogleConsentData, success: boolean) => void,
@@ -29,7 +36,8 @@ declare global {
 let initialized = false;
 let pixelAvailable = false;
 let sdkFailed = false;
-let cmpAllowsMeasurement: boolean | undefined;
+// Nothing is loaded while Google's consent tool may still answer.
+let googleState: GoogleConsentState = 'pending';
 let cmpRegistered = false;
 
 export const openAIPixelDebugEnabled = () => pixelDebugEnabled(
@@ -40,7 +48,7 @@ function choiceAllowsMeasurement(): boolean {
   if (window.location.pathname === '/consent-preview') return false;
   const gpc = (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true;
   return permitsOpenAIMeasurement(getConsent(), gpc)
-    && (!window.__tcfapi || cmpAllowsMeasurement === true);
+    && googleDecisionAllowsPixel(googleState);
 }
 
 /** Re-read the actual choice at the action, not just at script installation. */
@@ -109,11 +117,17 @@ async function syncMeasurementConsent() {
   }
 }
 
+function setGoogleState(next: GoogleConsentState) {
+  if (googleState === next) return;
+  googleState = next;
+  void syncMeasurementConsent();
+}
+
 function registerGoogleConsent() {
   if (!window.__tcfapi || cmpRegistered) return;
   cmpRegistered = true;
-  cmpAllowsMeasurement = false;
-  void syncMeasurementConsent();
+  // Also covers a tool that arrives after the wait ended: stop until it answers.
+  setGoogleState('pending');
   try {
     window.__tcfapi('addEventListener', 2, (data, success) => {
       if (!success) return;
@@ -122,12 +136,26 @@ function registerGoogleConsent() {
       // always required, including where GDPR does not apply.
       const decision = googleCmpMeasurementDecision(data);
       if (decision === undefined) return;
-      cmpAllowsMeasurement = decision;
-      void syncMeasurementConsent();
+      setGoogleState(data.gdprApplies === false ? 'not-applicable' : decision ? 'allowed' : 'denied');
     });
   } catch {
-    revokeMeasurement();
+    setGoogleState('denied');
   }
+}
+
+/** Google's tool is not coming (blocked, failed, or not served on this domain). */
+function stopWaitingForGoogle() {
+  if (!cmpRegistered && googleState === 'pending') setGoogleState('not-applicable');
+}
+
+function watchGoogleAdScript() {
+  const settled = () => {
+    if (window.__d1AdSenseScript === 'failed') stopWaitingForGoogle();
+    else if (window.__d1AdSenseScript === 'loaded') window.setTimeout(stopWaitingForGoogle, GOOGLE_TOOL_GRACE_MS);
+  };
+  window.addEventListener('adsenseScriptSettled', settled, { once: true });
+  if (window.__d1AdSenseScript) settled();
+  window.setTimeout(stopWaitingForGoogle, GOOGLE_TOOL_MAX_WAIT_MS);
 }
 
 export function initializeOpenAIPixel() {
@@ -139,11 +167,12 @@ export function initializeOpenAIPixel() {
   });
   window.addEventListener('focus', () => { void syncMeasurementConsent(); });
   registerGoogleConsent();
+  watchGoogleAdScript();
   // Funding Choices arrives asynchronously, so subscribe when it becomes ready.
   const cmpTimer = window.setInterval(() => {
     registerGoogleConsent();
     if (cmpRegistered) window.clearInterval(cmpTimer);
-  }, 500);
-  window.setTimeout(() => window.clearInterval(cmpTimer), 30000);
+  }, 250);
+  window.setTimeout(() => window.clearInterval(cmpTimer), 60000);
   void syncMeasurementConsent();
 }

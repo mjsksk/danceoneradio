@@ -122,6 +122,12 @@ export const loadGoogleAnalytics = (): void => {
   };
 };
 
+// Lets the OpenAI Pixel know whether Google's consent tool can still arrive.
+const reportAdSenseScript = (outcome: 'loaded' | 'failed'): void => {
+  (window as Window & { __d1AdSenseScript?: string }).__d1AdSenseScript = outcome;
+  window.dispatchEvent(new Event('adsenseScriptSettled'));
+};
+
 // Load Google AdSense - always load script, but ads won't display without consent
 export const loadGoogleAdSense = (): void => {
   console.log('📢 AdSense: Checking if script should be loaded');
@@ -141,10 +147,12 @@ export const loadGoogleAdSense = (): void => {
   script.onload = () => {
     console.log('📢 AdSense: Script loaded successfully');
     console.log('📢 AdSense: adsbygoogle available:', !!window.adsbygoogle);
+    reportAdSenseScript('loaded');
   };
   
   script.onerror = (error) => {
     console.error('📢 AdSense: Script failed to load', error);
+    reportAdSenseScript('failed');
   };
   
   document.head.appendChild(script);
