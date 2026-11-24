@@ -1,7 +1,7 @@
 import { describe, it as test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  LiveStreamStartIntent, googleCmpMeasurementDecision, googleDecisionAllowsPixel, OPENAI_MEASUREMENT_NOTICE_VERSION,
+  LiveStreamStartIntent, googleCmpMeasurementDecision, googleDecisionAllowsPixel, googleToolTimeoutAllowed, OPENAI_MEASUREMENT_NOTICE_VERSION,
   permitsOpenAIMeasurement, pixelDebugEnabled,
 } from './openaiMeasurementPolicy';
 
@@ -93,5 +93,17 @@ describe('Pixel waits for Google\'s consent decision', () => {
   test('an affirmative or not-applicable decision lets the site choice decide', () => {
     assert.equal(googleDecisionAllowsPixel('allowed'), true);
     assert.equal(googleDecisionAllowsPixel('not-applicable'), true);
+  });
+});
+
+describe('timed fallback when Google\'s tool is absent', () => {
+  test('the public domains never stop waiting on a timer', () => {
+    assert.equal(googleToolTimeoutAllowed(false, 'danceoneradio.com'), false);
+    assert.equal(googleToolTimeoutAllowed(false, 'www.danceoneradio.com'), false);
+    assert.equal(googleToolTimeoutAllowed(false, 'danceoneradio.lovable.app'), false);
+  });
+  test('Lovable preview keeps the fallback', () => {
+    assert.equal(googleToolTimeoutAllowed(false, 'id-preview--8bc93317.lovable.app'), true);
+    assert.equal(googleToolTimeoutAllowed(true, 'localhost'), true);
   });
 });

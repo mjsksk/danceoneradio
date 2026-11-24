@@ -47,3 +47,8 @@ export class LiveStreamStartIntent {
     return intentionalLiveStart;
   }
 }
+
+/** Only Lovable preview and local development may give up waiting for Google's tool. */
+export function googleToolTimeoutAllowed(development: boolean, hostname: string): boolean {
+  return pixelDebugEnabled(development, hostname);
+}

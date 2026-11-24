@@ -1,13 +1,13 @@
 import { getConsent } from './consentManager';
 import {
-  googleCmpMeasurementDecision, googleDecisionAllowsPixel, permitsOpenAIMeasurement, pixelDebugEnabled,
+  googleCmpMeasurementDecision, googleDecisionAllowsPixel, googleToolTimeoutAllowed, permitsOpenAIMeasurement, pixelDebugEnabled,
   type GoogleConsentState,
 } from './openaiMeasurementPolicy';
 
 const PIXEL_ID = 'QZs8QQBioHa6mexdc3fU2L';
 const SDK_URL = 'https://bzrcdn.openai.com/sdk/oaiq.min.js';
 const SCRIPT_ID = 'openai-measurement-pixel';
-// Google's tool normally appears ~2s after its ad script; wait this long for it.
+// Preview only: how long to wait for Google's tool before using the site choice alone.
 const GOOGLE_TOOL_GRACE_MS = 10000;
 const GOOGLE_TOOL_MAX_WAIT_MS = 20000;
 
@@ -149,13 +149,16 @@ function stopWaitingForGoogle() {
 }
 
 function watchGoogleAdScript() {
+  // Google's tool is not served in Lovable preview, so only preview may stop
+  // waiting on a timer. The public site waits for Google's answer indefinitely.
+  const previewOnly = googleToolTimeoutAllowed(import.meta.env?.DEV === true, window.location.hostname);
   const settled = () => {
     if (window.__d1AdSenseScript === 'failed') stopWaitingForGoogle();
-    else if (window.__d1AdSenseScript === 'loaded') window.setTimeout(stopWaitingForGoogle, GOOGLE_TOOL_GRACE_MS);
+    else if (window.__d1AdSenseScript === 'loaded' && previewOnly) window.setTimeout(stopWaitingForGoogle, GOOGLE_TOOL_GRACE_MS);
   };
   window.addEventListener('adsenseScriptSettled', settled, { once: true });
   if (window.__d1AdSenseScript) settled();
-  window.setTimeout(stopWaitingForGoogle, GOOGLE_TOOL_MAX_WAIT_MS);
+  if (previewOnly) window.setTimeout(stopWaitingForGoogle, GOOGLE_TOOL_MAX_WAIT_MS);
 }
 
 export function initializeOpenAIPixel() {
@@ -173,6 +176,5 @@ export function initializeOpenAIPixel() {
     registerGoogleConsent();
     if (cmpRegistered) window.clearInterval(cmpTimer);
   }, 250);
-  window.setTimeout(() => window.clearInterval(cmpTimer), 60000);
   void syncMeasurementConsent();
 }
