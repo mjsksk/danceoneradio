@@ -150,11 +150,13 @@ function stopWaitingForGoogle() {
 
 function watchGoogleAdScript() {
   // Google's tool is not served in Lovable preview, so only preview may stop
-  // waiting on a timer. The public site waits for Google's answer indefinitely.
+  // waiting (timer or failed ad script). The public site keeps the Pixel off
+  // until Google's tool actually answers, even if its ad script fails to load.
   const previewOnly = googleToolTimeoutAllowed(import.meta.env?.DEV === true, window.location.hostname);
   const settled = () => {
+    if (!previewOnly) return;
     if (window.__d1AdSenseScript === 'failed') stopWaitingForGoogle();
-    else if (window.__d1AdSenseScript === 'loaded' && previewOnly) window.setTimeout(stopWaitingForGoogle, GOOGLE_TOOL_GRACE_MS);
+    else if (window.__d1AdSenseScript === 'loaded') window.setTimeout(stopWaitingForGoogle, GOOGLE_TOOL_GRACE_MS);
   };
   window.addEventListener('adsenseScriptSettled', settled, { once: true });
   if (window.__d1AdSenseScript) settled();

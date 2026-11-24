@@ -48,7 +48,10 @@ export class LiveStreamStartIntent {
   }
 }
 
-/** Only Lovable preview and local development may give up waiting for Google's tool. */
+/**
+ * Only Lovable preview and local development may give up waiting for Google's
+ * tool (after a timer or a failed ad script). Public domains never do.
+ */
 export function googleToolTimeoutAllowed(development: boolean, hostname: string): boolean {
   return pixelDebugEnabled(development, hostname);
 }
