@@ -56,7 +56,7 @@ const Episode432 = () => {
   const handlePlayPause = () => {
     if (!audioUrl) return;
     if (isCurrent) {
-      if (audioPlayer.isPlaying) {
+      if (audioPlayer.isPlaying || audioPlayer.isLoading) {
         audioPlayer.pause();
         if (user && currentTime > 0 && duration > 0) {
           saveProgress(currentTime, duration);
@@ -176,8 +176,8 @@ const Episode432 = () => {
                             variant="ghost"
                             className="w-12 h-12 bg-gradient-to-br from-neon/20 to-neon-purple/20 border border-neon/30 rounded-full flex items-center justify-center hover:from-neon/30 hover:to-neon-purple/30 transition-all duration-200 p-0"
                             onClick={handlePlayPause}
-                            disabled={isLoading || !audioUrl}
-                            aria-label={isPlaying ? 'Pause episode 432' : 'Play episode 432'}
+                            disabled={!audioUrl}
+                            aria-label={isLoading ? 'Stop loading episode 432' : isPlaying ? 'Pause episode 432' : 'Play episode 432'}
                           >
                             {isLoading ? (
                               <div className="w-4 h-4 border-2 border-neon border-t-transparent rounded-full animate-spin" />

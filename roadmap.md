@@ -1,5 +1,5 @@
 # Roadmap
-- [ ] Diagnose reported playback failure — blocked: affected episode and Play-button behavior not yet provided; live radio and episode 432 passed pause/resume/refresh tests on preview and the published site, including mobile preview.
+- [x] Fix episode 432's reproduced false-playing state; verify delayed-audio recovery, bounded failure/retry, preserved position, pause/resume/refresh, mobile, and live playback in preview only.
 - [x] Install the existing OpenAI Ads pixel after advertising consent, stop on withdrawal, preserve its account settings, and verify intentional live starts, exclusions, and blocked-pixel playback in preview only.
 - [x] Create Wh0 Plays Sessions 256 with Molly Mouse for November 20, 2026, mirror all 14 tracks, and verify cue times and Shows navigation.
 - [x] Match European consent logo and layout to US and add an isolated mobile preview
