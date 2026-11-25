@@ -1,6 +1,6 @@
 # Roadmap
 - [x] Review the pending episode playback fix: 24 tests passed; desktop/mobile recovery, bounded failure, pause/resume, position, refresh and live radio verified; fresh security scan has no critical findings. Signed-in cross-device resume unavailable with the user-managed backend.
-- [ ] Request publication of the reviewed changes.
+- [x] Request publication of the reviewed changes; deployment scheduled for danceoneradio.com on November 25, 2026, completion not yet confirmed.
 - [x] Fix episode 432's reproduced false-playing state; verify delayed-audio recovery, bounded failure/retry, preserved position, pause/resume/refresh, mobile, and live playback in preview only.
 - [x] Install the existing OpenAI Ads pixel after advertising consent, stop on withdrawal, preserve its account settings, and verify intentional live starts, exclusions, and blocked-pixel playback in preview only.
 - [x] Create Wh0 Plays Sessions 256 with Molly Mouse for November 20, 2026, mirror all 14 tracks, and verify cue times and Shows navigation.
