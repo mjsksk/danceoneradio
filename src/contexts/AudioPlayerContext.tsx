@@ -592,6 +592,14 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
+      // A play request the app did not make (headphones, lock screen, media
+      // keys) is an intentional episode resume, watched like any other.
+      if (playbackSourceRef.current === 'episode' && !episodePlaybackRequestedRef.current
+        && !audio.paused && episodeInfoRef.current) {
+        episodePlaybackRequestedRef.current = true;
+        episodeRecoveryRef.current.start(Date.now(), audio.currentTime);
+      }
+
       // `play` is only a request; it fires even with zero decoded audio data.
       setState(prev => ({ ...prev, isPlaying: false, isLoading: true }));
     };
@@ -637,7 +645,13 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       // A pause queued by replacing a source must not reset the new load.
       if (!audio.paused) return;
       if (playbackSourceRef.current === 'episode' && episodePlaybackRequestedRef.current) {
-        setState(prev => ({ ...prev, isPlaying: false, isLoading: true }));
+        // Still paused with no load in flight: the listener paused from outside
+        // the page (headphones, lock screen, media keys). Honour it like the
+        // in-app Pause so the watchdog never restarts the episode.
+        episodePlaybackRequestedRef.current = false;
+        episodeRecoveryRef.current.cancel();
+        episodeAttemptTokenRef.current += 1;
+        setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
         return;
       }
       clearLiveRecoveryTimeout();
