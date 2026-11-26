@@ -42,7 +42,17 @@ type FeedItem =
 
 // Upcoming FDA pages appear here until their RSS item is published. The
 // episode-number check below prevents a duplicate as soon as RSS catches up.
-const UPCOMING_FDA_EPISODES: Episode[] = [];
+const UPCOMING_FDA_EPISODES: Episode[] = [
+  {
+    title: 'Anthems of the week 433',
+    description: 'Future Dance Anthems with Mario, broadcasting Friday at 5 PM Pacific. View the full episode tracklist now; audio will be available after broadcast.',
+    pubDate: '2026-11-27T17:00:00-08:00',
+    enclosure: { url: '', type: 'audio/mpeg' },
+    duration: 'Coming soon',
+    guid: 'upcoming-fda-433',
+    episodeNumber: 433,
+  },
+];
 
 const Shows = () => {
   const [episodes, setEpisodes] = useState<Episode[]>([]);

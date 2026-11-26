@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Create Future Dance Anthems 433 with 26 tracks for Friday, November 27, 2026; route, sitemap, Shows listing and show_tracks wired; page verified with playback disabled.
+- [ ] Link official episode 433 audio and length — blocked: not yet in the official podcast feed
 - [x] Review the pending episode playback fix: 24 tests passed; desktop/mobile recovery, bounded failure, pause/resume, position, refresh and live radio verified; fresh security scan has no critical findings. Signed-in cross-device resume unavailable with the user-managed backend.
 - [x] Publish the reviewed changes; public danceoneradio.com verified on November 25, 2026 serving a new bundle with episode recovery and advancing episode 432 audio.
 - [x] Fix episode 432's reproduced false-playing state; verify delayed-audio recovery, bounded failure/retry, preserved position, pause/resume/refresh, mobile, and live playback in preview only.
