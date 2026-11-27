@@ -13,6 +13,14 @@ export interface Wh0Session {
 
 export const WH0_SESSIONS: Wh0Session[] = [
   {
+    number: 257,
+    title: 'Wh0 Plays Sessions Episode 257',
+    blurb: '16 tracks • Wh0, Sam Frandisco, Crystal Waters, Junior Jack, Mark Knight, James Hurr, Sellier, Steve Martano & more',
+    link: '/show/wh0-plays-sessions/257',
+    broadcastDate: '2026-11-27T18:00:00',
+    genres: 'House • Tech House • Dance',
+  },
+  {
     number: 256,
     title: 'Wh0 Plays Sessions Episode 256 with Molly Mouse',
     guest: 'Molly Mouse',
