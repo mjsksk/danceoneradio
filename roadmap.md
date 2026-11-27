@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Create Wh0 Plays Sessions 257 for Friday, November 27, 2026 with 16 timestamped tracks; route, sitemap, feed, navigation and show_tracks wired; page and Shows listing verified.
 - [x] Create Future Dance Anthems 433 with 26 tracks for Friday, November 27, 2026; route, sitemap, Shows listing and show_tracks wired; page verified with playback disabled.
 - [ ] Link official episode 433 audio and length — blocked: not yet in the official podcast feed
 - [x] Review the pending episode playback fix: 24 tests passed; desktop/mobile recovery, bounded failure, pause/resume, position, refresh and live radio verified; fresh security scan has no critical findings. Signed-in cross-device resume unavailable with the user-managed backend.
